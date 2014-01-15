@@ -1,0 +1,2 @@
+Dans Unity, faire Edit > Project Settings > Editor et mettre "Hidden Meta Files"
+à "Version Control", pour éviter que des fichiers inutiles ne soient mis sur Git.
