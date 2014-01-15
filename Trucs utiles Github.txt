@@ -1,0 +1,11 @@
+Trucs utiles pour Github
+
+1) Mettre #numéro_issue dans le message du commit permet de lier un commit à une tâche ou bug
+
+2) Mettre un des mots suivants à la fin du message de commit permet de fermé la tâche ou le bug:
+	fixes #xxx
+	fixed #xxx
+	fix #xxx
+	closes #xxx
+	close #xxx
+	closed #xxx
