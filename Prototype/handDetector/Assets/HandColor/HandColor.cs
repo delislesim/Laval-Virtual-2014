@@ -31,11 +31,16 @@ public class HandColor : MonoBehaviour {
             for (int j = 0; j < depthImage.GetHeight(); ++j) { 
                 
                 int depth = depthImage.GetDepthAtPosition(i, j);
-                byte normalizedDepth = (byte)(depth * 255 / 1800);
 
-                int index = (depthImage.GetHeight() - j - 1) * depthImage.GetWidth() + i;
+				int index = (depthImage.GetHeight() - j - 1) * depthImage.GetWidth() + i;
 
-                depthImageArray[index] = new Color32(normalizedDepth, normalizedDepth, normalizedDepth, 255);
+	            byte normalizedDepth = (byte)(depth * 255 / 1800);
+	            depthImageArray[index] = new Color32(normalizedDepth, normalizedDepth, normalizedDepth, 255);
+
+				if (depth == 0) {
+					depthImageArray[index] = Color.red;
+				}
+
             }
         }
 

@@ -2,7 +2,8 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\HandColor\HandColor.cs">
     <Files>
-      <File FileName="Assets\HandColor\HandColor.cs" Line="36" Column="60" />
+      <File FileName="Assets\HandColor\HandColor.cs" Line="43" Column="5" />
+      <File FileName="Assets\HandColor\HandColor.cs" Line="66" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
