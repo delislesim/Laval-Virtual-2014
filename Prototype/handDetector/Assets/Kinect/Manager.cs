@@ -111,6 +111,9 @@ namespace Kinect
 
         //short[] usersLabelMap;
         private short[] usersDepthMap;
+        private int usersDepthWidth;
+        private int usersDepthHeight;
+
         private float[] usersHistogramMap;
 
         // List of all users
@@ -187,6 +190,11 @@ namespace Kinect
         public short[] GetUsersDepthMap()
         {
             return usersDepthMap;
+        }
+
+        public DepthImageFrame GetDepthImageFrame()
+        {
+            return new DepthImageFrame(usersDepthWidth, usersDepthHeight, usersDepthMap);
         }
 
         // returns the depth image/users histogram texture,if ComputeUserMap is true
@@ -842,6 +850,9 @@ namespace Kinect
                 usersMapRect = new Rect(Screen.width, Screen.height - usersLblTex.height / 2, -usersLblTex.width / 2, usersLblTex.height / 2);
 
                 usersDepthMap = new short[usersMapSize];
+                usersDepthWidth = Wrapper.GetDepthWidth();
+                usersDepthHeight = Wrapper.GetDepthHeight();
+
                 usersHistogramMap = new float[5000];
             }
 
