@@ -6,3 +6,13 @@
 *.csproj
 *.unityproj
 *.sln
+
+Thumbs.db
+.DS_Store
+*.user
+*.log
+*.tlog
+*.lastbuildstate
+*.obj
+*.cache
+*.log

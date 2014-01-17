@@ -19,30 +19,58 @@ include_directories(
   .
   $ENV{KINECTSDK10_DIR}/inc
   )
-	
-# Linker search path
-#link_directories(
-#  $(KINECTSDK10_DIR)/lib/x86
-#  ) 
 
 ####################
 # Libraries
 ####################
 
+add_library(base
+  base/base.h
+  base/logging.cc
+  base/logging.h
+  base/scoped_ptr.h
+  base/string_utils.cc
+  base/string_utils.h
+  )
+
+add_library(kinect_wrapper
+  kinect_wrapper/constants.cc
+  kinect_wrapper/constants.h
+  kinect_wrapper/kinect_buffer.cc
+  kinect_wrapper/kinect_buffer.h
+  kinect_wrapper/kinect_coordinate_mapper.cc
+  kinect_wrapper/kinect_coordinate_mapper.h
+  kinect_wrapper/kinect_depth_stream.cc
+  kinect_wrapper/kinect_depth_stream.h
+  kinect_wrapper/kinect_include.h
+  kinect_wrapper/kinect_sensor.cc
+  kinect_wrapper/kinect_sensor.h
+  kinect_wrapper/kinect_stream.cc
+  kinect_wrapper/kinect_stream.h
+  kinect_wrapper/kinect_wrapper.cc
+  kinect_wrapper/kinect_wrapper.h
+  kinect_wrapper/utility.h
+  )
+ target_link_libraries(kinect_wrapper
+  base
+  $ENV{KINECTSDK10_DIR}/lib/x86/Kinect10.lib
+  )
+
 add_library(kinect_power SHARED
-  kinect_power/main.cpp
+  kinect_power/lib.cc
+  kinect_power/lib.h
   )
 	
 target_link_libraries(kinect_power
-  $ENV{KINECTSDK10_DIR}/lib/x86/Kinect10.lib)
+  kinect_wrapper)
 	
 ####################
 # Executables
 ####################
 
-include_external_msproject(
-    sample sample/sample.csproj
-    TYPE FAE04EC0-301F-11D3-BF4B-00C04F79EFBC)
+#include_external_msproject(
+#    sample sample/sample.csproj
+#    TYPE FAE04EC0-301F-11D3-BF4B-00C04F79EFBC)
 	
 ####################
 # Unittests
