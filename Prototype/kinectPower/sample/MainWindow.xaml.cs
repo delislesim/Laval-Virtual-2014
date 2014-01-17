@@ -30,15 +30,19 @@ namespace sample
       aTimer.AutoReset = true;
       aTimer.Enabled = true;
     }
-
+    
     void aTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
     {
-      int i = tutu();
-      Console.WriteLine(i);
+      int buffer_size = 640 * 480 * 4;
+      byte[] buffer = new byte[buffer_size];
+
+      bool test = GetNiceDepthMap(buffer, buffer_size);
+
+      Console.WriteLine("tutu");
     }
     
-    [DllImport(@"kinect_power.dll", EntryPoint = "tutu")]
-    public static extern int tutu();
+    [DllImport(@"kinect_power.dll", EntryPoint = "GetNiceDepthMap", CallingConvention = CallingConvention.Cdecl)]
+    public static extern bool GetNiceDepthMap(byte[] buffer, int buffer_size);
 
     private static System.Timers.Timer aTimer;
   }

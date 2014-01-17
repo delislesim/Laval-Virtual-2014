@@ -10,8 +10,6 @@ using namespace kinect_wrapper;
 
 namespace {
 
-KinectWrapper wrapper;
-
 const int kBlueIndex = 0;
 const int kGreenIndex = 1;
 const int kRedIndex = 2;
@@ -19,9 +17,15 @@ const int kAlphaIndex = 3;
 
 }  // namespace
 
-bool GetNiceDepthMap(unsigned char* pixels) {
+bool GetNiceDepthMap(unsigned char* pixels, int buffer_size) {
+ /* static KinectWrapper wrapper;
   static kinect_wrapper::KinectBuffer buffer;
+  */
 
+  pixels[1] = 1;
+  pixels[2] = 2;
+  pixels[3] = 3;
+  /*
   // Get the raw data from the Kinect.
   std::string error_message;
   KinectSensor* sensor = wrapper.CreateSensorByIndex(0, &error_message);
@@ -56,6 +60,6 @@ bool GetNiceDepthMap(unsigned char* pixels) {
       pixels[color_index + kGreenIndex] = 0;
     }
   }
-
+  */
   return true;
 }
