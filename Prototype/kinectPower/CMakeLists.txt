@@ -46,6 +46,7 @@ add_library(kinect_wrapper
   kinect_wrapper/kinect_sensor.h
   kinect_wrapper/kinect_wrapper.cc
   kinect_wrapper/kinect_wrapper.h
+  kinect_wrapper/utility.cc
   kinect_wrapper/utility.h
   )
  target_link_libraries(kinect_wrapper
@@ -61,6 +62,14 @@ add_library(hands_tracker
   base
   )
   
+ add_library(piano
+  piano/piano.cc
+  piano/piano.h
+  )
+ target_link_libraries(hands_tracker
+  base
+  )
+  
 add_library(kinect_power SHARED
   kinect_power/lib.cc
   kinect_power/lib.h
@@ -69,6 +78,7 @@ add_library(kinect_power SHARED
 target_link_libraries(kinect_power
   hands_tracker
   kinect_wrapper
+  piano
   ${OpenCV_LIBS}
   )
 	

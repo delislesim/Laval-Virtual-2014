@@ -37,9 +37,7 @@ namespace sample
     [MethodImpl(MethodImplOptions.Synchronized)]
     void aTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
     {
-      uint buffer_size = kImageWidth * kImageHeight * kPixelSize;
-
-      if (!GetNiceDepthMap(buffer, buffer_size))
+      if (!GetPianoInfo(notes, (uint)notes.Length, buffer, (uint)buffer.Length))
         return;
 
       int stride = kImageWidth * kPixelSize;
@@ -50,6 +48,9 @@ namespace sample
                                             PixelFormats.Bgr32, null, buffer, stride);
       }));
     }
+
+    [DllImport(@"kinect_power.dll", EntryPoint = "GetPianoInfo", CallingConvention = CallingConvention.Cdecl)]
+    public static extern bool GetPianoInfo(bool[] notes, uint notes_size, byte[] pixels, uint pixels_size);
 
     [DllImport(@"kinect_power.dll", EntryPoint = "GetNiceDepthMap", CallingConvention = CallingConvention.Cdecl)]
     public static extern bool GetNiceDepthMap(byte[] buffer, uint buffer_size);
@@ -64,5 +65,6 @@ namespace sample
     private const int kPixelSize = 4;
 
     private byte[] buffer = new byte[kImageWidth * kImageHeight * kPixelSize];
+    private bool[] notes = new bool[15];
   }
 }

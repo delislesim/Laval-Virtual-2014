@@ -1,3 +1,9 @@
 #pragma once
 
-int test();
+namespace hands_tracker {
+
+class HandsTracker {
+
+};
+
+}  // namespace hands_tracker
