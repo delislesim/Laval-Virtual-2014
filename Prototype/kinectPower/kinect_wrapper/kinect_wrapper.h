@@ -14,6 +14,8 @@ class KinectWrapper {
 	KinectWrapper();
 	~KinectWrapper();
 
+  void Initialize();
+
   KinectSensor* CreateSensorByIndex(int index, std::string* error);
   int GetSensorCount();
 

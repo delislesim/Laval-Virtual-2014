@@ -38,15 +38,9 @@ add_library(kinect_wrapper
   kinect_wrapper/constants.h
   kinect_wrapper/kinect_buffer.cc
   kinect_wrapper/kinect_buffer.h
-  kinect_wrapper/kinect_coordinate_mapper.cc
-  kinect_wrapper/kinect_coordinate_mapper.h
-  kinect_wrapper/kinect_depth_stream.cc
-  kinect_wrapper/kinect_depth_stream.h
   kinect_wrapper/kinect_include.h
   kinect_wrapper/kinect_sensor.cc
   kinect_wrapper/kinect_sensor.h
-  kinect_wrapper/kinect_stream.cc
-  kinect_wrapper/kinect_stream.h
   kinect_wrapper/kinect_wrapper.cc
   kinect_wrapper/kinect_wrapper.h
   kinect_wrapper/utility.h

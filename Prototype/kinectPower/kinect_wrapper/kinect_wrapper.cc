@@ -24,8 +24,6 @@ void CALLBACK StatusChangeCallback(
 }  // namespace
 
 KinectWrapper::KinectWrapper() : sensors_(kMaxNbSensors) {
-  /*NuiSetDeviceStatusCallback(StatusChangeCallback,
-                             reinterpret_cast<void*>(this));*/
 }
 
 KinectWrapper::~KinectWrapper() {
@@ -33,6 +31,11 @@ KinectWrapper::~KinectWrapper() {
        it != sensors_.end(); ++it) {
     delete *it;
   }
+}
+
+void KinectWrapper::Initialize() {
+  NuiSetDeviceStatusCallback(StatusChangeCallback,
+                             reinterpret_cast<void*>(this));
 }
 
 KinectSensor* KinectWrapper::CreateSensorByIndex(int index,
@@ -48,13 +51,14 @@ KinectSensor* KinectWrapper::CreateSensorByIndex(int index,
     return NULL;
   }
 
-  if (native_sensor->NuiStatus() != S_OK) {
+  HRESULT hr = native_sensor->NuiStatus();
+  if (hr != S_OK) {
     *error = "Sensor not ready.";
     SafeRelease(native_sensor);
     return NULL;
   }
 
-  HRESULT hr = native_sensor->NuiInitialize(
+  hr = native_sensor->NuiInitialize(
       NUI_INITIALIZE_FLAG_USES_DEPTH_AND_PLAYER_INDEX
       | NUI_INITIALIZE_FLAG_USES_SKELETON
       | NUI_INITIALIZE_FLAG_USES_COLOR
@@ -69,7 +73,8 @@ KinectSensor* KinectWrapper::CreateSensorByIndex(int index,
     return NULL;
   }
 
-  return new KinectSensor(native_sensor);
+  sensors_[index] = new KinectSensor(native_sensor);
+  return sensors_[index];
 }
 
 int KinectWrapper::GetSensorCount() {

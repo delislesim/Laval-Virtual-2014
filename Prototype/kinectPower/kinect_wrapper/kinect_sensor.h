@@ -2,39 +2,18 @@
 
 #include "base/base.h"
 #include "base/scoped_ptr.h"
-#include "kinect_wrapper/kinect_depth_stream.h"
 #include "kinect_wrapper/kinect_include.h"
 
 namespace kinect_wrapper {
+
+class KinectBuffer;
 
 class KinectSensor {
  public:
   KinectSensor(INuiSensor* native_sensor);
 
-  // The called doesn't own the depth stream.
-  KinectDepthStream* GetDepthStream();
-
-  // Interface to NUI.
-  bool ImageStreamOpen(
-      /* [in] */ NUI_IMAGE_TYPE eImageType,
-      /* [in] */ NUI_IMAGE_RESOLUTION eResolution,
-      /* [in] */ DWORD dwImageFrameFlags,
-      /* [in] */ DWORD dwFrameLimit,
-      /* [in] */ HANDLE hNextFrameEvent,
-      /* [out] */ HANDLE *phStreamHandle);
-
-  bool ImageStreamSetImageFrameFlags( 
-      /* [in] */ HANDLE hStream,
-      /* [in] */ DWORD dwImageFrameFlags);
-
-  bool ImageStreamGetNextFrame( 
-      /* [in] */ HANDLE hStream,
-      /* [in] */ DWORD dwMillisecondsToWait,
-      /* [retval][out] */ NUI_IMAGE_FRAME *pImageFrame);
-
-  bool ImageStreamReleaseFrame( 
-      /* [in] */ HANDLE hStream,
-      /* [in] */ NUI_IMAGE_FRAME *pImageFrame);
+  bool OpenDepthStream();
+  bool PollNextDepthFrame(KinectBuffer* buffer);
 
  private:
   friend class KinectWrapper;
@@ -42,7 +21,14 @@ class KinectSensor {
 
   INuiSensor* native_sensor_;
 
-  scoped_ptr<KinectDepthStream> depth_stream_;
+  bool near_mode_enabled_;
+
+  // Depth stream.
+  bool depth_stream_opened_;
+  HANDLE depth_frame_ready_event_;
+  HANDLE depth_stream_handle_;
+  size_t depth_stream_width_;
+  size_t depth_stream_height_;
 
   DISALLOW_COPY_AND_ASSIGN(KinectSensor);
 };
