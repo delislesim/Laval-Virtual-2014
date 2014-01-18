@@ -17,28 +17,30 @@ const int kGreenIndex = 1;
 const int kRedIndex = 2;
 const int kAlphaIndex = 3;
 
-static KinectWrapper wrapper;
-
 }  // namespace
 
 
 bool Initialize() {
-  wrapper.Initialize();
-  wrapper.StartSensorThread(0);
+  KinectWrapper* wrapper = KinectWrapper::instance();
+  wrapper->Initialize();
+  wrapper->StartSensorThread(0);
   return true;
 }
 
 bool Shutdown() {
-  wrapper.Shutdown();
+  KinectWrapper* wrapper = KinectWrapper::instance();
+  wrapper->Shutdown();
   return true;
 }
 
 bool GetNiceDepthMap(unsigned char* pixels, unsigned int buffer_size) {
   const int kMaxDepth = 2500;
    
+  KinectWrapper* wrapper = KinectWrapper::instance();
+
   // Get the raw data from the Kinect.
   cv::Mat mat;
-  if (!wrapper.QueryDepthBuffer(0, &mat))
+  if (!wrapper->QueryDepthBuffer(0, &mat))
     return false;
 
   unsigned short* ptr = reinterpret_cast<unsigned short*>(mat.ptr());

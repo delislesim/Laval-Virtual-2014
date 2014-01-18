@@ -26,6 +26,13 @@ void CALLBACK StatusChangeCallback(
 
 }  // namespace
 
+KinectWrapper* KinectWrapper::instance_ = NULL;
+
+void KinectWrapper::Release() {
+  delete instance_;
+  instance_ = NULL;
+}
+
 KinectWrapper::KinectWrapper()
     : sensor_info_(kMaxNumSensors) {
   for (int i = 0; i < kMaxNumSensors; ++i) {

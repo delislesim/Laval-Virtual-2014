@@ -15,8 +15,13 @@ class KinectSensor;
 // TODO(fdoray): Singleton.
 class KinectWrapper {
  public:
-	KinectWrapper();
-	~KinectWrapper();
+  static KinectWrapper* instance() {
+    if (instance_ == NULL)
+      instance_ = new KinectWrapper();
+    return instance_;
+  }
+
+  static void Release();
 
   void Initialize();
   void StartSensorThread(int sensor_index);
@@ -26,6 +31,9 @@ class KinectWrapper {
   bool QueryDepthBuffer(int sensor_index, cv::Mat* mat);
 
  private:
+  KinectWrapper();
+	~KinectWrapper();
+
   struct SensorInfo {
     KinectSensor* sensor;
     KinectBuffer* depth_buffer;
@@ -41,6 +49,8 @@ class KinectWrapper {
 
   KinectSensor* CreateSensorByIndex(int index, std::string* error);
   int GetSensorCount();
+
+  static KinectWrapper* instance_;
 
   typedef std::vector<SensorInfo> SensorInfoVector;
   SensorInfoVector sensor_info_;
