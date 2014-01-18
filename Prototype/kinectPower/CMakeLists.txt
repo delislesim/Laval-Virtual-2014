@@ -1,6 +1,9 @@
 project(kinect_power CXX)
 cmake_minimum_required(VERSION 2.6.2)
 
+set (OpenCV_DIR $ENV{OPENCV_DIR}/../..)
+FIND_PACKAGE(OpenCV REQUIRED)
+
 set(CMAKE_SUPPRESS_REGENERATION TRUE)
 
 # Activate warning level 4.
@@ -50,13 +53,24 @@ add_library(kinect_wrapper
   $ENV{KINECTSDK10_DIR}/lib/x86/Kinect10.lib
   )
 
+add_library(hands_tracker
+  hands_tracker/hands_tracker.cc
+  hands_tracker/hands_tracker.h
+  )
+ target_link_libraries(hands_tracker
+  base
+  )
+  
 add_library(kinect_power SHARED
   kinect_power/lib.cc
   kinect_power/lib.h
   )
 	
 target_link_libraries(kinect_power
-  kinect_wrapper)
+  hands_tracker
+  kinect_wrapper
+  ${OpenCV_LIBS}
+  )
 	
 ####################
 # Executables

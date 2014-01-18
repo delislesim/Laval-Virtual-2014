@@ -37,7 +37,7 @@ bool Initialize() {
 
   if (!sensor->OpenDepthStream())
     return false;
-  
+
   return true;
 }
 

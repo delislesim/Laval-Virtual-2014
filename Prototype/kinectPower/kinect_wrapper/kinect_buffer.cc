@@ -17,7 +17,7 @@ void KinectBuffer::CopyData(const char* data,
                             size_t width,
                             size_t height,
                             size_t bytes_per_pixel) {
-  DCHECK(size = width * height * bytes_per_pixel);
+  DCHECK(size == width * height * bytes_per_pixel);
   width_ = width;
   height_ = height;
   buffer_.resize(size);

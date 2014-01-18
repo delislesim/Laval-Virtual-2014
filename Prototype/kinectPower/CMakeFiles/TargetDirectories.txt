@@ -1,4 +1,0 @@
-D:/laval/Laval-Virtual-2014/Prototype/kinectPower/CMakeFiles/ALL_BUILD.dir
-D:/laval/Laval-Virtual-2014/Prototype/kinectPower/CMakeFiles/base.dir
-D:/laval/Laval-Virtual-2014/Prototype/kinectPower/CMakeFiles/kinect_power.dir
-D:/laval/Laval-Virtual-2014/Prototype/kinectPower/CMakeFiles/kinect_wrapper.dir
