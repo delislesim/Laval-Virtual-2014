@@ -41,6 +41,24 @@ void KinectBuffer::CopyData(const char* data,
   // TODO(fdoray): Copy in an OpenCV matrix immediatly.
 }
 
+void KinectBuffer::CopyDepthTexture(const NUI_DEPTH_IMAGE_PIXEL* start,
+                                    const NUI_DEPTH_IMAGE_PIXEL* end) {
+  int new_buffer_index = current_buffer_index_ == 0 ? 1 : 0;
+
+  unsigned short* buffer_run =
+      reinterpret_cast<unsigned short*>(&buffers_[new_buffer_index][0]);
+  NUI_DEPTH_IMAGE_PIXEL const* src_run = start;
+
+  while (src_run < end) {
+    *buffer_run = src_run->depth;
+
+    ++buffer_run;
+    ++src_run;
+  }
+
+  current_buffer_index_ = new_buffer_index;
+}
+
 void KinectBuffer::GetDepthMat(cv::Mat* depth_mat) {
   *depth_mat = cv::Mat(height_, width_, CV_16U, 
                        &buffers_[current_buffer_index_][0]).clone();

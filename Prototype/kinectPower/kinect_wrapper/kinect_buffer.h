@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "base/base.h"
+#include "kinect_wrapper/kinect_include.h"
 
 namespace kinect_wrapper {
 
@@ -18,6 +19,9 @@ class KinectBuffer {
                 size_t width,
                 size_t height,
                 size_t bytes_per_pixel);
+
+  void CopyDepthTexture(const NUI_DEPTH_IMAGE_PIXEL* start,
+                        const NUI_DEPTH_IMAGE_PIXEL* end);
 
   // This method is thread-safe.
   size_t GetNbPixels() const {

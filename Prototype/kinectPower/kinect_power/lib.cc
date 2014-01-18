@@ -51,7 +51,7 @@ bool GetNiceDepthMap(unsigned char* pixels, unsigned int buffer_size) {
 
     unsigned short pixel_data = *ptr;
 
-    unsigned short depth = pixel_data >> kPlayerIndexBitmaskWidth;
+    unsigned short depth = pixel_data; /* >> kPlayerIndexBitmaskWidth; */
     unsigned int normalized_depth =
       static_cast<unsigned int>((depth) * 255 / kMaxDepth);
     if (normalized_depth > 255)

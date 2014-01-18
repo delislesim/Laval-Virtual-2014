@@ -47,7 +47,7 @@ namespace sample
       Application.Current.Dispatcher.Invoke(new Action(() =>
       {
         image1.Source = BitmapSource.Create(kImageWidth, kImageHeight, 96, 96,
-                                          PixelFormats.Bgr32, null, buffer, stride);
+                                            PixelFormats.Bgr32, null, buffer, stride);
       }));
     }
 

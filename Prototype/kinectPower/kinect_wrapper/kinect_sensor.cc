@@ -74,20 +74,31 @@ bool KinectSensor::PollNextDepthFrame(KinectBuffer* buffer) {
     goto ReleaseFrame;
   }
 
+  BOOL near_mode;
+  INuiFrameTexture* texture = NULL;
+
+  hr = native_sensor_->NuiImageFrameGetDepthImagePixelFrameTexture(
+      depth_stream_handle_, &image_frame, &near_mode, &texture);
+  if (FAILED(hr))
+    goto ReleaseFrame;
+
   NUI_LOCKED_RECT locked_rect;
 
   // Lock the frame data so the Kinect knows not to modify it while we're
   // reading it.
-  image_frame.pFrameTexture->LockRect(0, &locked_rect, NULL, 0);
+  texture->LockRect(0, &locked_rect, NULL, 0);
 
   if (locked_rect.Pitch == 0) {
     res = false;
     goto ReleaseFrame;
   }
 
-  buffer->CopyData(reinterpret_cast<const char*>(locked_rect.pBits),
-                   locked_rect.size, depth_stream_width_, depth_stream_height_,
-                   kKinectDepthBytesPerPixel);
+  const NUI_DEPTH_IMAGE_PIXEL* start =
+      reinterpret_cast<const NUI_DEPTH_IMAGE_PIXEL*>(locked_rect.pBits);
+  const NUI_DEPTH_IMAGE_PIXEL* end =
+      start + depth_stream_width_ * depth_stream_height_;
+
+  buffer->CopyDepthTexture(start, end);
 
   image_frame.pFrameTexture->UnlockRect(0);
 
