@@ -12,8 +12,18 @@ class KinectSensor {
  public:
   KinectSensor(INuiSensor* native_sensor);
 
+  // Depth stream.
   bool OpenDepthStream();
   bool PollNextDepthFrame(KinectBuffer* buffer);
+  HANDLE GetDepthFrameReadyEvent() const {
+    return depth_frame_ready_event_;
+  }
+  size_t depth_stream_width() const {
+    return depth_stream_width_;
+  }
+  size_t depth_stream_height() const {
+    return depth_stream_height_;
+  }
 
  private:
   friend class KinectWrapper;

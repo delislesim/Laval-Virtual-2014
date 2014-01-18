@@ -1,5 +1,7 @@
 #include "kinect_power/lib.h"
 
+#include <opencv2/core/core.hpp>
+
 #include "base/logging.h"
 #include "kinect_wrapper/constants.h"
 #include "kinect_wrapper/kinect_buffer.h"
@@ -19,50 +21,39 @@ static KinectWrapper wrapper;
 
 }  // namespace
 
-void CALLBACK StatusChangeCallback(
-    HRESULT /*hrStatus */,
-    const OLECHAR* /* instanceName */,
-    const OLECHAR* /* uniqueDeviceName */,
-    void* /* pUserData */) {
-  // TODO(fdoray): Implement this.
-}
 
 bool Initialize() {
   wrapper.Initialize();
+  wrapper.StartSensorThread(0);
+  return true;
+}
 
-  std::string error_message;
-  KinectSensor* sensor = wrapper.CreateSensorByIndex(0, &error_message);
-  if (sensor == NULL)
-    return false;
-
-  if (!sensor->OpenDepthStream())
-    return false;
-
+bool Shutdown() {
+  wrapper.Shutdown();
   return true;
 }
 
 bool GetNiceDepthMap(unsigned char* pixels, unsigned int buffer_size) {
-  static kinect_wrapper::KinectBuffer buffer;
-
+  const int kMaxDepth = 2500;
+   
   // Get the raw data from the Kinect.
-  std::string error_message;
-  KinectSensor* sensor = wrapper.CreateSensorByIndex(0, &error_message);
-  if (sensor == NULL)
+  cv::Mat mat;
+  if (!wrapper.QueryDepthBuffer(0, &mat))
     return false;
 
-  sensor->PollNextDepthFrame(&buffer);
+  unsigned short* ptr = reinterpret_cast<unsigned short*>(mat.ptr());
 
   // Generate a nice image.
   size_t color_index = 0;
   for (size_t pixel_index = 0;
-       pixel_index < buffer.GetNbPixels(); ++pixel_index) {
+       pixel_index < mat.total(); ++pixel_index) {
     DCHECK(color_index < buffer_size);
 
-    unsigned short pixel_data = buffer.GetDepthPixel(pixel_index);
+    unsigned short pixel_data = *ptr;
 
     unsigned short depth = pixel_data >> kPlayerIndexBitmaskWidth;
     unsigned int normalized_depth =
-      static_cast<unsigned int>((depth) * 255 / 2500);
+      static_cast<unsigned int>((depth) * 255 / kMaxDepth);
     if (normalized_depth > 255)
       normalized_depth = 255;
     unsigned char byte = static_cast<unsigned char>(normalized_depth);
@@ -78,6 +69,7 @@ bool GetNiceDepthMap(unsigned char* pixels, unsigned int buffer_size) {
     }
 
     color_index += 4;
+    ++ptr;
   }
 
   return true;

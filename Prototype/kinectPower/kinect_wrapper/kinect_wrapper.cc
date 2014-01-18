@@ -3,14 +3,17 @@
 #include <iostream>
 
 #include "base/logging.h"
+#include "kinect_wrapper/constants.h"
+#include "kinect_wrapper/kinect_buffer.h"
 #include "kinect_wrapper/kinect_include.h"
+#include "kinect_wrapper/kinect_sensor.h"
 #include "kinect_wrapper/utility.h"
 
 namespace kinect_wrapper {
 
 namespace {
 
-const int kMaxNbSensors = 6;
+const int kMaxNumSensors = 6;
 
 // Called when the Kinect device status changes.
 void CALLBACK StatusChangeCallback(
@@ -23,27 +26,94 @@ void CALLBACK StatusChangeCallback(
 
 }  // namespace
 
-KinectWrapper::KinectWrapper() : sensors_(kMaxNbSensors) {
+KinectWrapper::KinectWrapper()
+    : sensor_info_(kMaxNumSensors) {
+  for (int i = 0; i < kMaxNumSensors; ++i) {
+    sensor_info_[i].sensor = NULL;
+    sensor_info_[i].depth_buffer = NULL;
+    sensor_info_[i].thread = INVALID_HANDLE_VALUE;
+    sensor_info_[i].close_event = INVALID_HANDLE_VALUE;
+  }
 }
 
 KinectWrapper::~KinectWrapper() {
-  for (SensorVector::iterator it = sensors_.begin(); 
-       it != sensors_.end(); ++it) {
-    delete *it;
+  for (SensorInfoVector::iterator it = sensor_info_.begin();
+       it != sensor_info_.end(); ++it) {
+    delete it->sensor;
+    delete it->depth_buffer;
+    DCHECK(it->thread == INVALID_HANDLE_VALUE);
+    DCHECK(it->close_event == INVALID_HANDLE_VALUE);
   }
 }
 
 void KinectWrapper::Initialize() {
+  // Register a callback to be notified when the status of a sensor changes.
   NuiSetDeviceStatusCallback(StatusChangeCallback,
                              reinterpret_cast<void*>(this));
+
+  // Initialize all connected sensors.
+  int num_sensors = GetSensorCount();
+  DCHECK(num_sensors <= kMaxNumSensors);
+
+  for (int i = 0; i < num_sensors; ++i) {
+    std::string error;
+    CreateSensorByIndex(i, &error);
+  }
+}
+
+void KinectWrapper::StartSensorThread(int sensor_index) {
+  // TODO(fdoray): Create an event to stop the thread...
+  SensorThreadParams* params = new SensorThreadParams;
+  params->sensor_index = sensor_index;
+  params->wrapper = this;
+
+  sensor_info_[sensor_index].close_event =
+      CreateEventW(nullptr, TRUE, FALSE, nullptr);
+
+  sensor_info_[sensor_index].thread = CreateThread(
+      nullptr, 0, (LPTHREAD_START_ROUTINE)KinectWrapper::SensorThread, params,
+      0, nullptr);
+}
+
+void KinectWrapper::Shutdown() {
+  for (SensorInfoVector::iterator it = sensor_info_.begin();
+       it != sensor_info_.end(); ++it) {
+    if (it->close_event != INVALID_HANDLE_VALUE)
+      ::SetEvent(it->close_event);
+  }
+
+  for (SensorInfoVector::iterator it = sensor_info_.begin();
+       it != sensor_info_.end(); ++it) {
+    if (it->thread != INVALID_HANDLE_VALUE) {
+      ::WaitForSingleObject(it->thread, INFINITE);
+      ::CloseHandle(it->thread);
+      it->thread = INVALID_HANDLE_VALUE;
+      ::CloseHandle(it->close_event);
+      it->close_event = INVALID_HANDLE_VALUE;
+
+      DCHECK(it->depth_buffer == NULL);
+    }
+  }
+}
+
+bool KinectWrapper::QueryDepthBuffer(int sensor_index, cv::Mat* mat) {
+  DCHECK(mat != NULL);
+
+  if (sensor_info_[sensor_index].depth_buffer == NULL)
+    return false;
+
+  KinectBuffer* buffer = sensor_info_[sensor_index].depth_buffer;
+  buffer->GetDepthMat(mat);
+
+  return true;
 }
 
 KinectSensor* KinectWrapper::CreateSensorByIndex(int index,
                                                  std::string* error) {
   DCHECK(error != NULL);
 
-  if (sensors_[index] != NULL)
-    return sensors_[index];
+  if (sensor_info_[index].sensor != NULL)
+    return sensor_info_[index].sensor;
 
   INuiSensor* native_sensor = NULL;
   if (FAILED(NuiCreateSensorByIndex(index, &native_sensor))) {
@@ -73,14 +143,62 @@ KinectSensor* KinectWrapper::CreateSensorByIndex(int index,
     return NULL;
   }
 
-  sensors_[index] = new KinectSensor(native_sensor);
-  return sensors_[index];
+  sensor_info_[index].sensor = new KinectSensor(native_sensor);
+  return sensor_info_[index].sensor;
 }
 
 int KinectWrapper::GetSensorCount() {
   int nb_sensors = 0;
   NuiGetSensorCount(&nb_sensors);
   return nb_sensors;
+}
+
+DWORD KinectWrapper::SensorThread(SensorThreadParams* params) {
+  DCHECK(params != NULL);
+  DCHECK(params->wrapper != NULL);
+
+  // Retrieve thread parameters.
+  KinectWrapper* wrapper = params->wrapper;
+  int sensor_index = params->sensor_index;
+  delete params;
+
+  std::string error;
+  KinectSensor* sensor = wrapper->CreateSensorByIndex(sensor_index, &error);
+  if (sensor == NULL) {
+    LOG(INFO) << "Error while starting sensor thread: " << error;
+    return 0;
+  }
+
+  // Start the streams and create the buffers.
+  sensor->OpenDepthStream();
+  wrapper->sensor_info_[sensor_index].depth_buffer = new KinectBuffer(
+    sensor->depth_stream_width(), sensor->depth_stream_height(),
+    kKinectDepthBytesPerPixel);
+
+  // Wait for ready frames.
+  HANDLE events[] = {
+    wrapper->sensor_info_[sensor_index].close_event,
+    sensor->GetDepthFrameReadyEvent()
+  };
+  DWORD nb_events = ARRAYSIZE(events);
+
+  while (true) {
+    DWORD ret = ::WaitForMultipleObjects(nb_events, events,
+                                         FALSE, INFINITE);
+
+    if (ret == WAIT_OBJECT_0)  // Thread close event.
+      break;
+
+    // Poll the streams.
+    sensor->PollNextDepthFrame(
+        wrapper->sensor_info_[sensor_index].depth_buffer);
+  }
+
+  // Free memory.
+  delete wrapper->sensor_info_[sensor_index].depth_buffer;
+  wrapper->sensor_info_[sensor_index].depth_buffer = NULL;
+
+  return 1;
 }
 
 } // namespace kinect_wrapper

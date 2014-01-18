@@ -1,6 +1,7 @@
 #include "kinect_wrapper/kinect_sensor.h"
 
 #include "base/logging.h"
+#include "kinect_wrapper/constants.h"
 #include "kinect_wrapper/kinect_buffer.h"
 #include "kinect_wrapper/utility.h"
 
@@ -10,7 +11,6 @@ namespace {
 
 const NUI_IMAGE_TYPE kDepthImageType = NUI_IMAGE_TYPE_DEPTH_AND_PLAYER_INDEX;
 const NUI_IMAGE_RESOLUTION kDepthImageResolution = NUI_IMAGE_RESOLUTION_640x480;
-const size_t kDepthBytesPerPixel = 2;
 
 }  // namespace
 
@@ -87,7 +87,7 @@ bool KinectSensor::PollNextDepthFrame(KinectBuffer* buffer) {
 
   buffer->CopyData(reinterpret_cast<const char*>(locked_rect.pBits),
                    locked_rect.size, depth_stream_width_, depth_stream_height_,
-                   kDepthBytesPerPixel);
+                   kKinectDepthBytesPerPixel);
 
   image_frame.pFrameTexture->UnlockRect(0);
 

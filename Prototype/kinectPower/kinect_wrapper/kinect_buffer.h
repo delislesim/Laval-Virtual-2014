@@ -1,5 +1,6 @@
 #pragma once
 
+#include <opencv2/core/core.hpp>
 #include <vector>
 
 #include "base/base.h"
@@ -8,28 +9,31 @@ namespace kinect_wrapper {
 
 class KinectBuffer {
  public:
-  KinectBuffer();
+  KinectBuffer(size_t width, size_t height, size_t bytes_per_pixel);
   ~KinectBuffer();
 
+  // This method is not thread safe!
   void CopyData(const char* data,
                 size_t size,
                 size_t width,
                 size_t height,
                 size_t bytes_per_pixel);
 
+  // This method is thread-safe.
   size_t GetNbPixels() const {
     return width_ * height_;
   }
 
-  unsigned short GetDepthPixel(size_t index) const {
-    return (reinterpret_cast<const unsigned short*>(&buffer_[0]))[index];
-  }
+  void GetDepthMat(cv::Mat* depth_mat);
 
  private:
+  size_t current_buffer_index_;
+
   size_t width_;
   size_t height_;
+  size_t bytes_per_pixel_;
 
-  std::vector<char> buffer_;
+  std::vector<char> buffers_[2];
 
   DISALLOW_COPY_AND_ASSIGN(KinectBuffer);
 };
