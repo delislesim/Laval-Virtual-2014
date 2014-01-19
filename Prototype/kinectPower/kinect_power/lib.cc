@@ -8,6 +8,7 @@
 #include "kinect_wrapper/kinect_buffer.h"
 #include "kinect_wrapper/kinect_sensor.h"
 #include "kinect_wrapper/kinect_skeleton.h"
+#include "kinect_wrapper/kinect_skeleton_frame.h"
 #include "kinect_wrapper/kinect_wrapper.h"
 #include "kinect_wrapper/utility.h"
 #include "piano/piano.h"
@@ -53,9 +54,13 @@ bool GetNiceDepthMap(unsigned char* pixels, unsigned int pixels_size) {
 bool GetJointsPosition(int skeleton_id, float* joint_positions) {
   KinectWrapper* wrapper = KinectWrapper::instance();
 
-  KinectSkeleton skeleton;
-  wrapper->QuerySkeleton(0, &skeleton);
+  KinectSkeletonFrame skeleton_frame;
+  wrapper->QuerySkeletonFrame(0, &skeleton_frame);
  
+  KinectSkeleton skeleton;
+  if (!skeleton_frame.GetTrackedSkeleton(skeleton_id, &skeleton))
+    return false;
+
   for (int joint_index = 0;
        joint_index < KinectSkeleton::JointCount; ++joint_index) {
     cv::Vec3f pos;
@@ -63,7 +68,7 @@ bool GetJointsPosition(int skeleton_id, float* joint_positions) {
         static_cast<KinectSkeleton::JointIndex>(joint_index);
 
     bool inferred = false;
-    if (skeleton.GetJointPosition(skeleton_id, joint, &pos, &inferred)) { 
+    if (skeleton.GetJointPosition(joint, &pos, &inferred)) { 
       joint_positions[joint_index*3 + 0] = pos[0];
       joint_positions[joint_index*3 + 1] = pos[1];
       joint_positions[joint_index*3 + 2] = pos[2];

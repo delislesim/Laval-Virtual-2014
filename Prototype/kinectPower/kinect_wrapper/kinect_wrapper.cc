@@ -7,7 +7,7 @@
 #include "kinect_wrapper/kinect_buffer.h"
 #include "kinect_wrapper/kinect_include.h"
 #include "kinect_wrapper/kinect_sensor.h"
-#include "kinect_wrapper/kinect_skeleton.h"
+#include "kinect_wrapper/kinect_skeleton_frame.h"
 #include "kinect_wrapper/utility.h"
 
 namespace kinect_wrapper {
@@ -123,15 +123,17 @@ bool KinectWrapper::QueryDepth(int sensor_index, cv::Mat* mat) {
   return true;
 }
 
-bool KinectWrapper::QuerySkeleton(int sensor_index, KinectSkeleton* skeleton) {
-  DCHECK(skeleton != NULL);
+bool KinectWrapper::QuerySkeletonFrame(int sensor_index,
+                                       KinectSkeletonFrame* skeleton_frame) {
+  DCHECK(skeleton_frame != NULL);
 
   if (sensor_info_[sensor_index].skeleton_buffer == NULL)
     return false;
 
   size_t current_buffer_index =
       sensor_info_[sensor_index].current_skeleton_buffer;
-  *skeleton = sensor_info_[sensor_index].skeleton_buffer[current_buffer_index];
+  *skeleton_frame =
+      sensor_info_[sensor_index].skeleton_buffer[current_buffer_index];
 
   return true;
 }
@@ -204,7 +206,8 @@ DWORD KinectWrapper::SensorThread(SensorThreadParams* params) {
       kKinectDepthBytesPerPixel);
 
   sensor->OpenSkeletonStream();
-  wrapper->sensor_info_[sensor_index].skeleton_buffer = new KinectSkeleton[2];
+  wrapper->sensor_info_[sensor_index].skeleton_buffer =
+      new KinectSkeletonFrame[2];
 
   // Wait for ready frames.
   HANDLE events[] = {

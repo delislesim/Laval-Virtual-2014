@@ -8,7 +8,7 @@
 namespace kinect_wrapper {  
 
 class KinectBuffer;
-class KinectSkeleton;
+class KinectSkeletonFrame;
 
 class KinectSensor {
  public:
@@ -29,7 +29,7 @@ class KinectSensor {
 
   // Skeleton stream.
   bool OpenSkeletonStream();
-  bool PollNextSkeletonFrame(KinectSkeleton* skeleton);
+  bool PollNextSkeletonFrame(KinectSkeletonFrame* skeleton);
   HANDLE GetSkeletonFrameReadyEvent() const {
     return skeleton_frame_ready_event_;
   }

@@ -37,22 +37,16 @@ class KinectSkeleton {
     JointCount
   } JointIndex;
 
-  bool GetJointPosition(size_t skeleton_id, JointIndex joint_index,
+  bool GetJointPosition(JointIndex joint_index,
                         cv::Vec3f* position, bool* inferred);
 
   // Method to load the skeleton data from the sensor.
-  NUI_SKELETON_FRAME* frame_ptr() {
-    return &frame_;
-  }
-  void SetTrackedSkeletons(DWORD track_id_1, DWORD track_id_2);
+  void SetSkeletonData(const NUI_SKELETON_DATA& skeleton_data);
 
  private:
-  bool ready_;
+  NUI_SKELETON_DATA data_;
 
-  NUI_SKELETON_FRAME frame_;
-  DWORD tracked_skeletons_[kNumTrackedSkeletons];
-
-  // DISALLOW_COPY_AND_ASSIGN(KinectSkeleton);
+  DISALLOW_COPY_AND_ASSIGN(KinectSkeleton);
 };
 
 }  // namespace kinect_wrapper

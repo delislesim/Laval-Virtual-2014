@@ -21,6 +21,7 @@ class KinectBuffer {
                 size_t height,
                 size_t bytes_per_pixel);
 
+  // This method is not thread safe!
   void CopyDepthTexture(const NUI_DEPTH_IMAGE_PIXEL* start,
                         const NUI_DEPTH_IMAGE_PIXEL* end);
 
@@ -29,6 +30,7 @@ class KinectBuffer {
     return width_ * height_;
   }
 
+  // This method is thread-safe.
   void GetDepthMat(cv::Mat* depth_mat);
 
  private:

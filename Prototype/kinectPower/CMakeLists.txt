@@ -46,6 +46,8 @@ add_library(kinect_wrapper
   kinect_wrapper/kinect_sensor.h
   kinect_wrapper/kinect_skeleton.cc
   kinect_wrapper/kinect_skeleton.h
+  kinect_wrapper/kinect_skeleton_frame.cc
+  kinect_wrapper/kinect_skeleton_frame.h
   kinect_wrapper/kinect_wrapper.cc
   kinect_wrapper/kinect_wrapper.h
   kinect_wrapper/utility.cc

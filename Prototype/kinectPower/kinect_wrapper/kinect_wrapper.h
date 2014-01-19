@@ -11,7 +11,7 @@ namespace kinect_wrapper {
 
 class KinectBuffer;
 class KinectSensor;
-class KinectSkeleton;
+class KinectSkeletonFrame;
 
 class KinectWrapper {
  public:
@@ -28,7 +28,8 @@ class KinectWrapper {
   bool QueryDepth(int sensor_index, cv::Mat* mat);
 
   // Skeletons.
-  bool QuerySkeleton(int sensor_index, KinectSkeleton* skeleton);
+  bool QuerySkeletonFrame(int sensor_index,
+                          KinectSkeletonFrame* skeleton_frame);
 
  private:
   KinectWrapper();
@@ -37,7 +38,7 @@ class KinectWrapper {
   struct SensorInfo {
     KinectSensor* sensor;
     KinectBuffer* depth_buffer;
-    KinectSkeleton* skeleton_buffer;
+    KinectSkeletonFrame* skeleton_buffer;
     size_t current_skeleton_buffer;
     HANDLE thread;
     HANDLE close_event;

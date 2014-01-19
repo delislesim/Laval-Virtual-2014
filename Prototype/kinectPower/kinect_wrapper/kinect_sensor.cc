@@ -3,7 +3,7 @@
 #include "base/logging.h"
 #include "kinect_wrapper/constants.h"
 #include "kinect_wrapper/kinect_buffer.h"
-#include "kinect_wrapper/kinect_skeleton.h"
+#include "kinect_wrapper/kinect_skeleton_frame.h"
 #include "kinect_wrapper/utility.h"
 
 namespace kinect_wrapper {
@@ -137,14 +137,14 @@ bool KinectSensor::OpenSkeletonStream() {
   return true;
 }
 
-bool KinectSensor::PollNextSkeletonFrame(KinectSkeleton* skeleton) {
+bool KinectSensor::PollNextSkeletonFrame(KinectSkeletonFrame* skeleton) {
   DCHECK(skeleton);
   DCHECK(skeleton_stream_opened_);
 
   if (WaitForSingleObject(skeleton_frame_ready_event_, 0) != WAIT_OBJECT_0)
     return false;
 
-  NUI_SKELETON_FRAME* frame = skeleton->frame_ptr();
+  NUI_SKELETON_FRAME* frame = skeleton->GetSkeletonFramePtr();
 
   HRESULT res =
       native_sensor_->NuiSkeletonGetNextFrame(0, frame);

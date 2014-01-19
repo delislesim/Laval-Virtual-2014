@@ -27,12 +27,10 @@ void KinectBuffer::CopyData(const char* data,
                             size_t bytes_per_pixel) {
   DCHECK(size == width * height * bytes_per_pixel);
 
-  int new_buffer_index = current_buffer_index_ == 0 ? 1 : 0;
+  int new_buffer_index = (current_buffer_index_ + 1) % kNumBuffers;
   memcpy_s(&buffers_[new_buffer_index][0], buffers_[new_buffer_index].size(),
            data, size);
   current_buffer_index_ = new_buffer_index;
-
-  // TODO(fdoray): Copy in an OpenCV matrix immediatly.
 }
 
 void KinectBuffer::CopyDepthTexture(const NUI_DEPTH_IMAGE_PIXEL* start,
