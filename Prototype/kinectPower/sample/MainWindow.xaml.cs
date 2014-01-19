@@ -26,6 +26,7 @@ namespace sample
       InitializeComponent();
 
       Initialize();
+      RecordSensor(0, "test.txt");
 
       aTimer = new System.Timers.Timer(20);
       aTimer.Elapsed += new System.Timers.ElapsedEventHandler(aTimer_Elapsed);
@@ -63,6 +64,12 @@ namespace sample
     [DllImport(@"kinect_power.dll", EntryPoint = "Initialize", CallingConvention = CallingConvention.Cdecl)]
     public static extern bool Initialize();
 
+    [DllImport(@"kinect_power.dll", EntryPoint = "Shutdown", CallingConvention = CallingConvention.Cdecl)]
+    public static extern bool Shutdown();
+
+    [DllImport(@"kinect_power.dll", EntryPoint = "RecordSensor", CallingConvention = CallingConvention.Cdecl)]
+    public static extern bool RecordSensor(int sensor_index, [MarshalAs(UnmanagedType.LPStr)] string filename);
+
     private static System.Timers.Timer aTimer;
 
     private const int kImageWidth = 640;
@@ -73,5 +80,11 @@ namespace sample
     private byte[] notes = new byte[20];
 
     private float[] joint_positions = new float[20 * 3];
+
+    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    {
+      aTimer.Close();
+      Shutdown();
+    }
   }
 }

@@ -34,7 +34,6 @@ class KinectSensor {
     return skeleton_frame_ready_event_;
   }
 
-
  private:
   friend class KinectWrapper;
   ~KinectSensor();

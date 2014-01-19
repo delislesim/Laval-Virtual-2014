@@ -35,6 +35,11 @@ bool Shutdown() {
   return true;
 }
 
+bool RecordSensor(int sensor_index, const char* filename) {
+  KinectWrapper* wrapper = KinectWrapper::instance();
+  return wrapper->RecordSensor(sensor_index, filename);
+}
+
 bool GetNiceDepthMap(unsigned char* pixels, unsigned int pixels_size) {
   const int kMinDepth = 690;
   const int kMaxDepth = 2500;

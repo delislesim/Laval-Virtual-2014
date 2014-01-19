@@ -7,6 +7,9 @@ extern "C" bool __declspec(dllexport)
 Shutdown();
 
 extern "C" bool __declspec(dllexport)
+RecordSensor(int sensor_index, const char* filename);
+
+extern "C" bool __declspec(dllexport)
 GetNiceDepthMap(unsigned char* pixels, unsigned int pixels_size);
 
 extern "C" bool __declspec(dllexport)

@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "base/logging.h"
+#include "kinect_replay/kinect_recorder.h"
 #include "kinect_wrapper/constants.h"
 #include "kinect_wrapper/kinect_buffer.h"
 #include "kinect_wrapper/kinect_include.h"
@@ -13,8 +14,6 @@
 namespace kinect_wrapper {
 
 namespace {
-
-const int kMaxNumSensors = 6;
 
 // Called when the Kinect device status changes.
 void CALLBACK StatusChangeCallback(
@@ -40,24 +39,15 @@ void KinectWrapper::Release() {
   instance_ = NULL;
 }
 
-KinectWrapper::KinectWrapper()
-    : sensor_info_(kMaxNumSensors) {
-  for (int i = 0; i < kMaxNumSensors; ++i) {
-    sensor_info_[i].sensor = NULL;
-    sensor_info_[i].depth_buffer = NULL;
-    sensor_info_[i].current_skeleton_buffer = 0;
-    sensor_info_[i].thread = INVALID_HANDLE_VALUE;
-    sensor_info_[i].close_event = INVALID_HANDLE_VALUE;
-  }
+KinectWrapper::KinectWrapper() {
 }
 
 KinectWrapper::~KinectWrapper() {
-  for (SensorInfoVector::iterator it = sensor_info_.begin();
-       it != sensor_info_.end(); ++it) {
-    delete it->sensor;
-    delete it->depth_buffer;
-    DCHECK(it->thread == INVALID_HANDLE_VALUE);
-    DCHECK(it->close_event == INVALID_HANDLE_VALUE);
+  for (int i = 0; i < kMaxNumSensors; ++i) {
+    delete sensor_info_[i].sensor;
+    delete sensor_info_[i].depth_buffer;
+    DCHECK(sensor_info_[i].thread == INVALID_HANDLE_VALUE);
+    DCHECK(sensor_info_[i].close_event == INVALID_HANDLE_VALUE);
   }
 }
 
@@ -91,27 +81,35 @@ void KinectWrapper::StartSensorThread(int sensor_index) {
 }
 
 void KinectWrapper::Shutdown() {
-  for (SensorInfoVector::iterator it = sensor_info_.begin();
-       it != sensor_info_.end(); ++it) {
-    if (it->close_event != INVALID_HANDLE_VALUE)
-      ::SetEvent(it->close_event);
+  for (int i = 0; i < kMaxNumSensors; ++i) {
+    if (sensor_info_[i].close_event != INVALID_HANDLE_VALUE)
+      ::SetEvent(sensor_info_[i].close_event);
   }
 
-  for (SensorInfoVector::iterator it = sensor_info_.begin();
-       it != sensor_info_.end(); ++it) {
-    if (it->thread != INVALID_HANDLE_VALUE) {
-      ::WaitForSingleObject(it->thread, INFINITE);
-      ::CloseHandle(it->thread);
-      it->thread = INVALID_HANDLE_VALUE;
-      ::CloseHandle(it->close_event);
-      it->close_event = INVALID_HANDLE_VALUE;
+  for (int i = 0; i < kMaxNumSensors; ++i) {
+    SensorInfo* info = &sensor_info_[i];
 
-      DCHECK(it->depth_buffer == NULL);
+    if (info->thread != INVALID_HANDLE_VALUE) {
+      ::WaitForSingleObject(info->thread, INFINITE);
+      ::CloseHandle(info->thread);
+      info->thread = INVALID_HANDLE_VALUE;
+      ::CloseHandle(info->close_event);
+      info->close_event = INVALID_HANDLE_VALUE;
+
+      info->recorder.StopRecording();
+
+      DCHECK(info->depth_buffer == NULL);
     }
   }
 }
 
-bool KinectWrapper::QueryDepth(int sensor_index, cv::Mat* mat) {
+bool KinectWrapper::RecordSensor(int sensor_index,
+                                 const std::string& filename) {
+  DCHECK(sensor_index < kMaxNumSensors);
+  return sensor_info_[sensor_index].recorder.StartRecording(filename);
+}
+
+bool KinectWrapper::QueryDepth(int sensor_index, cv::Mat* mat) const {
   DCHECK(mat != NULL);
 
   if (sensor_info_[sensor_index].depth_buffer == NULL)
@@ -123,8 +121,8 @@ bool KinectWrapper::QueryDepth(int sensor_index, cv::Mat* mat) {
   return true;
 }
 
-bool KinectWrapper::QuerySkeletonFrame(int sensor_index,
-                                       KinectSkeletonFrame* skeleton_frame) {
+bool KinectWrapper::QuerySkeletonFrame(
+    int sensor_index, KinectSkeletonFrame* skeleton_frame) const {
   DCHECK(skeleton_frame != NULL);
 
   if (sensor_info_[sensor_index].skeleton_buffer == NULL)
@@ -183,6 +181,15 @@ int KinectWrapper::GetSensorCount() {
   return nb_sensors;
 }
 
+KinectWrapper::SensorInfo::SensorInfo()
+    : sensor(NULL),
+      depth_buffer(NULL),
+      skeleton_buffer(NULL),
+      current_skeleton_buffer(0),
+      thread(INVALID_HANDLE_VALUE),
+      close_event(INVALID_HANDLE_VALUE) {
+}
+
 DWORD KinectWrapper::SensorThread(SensorThreadParams* params) {
   DCHECK(params != NULL);
   DCHECK(params->wrapper != NULL);
@@ -225,7 +232,7 @@ DWORD KinectWrapper::SensorThread(SensorThreadParams* params) {
       break;
 
     // Poll the depth stream.
-    sensor->PollNextDepthFrame(
+    bool depth_polled = sensor->PollNextDepthFrame(
         wrapper->sensor_info_[sensor_index].depth_buffer);
 
     // Poll the skeleton stream.
@@ -236,6 +243,12 @@ DWORD KinectWrapper::SensorThread(SensorThreadParams* params) {
                 current_skeleton_buffer])) {
       wrapper->sensor_info_[sensor_index].current_skeleton_buffer =
         (current_skeleton_buffer + 1) % kNumBuffers;
+    }
+
+    // Record the frame.
+    if (depth_polled) {
+      wrapper->sensor_info_[sensor_index].recorder.RecordFrame(
+          *wrapper, sensor_index);
     }
   }
 

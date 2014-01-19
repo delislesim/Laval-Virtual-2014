@@ -58,6 +58,17 @@ add_library(kinect_wrapper
   $ENV{KINECTSDK10_DIR}/lib/x86/Kinect10.lib
   )
 
+add_library(kinect_replay
+  kinect_replay/kinect_recorder.cc
+  kinect_replay/kinect_recorder.h
+  kinect_replay/kinect_player.cc
+  kinect_replay/kinect_player.h
+  )
+ target_link_libraries(kinect_replay
+  base
+  kinect_wrapper
+  )
+  
 add_library(hands_tracker
   hands_tracker/hands_tracker.cc
   hands_tracker/hands_tracker.h
@@ -81,6 +92,7 @@ add_library(kinect_power SHARED
 	
 target_link_libraries(kinect_power
   hands_tracker
+  kinect_replay
   kinect_wrapper
   piano
   ${OpenCV_LIBS}
