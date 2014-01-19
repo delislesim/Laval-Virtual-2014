@@ -21,11 +21,8 @@ KinectBuffer::~KinectBuffer() {
 }
 
 void KinectBuffer::CopyData(const char* data,
-                            size_t size,
-                            size_t width,
-                            size_t height,
-                            size_t bytes_per_pixel) {
-  DCHECK(size == width * height * bytes_per_pixel);
+                            size_t size) {
+  DCHECK(size == buffers_[0].size());
 
   int new_buffer_index = (current_buffer_index_ + 1) % kNumBuffers;
   memcpy_s(&buffers_[new_buffer_index][0], buffers_[new_buffer_index].size(),

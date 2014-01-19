@@ -16,10 +16,7 @@ class KinectBuffer {
 
   // This method is not thread safe!
   void CopyData(const char* data,
-                size_t size,
-                size_t width,
-                size_t height,
-                size_t bytes_per_pixel);
+                size_t size);
 
   // This method is not thread safe!
   void CopyDepthTexture(const NUI_DEPTH_IMAGE_PIXEL* start,

@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "base/base.h"
+#include "kinect_replay/kinect_player.h"
 #include "kinect_replay/kinect_recorder.h"
 #include "kinect_wrapper/kinect_include.h"
 
@@ -29,11 +30,11 @@ class KinectWrapper {
 
   // Replay.
   bool RecordSensor(int sensor_index, const std::string& filename);
+  bool StartPlaySensor(int sensor_index, const std::string& filename);
+  bool PlayNextFrame(int sensor_index);
 
-  // Depth.
+  // Access streams.
   bool QueryDepth(int sensor_index, cv::Mat* mat) const;
-
-  // Skeletons.
   bool QuerySkeletonFrame(int sensor_index,
                           KinectSkeletonFrame* skeleton_frame) const;
 
@@ -51,6 +52,7 @@ class KinectWrapper {
     HANDLE thread;
     HANDLE close_event;
     kinect_replay::KinectRecorder recorder;
+    kinect_replay::KinectPlayer player;
 
     DISALLOW_COPY_AND_ASSIGN(SensorInfo);
   };

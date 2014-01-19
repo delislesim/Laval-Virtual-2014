@@ -3,7 +3,19 @@ using System.Collections;
 
 public class KinectPower : MonoBehaviour {
 
+	// Show the streams.
 	public bool showDepthMap;
+
+	// Replay mode.
+	public enum ReplayMode {
+		NO_REPLAY,
+		RECORD,
+		REPLAY
+	}
+	public ReplayMode replay = ReplayMode.NO_REPLAY;
+	public string replayFilename = "replay.boubou";
+
+	// Piano.
 	public bool showPiano;
 
 	public Note a;
@@ -21,17 +33,28 @@ public class KinectPower : MonoBehaviour {
 	public Note f1;
 	public Note g1;
 
-
 	// Use this for initialization
 	void Start () {
-    KinectPowerInterop.Initialize();
+		if (replay != ReplayMode.REPLAY)
+    		KinectPowerInterop.Initialize();
 
-    depthTexture = new Texture2D(kDepthWidth, kDepthHeight);
-    depthMapRect = new Rect(Screen.width, Screen.height - depthTexture.height,
-                            -depthTexture.width, depthTexture.height);
+    	depthTexture = new Texture2D(kDepthWidth, kDepthHeight);
+    	depthMapRect = new Rect(Screen.width, Screen.height - depthTexture.height,
+                                -depthTexture.width, depthTexture.height);
+
+		if (replay == ReplayMode.RECORD) {
+			KinectPowerInterop.RecordSensor(0, replayFilename);
+		} else if (replay == ReplayMode.REPLAY) {
+			KinectPowerInterop.StartPlaySensor(0, replayFilename);
+		}
 	}
 	
 	void Update () {
+
+		if (replay == ReplayMode.REPLAY) {
+			KinectPowerInterop.PlayNextFrame(0);
+		}
+
 		if (showDepthMap) {
 		    KinectPowerInterop.GetNiceDepthMap(depthBuffer, (uint)depthBuffer.Length);
 		    

@@ -121,6 +121,35 @@ bool KinectWrapper::QueryDepth(int sensor_index, cv::Mat* mat) const {
   return true;
 }
 
+bool KinectWrapper::StartPlaySensor(int sensor_index,
+                                    const std::string& filename) {
+  // Initialize the buffers.
+  // TODO(fdoray): Merge this code with the thread start code. ICI
+  sensor_info_[sensor_index].depth_buffer = new KinectBuffer(
+      640, 480, kKinectDepthBytesPerPixel);
+  sensor_info_[sensor_index].skeleton_buffer =
+      new KinectSkeletonFrame[kNumBuffers];
+
+  return sensor_info_[sensor_index].player.LoadFile(filename);
+}
+ 
+bool KinectWrapper::PlayNextFrame(int sensor_index) {
+  int next_skeleton_buffer =
+      (sensor_info_[sensor_index].current_skeleton_buffer + 1) % kNumBuffers;
+
+  bool res = sensor_info_[sensor_index].player.ReadFrame(
+      sensor_index,
+      sensor_info_[sensor_index].depth_buffer,
+      &sensor_info_[sensor_index].skeleton_buffer[next_skeleton_buffer]);
+
+  if (!res)
+    return false;
+
+  sensor_info_[sensor_index].current_skeleton_buffer = next_skeleton_buffer;
+  return true;
+}
+
+
 bool KinectWrapper::QuerySkeletonFrame(
     int sensor_index, KinectSkeletonFrame* skeleton_frame) const {
   DCHECK(skeleton_frame != NULL);
@@ -214,7 +243,7 @@ DWORD KinectWrapper::SensorThread(SensorThreadParams* params) {
 
   sensor->OpenSkeletonStream();
   wrapper->sensor_info_[sensor_index].skeleton_buffer =
-      new KinectSkeletonFrame[2];
+      new KinectSkeletonFrame[kNumBuffers];
 
   // Wait for ready frames.
   HANDLE events[] = {
