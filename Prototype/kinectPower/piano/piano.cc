@@ -85,8 +85,6 @@ void Piano::FindNotes() {
     unsigned short* pixel = depth_ptr() + GetIndexOfPixel(kPianoXMin, row);
 
     for (int note = 0; note < kPianoNumNotes; ++note) {
-      int kk = 2;
-
       for (int col = kPianoXMin + note * kPianoNoteWidth;
            col < kPianoXMin + (note + 1) * kPianoNoteWidth; ++col) {
         

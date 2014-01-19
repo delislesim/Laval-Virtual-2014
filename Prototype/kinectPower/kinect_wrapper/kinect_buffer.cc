@@ -5,12 +5,6 @@
 
 namespace kinect_wrapper {
 
-namespace {
-
-const int kNbBuffers = 2;
-
-}  // namespace
-
 KinectBuffer::KinectBuffer(size_t width,
                            size_t height,
                            size_t bytes_per_pixel)
@@ -19,7 +13,7 @@ KinectBuffer::KinectBuffer(size_t width,
       height_(height),
       bytes_per_pixel_(bytes_per_pixel) {
   size_t size = width * height * bytes_per_pixel;
-  for (int i = 0; i < kNbBuffers; ++i)
+  for (int i = 0; i < kNumBuffers; ++i)
     buffers_[i].resize(size);
 }
 

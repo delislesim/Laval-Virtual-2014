@@ -3,6 +3,7 @@
 #include "base/logging.h"
 #include "kinect_wrapper/constants.h"
 #include "kinect_wrapper/kinect_buffer.h"
+#include "kinect_wrapper/kinect_skeleton.h"
 #include "kinect_wrapper/utility.h"
 
 namespace kinect_wrapper {
@@ -21,8 +22,16 @@ KinectSensor::KinectSensor(INuiSensor* native_sensor)
       depth_frame_ready_event_(INVALID_HANDLE_VALUE),
       depth_stream_handle_(INVALID_HANDLE_VALUE),
       depth_stream_width_(0),
-      depth_stream_height_(0) {
+      depth_stream_height_(0),
+      skeleton_seated_enabled_(true),
+      skeleton_near_enabled_(true),  
+      skeleton_stream_opened_(false),
+      skeleton_frame_ready_event_(INVALID_HANDLE_VALUE) {
   depth_frame_ready_event_ = ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
+  skeleton_frame_ready_event_ = ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
+
+  skeleton_sticky_ids_[0] = 0;
+  skeleton_sticky_ids_[1] = 0;
 }
 
 bool KinectSensor::OpenDepthStream() {
@@ -105,6 +114,85 @@ bool KinectSensor::PollNextDepthFrame(KinectBuffer* buffer) {
 ReleaseFrame:
   native_sensor_->NuiImageStreamReleaseFrame(depth_stream_handle_, &image_frame);
   return res;
+}
+
+bool KinectSensor::OpenSkeletonStream() {
+  if (skeleton_stream_opened_)
+    return true;
+
+  DWORD flags = (
+      (skeleton_seated_enabled_ ?
+           NUI_SKELETON_TRACKING_FLAG_ENABLE_SEATED_SUPPORT : 0) |
+      (skeleton_near_enabled_ ?
+           NUI_SKELETON_TRACKING_FLAG_ENABLE_IN_NEAR_RANGE : 0)
+  );
+
+  HRESULT res = native_sensor_->NuiSkeletonTrackingEnable(
+      skeleton_frame_ready_event_, flags);
+
+  if (FAILED(res))
+    return false;
+
+  skeleton_stream_opened_ = true;
+  return true;
+}
+
+bool KinectSensor::PollNextSkeletonFrame(KinectSkeleton* skeleton) {
+  DCHECK(skeleton);
+  DCHECK(skeleton_stream_opened_);
+
+  if (WaitForSingleObject(skeleton_frame_ready_event_, 0) != WAIT_OBJECT_0)
+    return false;
+
+  NUI_SKELETON_FRAME* frame = skeleton->frame_ptr();
+
+  HRESULT res =
+      native_sensor_->NuiSkeletonGetNextFrame(0, frame);
+
+  if (FAILED(res))
+    return false;
+
+  // Smooth out the skeleton data.
+  native_sensor_->NuiTransformSmooth(frame, nullptr);
+
+  // Try to always track the same skeletons.
+  DWORD track_ids[kNumTrackedSkeletons];
+  ZeroMemory(track_ids, sizeof(track_ids));
+
+  for (int i = 0; i < kNumTrackedSkeletons; ++i) {
+    for (int j = 0; j < NUI_SKELETON_COUNT; ++j) {
+      if (frame->SkeletonData[j].eTrackingState != NUI_SKELETON_NOT_TRACKED) {
+        DWORD track_id = frame->SkeletonData[j].dwTrackingID;
+        if (track_id == skeleton_sticky_ids_[i]) {
+          track_ids[i] = track_id;
+          break;
+        }
+      }
+    }
+  }
+
+  for (int i = 0; i < NUI_SKELETON_COUNT; i++) {
+    if (track_ids[0] && track_ids[1])
+      break;
+
+    if (frame->SkeletonData[i].eTrackingState != NUI_SKELETON_NOT_TRACKED) {
+      DWORD track_id = frame->SkeletonData[i].dwTrackingID;
+
+      if (!track_ids[0] && track_id != track_ids[1])
+        track_ids[0] = track_id;
+      else if (!track_ids[1] && track_id != track_ids[0])
+        track_ids[1] = track_id;
+    }
+  }
+
+  skeleton_sticky_ids_[0] = track_ids[0];
+  skeleton_sticky_ids_[1] = track_ids[1];
+
+  skeleton->SetTrackedSkeletons(track_ids[0], track_ids[1]);
+
+  native_sensor_->NuiSkeletonSetTrackedSkeletons(track_ids);
+
+  return true;
 }
 
 KinectSensor::~KinectSensor() {

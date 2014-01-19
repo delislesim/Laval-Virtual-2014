@@ -42,6 +42,8 @@ namespace sample
 
       int stride = kImageWidth * kPixelSize;
 
+      GetJointsPosition(0, joint_positions);
+
       Application.Current.Dispatcher.Invoke(new Action(() =>
       {
         image1.Source = BitmapSource.Create(kImageWidth, kImageHeight, 96, 96,
@@ -55,6 +57,9 @@ namespace sample
     [DllImport(@"kinect_power.dll", EntryPoint = "GetNiceDepthMap", CallingConvention = CallingConvention.Cdecl)]
     public static extern bool GetNiceDepthMap(byte[] buffer, uint buffer_size);
 
+    [DllImport(@"kinect_power.dll", EntryPoint = "GetJointsPosition", CallingConvention = CallingConvention.Cdecl)]
+    public static extern bool GetJointsPosition(int skeleton_id, float[] joint_positions);
+
     [DllImport(@"kinect_power.dll", EntryPoint = "Initialize", CallingConvention = CallingConvention.Cdecl)]
     public static extern bool Initialize();
 
@@ -66,5 +71,7 @@ namespace sample
 
     private byte[] buffer = new byte[kImageWidth * kImageHeight * kPixelSize];
     private byte[] notes = new byte[20];
+
+    private float[] joint_positions = new float[20 * 3];
   }
 }

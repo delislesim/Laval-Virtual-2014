@@ -7,6 +7,7 @@
 #include "kinect_wrapper/kinect_buffer.h"
 #include "kinect_wrapper/kinect_include.h"
 #include "kinect_wrapper/kinect_sensor.h"
+#include "kinect_wrapper/kinect_skeleton.h"
 #include "kinect_wrapper/utility.h"
 
 namespace kinect_wrapper {
@@ -38,6 +39,7 @@ KinectWrapper::KinectWrapper()
   for (int i = 0; i < kMaxNumSensors; ++i) {
     sensor_info_[i].sensor = NULL;
     sensor_info_[i].depth_buffer = NULL;
+    sensor_info_[i].current_skeleton_buffer = 0;
     sensor_info_[i].thread = INVALID_HANDLE_VALUE;
     sensor_info_[i].close_event = INVALID_HANDLE_VALUE;
   }
@@ -103,7 +105,7 @@ void KinectWrapper::Shutdown() {
   }
 }
 
-bool KinectWrapper::QueryDepthBuffer(int sensor_index, cv::Mat* mat) {
+bool KinectWrapper::QueryDepth(int sensor_index, cv::Mat* mat) {
   DCHECK(mat != NULL);
 
   if (sensor_info_[sensor_index].depth_buffer == NULL)
@@ -111,6 +113,19 @@ bool KinectWrapper::QueryDepthBuffer(int sensor_index, cv::Mat* mat) {
 
   KinectBuffer* buffer = sensor_info_[sensor_index].depth_buffer;
   buffer->GetDepthMat(mat);
+
+  return true;
+}
+
+bool KinectWrapper::QuerySkeleton(int sensor_index, KinectSkeleton* skeleton) {
+  DCHECK(skeleton != NULL);
+
+  if (sensor_info_[sensor_index].skeleton_buffer == NULL)
+    return false;
+
+  size_t current_buffer_index =
+      sensor_info_[sensor_index].current_skeleton_buffer;
+  *skeleton = sensor_info_[sensor_index].skeleton_buffer[current_buffer_index];
 
   return true;
 }
@@ -179,13 +194,17 @@ DWORD KinectWrapper::SensorThread(SensorThreadParams* params) {
   // Start the streams and create the buffers.
   sensor->OpenDepthStream();
   wrapper->sensor_info_[sensor_index].depth_buffer = new KinectBuffer(
-    sensor->depth_stream_width(), sensor->depth_stream_height(),
-    kKinectDepthBytesPerPixel);
+      sensor->depth_stream_width(), sensor->depth_stream_height(),
+      kKinectDepthBytesPerPixel);
+
+  sensor->OpenSkeletonStream();
+  wrapper->sensor_info_[sensor_index].skeleton_buffer = new KinectSkeleton[2];
 
   // Wait for ready frames.
   HANDLE events[] = {
     wrapper->sensor_info_[sensor_index].close_event,
-    sensor->GetDepthFrameReadyEvent()
+    sensor->GetDepthFrameReadyEvent(),
+    sensor->GetSkeletonFrameReadyEvent()
   };
   DWORD nb_events = ARRAYSIZE(events);
 
@@ -196,14 +215,26 @@ DWORD KinectWrapper::SensorThread(SensorThreadParams* params) {
     if (ret == WAIT_OBJECT_0)  // Thread close event.
       break;
 
-    // Poll the streams.
+    // Poll the depth stream.
     sensor->PollNextDepthFrame(
         wrapper->sensor_info_[sensor_index].depth_buffer);
+
+    // Poll the skeleton stream.
+    size_t current_skeleton_buffer =
+        wrapper->sensor_info_[sensor_index].current_skeleton_buffer;
+    if (sensor->PollNextSkeletonFrame(
+            &wrapper->sensor_info_[sensor_index].skeleton_buffer[
+                current_skeleton_buffer])) {
+      wrapper->sensor_info_[sensor_index].current_skeleton_buffer =
+        (current_skeleton_buffer + 1) % kNumBuffers;
+    }
   }
 
   // Free memory.
   delete wrapper->sensor_info_[sensor_index].depth_buffer;
   wrapper->sensor_info_[sensor_index].depth_buffer = NULL;
+
+  delete[] wrapper->sensor_info_[sensor_index].skeleton_buffer;
 
   return 1;
 }

@@ -10,7 +10,8 @@
 namespace kinect_wrapper {
 
 class KinectBuffer;
-class KinectSensor; 
+class KinectSensor;
+class KinectSkeleton;
 
 // TODO(fdoray): Singleton.
 class KinectWrapper {
@@ -27,8 +28,11 @@ class KinectWrapper {
   void StartSensorThread(int sensor_index);
   void Shutdown();
 
-  // Depth buffers.
-  bool QueryDepthBuffer(int sensor_index, cv::Mat* mat);
+  // Depth.
+  bool QueryDepth(int sensor_index, cv::Mat* mat);
+
+  // Skeletons.
+  bool QuerySkeleton(int sensor_index, KinectSkeleton* skeleton);
 
  private:
   KinectWrapper();
@@ -37,6 +41,8 @@ class KinectWrapper {
   struct SensorInfo {
     KinectSensor* sensor;
     KinectBuffer* depth_buffer;
+    KinectSkeleton* skeleton_buffer;
+    size_t current_skeleton_buffer;
     HANDLE thread;
     HANDLE close_event;
   };

@@ -2,11 +2,13 @@
 
 #include "base/base.h"
 #include "base/scoped_ptr.h"
+#include "kinect_wrapper/constants.h"
 #include "kinect_wrapper/kinect_include.h"
 
-namespace kinect_wrapper {
+namespace kinect_wrapper {  
 
 class KinectBuffer;
+class KinectSkeleton;
 
 class KinectSensor {
  public:
@@ -25,6 +27,14 @@ class KinectSensor {
     return depth_stream_height_;
   }
 
+  // Skeleton stream.
+  bool OpenSkeletonStream();
+  bool PollNextSkeletonFrame(KinectSkeleton* skeleton);
+  HANDLE GetSkeletonFrameReadyEvent() const {
+    return skeleton_frame_ready_event_;
+  }
+
+
  private:
   friend class KinectWrapper;
   ~KinectSensor();
@@ -39,6 +49,14 @@ class KinectSensor {
   HANDLE depth_stream_handle_;
   size_t depth_stream_width_;
   size_t depth_stream_height_;
+
+  // Skeleton stream.
+  bool skeleton_seated_enabled_;
+  bool skeleton_near_enabled_;  
+  bool skeleton_stream_opened_;
+  HANDLE skeleton_frame_ready_event_;
+  DWORD skeleton_sticky_ids_[kNumTrackedSkeletons];
+
 
   DISALLOW_COPY_AND_ASSIGN(KinectSensor);
 };

@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "base/base.h"
+#include "kinect_wrapper/constants.h"
 #include "kinect_wrapper/kinect_include.h"
 
 namespace kinect_wrapper {
@@ -37,7 +38,7 @@ class KinectBuffer {
   size_t height_;
   size_t bytes_per_pixel_;
 
-  std::vector<char> buffers_[2];
+  std::vector<char> buffers_[kNumBuffers];
 
   DISALLOW_COPY_AND_ASSIGN(KinectBuffer);
 };
