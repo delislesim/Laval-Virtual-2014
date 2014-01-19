@@ -29,6 +29,12 @@ void CALLBACK StatusChangeCallback(
 
 KinectWrapper* KinectWrapper::instance_ = NULL;
 
+KinectWrapper* KinectWrapper::instance() {
+  if (instance_ == NULL)
+    instance_ = new KinectWrapper();
+  return instance_;
+}
+
 void KinectWrapper::Release() {
   delete instance_;
   instance_ = NULL;

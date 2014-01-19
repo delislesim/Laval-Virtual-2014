@@ -8,13 +8,12 @@
 
 namespace kinect_wrapper {
 
-
 class KinectSkeleton {
  public:
   KinectSkeleton();
   ~KinectSkeleton();
 
-    typedef enum _JointIndex {
+  typedef enum _JointIndex {
     HipCenter = 0,
     Spine,
     ShoulderCenter,

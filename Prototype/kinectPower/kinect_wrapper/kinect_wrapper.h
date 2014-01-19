@@ -13,17 +13,13 @@ class KinectBuffer;
 class KinectSensor;
 class KinectSkeleton;
 
-// TODO(fdoray): Singleton.
 class KinectWrapper {
  public:
-  static KinectWrapper* instance() {
-    if (instance_ == NULL)
-      instance_ = new KinectWrapper();
-    return instance_;
-  }
-
+  // Singleton.
+  static KinectWrapper* instance();
   static void Release();
 
+  // Initialization
   void Initialize();
   void StartSensorThread(int sensor_index);
   void Shutdown();

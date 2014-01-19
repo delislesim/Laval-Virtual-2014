@@ -1,10 +1,8 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\KinectPower\KinectPower.cs">
+  <MonoDevelop.Ide.Workspace />
+  <MonoDevelop.Ide.Workbench ActiveDocument="C:\Users\François\Documents\kinectTest\Assets\KinectScripts\KinectManager.cs">
     <Files>
-      <File FileName="Assets\KinectPower\KinectPower.cs" Line="62" Column="27" />
-      <File FileName="Assets\KinectPower\KinectPowerInterop.cs" Line="1" Column="1" />
-      <File FileName="Assets\Piano\Scripts\Note.cs" Line="14" Column="17" />
+      <File FileName="C:\Users\François\Documents\kinectTest\Assets\KinectScripts\KinectManager.cs" Line="1412" Column="116" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
