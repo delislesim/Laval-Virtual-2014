@@ -1,6 +1,7 @@
 #pragma once
 
 #include <opencv2/core/core.hpp>
+#include <vector>
 
 namespace piano {
 
@@ -11,7 +12,7 @@ class Piano {
   
   // Note: The provided |depth_mat| will be modified by the algorithm.
   void LoadDepthImage(cv::Mat depth_mat);
-  void QueryNotes(bool* notes, size_t notes_size);
+  void QueryNotes(unsigned char* notes, size_t notes_size);
   void QueryNiceImage(unsigned char* nice_image, size_t nice_image_size);
 
  private:
@@ -31,6 +32,8 @@ class Piano {
 
   cv::Mat depth_mat_;
   cv::Mat nice_image_;
+
+  std::vector<bool> notes_;
 };
 
 }  // namespace piano

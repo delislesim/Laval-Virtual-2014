@@ -49,7 +49,7 @@ bool GetNiceDepthMap(unsigned char* pixels, unsigned int pixels_size) {
   return true;
 }
 
-bool GetPianoInfo(bool* notes, unsigned int notes_size,
+bool GetPianoInfo(unsigned char* notes, unsigned int notes_size,
                   unsigned char* pixels, unsigned int pixels_size) {
   KinectWrapper* wrapper = KinectWrapper::instance();
 
@@ -59,6 +59,7 @@ bool GetPianoInfo(bool* notes, unsigned int notes_size,
 
   the_piano.LoadDepthImage(depth_mat);
   the_piano.QueryNiceImage(pixels, pixels_size);
+  the_piano.QueryNotes(notes, notes_size);
 
   return true;
 }

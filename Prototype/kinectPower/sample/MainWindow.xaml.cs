@@ -50,7 +50,7 @@ namespace sample
     }
 
     [DllImport(@"kinect_power.dll", EntryPoint = "GetPianoInfo", CallingConvention = CallingConvention.Cdecl)]
-    public static extern bool GetPianoInfo(bool[] notes, uint notes_size, byte[] pixels, uint pixels_size);
+    public static extern bool GetPianoInfo(byte[] notes, uint notes_size, byte[] pixels, uint pixels_size);
 
     [DllImport(@"kinect_power.dll", EntryPoint = "GetNiceDepthMap", CallingConvention = CallingConvention.Cdecl)]
     public static extern bool GetNiceDepthMap(byte[] buffer, uint buffer_size);
@@ -65,6 +65,6 @@ namespace sample
     private const int kPixelSize = 4;
 
     private byte[] buffer = new byte[kImageWidth * kImageHeight * kPixelSize];
-    private bool[] notes = new bool[15];
+    private byte[] notes = new byte[20];
   }
 }

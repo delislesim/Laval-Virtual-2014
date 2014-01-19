@@ -11,6 +11,9 @@ public class KinectPowerInterop {
   public static extern bool Shutdown();
 
   [DllImport(@"kinect_power.dll", EntryPoint = "GetNiceDepthMap", CallingConvention = CallingConvention.Cdecl)]
-  public static extern bool GetNiceDepthMap(byte[] buffer, uint buffer_size);
+  public static extern bool GetNiceDepthMap(byte[] pixels, uint pixels_size);
+	
+  [DllImport(@"kinect_power.dll", EntryPoint = "GetPianoInfo", CallingConvention = CallingConvention.Cdecl)]
+  public static extern bool GetPianoInfo(byte[] notes, uint notes_size, byte[] pixels, uint pixels_size);
 
 }

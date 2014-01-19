@@ -23,7 +23,9 @@ const int kPianoXMin = 15;
 const int kPianoYMin = 200;
 const int kPianoHeight = 80;
 const int kPianoNoteWidth = 25;
-const int kPianoNbNotes = 20;
+const int kPianoNumNotes = 20;
+const int kPianoXMax = kPianoXMin + kPianoNumNotes * kPianoNoteWidth;
+const int kPianoYMax = kPianoYMin + kPianoHeight;
 
 int GetIndexOfPixel(int x, int y) {
   return kinect_wrapper::kKinectDepthWidth * y + x;
@@ -31,7 +33,7 @@ int GetIndexOfPixel(int x, int y) {
 
 }  // namespace
 
-Piano::Piano() {
+Piano::Piano() : notes_(kPianoNumNotes) {
 }
 
 Piano::~Piano() {
@@ -43,7 +45,11 @@ void Piano::LoadDepthImage(Mat depth_mat) {
   DrawPiano();
 }
 
-void Piano::QueryNotes(bool* notes, size_t notes_size) {
+void Piano::QueryNotes(unsigned char* notes, size_t notes_size) {
+  DCHECK(notes_size == kPianoNumNotes);
+  for (size_t i = 0; i < notes_.size(); ++i) {
+    notes[i] = notes_[i] ? 1 : 0;
+  }
 }
 
 void Piano::QueryNiceImage(unsigned char* nice_image, size_t nice_image_size) {
@@ -58,21 +64,39 @@ void Piano::DrawPiano() {
                                         nice_image_.total() * 4);
 
   // Draw the actual piano.
-  const int kPianoXMax = kPianoXMin + kPianoNbNotes * kPianoNoteWidth;
-  const int kPianoYMax = kPianoYMin + kPianoHeight;
-
   DrawHorizontalLine(kPianoYMin, kPianoXMin, kPianoXMax);
   DrawVerticalLine(kPianoXMin, kPianoYMin, kPianoYMax);
   DrawVerticalLine(kPianoXMax, kPianoYMin, kPianoYMax);
   DrawHorizontalLine(kPianoYMax, kPianoXMin, kPianoXMax);
 
-  for (int i = 1; i < kPianoNbNotes; ++i) {
+  for (int i = 1; i < kPianoNumNotes; ++i) {
     DrawVerticalLine(kPianoXMin + i*kPianoNoteWidth, kPianoYMin, kPianoYMax);
   }
 }
 
 void Piano::FindNotes() {
-  
+  // Reset notes vector.
+  for (int note = 0; note < kPianoNumNotes; ++note) {
+    notes_[note] = false;
+  }
+
+  // Find played notes.
+  for (int row = kPianoYMin; row < kPianoYMax; ++row) {
+    unsigned short* pixel = depth_ptr() + GetIndexOfPixel(kPianoXMin, row);
+
+    for (int note = 0; note < kPianoNumNotes; ++note) {
+      int kk = 2;
+
+      for (int col = kPianoXMin + note * kPianoNoteWidth;
+           col < kPianoXMin + (note + 1) * kPianoNoteWidth; ++col) {
+        
+        if (*pixel < kPianoZ && *pixel > 0)
+          notes_[note] = true;
+
+        ++pixel;
+      }
+    }
+  }
 }
 
 void Piano::DrawVerticalLine(int x, int ymin, int ymax) {

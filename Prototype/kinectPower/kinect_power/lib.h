@@ -10,4 +10,5 @@ extern "C" bool __declspec(dllexport)
 GetNiceDepthMap(unsigned char* pixels, unsigned int pixels_size);
 
 extern "C" bool __declspec(dllexport)
-GetPianoInfo(bool* notes, unsigned int notes_size, unsigned char* pixels, unsigned int pixels_size);
+GetPianoInfo(unsigned char* notes, unsigned int notes_size,
+             unsigned char* pixels, unsigned int pixels_size);
