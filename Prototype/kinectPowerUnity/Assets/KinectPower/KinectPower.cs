@@ -96,6 +96,10 @@ public class KinectPower : MonoBehaviour {
  		KinectPowerInterop.Shutdown();
 	}
 
+	void OnApplicationQuit() {
+		KinectPowerInterop.Shutdown();
+	}
+
 	// Depth stream.
 	private Rect depthMapRect;
 	private Texture2D depthTexture;
