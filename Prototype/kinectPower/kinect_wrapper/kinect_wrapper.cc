@@ -12,7 +12,7 @@
 #include "kinect_wrapper/kinect_skeleton_frame.h"
 #include "kinect_wrapper/utility.h"
 
-//#define ENABLE_TIMER
+#define ENABLE_TIMER
 
 namespace kinect_wrapper {
 
@@ -95,7 +95,7 @@ bool KinectWrapper::RecordSensor(int sensor_index,
 
 bool KinectWrapper::QueryDepth(int sensor_index, cv::Mat* mat) const {
   DCHECK(mat != NULL);
-  return sensor_state_[sensor_index].QueryDepth(mat);
+  return sensor_state_[sensor_index].QueryDepth(0, mat);
 }
 
 bool KinectWrapper::StartPlaySensor(int sensor_index,

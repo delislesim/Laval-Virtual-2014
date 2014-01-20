@@ -48,7 +48,7 @@ bool KinectRecorder::RecordFrame(
 
   // Query the depth frame.
   cv::Mat depth_mat;
-  sensor_state.QueryDepth(&depth_mat);
+  sensor_state.QueryDepth(0, &depth_mat);
 
   // Write the depth frame.
   size_t depth_frame_size = depth_mat.total() *  depth_mat.elemSize();

@@ -22,25 +22,17 @@ class Piano : kinect_wrapper::KinectObserver {
   void QueryNiceImage(unsigned char* nice_image, size_t nice_image_size);
 
  private:
-  void DrawPiano();
-  void FindNotes();
+  void DrawDepth(const cv::Mat& depth_mat);
+  void DrawMotion(const cv::Mat& depth_mat,
+                  const kinect_wrapper::KinectSensorState& sensor_state);
+  void DrawPiano(cv::Mat* image);
+  void FindNotes(const cv::Mat& depth_mat);
 
-  void DrawVerticalLine(int x, int ymin, int ymax, unsigned char* img);
-  void DrawHorizontalLine(int y, int xmin, int xmax, unsigned char* img);
-
-  unsigned short* depth_ptr() {
-    return reinterpret_cast<unsigned short*>(depth_mat_.ptr());
-  }
-
-  unsigned char* nice_ptr() {
-    return reinterpret_cast<unsigned char*>(nice_image_.GetNextPtr()->ptr());
-  }
+  void DrawVerticalLine(int x, int ymin, int ymax, cv::Mat* image);
+  void DrawHorizontalLine(int y, int xmin, int xmax, cv::Mat* image);
 
   bool started_;
-
-  cv::Mat depth_mat_;
   kinect_wrapper::KinectSwitch<cv::Mat> nice_image_;
-
   kinect_wrapper::KinectSwitch<std::vector<bool> > notes_;
 };
 

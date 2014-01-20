@@ -27,7 +27,7 @@ class KinectBuffer {
   }
 
   // This method is thread-safe.
-  void GetDepthMat(cv::Mat* depth_mat);
+  void GetMatrix(int past_frame, cv::Mat* depth_mat);
 
  private:
   size_t current_buffer_index_;

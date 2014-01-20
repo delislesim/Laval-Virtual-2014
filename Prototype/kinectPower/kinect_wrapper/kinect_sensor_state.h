@@ -45,7 +45,13 @@ class KinectSensorState {
   void CreateBuffers();
   void ReleaseBuffers();
 
-  bool QueryDepth(cv::Mat* mat) const;
+  // Retrieves the depth matrix.
+  // @param past_frame indicates which past matrix to retrieve. 0 is the
+  //    current matrix, 1 the last matrix, etc. until kNumBuffers - 1.
+  // @param mat the depth matrix.
+  // @returns true in case of success, false otherwise.
+  bool QueryDepth(int past_frame, cv::Mat* mat) const;
+  
   bool QuerySkeletonFrame(KinectSkeletonFrame* skeleton_frame) const;
 
   void InsertDepthFrame(const char* depth_frame, size_t depth_frame_size);

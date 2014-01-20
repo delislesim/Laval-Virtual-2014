@@ -51,8 +51,11 @@ void KinectBuffer::CopyDepthTexture(const NUI_DEPTH_IMAGE_PIXEL* start,
   current_buffer_index_ = new_buffer_index;
 }
 
-void KinectBuffer::GetDepthMat(cv::Mat* depth_mat) {
-  *depth_mat = buffers_[current_buffer_index_];
+void KinectBuffer::GetMatrix(int past_frame, cv::Mat* depth_mat) {
+  DCHECK(past_frame < kNumBuffers);
+  int frame_index =
+      (current_buffer_index_ + kNumBuffers + past_frame) % kNumBuffers;
+  *depth_mat = buffers_[frame_index];
 }
 
 }  // namespace kinect_wrapper
