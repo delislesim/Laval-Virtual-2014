@@ -15,6 +15,8 @@ class KinectSwitch {
   void GetCurrent(T* current) const;
   void SetNext(const T& next);
 
+  T* GetNextPtr();
+
  private:
   size_t current_buffer_index_;
   T frames_[kNumBuffers];
@@ -43,5 +45,12 @@ void KinectSwitch<T>::SetNext(const T& next) {
   frames_[next_buffer_index] = next;
   current_buffer_index_ = next_buffer_index;
 }
+
+template <typename T>
+T* KinectSwitch<T>::GetNextPtr() {
+  size_t next_buffer_index = (current_buffer_index_ + 1) % kNumBuffers;
+  return &frames_[next_buffer_index];
+}
+
 
 }  // namespace kinect_wrapper

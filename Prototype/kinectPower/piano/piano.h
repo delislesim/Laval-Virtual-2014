@@ -3,6 +3,8 @@
 #include <opencv2/core/core.hpp>
 #include <vector>
 
+#include "kinect_wrapper/kinect_switch.h"
+
 namespace piano {
 
 class Piano {
@@ -19,21 +21,22 @@ class Piano {
   void DrawPiano();
   void FindNotes();
 
-  void DrawVerticalLine(int x, int ymin, int ymax);
-  void DrawHorizontalLine(int y, int xmin, int xmax);
+  void DrawVerticalLine(int x, int ymin, int ymax, unsigned char* img);
+  void DrawHorizontalLine(int y, int xmin, int xmax, unsigned char* img);
 
   unsigned short* depth_ptr() {
     return reinterpret_cast<unsigned short*>(depth_mat_.ptr());
   }
 
   unsigned char* nice_ptr() {
-    return reinterpret_cast<unsigned char*>(nice_image_.ptr());
+    return reinterpret_cast<unsigned char*>(nice_image_.GetNextPtr()->ptr());
   }
 
-  cv::Mat depth_mat_;
-  cv::Mat nice_image_;
 
-  std::vector<bool> notes_;
+  cv::Mat depth_mat_;
+  kinect_wrapper::KinectSwitch<cv::Mat> nice_image_;
+
+  kinect_wrapper::KinectSwitch<std::vector<bool> > notes_;
 };
 
 }  // namespace piano
