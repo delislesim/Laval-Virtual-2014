@@ -6,8 +6,7 @@
 #include "base/base.h"
 
 namespace kinect_wrapper {
-class KinectBuffer;
-class KinectSkeletonFrame;
+class KinectSensorState;
 }  // namespace kinect_wrapper
 
 namespace kinect_replay {
@@ -18,9 +17,7 @@ class KinectPlayer {
   ~KinectPlayer();
 
   bool LoadFile(const std::string& filename);
-  bool ReadFrame(int sensor_index, 
-                 kinect_wrapper::KinectBuffer* depth_buffer,
-                 kinect_wrapper::KinectSkeletonFrame* skeleton_frame);
+  bool ReadFrame(kinect_wrapper::KinectSensorState* sensor_state);
   bool CloseFile();
 
  private:

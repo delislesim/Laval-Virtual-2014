@@ -3,8 +3,7 @@
 #include <opencv2/core/core.hpp>
 
 #include "base/logging.h"
-#include "kinect_wrapper/kinect_skeleton_frame.h"
-#include "kinect_wrapper/kinect_wrapper.h"
+#include "kinect_wrapper/kinect_sensor_state.h"
 
 using namespace kinect_wrapper;
 
@@ -35,8 +34,8 @@ bool KinectRecorder::StartRecording(const std::string& filename) {
   return true;
 }
 
-bool KinectRecorder::RecordFrame(const kinect_wrapper::KinectWrapper& wrapper,
-                                 int sensor_index) {
+bool KinectRecorder::RecordFrame(
+    const kinect_wrapper::KinectSensorState& sensor_state) {
   if (!is_recording_)
     return false;
 
@@ -49,7 +48,7 @@ bool KinectRecorder::RecordFrame(const kinect_wrapper::KinectWrapper& wrapper,
 
   // Query the depth frame.
   cv::Mat depth_mat;
-  wrapper.QueryDepth(sensor_index, &depth_mat);
+  sensor_state.QueryDepth(&depth_mat);
 
   // Write the depth frame.
   size_t depth_frame_size = depth_mat.total() *  depth_mat.elemSize();
@@ -61,7 +60,7 @@ bool KinectRecorder::RecordFrame(const kinect_wrapper::KinectWrapper& wrapper,
 
   // Query the skeleton frame.
   KinectSkeletonFrame skeleton_frame;
-  wrapper.QuerySkeletonFrame(sensor_index, &skeleton_frame);
+  sensor_state.QuerySkeletonFrame(&skeleton_frame);
 
   // Write the skeleton frame.
   out_.write(kSkeletonHeader, kSectionHeaderSize);
@@ -70,6 +69,12 @@ bool KinectRecorder::RecordFrame(const kinect_wrapper::KinectWrapper& wrapper,
   out_.write(
       reinterpret_cast<const char*>(skeleton_frame.GetSkeletonFramePtr()),
       kSkeletonFrameSize);
+
+  for (int i = 0; i < kNumTrackedSkeletons; ++i) {
+    DWORD tracked_id = skeleton_frame.GetSkeletonTrackId(i);
+    out_.write(reinterpret_cast<const char*>(&tracked_id),
+               sizeof(tracked_id));
+  }
 
   return true;
 }

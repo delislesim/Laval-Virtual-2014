@@ -16,6 +16,8 @@ class KinectSkeletonFrame {
   bool GetTrackedSkeleton(size_t tracked_skeleton_id,
                           KinectSkeleton* skeleton) const;
 
+  DWORD GetSkeletonTrackId(size_t tracked_skeleton_id) const;
+
   // Methods to load the skeleton data from the sensor.
   NUI_SKELETON_FRAME* GetSkeletonFramePtr() {
     return &frame_;

@@ -1,7 +1,7 @@
 project(kinect_power CXX)
 cmake_minimum_required(VERSION 2.6.2)
 
-set (OpenCV_DIR $ENV{OPENCV_DIR}/../..)
+set (OpenCV_DIR $ENV{OPENCV_DIR})
 FIND_PACKAGE(OpenCV REQUIRED)
 
 set(CMAKE_SUPPRESS_REGENERATION TRUE)
@@ -32,6 +32,8 @@ add_library(base
   base/logging.cc
   base/logging.h
   base/scoped_ptr.h
+  base/scoped_handle.cc
+  base/scoped_handle.h
   base/string_utils.cc
   base/string_utils.h
   )
@@ -44,8 +46,12 @@ add_library(kinect_wrapper
   kinect_wrapper/kinect_include.h
   kinect_wrapper/kinect_sensor.cc
   kinect_wrapper/kinect_sensor.h
+  kinect_wrapper/kinect_sensor_state.cc
+  kinect_wrapper/kinect_sensor_state.h
   kinect_wrapper/kinect_skeleton.cc
   kinect_wrapper/kinect_skeleton.h
+  kinect_wrapper/kinect_skeleton_buffer.cc
+  kinect_wrapper/kinect_skeleton_buffer.h
   kinect_wrapper/kinect_skeleton_frame.cc
   kinect_wrapper/kinect_skeleton_frame.h
   kinect_wrapper/kinect_wrapper.cc

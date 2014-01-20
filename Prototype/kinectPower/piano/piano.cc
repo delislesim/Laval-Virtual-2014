@@ -18,7 +18,7 @@ const int kRedIndex = 2;
 const int kAlphaIndex = 3;
 
 // Piano image
-const int kPianoZ = 690;
+const int kPianoZ = /*690 */ 750;
 const int kPianoXMin = 15;
 const int kPianoYMin = 200;
 const int kPianoHeight = 80;

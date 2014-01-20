@@ -2,8 +2,7 @@
 
 #include "base/logging.h"
 #include "kinect_wrapper/constants.h"
-#include "kinect_wrapper/kinect_buffer.h"
-#include "kinect_wrapper/kinect_skeleton_frame.h"
+#include "kinect_wrapper/kinect_sensor_state.h"
 #include "kinect_wrapper/utility.h"
 
 namespace kinect_wrapper {
@@ -65,8 +64,8 @@ bool KinectSensor::OpenDepthStream() {
   return true;
 }
 
-bool KinectSensor::PollNextDepthFrame(KinectBuffer* buffer) {
-  DCHECK(buffer);
+bool KinectSensor::PollNextDepthFrame(KinectSensorState* state) {
+  DCHECK(state);
   DCHECK(depth_stream_opened_);
   DCHECK(depth_stream_handle_ != INVALID_HANDLE_VALUE);
 
@@ -107,7 +106,7 @@ bool KinectSensor::PollNextDepthFrame(KinectBuffer* buffer) {
   const NUI_DEPTH_IMAGE_PIXEL* end =
       start + depth_stream_width_ * depth_stream_height_;
 
-  buffer->CopyDepthTexture(start, end);
+  state->InsertDepthFrame(start, end);
 
   image_frame.pFrameTexture->UnlockRect(0);
 
@@ -137,17 +136,17 @@ bool KinectSensor::OpenSkeletonStream() {
   return true;
 }
 
-bool KinectSensor::PollNextSkeletonFrame(KinectSkeletonFrame* skeleton) {
-  DCHECK(skeleton);
+bool KinectSensor::PollNextSkeletonFrame(KinectSensorState* state) {
+  DCHECK(state);
   DCHECK(skeleton_stream_opened_);
 
   if (WaitForSingleObject(skeleton_frame_ready_event_, 0) != WAIT_OBJECT_0)
     return false;
 
-  NUI_SKELETON_FRAME* frame = skeleton->GetSkeletonFramePtr();
+  KinectSkeletonFrame skeleton_frame;
+  NUI_SKELETON_FRAME* frame = skeleton_frame.GetSkeletonFramePtr();
 
-  HRESULT res =
-      native_sensor_->NuiSkeletonGetNextFrame(0, frame);
+  HRESULT res = native_sensor_->NuiSkeletonGetNextFrame(0, frame);
 
   if (FAILED(res))
     return false;
@@ -188,7 +187,7 @@ bool KinectSensor::PollNextSkeletonFrame(KinectSkeletonFrame* skeleton) {
   skeleton_sticky_ids_[0] = track_ids[0];
   skeleton_sticky_ids_[1] = track_ids[1];
 
-  skeleton->SetTrackedSkeletons(track_ids[0], track_ids[1]);
+  state->InsertSkeletonFrame(skeleton_frame, track_ids[0], track_ids[1]);
 
   native_sensor_->NuiSkeletonSetTrackedSkeletons(track_ids);
 

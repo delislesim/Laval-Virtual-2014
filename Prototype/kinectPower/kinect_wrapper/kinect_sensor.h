@@ -7,16 +7,16 @@
 
 namespace kinect_wrapper {  
 
-class KinectBuffer;
-class KinectSkeletonFrame;
+class KinectSensorState;
 
 class KinectSensor {
  public:
   KinectSensor(INuiSensor* native_sensor);
+  ~KinectSensor();
 
   // Depth stream.
   bool OpenDepthStream();
-  bool PollNextDepthFrame(KinectBuffer* buffer);
+  bool PollNextDepthFrame(KinectSensorState* state);
   HANDLE GetDepthFrameReadyEvent() const {
     return depth_frame_ready_event_;
   }
@@ -29,15 +29,12 @@ class KinectSensor {
 
   // Skeleton stream.
   bool OpenSkeletonStream();
-  bool PollNextSkeletonFrame(KinectSkeletonFrame* skeleton);
+  bool PollNextSkeletonFrame(KinectSensorState* state);
   HANDLE GetSkeletonFrameReadyEvent() const {
     return skeleton_frame_ready_event_;
   }
 
  private:
-  friend class KinectWrapper;
-  ~KinectSensor();
-
   INuiSensor* native_sensor_;
 
   bool near_mode_enabled_;

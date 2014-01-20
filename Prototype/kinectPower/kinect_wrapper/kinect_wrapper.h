@@ -8,6 +8,7 @@
 #include "kinect_replay/kinect_player.h"
 #include "kinect_replay/kinect_recorder.h"
 #include "kinect_wrapper/kinect_include.h"
+#include "kinect_wrapper/kinect_sensor_state.h"
 
 namespace kinect_wrapper {
 
@@ -42,21 +43,6 @@ class KinectWrapper {
   KinectWrapper();
 	~KinectWrapper();
 
-  struct SensorInfo {
-    SensorInfo();
-
-    KinectSensor* sensor;
-    KinectBuffer* depth_buffer;
-    KinectSkeletonFrame* skeleton_buffer;
-    size_t current_skeleton_buffer;
-    HANDLE thread;
-    HANDLE close_event;
-    kinect_replay::KinectRecorder recorder;
-    kinect_replay::KinectPlayer player;
-
-    DISALLOW_COPY_AND_ASSIGN(SensorInfo);
-  };
-
   struct SensorThreadParams {
     KinectWrapper* wrapper;
     int sensor_index;
@@ -68,7 +54,7 @@ class KinectWrapper {
 
   static KinectWrapper* instance_;
 
-  SensorInfo sensor_info_[kMaxNumSensors];
+  KinectSensorState sensor_state_[kMaxNumSensors];
 
   DISALLOW_COPY_AND_ASSIGN(KinectWrapper);
 };

@@ -6,7 +6,7 @@
 #include "base/base.h"
 
 namespace kinect_wrapper {
-class KinectWrapper;
+class KinectSensorState;
 }  // namespace kinect_wrapper
 
 namespace kinect_replay {
@@ -17,8 +17,7 @@ class KinectRecorder {
   ~KinectRecorder();
 
   bool StartRecording(const std::string& filename);
-  bool RecordFrame(const kinect_wrapper::KinectWrapper& wrapper,
-                   int sensor_index);
+  bool RecordFrame(const kinect_wrapper::KinectSensorState& sensor_state);
   bool StopRecording();
 
  private:

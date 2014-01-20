@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "base/logging.h"
-#include "kinect_wrapper/kinect_buffer.h"
+#include "kinect_wrapper/kinect_sensor_state.h"
 #include "kinect_wrapper/kinect_skeleton_frame.h"
 
 namespace kinect_replay {
@@ -42,12 +42,8 @@ bool KinectPlayer::LoadFile(const std::string& filename) {
   return true;
 }
 
-bool KinectPlayer::ReadFrame(
-    int /* sensor_index */, 
-    kinect_wrapper::KinectBuffer* depth_buffer,
-    kinect_wrapper::KinectSkeletonFrame* skeleton_frame) {
-  DCHECK(depth_buffer);
-  DCHECK(skeleton_frame);
+bool KinectPlayer::ReadFrame(kinect_wrapper::KinectSensorState* sensor_state) {
+  DCHECK(sensor_state);
 
   if (!is_playing_)
     return false;
@@ -79,7 +75,7 @@ bool KinectPlayer::ReadFrame(
 
   buffer.resize(depth_length);
   in_.read(&buffer[0], depth_length);
-  depth_buffer->CopyData(&buffer[0], depth_length);
+  sensor_state->InsertDepthFrame(&buffer[0], depth_length);
 
   // Read the skeleton frame.
   buffer.resize(kSectionHeaderSize + 1);
@@ -89,11 +85,20 @@ bool KinectPlayer::ReadFrame(
   if (kSkeletonHeader != &buffer[0])
     return false;
 
+  kinect_wrapper::KinectSkeletonFrame skeleton_frame;
   const size_t kSkeletonFrameSize =
-      sizeof(*skeleton_frame->GetSkeletonFramePtr());
+      sizeof(*skeleton_frame.GetSkeletonFramePtr());
 
-  in_.read(reinterpret_cast<char*>(skeleton_frame->GetSkeletonFramePtr()),
+  in_.read(reinterpret_cast<char*>(skeleton_frame.GetSkeletonFramePtr()),
            kSkeletonFrameSize);
+
+  DWORD tracked_ids[kNumTrackedSkeletons];
+  for (int i = 0; i < kNumTrackedSkeletons; ++i) {
+    in_.read(reinterpret_cast<char*>(&tracked_ids[i]), sizeof(DWORD));
+  }
+
+  sensor_state->InsertSkeletonFrame(skeleton_frame,
+                                    tracked_ids[0], tracked_ids[1]);
 
   return true;
 }

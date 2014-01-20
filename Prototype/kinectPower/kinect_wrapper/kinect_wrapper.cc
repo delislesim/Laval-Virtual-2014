@@ -43,12 +43,6 @@ KinectWrapper::KinectWrapper() {
 }
 
 KinectWrapper::~KinectWrapper() {
-  for (int i = 0; i < kMaxNumSensors; ++i) {
-    delete sensor_info_[i].sensor;
-    delete sensor_info_[i].depth_buffer;
-    DCHECK(sensor_info_[i].thread == INVALID_HANDLE_VALUE);
-    DCHECK(sensor_info_[i].close_event == INVALID_HANDLE_VALUE);
-  }
 }
 
 void KinectWrapper::Initialize() {
@@ -72,105 +66,58 @@ void KinectWrapper::StartSensorThread(int sensor_index) {
   params->sensor_index = sensor_index;
   params->wrapper = this;
 
-  sensor_info_[sensor_index].close_event =
-      CreateEventW(nullptr, TRUE, FALSE, nullptr);
+  sensor_state_[sensor_index].SetCloseEvent(
+      CreateEventW(nullptr, TRUE, FALSE, nullptr));
 
-  sensor_info_[sensor_index].thread = CreateThread(
+  sensor_state_[sensor_index].SetThread(CreateThread(
       nullptr, 0, (LPTHREAD_START_ROUTINE)KinectWrapper::SensorThread, params,
-      0, nullptr);
+      0, nullptr));
 }
 
 void KinectWrapper::Shutdown() {
-  for (int i = 0; i < kMaxNumSensors; ++i) {
-    if (sensor_info_[i].close_event != INVALID_HANDLE_VALUE)
-      ::SetEvent(sensor_info_[i].close_event);
-  }
+  for (int i = 0; i < kMaxNumSensors; ++i)
+    sensor_state_[i].SendCloseEvent();
 
   for (int i = 0; i < kMaxNumSensors; ++i) {
-    SensorInfo* info = &sensor_info_[i];
-
-    if (info->thread != INVALID_HANDLE_VALUE) {
-      ::WaitForSingleObject(info->thread, INFINITE);
-      ::CloseHandle(info->thread);
-      info->thread = INVALID_HANDLE_VALUE;
-      ::CloseHandle(info->close_event);
-      info->close_event = INVALID_HANDLE_VALUE;
-
-      info->recorder.StopRecording();
-
-      DCHECK(info->depth_buffer == NULL);
-    }
+    sensor_state_[i].WaitThreadCloseAndDelete();
+    sensor_state_[i].StopRecording();
   }
 }
 
 bool KinectWrapper::RecordSensor(int sensor_index,
                                  const std::string& filename) {
   DCHECK(sensor_index < kMaxNumSensors);
-  return sensor_info_[sensor_index].recorder.StartRecording(filename);
+  return sensor_state_[sensor_index].StartRecording(filename);
 }
 
 bool KinectWrapper::QueryDepth(int sensor_index, cv::Mat* mat) const {
   DCHECK(mat != NULL);
-
-  if (sensor_info_[sensor_index].depth_buffer == NULL)
-    return false;
-
-  KinectBuffer* buffer = sensor_info_[sensor_index].depth_buffer;
-  buffer->GetDepthMat(mat);
-
-  return true;
+  return sensor_state_[sensor_index].QueryDepth(mat);
 }
 
 bool KinectWrapper::StartPlaySensor(int sensor_index,
                                     const std::string& filename) {
-  // Initialize the buffers.
-  // TODO(fdoray): Merge this code with the thread start code. ICI
-  sensor_info_[sensor_index].depth_buffer = new KinectBuffer(
-      640, 480, kKinectDepthBytesPerPixel);
-  sensor_info_[sensor_index].skeleton_buffer =
-      new KinectSkeletonFrame[kNumBuffers];
-
-  return sensor_info_[sensor_index].player.LoadFile(filename);
+  sensor_state_[sensor_index].CreateBuffers();
+  return sensor_state_[sensor_index].LoadReplayFile(filename);
 }
  
 bool KinectWrapper::PlayNextFrame(int sensor_index) {
-  int next_skeleton_buffer =
-      (sensor_info_[sensor_index].current_skeleton_buffer + 1) % kNumBuffers;
-
-  bool res = sensor_info_[sensor_index].player.ReadFrame(
-      sensor_index,
-      sensor_info_[sensor_index].depth_buffer,
-      &sensor_info_[sensor_index].skeleton_buffer[next_skeleton_buffer]);
-
-  if (!res)
-    return false;
-
-  sensor_info_[sensor_index].current_skeleton_buffer = next_skeleton_buffer;
-  return true;
+  return sensor_state_[sensor_index].ReplayFrame();
 }
 
 
 bool KinectWrapper::QuerySkeletonFrame(
     int sensor_index, KinectSkeletonFrame* skeleton_frame) const {
   DCHECK(skeleton_frame != NULL);
-
-  if (sensor_info_[sensor_index].skeleton_buffer == NULL)
-    return false;
-
-  size_t current_buffer_index =
-      sensor_info_[sensor_index].current_skeleton_buffer;
-  *skeleton_frame =
-      sensor_info_[sensor_index].skeleton_buffer[current_buffer_index];
-
-  return true;
+  return sensor_state_[sensor_index].QuerySkeletonFrame(skeleton_frame);
 }
 
 KinectSensor* KinectWrapper::CreateSensorByIndex(int index,
                                                  std::string* error) {
   DCHECK(error != NULL);
 
-  if (sensor_info_[index].sensor != NULL)
-    return sensor_info_[index].sensor;
+  if (sensor_state_[index].GetSensor() != NULL)
+    return sensor_state_[index].GetSensor();
 
   INuiSensor* native_sensor = NULL;
   if (FAILED(NuiCreateSensorByIndex(index, &native_sensor))) {
@@ -200,23 +147,14 @@ KinectSensor* KinectWrapper::CreateSensorByIndex(int index,
     return NULL;
   }
 
-  sensor_info_[index].sensor = new KinectSensor(native_sensor);
-  return sensor_info_[index].sensor;
+  sensor_state_[index].SetSensor(new KinectSensor(native_sensor));
+  return sensor_state_[index].GetSensor();
 }
 
 int KinectWrapper::GetSensorCount() {
   int nb_sensors = 0;
   NuiGetSensorCount(&nb_sensors);
   return nb_sensors;
-}
-
-KinectWrapper::SensorInfo::SensorInfo()
-    : sensor(NULL),
-      depth_buffer(NULL),
-      skeleton_buffer(NULL),
-      current_skeleton_buffer(0),
-      thread(INVALID_HANDLE_VALUE),
-      close_event(INVALID_HANDLE_VALUE) {
 }
 
 DWORD KinectWrapper::SensorThread(SensorThreadParams* params) {
@@ -237,17 +175,12 @@ DWORD KinectWrapper::SensorThread(SensorThreadParams* params) {
 
   // Start the streams and create the buffers.
   sensor->OpenDepthStream();
-  wrapper->sensor_info_[sensor_index].depth_buffer = new KinectBuffer(
-      sensor->depth_stream_width(), sensor->depth_stream_height(),
-      kKinectDepthBytesPerPixel);
-
   sensor->OpenSkeletonStream();
-  wrapper->sensor_info_[sensor_index].skeleton_buffer =
-      new KinectSkeletonFrame[kNumBuffers];
+  wrapper->sensor_state_[sensor_index].CreateBuffers();
 
   // Wait for ready frames.
   HANDLE events[] = {
-    wrapper->sensor_info_[sensor_index].close_event,
+    wrapper->sensor_state_[sensor_index].GetCloseEvent(),
     sensor->GetDepthFrameReadyEvent(),
     sensor->GetSkeletonFrameReadyEvent()
   };
@@ -262,30 +195,18 @@ DWORD KinectWrapper::SensorThread(SensorThreadParams* params) {
 
     // Poll the depth stream.
     bool depth_polled = sensor->PollNextDepthFrame(
-        wrapper->sensor_info_[sensor_index].depth_buffer);
+        &wrapper->sensor_state_[sensor_index]);
 
     // Poll the skeleton stream.
-    size_t current_skeleton_buffer =
-        wrapper->sensor_info_[sensor_index].current_skeleton_buffer;
-    if (sensor->PollNextSkeletonFrame(
-            &wrapper->sensor_info_[sensor_index].skeleton_buffer[
-                current_skeleton_buffer])) {
-      wrapper->sensor_info_[sensor_index].current_skeleton_buffer =
-        (current_skeleton_buffer + 1) % kNumBuffers;
-    }
+    sensor->PollNextSkeletonFrame(&wrapper->sensor_state_[sensor_index]);
 
     // Record the frame.
-    if (depth_polled) {
-      wrapper->sensor_info_[sensor_index].recorder.RecordFrame(
-          *wrapper, sensor_index);
-    }
+    if (depth_polled)
+      wrapper->sensor_state_[sensor_index].RecordFrame();
   }
 
-  // Free memory.
-  delete wrapper->sensor_info_[sensor_index].depth_buffer;
-  wrapper->sensor_info_[sensor_index].depth_buffer = NULL;
-
-  delete[] wrapper->sensor_info_[sensor_index].skeleton_buffer;
+  // Release the buffers.
+  wrapper->sensor_state_[sensor_index].ReleaseBuffers();
 
   return 1;
 }
