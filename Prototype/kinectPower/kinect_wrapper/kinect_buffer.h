@@ -11,7 +11,7 @@ namespace kinect_wrapper {
 
 class KinectBuffer {
  public:
-  KinectBuffer(size_t width, size_t height, size_t bytes_per_pixel);
+  KinectBuffer(size_t width, size_t height, int type);
   ~KinectBuffer();
 
   // This method is not thread safe!
@@ -37,7 +37,7 @@ class KinectBuffer {
   size_t height_;
   size_t bytes_per_pixel_;
 
-  std::vector<char> buffers_[kNumBuffers];
+  cv::Mat buffers_[kNumBuffers];
 
   DISALLOW_COPY_AND_ASSIGN(KinectBuffer);
 };
