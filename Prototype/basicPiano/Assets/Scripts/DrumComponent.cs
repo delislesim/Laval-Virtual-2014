@@ -28,7 +28,6 @@ public class DrumComponent : MonoBehaviour {
 	void OnMouseDown()
 	{
 		audio.Play();
-		Debug.Log ("YOLOS");
 	}
 	
 	void OnMouseUp()
