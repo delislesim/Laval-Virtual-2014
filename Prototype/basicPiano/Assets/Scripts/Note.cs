@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Note : MonoBehaviour {
 	
-	public float ecartOctave = 0;
+	public float ecartDemiTon = 0;
 	public string inputNote;
 	public Material neutre;
 	public Material touchee;
@@ -17,7 +17,7 @@ public class Note : MonoBehaviour {
 	void Update () {
 		if(Input.GetButtonDown(inputNote)){
 			transform.Translate(0,-0.35f,-0.1f);
-			audio.pitch = Mathf.Pow(2.0f, ecartOctave);
+			audio.pitch = Mathf.Pow(2.0f, ecartDemiTon/12);
 			audio.Play();
 			renderer.material=touchee;
 		}
@@ -33,7 +33,7 @@ public class Note : MonoBehaviour {
 	void OnMouseDown()
 	{
 		transform.Translate(0,-0.35f,-0.1f);
-		audio.pitch = Mathf.Pow(2.0f, ecartOctave);
+		audio.pitch = Mathf.Pow(2.0f, ecartDemiTon/12);
 		audio.Play();
 		renderer.material=touchee;
 	}
