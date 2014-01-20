@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "base/logging.h"
+#include "base/timer.h"
 #include "kinect_replay/kinect_recorder.h"
 #include "kinect_wrapper/constants.h"
 #include "kinect_wrapper/kinect_buffer.h"
@@ -10,6 +11,8 @@
 #include "kinect_wrapper/kinect_sensor.h"
 #include "kinect_wrapper/kinect_skeleton_frame.h"
 #include "kinect_wrapper/utility.h"
+
+//#define ENABLE_TIMER
 
 namespace kinect_wrapper {
 
@@ -197,6 +200,11 @@ DWORD KinectWrapper::SensorThread(SensorThreadParams* params) {
     if (ret == WAIT_OBJECT_0)  // Thread close event.
       break;
 
+#ifdef ENABLE_TIMER
+    base::Timer timer;
+    timer.Start();
+#endif
+
     // Poll the depth stream.
     bool depth_polled = sensor->PollNextDepthFrame(
         &wrapper->sensor_state_[sensor_index]);
@@ -207,6 +215,10 @@ DWORD KinectWrapper::SensorThread(SensorThreadParams* params) {
     // Record the frame.
     if (depth_polled)
       wrapper->sensor_state_[sensor_index].RecordFrame();
+
+#ifdef ENABLE_TIMER
+    std::cout << "Elapsed time: " << timer.ElapsedTime() << " ms." << std::endl;
+#endif
   }
 
   // Release the buffers.

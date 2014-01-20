@@ -29,6 +29,7 @@ include_directories(
 
 add_library(base
   base/base.h
+  base/float_util.h
   base/logging.cc
   base/logging.h
   base/observer_list.h
@@ -37,6 +38,8 @@ add_library(base
   base/scoped_handle.h
   base/string_utils.cc
   base/string_utils.h
+  base/timer.cc
+  base/timer.h
   )
 
 add_library(kinect_wrapper
@@ -108,6 +111,14 @@ target_link_libraries(kinect_power
 ####################
 # Executables
 ####################
+
+add_executable (test_opencv
+  test_opencv/main.cc
+)
+
+target_link_libraries(test_opencv
+  ${OpenCV_LIBS}
+  )
 
 #include_external_msproject(
 #    sample sample/sample.csproj
