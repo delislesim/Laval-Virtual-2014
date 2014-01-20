@@ -3,17 +3,21 @@
 #include <opencv2/core/core.hpp>
 #include <vector>
 
+#include "base/base.h"
+#include "kinect_wrapper/kinect_observer.h"
 #include "kinect_wrapper/kinect_switch.h"
 
 namespace piano {
 
-class Piano {
+class Piano : kinect_wrapper::KinectObserver {
  public:
   Piano();
   ~Piano();
   
-  // Note: The provided |depth_mat| will be modified by the algorithm.
-  void LoadDepthImage(cv::Mat depth_mat);
+  virtual void ObserveDepth(
+      const cv::Mat& depth_mat,
+      const kinect_wrapper::KinectSensorState& sensor_state) OVERRIDE;
+
   void QueryNotes(unsigned char* notes, size_t notes_size);
   void QueryNiceImage(unsigned char* nice_image, size_t nice_image_size);
 
@@ -32,6 +36,7 @@ class Piano {
     return reinterpret_cast<unsigned char*>(nice_image_.GetNextPtr()->ptr());
   }
 
+  bool started_;
 
   cv::Mat depth_mat_;
   kinect_wrapper::KinectSwitch<cv::Mat> nice_image_;

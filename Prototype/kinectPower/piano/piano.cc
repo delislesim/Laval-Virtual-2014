@@ -2,6 +2,7 @@
 
 #include "base/logging.h"
 #include "kinect_wrapper/constants.h"
+#include "kinect_wrapper/kinect_wrapper.h"
 #include "kinect_wrapper/utility.h"
 
 using namespace cv;
@@ -33,20 +34,29 @@ int GetIndexOfPixel(int x, int y) {
 
 }  // namespace
 
-Piano::Piano() {
+Piano::Piano() : started_(false) {
+  // Register the piano as an observer of the main Kinect sensor.
+  kinect_wrapper::KinectWrapper::instance()->AddObserver(0, this);
 }
 
 Piano::~Piano() {
 }
 
-void Piano::LoadDepthImage(Mat depth_mat) {
-  depth_mat_ = depth_mat;
+void Piano::ObserveDepth(
+      const cv::Mat& depth_mat,
+      const kinect_wrapper::KinectSensorState& /* sensor_state */) {
+  depth_mat_ = depth_mat.clone();
   FindNotes();
   DrawPiano();
+  started_ = true;
 }
 
 void Piano::QueryNotes(unsigned char* notes, size_t notes_size) {
   DCHECK(notes_size == kPianoNumNotes);
+
+  if (!started_)
+    return;
+
   std::vector<bool> notes_vector;
   notes_.GetCurrent(&notes_vector);
 
@@ -56,6 +66,11 @@ void Piano::QueryNotes(unsigned char* notes, size_t notes_size) {
 }
 
 void Piano::QueryNiceImage(unsigned char* nice_image, size_t nice_image_size) {
+  DCHECK(nice_image);
+
+  if (!started_)
+    return;
+
   cv::Mat nice_mat;
   nice_image_.GetCurrent(&nice_mat);
 
@@ -69,7 +84,7 @@ void Piano::DrawPiano() {
   // Generate a nice image from the depth information.
   kinect_wrapper::NiceImageFromDepthMat(depth_mat_, 2500, kPianoZ, nice_ptr,
                                         nice_image.total() * 4);
-
+ 
   // Draw the actual piano.
   DrawHorizontalLine(kPianoYMin, kPianoXMin, kPianoXMax, nice_ptr);
   DrawVerticalLine(kPianoXMin, kPianoYMin, kPianoYMax, nice_ptr);

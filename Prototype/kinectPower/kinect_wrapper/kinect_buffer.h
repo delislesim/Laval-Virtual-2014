@@ -1,7 +1,6 @@
 #pragma once
 
 #include <opencv2/core/core.hpp>
-#include <vector>
 
 #include "base/base.h"
 #include "kinect_wrapper/constants.h"

@@ -99,13 +99,6 @@ bool GetJointsPosition(int skeleton_id, float* joint_positions) {
 
 bool GetPianoInfo(unsigned char* notes, unsigned int notes_size,
                   unsigned char* pixels, unsigned int pixels_size) {
-  KinectWrapper* wrapper = KinectWrapper::instance();
-
-  cv::Mat depth_mat;
-  if (!wrapper->QueryDepth(0, &depth_mat))
-    return false;
-
-  the_piano.LoadDepthImage(depth_mat);
   the_piano.QueryNiceImage(pixels, pixels_size);
   the_piano.QueryNotes(notes, notes_size);
 

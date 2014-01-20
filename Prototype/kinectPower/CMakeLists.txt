@@ -31,6 +31,7 @@ add_library(base
   base/base.h
   base/logging.cc
   base/logging.h
+  base/observer_list.h
   base/scoped_ptr.h
   base/scoped_handle.cc
   base/scoped_handle.h
@@ -44,6 +45,7 @@ add_library(kinect_wrapper
   kinect_wrapper/kinect_buffer.cc
   kinect_wrapper/kinect_buffer.h
   kinect_wrapper/kinect_include.h
+  kinect_wrapper/kinect_observer.h
   kinect_wrapper/kinect_sensor.cc
   kinect_wrapper/kinect_sensor.h
   kinect_wrapper/kinect_sensor_state.cc

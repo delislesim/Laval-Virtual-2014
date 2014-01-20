@@ -112,6 +112,10 @@ bool KinectWrapper::QuerySkeletonFrame(
   return sensor_state_[sensor_index].QuerySkeletonFrame(skeleton_frame);
 }
 
+void KinectWrapper::AddObserver(int sensor_index, KinectObserver* observer) {
+  sensor_state_[sensor_index].AddObserver(observer);
+}
+
 KinectSensor* KinectWrapper::CreateSensorByIndex(int index,
                                                  std::string* error) {
   DCHECK(error != NULL);

@@ -1,6 +1,7 @@
 #include "kinect_wrapper/kinect_sensor_state.h"
 
 #include "base/logging.h"
+#include "kinect_wrapper/kinect_observer.h"
 
 namespace kinect_wrapper {
 
@@ -36,23 +37,23 @@ void KinectSensorState::WaitThreadCloseAndDelete() {
 }
 
 bool KinectSensorState::StartRecording(const std::string& filename) {
-  return recorder.StartRecording(filename);
+  return recorder_.StartRecording(filename);
 }
 
 void KinectSensorState::StopRecording() {
-  recorder.StopRecording();
+  recorder_.StopRecording();
 }
 
 bool KinectSensorState::LoadReplayFile(const std::string& filename) {
-  return player.LoadFile(filename);
+  return player_.LoadFile(filename);
 }
 
 bool KinectSensorState::ReplayFrame() {
-  return player.ReadFrame(this);
+  return player_.ReadFrame(this);
 }
 
 bool KinectSensorState::RecordFrame() {
-  return recorder.RecordFrame(*this);
+  return recorder_.RecordFrame(*this);
 }
 
 void KinectSensorState::CreateBuffers() {
@@ -88,16 +89,37 @@ bool KinectSensorState::QuerySkeletonFrame(
 void KinectSensorState::InsertDepthFrame(const char* depth_frame,
                                          size_t depth_frame_size) {
   depth_buffer_->CopyData(depth_frame, depth_frame_size);
+
+  cv::Mat depth_mat;
+  QueryDepth(&depth_mat);
+  FOR_EACH_OBSERVER(KinectObserver, observers_, ObserveDepth(depth_mat, *this));
 }
 
 void KinectSensorState::InsertDepthFrame(const NUI_DEPTH_IMAGE_PIXEL* start,
                                          const NUI_DEPTH_IMAGE_PIXEL* end) {
   depth_buffer_->CopyDepthTexture(start, end);
+
+  cv::Mat depth_mat;
+  QueryDepth(&depth_mat);
+  FOR_EACH_OBSERVER(KinectObserver, observers_, ObserveDepth(depth_mat, *this));
 }
 
 void KinectSensorState::InsertSkeletonFrame(
     const KinectSkeletonFrame& skeleton_frame) {
   skeleton_buffer_->SetNext(skeleton_frame);
+
+  cv::Mat depth_mat;
+  QueryDepth(&depth_mat);
+  FOR_EACH_OBSERVER(KinectObserver, observers_,
+                    ObserveSkeleton(skeleton_frame, *this));
+}
+
+void KinectSensorState::AddObserver(KinectObserver* obs) {
+  observers_.AddObserver(obs);
+}
+
+void KinectSensorState::RemoveObserver(KinectObserver* obs) {
+  observers_.RemoveObserver(obs);
 }
 
 }  // namespace kinect_wrapper

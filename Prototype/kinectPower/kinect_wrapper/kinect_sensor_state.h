@@ -3,6 +3,7 @@
 #include <opencv2/core/core.hpp>
 
 #include "base/base.h"
+#include "base/observer_list.h"
 #include "base/scoped_handle.h"
 #include "base/scoped_ptr.h"
 #include "kinect_replay/kinect_player.h"
@@ -14,6 +15,8 @@
 #include "kinect_wrapper/kinect_switch.h"
 
 namespace kinect_wrapper {  
+
+class KinectObserver;
 
 class KinectSensorState {
  public:
@@ -50,6 +53,9 @@ class KinectSensorState {
                         const NUI_DEPTH_IMAGE_PIXEL* end);
   void InsertSkeletonFrame(const KinectSkeletonFrame& skeleton_frame);
 
+  void AddObserver(KinectObserver* obs);
+  void RemoveObserver(KinectObserver* obs);
+
  private:
   scoped_ptr<KinectSensor> sensor_;
   scoped_ptr<KinectBuffer> depth_buffer_;
@@ -58,8 +64,10 @@ class KinectSensorState {
   base::ScopedHandle thread_;
   base::ScopedHandle close_event_;
 
-  kinect_replay::KinectRecorder recorder;
-  kinect_replay::KinectPlayer player;
+  kinect_replay::KinectRecorder recorder_;
+  kinect_replay::KinectPlayer player_;
+
+  ObserverList<KinectObserver> observers_;
 
   DISALLOW_COPY_AND_ASSIGN(KinectSensorState);
 };

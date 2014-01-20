@@ -64,7 +64,7 @@ class LogMessage {
 #define DCHECK_GT(a, b) DCHECK((a) > (b))
 #define DCHECK_GE(a, b) DCHECK((a) >= (b))
 
-#define NOTREACHED(message) LOG(FATAL) << message
+#define NOTREACHED() LOG(FATAL)
 
 }  // namespace base
 

@@ -13,6 +13,7 @@
 namespace kinect_wrapper {
 
 class KinectBuffer;
+class KinectObserver;
 class KinectSensor;
 class KinectSkeletonFrame;
 
@@ -38,6 +39,7 @@ class KinectWrapper {
   bool QueryDepth(int sensor_index, cv::Mat* mat) const;
   bool QuerySkeletonFrame(int sensor_index,
                           KinectSkeletonFrame* skeleton_frame) const;
+  void AddObserver(int sensor_index, KinectObserver* observer);
 
  private:
   KinectWrapper();
