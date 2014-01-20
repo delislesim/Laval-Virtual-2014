@@ -25,9 +25,9 @@ namespace sample
     {
       InitializeComponent();
 
-      //Initialize();
+      Initialize();
       //RecordSensor(0, "test.txt");
-      StartPlaySensor(0, "test.txt");
+      //StartPlaySensor(0, "test.txt");
 
       aTimer = new System.Timers.Timer(20);
       aTimer.Elapsed += new System.Timers.ElapsedEventHandler(aTimer_Elapsed);

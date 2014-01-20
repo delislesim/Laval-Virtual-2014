@@ -58,7 +58,7 @@ bool KinectSensorState::RecordFrame() {
 void KinectSensorState::CreateBuffers() {
   depth_buffer_.reset(new KinectBuffer(
       kKinectDepthWidth, kKinectDepthHeight, kKinectDepthBytesPerPixel));
-  skeleton_buffer_.reset(new KinectSkeletonBuffer);
+  skeleton_buffer_.reset(new KinectSwitch<KinectSkeletonFrame>);
 }
 
 void KinectSensorState::ReleaseBuffers() {
@@ -81,7 +81,7 @@ bool KinectSensorState::QuerySkeletonFrame(
 
   if (skeleton_buffer_.get() == NULL)
     return false;
-  skeleton_buffer_->GetCurrentSkeletonFrame(skeleton_frame);
+  skeleton_buffer_->GetCurrent(skeleton_frame);
   return true;
 }
 
@@ -96,9 +96,8 @@ void KinectSensorState::InsertDepthFrame(const NUI_DEPTH_IMAGE_PIXEL* start,
 }
 
 void KinectSensorState::InsertSkeletonFrame(
-    const KinectSkeletonFrame& skeleton_frame,
-    DWORD track_id_1, DWORD track_id_2) {
-  skeleton_buffer_->SetNextSkeleton(skeleton_frame, track_id_1, track_id_2);
+    const KinectSkeletonFrame& skeleton_frame) {
+  skeleton_buffer_->SetNext(skeleton_frame);
 }
 
 }  // namespace kinect_wrapper

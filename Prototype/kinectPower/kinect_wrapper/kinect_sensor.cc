@@ -187,7 +187,8 @@ bool KinectSensor::PollNextSkeletonFrame(KinectSensorState* state) {
   skeleton_sticky_ids_[0] = track_ids[0];
   skeleton_sticky_ids_[1] = track_ids[1];
 
-  state->InsertSkeletonFrame(skeleton_frame, track_ids[0], track_ids[1]);
+  skeleton_frame.SetTrackedSkeletons(track_ids[0], track_ids[1]);
+  state->InsertSkeletonFrame(skeleton_frame);
 
   native_sensor_->NuiSkeletonSetTrackedSkeletons(track_ids);
 

@@ -186,7 +186,7 @@ DWORD KinectWrapper::SensorThread(SensorThreadParams* params) {
   };
   DWORD nb_events = ARRAYSIZE(events);
 
-  while (true) {
+  for (;;) {
     DWORD ret = ::WaitForMultipleObjects(nb_events, events,
                                          FALSE, INFINITE);
 

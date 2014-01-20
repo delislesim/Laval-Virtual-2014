@@ -97,8 +97,8 @@ bool KinectPlayer::ReadFrame(kinect_wrapper::KinectSensorState* sensor_state) {
     in_.read(reinterpret_cast<char*>(&tracked_ids[i]), sizeof(DWORD));
   }
 
-  sensor_state->InsertSkeletonFrame(skeleton_frame,
-                                    tracked_ids[0], tracked_ids[1]);
+  skeleton_frame.SetTrackedSkeletons(tracked_ids[0], tracked_ids[1]);
+  sensor_state->InsertSkeletonFrame(skeleton_frame);
 
   return true;
 }

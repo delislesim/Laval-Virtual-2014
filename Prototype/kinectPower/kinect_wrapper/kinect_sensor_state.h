@@ -10,13 +10,10 @@
 #include "kinect_wrapper/constants.h"
 #include "kinect_wrapper/kinect_buffer.h"
 #include "kinect_wrapper/kinect_sensor.h"
-#include "kinect_wrapper/kinect_skeleton_buffer.h"
 #include "kinect_wrapper/kinect_skeleton_frame.h"
+#include "kinect_wrapper/kinect_switch.h"
 
 namespace kinect_wrapper {  
-
-class KinectSensor;
-class KinectSkeletonFrame;
 
 class KinectSensorState {
  public:
@@ -51,13 +48,12 @@ class KinectSensorState {
   void InsertDepthFrame(const char* depth_frame, size_t depth_frame_size);
   void InsertDepthFrame(const NUI_DEPTH_IMAGE_PIXEL* start,
                         const NUI_DEPTH_IMAGE_PIXEL* end);
-  void InsertSkeletonFrame(const KinectSkeletonFrame& skeleton_frame,
-                           DWORD track_id_1, DWORD track_id_2);
+  void InsertSkeletonFrame(const KinectSkeletonFrame& skeleton_frame);
 
  private:
   scoped_ptr<KinectSensor> sensor_;
   scoped_ptr<KinectBuffer> depth_buffer_;
-  scoped_ptr<KinectSkeletonBuffer> skeleton_buffer_;
+  scoped_ptr<KinectSwitch<KinectSkeletonFrame> > skeleton_buffer_;
   
   base::ScopedHandle thread_;
   base::ScopedHandle close_event_;
