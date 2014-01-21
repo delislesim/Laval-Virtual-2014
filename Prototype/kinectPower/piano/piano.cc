@@ -1,6 +1,7 @@
 #include "piano/piano.h"
 
 #include <iostream>
+#include <opencv2/imgproc/imgproc.hpp>
 
 #include "base/logging.h"
 #include "kinect_wrapper/constants.h"
@@ -55,7 +56,8 @@ void Piano::ObserveDepth(
       const cv::Mat& depth_mat,
       const kinect_wrapper::KinectSensorState& sensor_state) {
   FindNotes(depth_mat, sensor_state);
-  DrawDepth(depth_mat);
+  DrawFingers(depth_mat);
+  //DrawDepth(depth_mat);
   //DrawMotion(depth_mat, sensor_state);
   started_ = true;
 }
@@ -84,6 +86,84 @@ void Piano::QueryNiceImage(unsigned char* nice_image, size_t nice_image_size) {
   nice_image_.GetCurrent(&nice_mat);
 
   memcpy_s(nice_image, nice_image_size, nice_mat.ptr(), nice_mat.total() * 4);
+}
+
+void Piano::DrawFingers(const cv::Mat& depth_mat) {
+  cv::Mat image = Mat(depth_mat.rows, depth_mat.cols, CV_8UC4);
+  unsigned char* image_ptr = image.ptr();
+  unsigned short const* depth_ptr = reinterpret_cast<unsigned short const*>(depth_mat.ptr());
+
+  const int kMinZ = kPianoZ - 140;
+  const int kMaxZ = kPianoZ + 140;
+
+  // std::vector<cv::Point> hand_points;
+
+  cv::Mat simple_hand = cv::Mat(depth_mat.rows, depth_mat.cols, CV_8U);
+  unsigned char* simple_hand_ptr = simple_hand.ptr();
+
+  // Draw the initial depth image.
+  for (int i = 0; i < image.total(); ++i) {
+
+    int y = i / depth_mat.cols;
+    int x = i % depth_mat.cols;
+
+    if (*depth_ptr > kMinZ && *depth_ptr < kMaxZ && y > 100 && y < 350 && x > 100 && x < 500) {
+      
+      unsigned int normalized_depth = (((unsigned int)*depth_ptr) - kMinZ) * 255;
+      normalized_depth /= (kMaxZ - kMinZ);
+      
+      image_ptr[kRedIndex] = (unsigned char)normalized_depth;
+      image_ptr[kGreenIndex] = (unsigned char)normalized_depth;
+      image_ptr[kBlueIndex] = (unsigned char)normalized_depth;
+
+      *simple_hand_ptr = 1;
+
+    } else {
+      image_ptr[kRedIndex] = 0;
+      image_ptr[kGreenIndex] = 0;
+      image_ptr[kBlueIndex] = 0;
+
+      *simple_hand_ptr = 0;
+    }
+
+    image_ptr += 4;
+    ++depth_ptr;
+    ++simple_hand_ptr;
+  }
+  
+  // Find contours.
+  std::vector<std::vector<cv::Point> > contours;
+  cv::findContours(simple_hand, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
+
+  size_t biggest_contour = 9999;
+  size_t biggest_contour_size = 0;
+  for (int i = 0; i < contours.size(); ++i) {
+    if (contours[i].size() > biggest_contour_size) {
+      biggest_contour = i;
+      biggest_contour_size = contours[i].size();
+    }
+  }
+
+  if (biggest_contour != 9999) {
+    // Draw the biggest contour.
+    cv::drawContours(image, contours, biggest_contour, Scalar(255, 0, 0), 2, 8);
+
+    // Find a convex hull for the hand.
+    std::vector<int> convex_hull;
+    cv::convexHull(contours[biggest_contour], convex_hull);
+
+    // Find convexity defects.
+    std::vector<Vec4i> convexity_defects;
+    cv::convexityDefects(contours[biggest_contour], convex_hull, convexity_defects);
+
+    for (int i = 0; i < convexity_defects.size(); ++i) {
+      cv::circle(image, contours[biggest_contour][convexity_defects[i].val[0]], 2, Scalar(0, 255, 0));
+      cv::circle(image, contours[biggest_contour][convexity_defects[i].val[2]], 2, Scalar(0, 0, 255));
+    }
+
+  }
+
+  nice_image_.SetNext(image);
 }
 
 void Piano::DrawDepth(const cv::Mat& depth_mat) {

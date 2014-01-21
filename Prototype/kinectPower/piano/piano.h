@@ -22,6 +22,7 @@ class Piano : kinect_wrapper::KinectObserver {
   void QueryNiceImage(unsigned char* nice_image, size_t nice_image_size);
 
  private:
+  void DrawFingers(const cv::Mat& depth_mat);
   void DrawDepth(const cv::Mat& depth_mat);
   void DrawMotion(const cv::Mat& depth_mat,
                   const kinect_wrapper::KinectSensorState& sensor_state);
