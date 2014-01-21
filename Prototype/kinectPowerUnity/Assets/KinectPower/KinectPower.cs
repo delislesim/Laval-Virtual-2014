@@ -69,20 +69,20 @@ public class KinectPower : MonoBehaviour {
 			depthTexture.SetPixels32(depthColors);
 			depthTexture.Apply();
 
-			a.SetEnfoncee(notes[0] == 1);
-			b.SetEnfoncee(notes[1] == 1);
-			c.SetEnfoncee(notes[2] == 1);
-			d.SetEnfoncee(notes[3] == 1);
-			e.SetEnfoncee(notes[4] == 1);
-			f.SetEnfoncee(notes[5] == 1);
-			g.SetEnfoncee(notes[6] == 1);
-			a1.SetEnfoncee(notes[7] == 1);
-			b1.SetEnfoncee(notes[8] == 1);
-			c1.SetEnfoncee(notes[9] == 1);
-			d1.SetEnfoncee(notes[10] == 1);
-			e1.SetEnfoncee(notes[11] == 1);
-			f1.SetEnfoncee(notes[12] == 1);
-			g1.SetEnfoncee(notes[13] == 1);
+			a.SetEnfoncee(notes[0]);
+			b.SetEnfoncee(notes[1]);
+			c.SetEnfoncee(notes[2]);
+			d.SetEnfoncee(notes[3]);
+			e.SetEnfoncee(notes[4]);
+			f.SetEnfoncee(notes[5]);
+			g.SetEnfoncee(notes[6]);
+			a1.SetEnfoncee(notes[7]);
+			b1.SetEnfoncee(notes[8]);
+			c1.SetEnfoncee(notes[9]);
+			d1.SetEnfoncee(notes[10]);
+			e1.SetEnfoncee(notes[11]);
+			f1.SetEnfoncee(notes[12]);
+			g1.SetEnfoncee(notes[13]);
 		}
 	}
 

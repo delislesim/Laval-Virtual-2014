@@ -21,14 +21,21 @@ const int kRedIndex = 2;
 const int kAlphaIndex = 3;
 
 // Piano image
-const int kPianoZ = /*690 */ 750;
-const int kPianoXMin = 15;
+const int kPianoZ = 690 /*690 */ /*750 */;
+const int kPianoXMin = 100;
 const int kPianoYMin = 200;
-const int kPianoHeight = 80;
-const int kPianoNoteWidth = 20;
+const int kPianoHeight = 130;
+const int kPianoNoteWidth = 24;
 const int kPianoNumNotes = 20;
 const int kPianoXMax = kPianoXMin + kPianoNumNotes * kPianoNoteWidth;
 const int kPianoYMax = kPianoYMin + kPianoHeight;
+
+const int kPixelsToPlay = 150 /*250*/;
+const int kPixelsToRemove = 75;
+
+const int ACTION_PLAY = 1;
+const int ACTION_STAY = 2;
+const int ACTION_REMOVE = 3;
 
 int GetIndexOfPixel(int x, int y) {
   return kinect_wrapper::kKinectDepthWidth * y + x;
@@ -47,9 +54,9 @@ Piano::~Piano() {
 void Piano::ObserveDepth(
       const cv::Mat& depth_mat,
       const kinect_wrapper::KinectSensorState& sensor_state) {
-  FindNotes(depth_mat);
-  //DrawDepth(depth_mat);
-  DrawMotion(depth_mat, sensor_state);
+  FindNotes(depth_mat, sensor_state);
+  DrawDepth(depth_mat);
+  //DrawMotion(depth_mat, sensor_state);
   started_ = true;
 }
 
@@ -59,11 +66,11 @@ void Piano::QueryNotes(unsigned char* notes, size_t notes_size) {
   if (!started_)
     return;
 
-  std::vector<bool> notes_vector;
+  std::vector<int> notes_vector;
   notes_.GetCurrent(&notes_vector);
 
   for (size_t i = 0; i < notes_vector.size(); ++i) {
-    notes[i] = notes_vector[i] ? 1 : 0;
+    notes[i] = notes_vector[i];
   }
 }
 
@@ -84,7 +91,7 @@ void Piano::DrawDepth(const cv::Mat& depth_mat) {
   unsigned char* image_ptr = image.ptr();
 
   // Generate a nice image from the depth information.
-  kinect_wrapper::NiceImageFromDepthMat(depth_mat, 2500, kPianoZ, image_ptr,
+  kinect_wrapper::NiceImageFromDepthMat(depth_mat, kPianoZ + 140, kPianoZ - 140, kPianoZ, image_ptr,
                                         image.total() * 4);
 
   // Draw the piano.
@@ -96,7 +103,7 @@ void Piano::DrawDepth(const cv::Mat& depth_mat) {
 void Piano::DrawMotion(const cv::Mat& depth_mat,
                        const kinect_wrapper::KinectSensorState& sensor_state) {
   cv::Mat past_mat;
-  sensor_state.QueryDepth(4, &past_mat);
+  sensor_state.QueryDepth(8, &past_mat);
 
   cv::Mat image = Mat(depth_mat.rows, depth_mat.cols, CV_8UC4);
 
@@ -164,15 +171,21 @@ void Piano::DrawPiano(cv::Mat* image) {
   }
 }
 
-void Piano::FindNotes(const cv::Mat& depth_mat) {
-  std::vector<bool> notes(kPianoNumNotes);
+void Piano::FindNotes(const cv::Mat& depth_mat,
+                      const kinect_wrapper::KinectSensorState& sensor_state) {
+  std::vector<int> notes(kPianoNumNotes);
+  std::vector<int> pixels_per_note(kPianoNumNotes);
+  std::vector<int> motion_per_note(kPianoNumNotes);
 
-  // Reset notes vector.
-  for (int note = 0; note < kPianoNumNotes; ++note) {
-    notes[note] = false;
-  }
+  cv::Mat past_mat;
+  sensor_state.QueryDepth(8, &past_mat);
 
-  // Find played notes.
+  cv::Mat motion;
+  cv::subtract(depth_mat, past_mat, motion, noArray(), CV_16S);
+
+  short const* motion_ptr = reinterpret_cast<short const*>(motion.ptr());
+
+  // Count active pixels per note and calculate motion.
   for (int row = kPianoYMin; row < kPianoYMax; ++row) {
     unsigned short const* pixel = reinterpret_cast<unsigned short const*>(
         depth_mat.ptr()) + GetIndexOfPixel(kPianoXMin, row);
@@ -181,11 +194,29 @@ void Piano::FindNotes(const cv::Mat& depth_mat) {
       for (int col = kPianoXMin + note * kPianoNoteWidth;
            col < kPianoXMin + (note + 1) * kPianoNoteWidth; ++col) {
         
-        if (*pixel < kPianoZ && *pixel > 0)
-          notes[note] = true;
+        if (*pixel < kPianoZ && *pixel > 0) {
+          ++pixels_per_note[note];
+          motion_per_note[note] += abs(*motion_ptr);
+        }
 
         ++pixel;
+        ++motion_ptr;
       }
+    }
+  }
+
+  // Find played notes.
+  for (int i = 0; i < kPianoNumNotes; ++i) {
+    int average_motion = 0;
+    if (pixels_per_note[i] > 0)    
+      average_motion = motion_per_note[i] / pixels_per_note[i];
+
+    if (pixels_per_note[i] > kPixelsToPlay) {
+      notes[i] = ACTION_PLAY;
+    } else if (pixels_per_note[i] < kPixelsToRemove) {
+      notes[i] = ACTION_REMOVE;
+    } else {
+      notes[i] = ACTION_STAY;
     }
   }
 
@@ -202,9 +233,9 @@ void Piano::DrawVerticalLine(int x, int ymin, int ymax, cv::Mat* image) {
   unsigned char* img_stop = img_ptr + 4*stop_index;
 
   while (img_run < img_stop) {
-    img_run[kRedIndex] = 0;
-    img_run[kGreenIndex] = 255;
-    img_run[kBlueIndex] = 0;
+    img_run[kRedIndex] = (unsigned char)(static_cast<unsigned int>(255 - img_run[kRedIndex]) * 180 / 255);
+    img_run[kGreenIndex] = (unsigned char)(static_cast<unsigned int>(255 -img_run[kGreenIndex]) * 180 / 255);
+    img_run[kBlueIndex] = (unsigned char)(static_cast<unsigned int>(255 -img_run[kBlueIndex]) * 180 / 255);
 
     img_run += 4*kinect_wrapper::kKinectDepthWidth;
   }
@@ -221,9 +252,9 @@ void Piano::DrawHorizontalLine(int y, int xmin, int xmax, cv::Mat* image) {
   unsigned char* img_stop = img_ptr + 4*stop_index;
 
   while (img_run < img_stop) {
-    img_run[kRedIndex] = 0;
-    img_run[kGreenIndex] = 255;
-    img_run[kBlueIndex] = 0;
+    img_run[kRedIndex] = (unsigned char)(static_cast<unsigned int>(255 - img_run[kRedIndex]) * 180 / 255);
+    img_run[kGreenIndex] = (unsigned char)(static_cast<unsigned int>(255 -img_run[kGreenIndex]) * 180 / 255);
+    img_run[kBlueIndex] = (unsigned char)(static_cast<unsigned int>(255 -img_run[kBlueIndex]) * 180 / 255);
 
     img_run += 4;
   }

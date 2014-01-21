@@ -14,12 +14,16 @@ public class Note : MonoBehaviour {
 	// Indique si la note est déja enfoncée.
 	private bool enfoncee = false;
 
-	public void SetEnfoncee(bool v) {
-		if (v) {
+	private int ACTION_PLAY = 1;
+	//private int ACTION_STAY = 2;
+	private int ACTION_REMOVE = 3;
+
+	public void SetEnfoncee(int action) {
+		if (action == ACTION_PLAY) {
 			if (!enfoncee) {
 				this.enfoncee_start = true;
 			}
-		} else {
+		} else if (action == ACTION_REMOVE) {
 			this.enfoncee_start = false;
 			this.enfoncee = false;
 		}

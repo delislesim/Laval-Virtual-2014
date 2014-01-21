@@ -12,7 +12,7 @@
 #include "kinect_wrapper/kinect_skeleton_frame.h"
 #include "kinect_wrapper/utility.h"
 
-#define ENABLE_TIMER
+//#define ENABLE_TIMER
 
 namespace kinect_wrapper {
 

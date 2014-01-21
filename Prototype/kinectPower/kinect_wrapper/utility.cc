@@ -16,6 +16,7 @@ const int kAlphaIndex = 3;
 
 void NiceImageFromDepthMat(cv::Mat depth_mat,
                            unsigned short max_depth, unsigned short min_depth,
+                           unsigned short color_depth,
                            unsigned char* nice_image, size_t nice_image_size) {
   unsigned short* ptr = reinterpret_cast<unsigned short*>(depth_mat.ptr());
 
@@ -27,11 +28,19 @@ void NiceImageFromDepthMat(cv::Mat depth_mat,
 
     unsigned short pixel_data = *ptr;
 
-    unsigned short depth = pixel_data; /* >> kPlayerIndexBitmaskWidth; */
-    unsigned int normalized_depth =
-      static_cast<unsigned int>((depth) * 255 / max_depth);
-    if (normalized_depth > 255)
-      normalized_depth = 255;
+    unsigned short depth = pixel_data;
+
+    unsigned int normalized_depth = 0;
+    if (depth > min_depth) {
+      normalized_depth =
+        static_cast<unsigned int>((depth - min_depth)
+            * 255 / (max_depth - min_depth));
+      if (normalized_depth > 255)
+        normalized_depth = 255;
+      else 
+        int i =2;
+    }
+
     unsigned char byte = static_cast<unsigned char>(normalized_depth);
 
     nice_image[color_index + kBlueIndex] = 255 - byte;
@@ -41,9 +50,10 @@ void NiceImageFromDepthMat(cv::Mat depth_mat,
 
     if (depth == 0) {
       // Red.
+      nice_image[color_index + kRedIndex] = 0;
       nice_image[color_index + kBlueIndex] = 0;
       nice_image[color_index + kGreenIndex] = 0;
-    } else if (depth < min_depth) {
+    } else if (depth < color_depth) {
       // Blue.
       nice_image[color_index + kRedIndex] = 0;
       nice_image[color_index + kGreenIndex] = 0;

@@ -52,6 +52,7 @@ bool PlayNextFrame(int sensor_index) {
 
 bool GetNiceDepthMap(unsigned char* pixels, unsigned int pixels_size) {
   const int kMinDepth = 690;
+  const int kColorDepth = 700;
   const int kMaxDepth = 2500;
    
   KinectWrapper* wrapper = KinectWrapper::instance();
@@ -61,7 +62,8 @@ bool GetNiceDepthMap(unsigned char* pixels, unsigned int pixels_size) {
   if (!wrapper->QueryDepth(0, &mat))
     return false;
 
-  NiceImageFromDepthMat(mat, kMaxDepth, kMinDepth, pixels, pixels_size);
+  NiceImageFromDepthMat(mat, kMaxDepth, kMinDepth, kColorDepth,
+                        pixels, pixels_size);
 
   return true;
 }

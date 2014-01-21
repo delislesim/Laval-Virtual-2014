@@ -18,6 +18,7 @@ inline void SafeRelease(Interface*& pInterfaceToRelease) {
 
 void NiceImageFromDepthMat(cv::Mat depth_mat,
                            unsigned short max_depth, unsigned short min_depth,
+                           unsigned short color_depth,
                            unsigned char* nice_image, size_t nice_image_size);
 
 }  // namespace kinect_wrapper
