@@ -79,6 +79,10 @@ bool IsLeft(cv::Point line1, cv::Point line2, cv::Point point) {
   return ((line2.x - line1.x)*(point.y - line1.y) - (line2.y - line1.y)*(point.x - line1.x)) > 0;
 }
 
+bool IsBlack(const cv::Vec3i& color) {
+  return color[0] == 0 && color[1] == 0 && color[2] == 0;
+}
+
 double RadToDegrees(double rad) {
   return rad * 360 / (2*kPi);
 }
@@ -141,7 +145,7 @@ void ReduceTips(const std::vector<cv::Point>& contour,
     defect_points.push_back(contour[defects[i].val[1]]);
     defect_points.push_back(contour[defects[i].val[2]]);
 
-    const float kThresholdArea = 900.0;
+    const float kThresholdArea = 100.0;
 
     RotatedRect box = minAreaRect(defect_points);
     float area = box.size.height * box.size.width;
@@ -301,8 +305,15 @@ void Piano::DrawFingers(const cv::Mat& depth_mat, cv::Mat* rgba_image) {
     if (area < kMinContourArea)
       continue;
 
+    // Simplify the contour.
+    std::vector<cv::Point> simple_contour;
+    cv::approxPolyDP(contour, simple_contour, 3 /* epsilon */, true);
+
     // Draw the contour.
-    cv::drawContours(image, contours, contour_index, kBlue, kThickness1);
+    std::vector<std::vector<cv::Point> > simple_contours;
+    simple_contours.push_back(simple_contour);
+    cv::drawContours(image, simple_contours, 0, kBlue, kThickness1);
+    //cv::drawContours(image, contours, contour_index, kBlue, kThickness1);
 
     // Compute a convex hull for the hand.
     std::vector<int> convex_hull;
@@ -353,28 +364,29 @@ void Piano::DrawFingers(const cv::Mat& depth_mat, cv::Mat* rgba_image) {
         cv::Point line_toward_tip(tip.x - line2.x,
           tip.y - line2.y);
 
-        cv::Point perp1(-parallel.y, parallel.x);
-        cv::Point perp2 = -perp1;
-
-        bool perp1_left = IsLeft(line1, line2, perp1);
-        bool tip_left = IsLeft(line1, line2, line_toward_tip);
-
-        cv::Point perp = (perp1_left == tip_left) ? perp1 : perp2;
+        cv::Point perp(-parallel.y, parallel.x);
 
         if (perp.x == 0 && perp.y == 0)
           continue;  // Avoid division by 0.
-
         double norm_perp = norm(perp);
         perp = cv::Point(static_cast<int>(perp.x * 2 / norm_perp),
-                         static_cast<int>(perp.y * 2 / norm_perp));
+          static_cast<int>(perp.y * 2 / norm_perp));
 
         // Fill the finger.
-        /*
         cv::Point fill_point(line1 + cv::Point(parallel.x / 2, parallel.y / 2)
-                             + perp);
-        cv::floodFill(image, fill_point, kColors[i % kNumColors], 0,
-                      kFloodFillTolerance, kFloodFillTolerance);
-                      */
+          + perp);
+        Vec3b fill_point_color = image.at<Vec3b>(fill_point);
+        if (IsBlack(fill_point_color)) {
+          fill_point = (line1 + cv::Point(parallel.x / 2, parallel.y / 2)
+            - perp);
+          fill_point_color = image.at<Vec3b>(fill_point);
+        }
+
+        if (!IsBlack(fill_point_color)) {
+          cv::floodFill(image, fill_point, kColors[i % kNumColors], 0,
+                        kFloodFillTolerance, kFloodFillTolerance);
+        }
+
         // Draw the flood fill seed point.
         //cv::circle(image, fill_point, 4, cv::Scalar(255, 0, 255), 3);
       }
