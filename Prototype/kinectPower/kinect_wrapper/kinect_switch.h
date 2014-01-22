@@ -35,7 +35,7 @@ KinectSwitch<T>::~KinectSwitch() {
 
 template <typename T>
 void KinectSwitch<T>::GetCurrent(T* current) const {
-  DCHECK(current);
+  assert(current);
   *current = frames_[current_buffer_index_];
 }
 

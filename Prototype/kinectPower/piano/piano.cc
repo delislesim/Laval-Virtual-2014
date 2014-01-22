@@ -23,14 +23,36 @@ const int kGreenIndex = 1;
 const int kRedIndex = 2;
 const int kAlphaIndex = 3;
 
+const Scalar kBlue(255, 0, 0);
+const Scalar kGreen(0, 255, 0);
+const Scalar kRed(0, 0, 255);
+const int kThickness1 = 1;
+
+const cv::Scalar kColors[] = {
+  cv::Scalar(176, 23, 31), // indian red
+  cv::Scalar(70, 130, 180), // steel blue
+  cv::Scalar(0, 201, 87), // emerald green
+  cv::Scalar(238, 201, 0), // gold 
+  cv::Scalar(255, 127, 80), // coral
+  cv::Scalar(255, 250, 250), // snow
+  cv::Scalar(124, 252, 0) // lawn green
+};
+const int kNumColors = 7;
+
+const cv::Scalar kFloodFillTolerance(5, 5, 5);
+
 // Piano image
 const int kPianoZ = 690 /*690 */ /*750 */;
+const int kPianoZTolerance = 140;
+const int kMinZ = kPianoZ - kPianoZTolerance;
+const int kMaxZ = kPianoZ + kPianoZTolerance;
+
 const int kPianoXMin = 100;
 const int kPianoYMin = 200;
 const int kPianoHeight = 130;
-const int kPianoNoteWidth = 24;
+const int kPianoNoteWidth = 30;
 const int kPianoNumNotes = 20;
-const int kPianoXMax = kPianoXMin + kPianoNumNotes * kPianoNoteWidth;
+const int kPianoXMax = kPianoXMin + (kPianoNumNotes - 6) * kPianoNoteWidth; //////////////
 const int kPianoYMax = kPianoYMin + kPianoHeight;
 
 const int kPixelsToPlay = 150 /*250*/;
@@ -88,17 +110,17 @@ double CalculateTilt(double m11, double m20, double m02) {
   else if ((diff < 0) && (m11 < 0))   // -90 to -45
     return (180 + tilt);  // change to counter-clockwise angle
 
-  NOTREACHED() << "Not reached in CalculateTilt";
+  NOTREACHED();
   return 0;
 }
 
 int AngleBetween(const cv::Point& tip, const cv::Point& before,
                  const cv::Point& after) {
-  int angle =  abs(round(RadToDegrees(
+  int angle =  abs(static_cast<int>(round(RadToDegrees(
       atan2(static_cast<double>(before.x - tip.x),
             static_cast<double>(before.y - tip.y)) -
       atan2(static_cast<double>(after.x - tip.x),
-            static_cast<double>(after.y - tip.y)))));
+            static_cast<double>(after.y - tip.y))))));
   return angle;
 }
 
@@ -106,14 +128,14 @@ void ReduceTips(const std::vector<cv::Point>& contour,
                 const std::vector<cv::Vec4i>& defects,
                 std::vector<cv::Point>* tips,
                 std::vector<cv::Point>* folds) {
-  DCHECK(tips);
-  DCHECK(folds);
-  DCHECK(tips->empty());
-  DCHECK(folds->empty());
+  assert(tips);
+  assert(folds);
+  assert(tips->empty());
+  assert(folds->empty());
 
   bool found_first_fold = false;
 
-  for (int i = 0; i < defects.size(); ++i) {
+  for (size_t i = 0; i < defects.size(); ++i) {
     std::vector<cv::Point> defect_points;
     defect_points.push_back(contour[defects[i].val[0]]);
     defect_points.push_back(contour[defects[i].val[1]]);
@@ -123,10 +145,11 @@ void ReduceTips(const std::vector<cv::Point>& contour,
 
     RotatedRect box = minAreaRect(defect_points);
     float area = box.size.height * box.size.width;
-    
+
+ 
     if (area < kThresholdArea)
       continue;
-
+  
     if (!found_first_fold) {
       tips->push_back(defect_points[0]);
       found_first_fold = true;
@@ -135,7 +158,43 @@ void ReduceTips(const std::vector<cv::Point>& contour,
     tips->push_back(defect_points[1]);
     folds->push_back(defect_points[2]);
   }
-}               
+}    
+
+float Area(const std::vector<cv::Point>& points) {
+  cv::RotatedRect rect = cv::minAreaRect(points);
+  float area = rect.size.width * rect.size.height;
+  return area;
+}
+
+std::vector<Vec4i> convexity_defects;
+
+void DrawConvexityDefects(const std::vector<cv::Point> contour,
+                          const std::vector<Vec4i>& convexity_defects,
+                          cv::Mat* image) {
+  for (size_t i = 0; i < convexity_defects.size(); ++i) {
+    cv::circle(*image, contour[convexity_defects[i].val[0]], 2, kGreen);
+    cv::circle(*image, contour[convexity_defects[i].val[1]], 2, kGreen);
+    cv::circle(*image, contour[convexity_defects[i].val[2]], 2, kRed);
+  }
+}
+
+void RgbImageToRgbaImage(const cv::Mat& rgb, cv::Mat* rgba) {
+  assert(rgba);
+  assert(rgb.type() == CV_8UC3);
+
+  *rgba = cv::Mat(rgb.rows, rgb.cols, CV_8UC4);
+  unsigned char* rgba_ptr = rgba->ptr();
+  unsigned char const* rgb_ptr = rgb.ptr();
+  for (size_t i = 0; i < rgb.total(); ++i) {
+    rgba_ptr[0] = rgb_ptr[0];
+    rgba_ptr[1] = rgb_ptr[1];
+    rgba_ptr[2] = rgb_ptr[2];
+    rgba_ptr[3] = 255;
+
+    rgba_ptr += 4;
+    rgb_ptr += 3;
+  }
+}
 
 }  // namespace
 
@@ -151,14 +210,18 @@ void Piano::ObserveDepth(
       const cv::Mat& depth_mat,
       const kinect_wrapper::KinectSensorState& sensor_state) {
   FindNotes(depth_mat, sensor_state);
-  DrawFingers(depth_mat);
-  //DrawDepth(depth_mat);
+
+  cv::Mat image;
+  DrawFingers(depth_mat, &image);
+  //DrawDepth(depth_mat, &image);
   //DrawMotion(depth_mat, sensor_state);
   started_ = true;
+
+  nice_image_.SetNext(image);
 }
 
 void Piano::QueryNotes(unsigned char* notes, size_t notes_size) {
-  DCHECK(notes_size == kPianoNumNotes);
+  assert(notes_size == kPianoNumNotes);
 
   if (!started_)
     return;
@@ -167,12 +230,12 @@ void Piano::QueryNotes(unsigned char* notes, size_t notes_size) {
   notes_.GetCurrent(&notes_vector);
 
   for (size_t i = 0; i < notes_vector.size(); ++i) {
-    notes[i] = notes_vector[i];
+    notes[i] = static_cast<unsigned char>(notes_vector[i]);
   }
 }
 
 void Piano::QueryNiceImage(unsigned char* nice_image, size_t nice_image_size) {
-  DCHECK(nice_image);
+  assert(nice_image);
 
   if (!started_)
     return;
@@ -183,225 +246,168 @@ void Piano::QueryNiceImage(unsigned char* nice_image, size_t nice_image_size) {
   memcpy_s(nice_image, nice_image_size, nice_mat.ptr(), nice_mat.total() * 4);
 }
 
-void Piano::DrawFingers(const cv::Mat& depth_mat____param) {
-  cv::Mat depth_mat = depth_mat____param;
+void Piano::DrawFingers(const cv::Mat& depth_mat, cv::Mat* rgba_image) {
+  assert(rgba_image);
 
   cv::Mat image = Mat(depth_mat.rows, depth_mat.cols, CV_8UC3);
   unsigned char* image_ptr = image.ptr();
   unsigned short const* depth_ptr = reinterpret_cast<unsigned short const*>(depth_mat.ptr());
 
-  cv::Mat jpg = cv::imread("hands.jpg", CV_LOAD_IMAGE_COLOR);
-  unsigned char* jpg_ptr = jpg.ptr();
-
-  // TEMP ----------
-  for (int i = 0; i < jpg.total(); ++i) {
-    int orig_x = i % jpg.cols;
-    int orig_y = i / jpg.cols;
-
-    int target_x = 100 + orig_x;
-    int target_y = 100 + orig_y;
-
-    int sum = jpg_ptr[0] + jpg_ptr[1] + jpg_ptr[2];
-
-    if (sum > 255*3 - 20) {
-      depth_mat.at<unsigned short>(target_y, target_x) = 0;
-    } else {
-      depth_mat.at<unsigned short>(target_y, target_x) = kPianoZ;
-    }
-    jpg_ptr += 3;
-  }
-  // TEMP ----------
-
-  const int kMinZ = kPianoZ - 140;
-  const int kMaxZ = kPianoZ + 140;
-
   cv::Mat simple_hand = cv::Mat(depth_mat.rows, depth_mat.cols, CV_8U);
   unsigned char* simple_hand_ptr = simple_hand.ptr();
 
   // Draw the initial depth image.
-  for (int i = 0; i < image.total(); ++i) {
-
-    int y = i / depth_mat.cols;
-    int x = i % depth_mat.cols;
-
-    if (*depth_ptr > kMinZ && *depth_ptr < kMaxZ && y > 100 && y < 100 + jpg.rows && x > 100 && x < 100 + jpg.cols /*&& y > 100 && y < 350 && x > 100 && x < 500*/) {
+  for (int y = 0; y < image.rows; ++y) {
+    for (int x = 0; x < image.cols; ++x) {
       
-      unsigned int normalized_depth = (((unsigned int)*depth_ptr) - kMinZ) * 255;
-      normalized_depth /= (kMaxZ - kMinZ);
-      
-      image_ptr[kRedIndex] = (unsigned char)normalized_depth;
-      image_ptr[kGreenIndex] = (unsigned char)normalized_depth;
-      image_ptr[kBlueIndex] = (unsigned char)normalized_depth;
+      if (*depth_ptr > kMinZ && *depth_ptr < kMaxZ && y > 100 && x > 100 && x < 500) {
 
-      *simple_hand_ptr = 1;
+        unsigned int normalized_depth = (((unsigned int)*depth_ptr) - kMinZ) * 255;
+        normalized_depth /= (kMaxZ - kMinZ);
 
-    } else {
-      image_ptr[kRedIndex] = 0;
-      image_ptr[kGreenIndex] = 0;
-      image_ptr[kBlueIndex] = 0;
+        image_ptr[kRedIndex] = (unsigned char)normalized_depth;
+        image_ptr[kGreenIndex] = (unsigned char)normalized_depth;
+        image_ptr[kBlueIndex] = (unsigned char)normalized_depth;
 
-      *simple_hand_ptr = 0;
+        *simple_hand_ptr = 1;
+      }
+      else {
+        image_ptr[kRedIndex] = 0;
+        image_ptr[kGreenIndex] = 0;
+        image_ptr[kBlueIndex] = 0;
+
+        *simple_hand_ptr = 0;
+      }
+
+      image_ptr += image.channels();
+      ++depth_ptr;
+      ++simple_hand_ptr;
     }
-
-    image_ptr += 3; //// number of channels !!!!!!!
-    ++depth_ptr;
-    ++simple_hand_ptr;
   }
-  
+
   // Find contours.
   std::vector<std::vector<cv::Point> > contours;
   cv::findContours(simple_hand, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
 
-  size_t biggest_contour = 9999;
-  size_t biggest_contour_size = 0;
-  for (int i = 0; i < contours.size(); ++i) {
-    if (contours[i].size() > biggest_contour_size) {
-      biggest_contour = i;
-      biggest_contour_size = contours[i].size();
-    }
-  }
+  for (size_t contour_index = 0; contour_index < contours.size(); ++contour_index) {
+    const std::vector<cv::Point>& contour = contours[contour_index];
 
-  // TODO(fdoray): Find the biggest AREA for a contour rather than highest number of points.
-  // TODO(fdoray): Make a separate method for each step.
+    // Handle the contour only if it's big enough.
+    float area = Area(contours[contour_index]);
 
-  if (biggest_contour != 9999) {
-    // Draw the biggest contour.
-    cv::drawContours(image, contours, biggest_contour, Scalar(255, 0, 0), 1, 8);
+    // Minimum area to consider that a contour is a hand contour.
+    const float kMinContourArea = 1000.0;
 
-    // Find a convex hull for the hand.
+    if (area < kMinContourArea)
+      continue;
+
+    // Draw the contour.
+    cv::drawContours(image, contours, contour_index, kBlue, kThickness1);
+
+    // Compute a convex hull for the hand.
     std::vector<int> convex_hull;
-    cv::convexHull(contours[biggest_contour], convex_hull);
-
-    // --- Draw the convex hull ---
-    /*
-    std::vector<std::vector<cv::Point> > hull_pts;
-    hull_pts.push_back(std::vector<cv::Point>());
-    for (int i = 0; i < convex_hull.size(); ++i) {
-      hull_pts[0].push_back(contours[biggest_contour][convex_hull[i]]);
-    }
-    cv::drawContours(image, hull_pts, 0, Scalar(255, 0, 0), 2, 8);
-    */
+    cv::convexHull(contour, convex_hull);
 
     // Find convexity defects.
     std::vector<Vec4i> convexity_defects;
-    cv::convexityDefects(contours[biggest_contour], convex_hull, convexity_defects);
+    cv::convexityDefects(contour, convex_hull, convexity_defects);
 
-    /*
-    for (int i = 0; i < convexity_defects.size(); ++i) {
-      cv::circle(image, contours[biggest_contour][convexity_defects[i].val[0]], 2, Scalar(0, 255, 0));
-      cv::circle(image, contours[biggest_contour][convexity_defects[i].val[1]], 2, Scalar(0, 255, 0));
-      cv::circle(image, contours[biggest_contour][convexity_defects[i].val[2]], 2, Scalar(0, 0, 255));
-    }
-    */
+    //DrawConvexityDefects(contour, convexity_defects, &image);
 
-    // Find the moments of the image.
-    cv::Moments hand_moments = cv::moments(contours[biggest_contour]);
-    cv::Point center_of_gravity = cv::Point(round(hand_moments.m10/hand_moments.m00),
-                                            round(hand_moments.m01/hand_moments.m00));
-    double tilt = CalculateTilt(hand_moments.m11, hand_moments.m20, hand_moments.m02);
+    // Find the moments of the hand.
+    cv::Moments hand_moments = cv::moments(contour);
+    cv::Point center_of_gravity = cv::Point(static_cast<int>(round(hand_moments.m10/hand_moments.m00)),
+                                            static_cast<int>(round(hand_moments.m01/hand_moments.m00)));
+    // double tilt = CalculateTilt(hand_moments.m11, hand_moments.m20, hand_moments.m02);
 
     // Draw the center of gravity.
-    cv::circle(image, center_of_gravity, 5, Scalar(255, 0, 0));
+    // cv::circle(image, center_of_gravity, 5, Scalar(255, 0, 0));
 
     // Remove unwanted defects.
     std::vector<cv::Point> tips;
     std::vector<cv::Point> folds;
-    ReduceTips(contours[biggest_contour], convexity_defects,
-               &tips, &folds);
+    ReduceTips(contour, convexity_defects, &tips, &folds);
 
-    // Draw the finger points.
-    for (int i = 0; i < tips.size(); ++i)
+    // Draw the tips and folds.
+    /*
+    for (size_t i = 0; i < tips.size(); ++i)
       cv::circle(image, tips[i], 5, Scalar(0, 255, 0));
-    for (int i = 0; i < folds.size(); ++i)
-      cv::circle(image, folds[i], 2, Scalar(0, 0, 255));
+    for (size_t i = 0; i < folds.size(); ++i)
+      cv::circle(image, folds[i], 5, Scalar(0, 0, 255));
+    */
+    
+    if (folds.size() > 1) {
+      for (size_t i = 0; i < folds.size(); ++i) {
 
-    std::vector<cv::Scalar> colors;
-    colors.push_back(cv::Scalar(176, 23, 31)); // indian red
-    colors.push_back(cv::Scalar(70, 130, 180)); // steel blue
-    colors.push_back(cv::Scalar(0, 201, 87)); // emerald green
-    colors.push_back(cv::Scalar(238, 201, 0)); // gold 
-    colors.push_back(cv::Scalar(255, 127, 80)); // coral
-    colors.push_back(cv::Scalar(255, 250, 250)); // snow
-    colors.push_back(cv::Scalar(124, 252, 0)); // lawn green 
+        cv::Point line1(folds[i]);
+        cv::Point line2(folds[(i + 1) % folds.size()]);
+        cv::Point parallel(line2.x - line1.x,
+          line2.y - line1.y);
 
-    // Draw a line between each fold.
-    for (int i = 0; i < folds.size(); ++i) {
-      cv::Point line1(folds[i]);
-      cv::Point line2(folds[(i + 1)%folds.size()]);
+        // Draw a line to separate the finger from the rest of the hand.
+        cv::line(image, line1, line2, kBlue, kThickness1);
 
-      cv::line(image, line1, line2, cv::Scalar(255, 0, 0), 1);
+        // Compute a vector perpendicular to the separation line and that
+        // points toward the finger tip.
+        cv::Point tip = tips[(i + 1) % folds.size()];
+        cv::Point line_toward_tip(tip.x - line2.x,
+          tip.y - line2.y);
 
-      // Vector parallel to the separation line.
-      cv::Point parallel(line2.x - line1.x,
-                         line2.y - line1.y);
-      
-      // Vector from the separation line to the tip.
-      cv::Point tip = tips[(i + 1)%folds.size()];
-      cv::Point line_toward_tip(tip.x - line2.x,
-                                tip.y - line2.y);
+        cv::Point perp1(-parallel.y, parallel.x);
+        cv::Point perp2 = -perp1;
 
-      // Vectors perpendicular to the separation line.
-      cv::Point perp1(-parallel.y, parallel.x);
-      cv::Point perp2 = -perp1;
-      cv::Point perp;
+        bool perp1_left = IsLeft(line1, line2, perp1);
+        bool tip_left = IsLeft(line1, line2, line_toward_tip);
 
-      bool perp1_left = IsLeft(line1, line2, perp1);
-      bool tip_left = IsLeft(line1, line2, line_toward_tip);
-      if (perp1_left == tip_left)
-        perp = perp1;
-      else
-        perp = perp2;
+        cv::Point perp = (perp1_left == tip_left) ? perp1 : perp2;
 
-      int norm_perp = norm(perp);
-      perp = cv::Point(perp.x * 6 / norm_perp, perp.y * 6 / norm_perp);
+        if (perp.x == 0 && perp.y == 0)
+          continue;  // Avoid division by 0.
 
-      // Fill the finger.
-      cv::Point fill_point(line1 + cv::Point(parallel.x / 2, parallel.y / 2) + perp);
-      cv::floodFill(image, fill_point, colors[i % colors.size()], 0, cv::Scalar(5, 5, 5), cv::Scalar(5, 5, 5));
+        double norm_perp = norm(perp);
+        perp = cv::Point(static_cast<int>(perp.x * 2 / norm_perp),
+                         static_cast<int>(perp.y * 2 / norm_perp));
 
-      cv::circle(image, fill_point, 4, cv::Scalar(255, 0, 255), 3);
-
+        // Fill the finger.
+        /*
+        cv::Point fill_point(line1 + cv::Point(parallel.x / 2, parallel.y / 2)
+                             + perp);
+        cv::floodFill(image, fill_point, kColors[i % kNumColors], 0,
+                      kFloodFillTolerance, kFloodFillTolerance);
+                      */
+        // Draw the flood fill seed point.
+        //cv::circle(image, fill_point, 4, cv::Scalar(255, 0, 255), 3);
+      }
     }
   }
 
   // Add an alpha channel to the image...
-  cv::Mat rgba_image = cv::Mat(image.rows, image.cols, CV_8UC4);
-  unsigned char* rgba_ptr = rgba_image.ptr();
-  unsigned char* rgb_ptr = image.ptr();
-  for (int i = 0; i < image.total(); ++i) {
-    rgba_ptr[0] = rgb_ptr[0];
-    rgba_ptr[1] = rgb_ptr[1];
-    rgba_ptr[2] = rgb_ptr[2];
-    rgba_ptr[3] = 255;
-
-    rgba_ptr += 4;
-    rgb_ptr += 3;
-
-  }
-
-  nice_image_.SetNext(rgba_image);
-}
-
-void Piano::DrawDepth(const cv::Mat& depth_mat) {
-  cv::Mat image = Mat(depth_mat.rows, depth_mat.cols, CV_8UC4);
-  unsigned char* image_ptr = image.ptr();
-
-  // Generate a nice image from the depth information.
-  kinect_wrapper::NiceImageFromDepthMat(depth_mat, kPianoZ + 140, kPianoZ - 140, kPianoZ, image_ptr,
-                                        image.total() * 4);
+  RgbImageToRgbaImage(image, rgba_image);
 
   // Draw the piano.
-  DrawPiano(&image);
+  DrawPiano(rgba_image);
+}
 
-  nice_image_.SetNext(image);
+void Piano::DrawDepth(const cv::Mat& depth_mat, cv::Mat* image) {
+  *image = Mat(depth_mat.rows, depth_mat.cols, CV_8UC4);
+  unsigned char* image_ptr = image->ptr();
+
+  // Generate a nice image from the depth information.
+  kinect_wrapper::NiceImageFromDepthMat(depth_mat, kMaxZ, kMinZ, kPianoZ,
+                                        image_ptr,
+                                        image->total() * image->channels());
+
+  // Draw the piano.
+  DrawPiano(image);
 }
 
 void Piano::DrawMotion(const cv::Mat& depth_mat,
-                       const kinect_wrapper::KinectSensorState& sensor_state) {
+                       const kinect_wrapper::KinectSensorState& sensor_state,
+                       cv::Mat* image) {
   cv::Mat past_mat;
   sensor_state.QueryDepth(8, &past_mat);
 
-  cv::Mat image = Mat(depth_mat.rows, depth_mat.cols, CV_8UC4);
+  *image = Mat(depth_mat.rows, depth_mat.cols, CV_8UC4);
 
   // Draw the motion.
   cv::Mat motion;
@@ -412,9 +418,7 @@ void Piano::DrawMotion(const cv::Mat& depth_mat,
   const unsigned short* past_ptr =
       reinterpret_cast<const unsigned short*>(past_mat.ptr());
   short* motion_ptr = reinterpret_cast<short*>(motion.ptr());
-  unsigned char* img_ptr = image.ptr();
-
-  unsigned long long total = 0;
+  unsigned char* img_ptr = image->ptr();
 
   for (size_t i = 0; i < motion.total(); ++i) {
     unsigned char normalized_motion = 0;
@@ -450,9 +454,7 @@ void Piano::DrawMotion(const cv::Mat& depth_mat,
   }
 
   // Draw the piano.
-  DrawPiano(&image);
-
-  nice_image_.SetNext(image);
+  DrawPiano(image);
 }
 
 void Piano::DrawPiano(cv::Mat* image) {
@@ -461,7 +463,7 @@ void Piano::DrawPiano(cv::Mat* image) {
   DrawVerticalLine(kPianoXMax, kPianoYMin, kPianoYMax, image);
   DrawHorizontalLine(kPianoYMax, kPianoXMin, kPianoXMax, image);
 
-  for (int i = 1; i < kPianoNumNotes; ++i) {
+  for (int i = 0; i < kPianoNumNotes - 6; ++i) {
     DrawVerticalLine(kPianoXMin + i*kPianoNoteWidth, kPianoYMin,
                      kPianoYMax, image);
   }
@@ -502,7 +504,7 @@ void Piano::FindNotes(const cv::Mat& depth_mat,
   }
 
   // Find played notes.
-  for (int i = 0; i < kPianoNumNotes; ++i) {
+  for (size_t i = 0; i < kPianoNumNotes; ++i) {
     int average_motion = 0;
     if (pixels_per_note[i] > 0)    
       average_motion = motion_per_note[i] / pixels_per_note[i];

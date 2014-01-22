@@ -16,8 +16,8 @@ KinectSkeletonFrame::~KinectSkeletonFrame() {
 
 bool KinectSkeletonFrame::GetTrackedSkeleton(size_t tracked_skeleton_id,
                                              KinectSkeleton* skeleton) const {
-  DCHECK(skeleton != NULL);
-  DCHECK(tracked_skeleton_id < kNumTrackedSkeletons);
+  assert(skeleton != NULL);
+  assert(tracked_skeleton_id < kNumTrackedSkeletons);
   
   DWORD track_id = tracked_skeletons_[tracked_skeleton_id];
 
@@ -34,7 +34,7 @@ bool KinectSkeletonFrame::GetTrackedSkeleton(size_t tracked_skeleton_id,
 
 DWORD KinectSkeletonFrame::GetSkeletonTrackId(
     size_t tracked_skeleton_id) const {
-  DCHECK(tracked_skeleton_id < kNumTrackedSkeletons);
+  assert(tracked_skeleton_id < kNumTrackedSkeletons);
   return tracked_skeletons_[tracked_skeleton_id];
 }
 

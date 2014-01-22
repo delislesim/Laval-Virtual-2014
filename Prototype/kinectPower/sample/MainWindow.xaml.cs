@@ -27,9 +27,9 @@ namespace sample
 
       //Initialize();
       //RecordSensor(0, "test.txt");
-      StartPlaySensor(0, "test.txt");
+      StartPlaySensor(0, "replay_piano.boubou");
 
-      aTimer = new System.Timers.Timer(20);
+      aTimer = new System.Timers.Timer(150);
       aTimer.Elapsed += new System.Timers.ElapsedEventHandler(aTimer_Elapsed);
 
       aTimer.AutoReset = true;
@@ -48,11 +48,17 @@ namespace sample
 
       GetJointsPosition(0, joint_positions);
 
-      Application.Current.Dispatcher.Invoke(new Action(() =>
+      try
       {
-        image1.Source = BitmapSource.Create(kImageWidth, kImageHeight, 96, 96,
-                                            PixelFormats.Bgr32, null, buffer, stride);
-      }));
+          Application.Current.Dispatcher.Invoke(new Action(() =>
+          {
+              image1.Source = BitmapSource.Create(kImageWidth, kImageHeight, 96, 96,
+                                                  PixelFormats.Bgr32, null, buffer, stride);
+          }));
+      }
+      catch (Exception exception) {
+          Console.WriteLine(exception.Message);
+      }
     }
 
     [DllImport(@"kinect_power.dll", EntryPoint = "Initialize", CallingConvention = CallingConvention.Cdecl)]

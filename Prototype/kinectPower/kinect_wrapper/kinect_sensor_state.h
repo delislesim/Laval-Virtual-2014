@@ -60,7 +60,6 @@ class KinectSensorState {
   void InsertSkeletonFrame(const KinectSkeletonFrame& skeleton_frame);
 
   void AddObserver(KinectObserver* obs);
-  void RemoveObserver(KinectObserver* obs);
 
  private:
   scoped_ptr<KinectSensor> sensor_;

@@ -53,7 +53,6 @@ class KinectSensor {
   HANDLE skeleton_frame_ready_event_;
   DWORD skeleton_sticky_ids_[kNumTrackedSkeletons];
 
-
   DISALLOW_COPY_AND_ASSIGN(KinectSensor);
 };
 

@@ -13,9 +13,9 @@ KinectSkeleton::~KinectSkeleton() {
 
 bool KinectSkeleton::GetJointPosition(
     JointIndex joint_index, cv::Vec3f* position, bool* inferred) {
-  DCHECK(joint_index < JointCount);
-  DCHECK(position != NULL);
-  DCHECK(inferred != NULL);
+  assert(joint_index < JointCount);
+  assert(position != NULL);
+  assert(inferred != NULL);
 
   if (data_.eTrackingState == NUI_SKELETON_NOT_TRACKED)
     return false;

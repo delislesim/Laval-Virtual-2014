@@ -55,7 +55,7 @@ void KinectWrapper::Initialize() {
 
   // Initialize all connected sensors.
   int num_sensors = GetSensorCount();
-  DCHECK(num_sensors <= kMaxNumSensors);
+  assert(num_sensors <= kMaxNumSensors);
 
   for (int i = 0; i < num_sensors; ++i) {
     std::string error;
@@ -89,12 +89,12 @@ void KinectWrapper::Shutdown() {
 
 bool KinectWrapper::RecordSensor(int sensor_index,
                                  const std::string& filename) {
-  DCHECK(sensor_index < kMaxNumSensors);
+  assert(sensor_index < kMaxNumSensors);
   return sensor_state_[sensor_index].StartRecording(filename);
 }
 
 bool KinectWrapper::QueryDepth(int sensor_index, cv::Mat* mat) const {
-  DCHECK(mat != NULL);
+  assert(mat != NULL);
   return sensor_state_[sensor_index].QueryDepth(0, mat);
 }
 
@@ -111,7 +111,7 @@ bool KinectWrapper::PlayNextFrame(int sensor_index) {
 
 bool KinectWrapper::QuerySkeletonFrame(
     int sensor_index, KinectSkeletonFrame* skeleton_frame) const {
-  DCHECK(skeleton_frame != NULL);
+  assert(skeleton_frame != NULL);
   return sensor_state_[sensor_index].QuerySkeletonFrame(skeleton_frame);
 }
 
@@ -121,7 +121,7 @@ void KinectWrapper::AddObserver(int sensor_index, KinectObserver* observer) {
 
 KinectSensor* KinectWrapper::CreateSensorByIndex(int index,
                                                  std::string* error) {
-  DCHECK(error != NULL);
+  assert(error != NULL);
 
   if (sensor_state_[index].GetSensor() != NULL)
     return sensor_state_[index].GetSensor();
@@ -165,8 +165,8 @@ int KinectWrapper::GetSensorCount() {
 }
 
 DWORD KinectWrapper::SensorThread(SensorThreadParams* params) {
-  DCHECK(params != NULL);
-  DCHECK(params->wrapper != NULL);
+  assert(params != NULL);
+  assert(params->wrapper != NULL);
 
   // Retrieve thread parameters.
   KinectWrapper* wrapper = params->wrapper;
@@ -176,7 +176,7 @@ DWORD KinectWrapper::SensorThread(SensorThreadParams* params) {
   std::string error;
   KinectSensor* sensor = wrapper->CreateSensorByIndex(sensor_index, &error);
   if (sensor == NULL) {
-    LOG(INFO) << "Error while starting sensor thread: " << error;
+    std::cout << "Error while starting sensor thread: " << error << std::endl;
     return 0;
   }
 

@@ -16,7 +16,7 @@ KinectPlayer::~KinectPlayer() {
 }
 
 bool KinectPlayer::LoadFile(const std::string& filename) {
-  DCHECK(!is_playing_);
+  assert(!is_playing_);
 
   filename_ = filename;
 
@@ -43,7 +43,7 @@ bool KinectPlayer::LoadFile(const std::string& filename) {
 }
 
 bool KinectPlayer::ReadFrame(kinect_wrapper::KinectSensorState* sensor_state) {
-  DCHECK(sensor_state);
+  assert(sensor_state);
 
   if (!is_playing_)
     return false;

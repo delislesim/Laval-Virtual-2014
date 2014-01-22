@@ -18,7 +18,7 @@ KinectRecorder::~KinectRecorder() {
 }
 
 bool KinectRecorder::StartRecording(const std::string& filename) {
-  DCHECK(!is_recording_);
+  assert(!is_recording_);
 
   out_.open(filename,
             std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);

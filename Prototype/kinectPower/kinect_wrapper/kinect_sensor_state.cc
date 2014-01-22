@@ -68,8 +68,8 @@ void KinectSensorState::ReleaseBuffers() {
 }
 
 bool KinectSensorState::QueryDepth(int past_frame, cv::Mat* mat) const {
-  DCHECK(past_frame < kNumBuffers);
-  DCHECK(mat != NULL);
+  assert(past_frame < kNumBuffers);
+  assert(mat != NULL);
 
   if (depth_buffer_.get() == NULL)
     return false;
@@ -79,7 +79,7 @@ bool KinectSensorState::QueryDepth(int past_frame, cv::Mat* mat) const {
 
 bool KinectSensorState::QuerySkeletonFrame(
     KinectSkeletonFrame* skeleton_frame) const {
-  DCHECK(skeleton_frame != NULL);
+  assert(skeleton_frame != NULL);
 
   if (skeleton_buffer_.get() == NULL)
     return false;
@@ -117,10 +117,6 @@ void KinectSensorState::InsertSkeletonFrame(
 
 void KinectSensorState::AddObserver(KinectObserver* obs) {
   observers_.AddObserver(obs);
-}
-
-void KinectSensorState::RemoveObserver(KinectObserver* obs) {
-  observers_.RemoveObserver(obs);
 }
 
 }  // namespace kinect_wrapper

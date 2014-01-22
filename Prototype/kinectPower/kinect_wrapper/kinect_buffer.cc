@@ -23,7 +23,7 @@ KinectBuffer::~KinectBuffer() {
 
 void KinectBuffer::CopyData(const char* data,
                             size_t size) {
-  DCHECK(size == buffers_[0].total() * buffers_[0].elemSize());
+  assert(size == buffers_[0].total() * buffers_[0].elemSize());
 
   int new_buffer_index = (current_buffer_index_ + 1) % kNumBuffers;
   memcpy_s(buffers_[new_buffer_index].ptr(), size,
@@ -33,7 +33,7 @@ void KinectBuffer::CopyData(const char* data,
 
 void KinectBuffer::CopyDepthTexture(const NUI_DEPTH_IMAGE_PIXEL* start,
                                     const NUI_DEPTH_IMAGE_PIXEL* end) {
-  DCHECK(bytes_per_pixel_ == sizeof(short));
+  assert(bytes_per_pixel_ == sizeof(short));
 
   int new_buffer_index = (current_buffer_index_ + 1) % kNumBuffers;
 
@@ -52,7 +52,7 @@ void KinectBuffer::CopyDepthTexture(const NUI_DEPTH_IMAGE_PIXEL* start,
 }
 
 void KinectBuffer::GetMatrix(int past_frame, cv::Mat* depth_mat) {
-  DCHECK(past_frame < kNumBuffers);
+  assert(past_frame < kNumBuffers);
   int frame_index =
       (current_buffer_index_ + kNumBuffers + past_frame) % kNumBuffers;
   *depth_mat = buffers_[frame_index];

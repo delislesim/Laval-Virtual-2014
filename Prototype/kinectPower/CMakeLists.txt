@@ -29,15 +29,11 @@ include_directories(
 
 add_library(base
   base/base.h
-  base/float_util.h
-  base/logging.cc
   base/logging.h
   base/observer_list.h
   base/scoped_ptr.h
   base/scoped_handle.cc
   base/scoped_handle.h
-  base/string_utils.cc
-  base/string_utils.h
   base/timer.cc
   base/timer.h
   )

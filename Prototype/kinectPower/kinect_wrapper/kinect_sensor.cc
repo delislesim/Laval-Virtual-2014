@@ -65,9 +65,9 @@ bool KinectSensor::OpenDepthStream() {
 }
 
 bool KinectSensor::PollNextDepthFrame(KinectSensorState* state) {
-  DCHECK(state);
-  DCHECK(depth_stream_opened_);
-  DCHECK(depth_stream_handle_ != INVALID_HANDLE_VALUE);
+  assert(state);
+  assert(depth_stream_opened_);
+  assert(depth_stream_handle_ != INVALID_HANDLE_VALUE);
 
   if (WaitForSingleObject(depth_frame_ready_event_, 0) != WAIT_OBJECT_0)
     return false;
@@ -137,8 +137,8 @@ bool KinectSensor::OpenSkeletonStream() {
 }
 
 bool KinectSensor::PollNextSkeletonFrame(KinectSensorState* state) {
-  DCHECK(state);
-  DCHECK(skeleton_stream_opened_);
+  assert(state);
+  assert(skeleton_stream_opened_);
 
   if (WaitForSingleObject(skeleton_frame_ready_event_, 0) != WAIT_OBJECT_0)
     return false;

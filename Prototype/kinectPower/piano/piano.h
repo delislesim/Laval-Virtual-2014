@@ -16,16 +16,17 @@ class Piano : kinect_wrapper::KinectObserver {
   
   virtual void ObserveDepth(
       const cv::Mat& depth_mat,
-      const kinect_wrapper::KinectSensorState& sensor_state) OVERRIDE;
+      const kinect_wrapper::KinectSensorState& sensor_state) override;
 
   void QueryNotes(unsigned char* notes, size_t notes_size);
   void QueryNiceImage(unsigned char* nice_image, size_t nice_image_size);
 
  private:
-  void DrawFingers(const cv::Mat& depth_mat);
-  void DrawDepth(const cv::Mat& depth_mat);
+  void DrawFingers(const cv::Mat& depth_mat, cv::Mat* image);
+  void DrawDepth(const cv::Mat& depth_mat, cv::Mat* image);
   void DrawMotion(const cv::Mat& depth_mat,
-                  const kinect_wrapper::KinectSensorState& sensor_state);
+                  const kinect_wrapper::KinectSensorState& sensor_state,
+                  cv::Mat* image);
   void DrawPiano(cv::Mat* image);
   void FindNotes(const cv::Mat& depth_mat,
                  const kinect_wrapper::KinectSensorState& sensor_state);

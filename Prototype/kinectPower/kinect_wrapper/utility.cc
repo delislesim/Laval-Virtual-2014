@@ -24,7 +24,7 @@ void NiceImageFromDepthMat(cv::Mat depth_mat,
   size_t color_index = 0;
   for (size_t pixel_index = 0;
        pixel_index < depth_mat.total(); ++pixel_index) {
-    DCHECK(color_index < nice_image_size);
+    assert(color_index < nice_image_size);
 
     unsigned short pixel_data = *ptr;
 
@@ -37,8 +37,6 @@ void NiceImageFromDepthMat(cv::Mat depth_mat,
             * 255 / (max_depth - min_depth));
       if (normalized_depth > 255)
         normalized_depth = 255;
-      else 
-        int i =2;
     }
 
     unsigned char byte = static_cast<unsigned char>(normalized_depth);
