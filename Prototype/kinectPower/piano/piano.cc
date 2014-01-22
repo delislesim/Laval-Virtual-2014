@@ -26,6 +26,7 @@ const int kAlphaIndex = 3;
 const Scalar kBlue(255, 0, 0);
 const Scalar kGreen(0, 255, 0);
 const Scalar kRed(0, 0, 255);
+const Scalar kGrey(150, 150, 150);
 const int kThickness1 = 1;
 
 const cv::Scalar kColors[] = {
@@ -51,8 +52,8 @@ const int kPianoXMin = 100;
 const int kPianoYMin = 200;
 const int kPianoHeight = 130;
 const int kPianoNoteWidth = 30;
-const int kPianoNumNotes = 20;
-const int kPianoXMax = kPianoXMin + (kPianoNumNotes - 6) * kPianoNoteWidth; //////////////
+const int kPianoNumNotes = 14;
+const int kPianoXMax = kPianoXMin + kPianoNumNotes * kPianoNoteWidth;
 const int kPianoYMax = kPianoYMin + kPianoHeight;
 
 const int kPixelsToPlay = 150 /*250*/;
@@ -470,14 +471,18 @@ void Piano::DrawMotion(const cv::Mat& depth_mat,
 }
 
 void Piano::DrawPiano(cv::Mat* image) {
-  DrawHorizontalLine(kPianoYMin, kPianoXMin, kPianoXMax, image);
-  DrawVerticalLine(kPianoXMin, kPianoYMin, kPianoYMax, image);
-  DrawVerticalLine(kPianoXMax, kPianoYMin, kPianoYMax, image);
-  DrawHorizontalLine(kPianoYMax, kPianoXMin, kPianoXMax, image);
+  cv::line(*image, cv::Point(kPianoXMin, kPianoYMin),
+           cv::Point(kPianoXMax, kPianoYMin), kGrey);
+  cv::line(*image, cv::Point(kPianoXMin, kPianoYMin),
+           cv::Point(kPianoXMin, kPianoYMax), kGrey);
+  cv::line(*image, cv::Point(kPianoXMax, kPianoYMin),
+           cv::Point(kPianoXMax, kPianoYMax), kGrey);
+  cv::line(*image, cv::Point(kPianoXMin, kPianoYMax),
+           cv::Point(kPianoXMax, kPianoYMax), kGrey);
 
-  for (int i = 0; i < kPianoNumNotes - 6; ++i) {
-    DrawVerticalLine(kPianoXMin + i*kPianoNoteWidth, kPianoYMin,
-                     kPianoYMax, image);
+  for (int i = 0; i < kPianoNumNotes; ++i) {
+    cv::line(*image, cv::Point(kPianoXMin + i*kPianoNoteWidth, kPianoYMin),
+             cv::Point(kPianoXMin + i*kPianoNoteWidth, kPianoYMax), kGrey);
   }
 }
 
@@ -531,43 +536,6 @@ void Piano::FindNotes(const cv::Mat& depth_mat,
   }
 
   notes_.SetNext(notes);
-}
-
-void Piano::DrawVerticalLine(int x, int ymin, int ymax, cv::Mat* image) {
-  unsigned char* img_ptr = image->ptr();
-
-  int start_index = GetIndexOfPixel(x, ymin);
-  int stop_index = GetIndexOfPixel(x, ymax);
-
-  unsigned char* img_run = img_ptr + 4*start_index;
-  unsigned char* img_stop = img_ptr + 4*stop_index;
-
-  while (img_run < img_stop) {
-    img_run[kRedIndex] = (unsigned char)(static_cast<unsigned int>(255 - img_run[kRedIndex]) * 180 / 255);
-    img_run[kGreenIndex] = (unsigned char)(static_cast<unsigned int>(255 -img_run[kGreenIndex]) * 180 / 255);
-    img_run[kBlueIndex] = (unsigned char)(static_cast<unsigned int>(255 -img_run[kBlueIndex]) * 180 / 255);
-
-    img_run += 4*kinect_wrapper::kKinectDepthWidth;
-  }
-}
-
-
-void Piano::DrawHorizontalLine(int y, int xmin, int xmax, cv::Mat* image) {
-  unsigned char* img_ptr = image->ptr();
-
-  int start_index = GetIndexOfPixel(xmin, y);
-  int stop_index = GetIndexOfPixel(xmax, y);
-
-  unsigned char* img_run = img_ptr + 4*start_index;
-  unsigned char* img_stop = img_ptr + 4*stop_index;
-
-  while (img_run < img_stop) {
-    img_run[kRedIndex] = (unsigned char)(static_cast<unsigned int>(255 - img_run[kRedIndex]) * 180 / 255);
-    img_run[kGreenIndex] = (unsigned char)(static_cast<unsigned int>(255 -img_run[kGreenIndex]) * 180 / 255);
-    img_run[kBlueIndex] = (unsigned char)(static_cast<unsigned int>(255 -img_run[kBlueIndex]) * 180 / 255);
-
-    img_run += 4;
-  }
 }
 
 }  // namespace piano

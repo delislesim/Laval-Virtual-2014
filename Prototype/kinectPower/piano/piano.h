@@ -31,9 +31,6 @@ class Piano : kinect_wrapper::KinectObserver {
   void FindNotes(const cv::Mat& depth_mat,
                  const kinect_wrapper::KinectSensorState& sensor_state);
 
-  void DrawVerticalLine(int x, int ymin, int ymax, cv::Mat* image);
-  void DrawHorizontalLine(int y, int xmin, int xmax, cv::Mat* image);
-
   bool started_;
   kinect_wrapper::KinectSwitch<cv::Mat> nice_image_;
   kinect_wrapper::KinectSwitch<std::vector<int> > notes_;
