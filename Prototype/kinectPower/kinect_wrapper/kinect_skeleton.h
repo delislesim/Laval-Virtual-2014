@@ -43,6 +43,9 @@ class KinectSkeleton {
   // Method to load the skeleton data from the sensor.
   void SetSkeletonData(const NUI_SKELETON_DATA& skeleton_data);
 
+  void CalculateBoneOrientations(
+      NUI_SKELETON_BONE_ORIENTATION* bone_orientations) const;
+
  private:
   NUI_SKELETON_DATA data_;
 
