@@ -39,8 +39,8 @@ public class KinectPower : MonoBehaviour {
     		KinectPowerInterop.Initialize();
 
     	depthTexture = new Texture2D(kDepthWidth, kDepthHeight);
-    	depthMapRect = new Rect(Screen.width, Screen.height - depthTexture.height,
-                                -depthTexture.width, depthTexture.height);
+    	depthMapRect = new Rect(Screen.width, Screen.height - depthTexture.height * 2,
+                                -depthTexture.width * 2, depthTexture.height * 2);
 
 		if (replay == ReplayMode.RECORD) {
 			KinectPowerInterop.RecordSensor(0, replayFilename);
@@ -132,6 +132,6 @@ public class KinectPower : MonoBehaviour {
 	private const int kDepthHeight = 480;
 
 	// Piano stream.
-	private const int kPianoNumNotes = 20;
+	private const int kPianoNumNotes = 14;
 	private byte[] notes = new byte[kPianoNumNotes];
 }

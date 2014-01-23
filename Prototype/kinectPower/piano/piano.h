@@ -29,6 +29,7 @@ class Piano : kinect_wrapper::KinectObserver {
                   cv::Mat* image);
   void DrawPiano(cv::Mat* image);
   void FindNotes(const cv::Mat& depth_mat,
+                 const cv::Mat& fingers_mat,
                  const kinect_wrapper::KinectSensorState& sensor_state);
 
   bool started_;

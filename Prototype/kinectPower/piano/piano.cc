@@ -30,20 +30,31 @@ const Scalar kGrey(150, 150, 150);
 const int kThickness1 = 1;
 
 const cv::Scalar kColors[] = {
+  /*
   cv::Scalar(176, 23, 31), // indian red
   cv::Scalar(70, 130, 180), // steel blue
   cv::Scalar(0, 201, 87), // emerald green
   cv::Scalar(238, 201, 0), // gold 
   cv::Scalar(255, 127, 80), // coral
   cv::Scalar(255, 250, 250), // snow
-  cv::Scalar(124, 252, 0) // lawn green
+  cv::Scalar(124, 252, 0), // lawn green
+  cv::Scalar(255, 0, 255) // magenta
+  */
+  cv::Scalar(255, 255, 0),
+  cv::Scalar(255, 255, 1),
+  cv::Scalar(255, 255, 2),
+  cv::Scalar(255, 255, 3),
+  cv::Scalar(255, 255, 4),
+  cv::Scalar(255, 255, 5),
+  cv::Scalar(255, 255, 6),
+  cv::Scalar(255, 255, 7)
 };
-const int kNumColors = 7;
+const int kNumColors = 8;
 
 const cv::Scalar kFloodFillTolerance(5, 5, 5);
 
 // Piano image
-const int kPianoZ = 690 /*690 */ /*750 */;
+const int kPianoZ = 690;
 const int kPianoZTolerance = 140;
 const int kMinZ = kPianoZ - kPianoZTolerance;
 const int kMaxZ = kPianoZ + kPianoZTolerance;
@@ -214,11 +225,15 @@ Piano::~Piano() {
 void Piano::ObserveDepth(
       const cv::Mat& depth_mat,
       const kinect_wrapper::KinectSensorState& sensor_state) {
-  FindNotes(depth_mat, sensor_state);
+  cv::Mat fingers_image;
+  DrawFingers(depth_mat, &fingers_image);
 
   cv::Mat image;
-  DrawFingers(depth_mat, &image);
-  //DrawDepth(depth_mat, &image);
+  DrawDepth(depth_mat, &image);
+  //DrawFingers(depth_mat, &image)
+
+  FindNotes(depth_mat, fingers_image, sensor_state);
+
   //DrawMotion(depth_mat, sensor_state);
   started_ = true;
 
@@ -333,7 +348,7 @@ void Piano::DrawFingers(const cv::Mat& depth_mat, cv::Mat* rgba_image) {
     // double tilt = CalculateTilt(hand_moments.m11, hand_moments.m20, hand_moments.m02);
 
     // Draw the center of gravity.
-    // cv::circle(image, center_of_gravity, 5, Scalar(255, 0, 0));
+    cv::circle(image, center_of_gravity, 5, Scalar(255, 0, 0));
 
     // Remove unwanted defects.
     std::vector<cv::Point> tips;
@@ -467,7 +482,7 @@ void Piano::DrawMotion(const cv::Mat& depth_mat,
   }
 
   // Draw the piano.
-  DrawPiano(image);
+  //DrawPiano(image);
 }
 
 void Piano::DrawPiano(cv::Mat* image) {
@@ -487,6 +502,7 @@ void Piano::DrawPiano(cv::Mat* image) {
 }
 
 void Piano::FindNotes(const cv::Mat& depth_mat,
+                      const cv::Mat& fingers_mat,
                       const kinect_wrapper::KinectSensorState& sensor_state) {
   std::vector<int> notes(kPianoNumNotes);
   std::vector<int> pixels_per_note(kPianoNumNotes);
