@@ -99,6 +99,20 @@ bool GetJointsPosition(int skeleton_id, float* joint_positions) {
   return true;
 }
 
+bool GetBonesOrientation(int skeleton_id,
+                         NUI_SKELETON_BONE_ORIENTATION* bone_orientations) {
+  KinectWrapper* wrapper = KinectWrapper::instance();
+
+  KinectSkeletonFrame skeleton_frame;
+  wrapper->QuerySkeletonFrame(0, &skeleton_frame);
+
+  KinectSkeleton skeleton;
+  if (!skeleton_frame.GetTrackedSkeleton(skeleton_id, &skeleton))
+    return false;
+
+  skeleton.CalculateBoneOrientations(bone_orientations);
+}
+
 bool GetPianoInfo(unsigned char* notes, unsigned int notes_size,
                   unsigned char* pixels, unsigned int pixels_size) {
   the_piano.QueryNiceImage(pixels, pixels_size);

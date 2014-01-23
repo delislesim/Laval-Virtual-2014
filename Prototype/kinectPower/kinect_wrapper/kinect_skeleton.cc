@@ -43,4 +43,10 @@ void KinectSkeleton::SetSkeletonData(const NUI_SKELETON_DATA& skeleton_data) {
   memcpy_s(&data_, sizeof(data_), &skeleton_data, sizeof(NUI_SKELETON_DATA));
 }
 
+void KinectSkeleton::CalculateBoneOrientations(
+    NUI_SKELETON_BONE_ORIENTATION* bone_orientations) const {
+  assert(bone_orientations);
+  NuiSkeletonCalculateBoneOrientations(&data_, bone_orientations);
+}
+
 }  // namespace kinect_wrapper
