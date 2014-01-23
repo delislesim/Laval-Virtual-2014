@@ -20,8 +20,8 @@ B. COMPILATION DE KINECT POWER
     cmake -G "Visual Studio X"
 	---> ou X est remplace par:
 		10: pour Visual Studio 2010
-		11: pour Visual Studio 2011
-		12: pour Visual Studio 2012
+		11: pour Visual Studio 2012
+		12: pour Visual Studio 2013
 2. CMake suggere d'ajouter un dossier au PATH. L'ajouter commme demande.
 2. Ouvrir le projet Visual Studio qui est genere et compiler!
 3. Une DLL nommee "kinect_power.dll" est alors generee dans le dossier
