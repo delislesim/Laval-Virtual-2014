@@ -43,6 +43,28 @@ public class KinectPowerInterop
 	private static extern bool GetBonesOrientationInternal(int skeleton_id, NuiSkeletonBoneOrientation[] bone_orientations);
 
 	// Structures and enumerations for the arguments of the Kinect SDK functions.
+	public enum NuiErrorCodes : uint
+	{
+		FrameNoData = 0x83010001,
+		StreamNotEnabled = 0x83010002,
+		ImageStreamInUse = 0x83010003,
+		FrameLimitExceeded = 0x83010004,
+		FeatureNotInitialized = 0x83010005,
+		DeviceNotGenuine = 0x83010006,
+		InsufficientBandwidth = 0x83010007,
+		DeviceNotSupported = 0x83010008,
+		DeviceInUse = 0x83010009,
+		
+		DatabaseNotFound = 0x8301000D,
+		DatabaseVersionMismatch = 0x8301000E,
+		HardwareFeatureUnavailable = 0x8301000F,
+		
+		DeviceNotConnected = 0x83010014,
+		DeviceNotReady = 0x83010015,
+		SkeletalEngineBusy = 0x830100AA,
+		DeviceNotPowered = 0x8301027F,
+	}
+
 	public enum NuiSkeletonPositionIndex : int
 	{
 		HipCenter = 0,
@@ -80,5 +102,54 @@ public class KinectPowerInterop
 		public NuiSkeletonPositionIndex startJoint;
 		public NuiSkeletonBoneRotation hierarchicalRotation;
 		public NuiSkeletonBoneRotation absoluteRotation;
+	}
+
+	public enum NuiSkeletonPositionTrackingState
+	{
+		NotTracked = 0,
+		Inferred,
+		Tracked
+	}
+	
+	public enum NuiSkeletonTrackingState
+	{
+		NotTracked = 0,
+		PositionOnly,
+		SkeletonTracked
+	}
+	
+	public enum NuiImageType
+	{
+		DepthAndPlayerIndex = 0,	// USHORT
+		Color,						// RGB32 data
+		ColorYUV,					// YUY2 stream from camera h/w, but converted to RGB32 before user getting it.
+		ColorRawYUV,				// YUY2 stream from camera h/w.
+		Depth						// USHORT
+	}
+	
+	public enum NuiImageResolution
+	{
+		resolutionInvalid = -1,
+		resolution80x60 = 0,
+		resolution320x240,
+		resolution640x480,
+		resolution1280x960                        // for hires color only
+	}
+	
+	public enum NuiImageStreamFlags
+	{
+		None = 0x00000000,
+		SupressNoFrameData = 0x0001000,
+		EnableNearMode = 0x00020000,
+		TooFarIsNonZero = 0x0004000
+	}
+
+	public enum FrameEdges
+	{
+		None = 0,
+		Right = 1,
+		Left = 2,
+		Top = 4,
+		Bottom = 8
 	}
 }
