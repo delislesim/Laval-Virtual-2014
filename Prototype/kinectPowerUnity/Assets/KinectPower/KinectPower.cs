@@ -15,24 +15,6 @@ public class KinectPower : MonoBehaviour {
 	public ReplayMode replay = ReplayMode.NO_REPLAY;
 	public string replayFilename = "replay.boubou";
 
-	// Piano.
-	public bool showPiano;
-
-	public Note a;
-	public Note b;
-	public Note c;
-	public Note d;
-	public Note e;
-	public Note f;
-	public Note g;
-	public Note a1;
-	public Note b1;
-	public Note c1;
-	public Note d1;
-	public Note e1;
-	public Note f1;
-	public Note g1;
-
 	// Use this for initialization
 	void Start () {
 		if (replay != ReplayMode.REPLAY)
@@ -61,28 +43,6 @@ public class KinectPower : MonoBehaviour {
 			BytesToColors(depthBuffer, depthColors);
 		    depthTexture.SetPixels32(depthColors);
 		    depthTexture.Apply();
-		} else if (showPiano) {
-			KinectPowerInterop.GetPianoInfo(notes, (uint)notes.Length,
-											depthBuffer, (uint)depthBuffer.Length);
-
-			BytesToColors(depthBuffer, depthColors);			
-			depthTexture.SetPixels32(depthColors);
-			depthTexture.Apply();
-
-			a.SetEnfoncee(notes[0]);
-			b.SetEnfoncee(notes[1]);
-			c.SetEnfoncee(notes[2]);
-			d.SetEnfoncee(notes[3]);
-			e.SetEnfoncee(notes[4]);
-			f.SetEnfoncee(notes[5]);
-			g.SetEnfoncee(notes[6]);
-			a1.SetEnfoncee(notes[7]);
-			b1.SetEnfoncee(notes[8]);
-			c1.SetEnfoncee(notes[9]);
-			d1.SetEnfoncee(notes[10]);
-			e1.SetEnfoncee(notes[11]);
-			f1.SetEnfoncee(notes[12]);
-			g1.SetEnfoncee(notes[13]);
 		}
 	}
 
@@ -111,7 +71,7 @@ public class KinectPower : MonoBehaviour {
 
 	void OnGUI()
 	{
-		if (showDepthMap || showPiano)
+		if (showDepthMap)
 			GUI.DrawTexture(depthMapRect, depthTexture);
 	}
 
@@ -130,8 +90,4 @@ public class KinectPower : MonoBehaviour {
 	private Color32[] depthColors = new Color32[kDepthWidth * kDepthHeight];
 	private const int kDepthWidth = 640;
 	private const int kDepthHeight = 480;
-
-	// Piano stream.
-	private const int kPianoNumNotes = 14;
-	private byte[] notes = new byte[kPianoNumNotes];
 }
