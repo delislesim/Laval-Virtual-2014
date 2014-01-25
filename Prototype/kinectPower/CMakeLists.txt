@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.6.2)
 
 set (OpenCV_DIR $ENV{OPENCV_DIR})
 FIND_PACKAGE(OpenCV REQUIRED)
+#FIND_PACKAGE(OpenCL REQUIRED)
 
 set(CMAKE_SUPPRESS_REGENERATION TRUE)
 
@@ -95,6 +96,29 @@ add_library(kinect_power SHARED
   kinect_power/lib.cc
   kinect_power/lib.h
   )
+####################################################
+# À tester, car je ne suis pas sur que ça va marcher
+####################################################
+# FIND_PATH(OPENCL_INCLUDE_DIR
+	# NAMES
+		# CL\cl.h
+	# PATHS
+		# $ENV{CUDA_PATH}\include\)
+
+# SET(OPENCL_LIB_SEARCH_PATH
+		# ${OPENCL_LIB_SEARCH_PATH}
+		# $ENV{CUDA_PATH}\lib\Win32)
+
+# FIND_LIBRARY(
+    # OPENCL_LIBRARY
+    # NAMES OpenCL
+    # PATHS ${OPENCL_LIB_SEARCH_PATH})
+
+# include_directories( ${OPENCL_INCLUDE_DIR} )
+#include_directories( $ENV{CUDA_PATH}\include\CL\cl.h)
+
+#target_link_libraries(${OPENCL_LIBRARY})
+#####################################################
 	
 target_link_libraries(kinect_power
   hands_tracker
@@ -102,6 +126,8 @@ target_link_libraries(kinect_power
   kinect_wrapper
   piano
   ${OpenCV_LIBS}
+  #${OPENCL_LIBRARY}
+  #$ENV{CUDA_PATH}\lib\Win32\OpenCL.lib
   )
 	
 ####################
