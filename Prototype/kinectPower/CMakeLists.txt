@@ -37,7 +37,39 @@ add_library(base
   base/timer.cc
   base/timer.h
   )
+  
+add_library(hand_extractor
+  hand_extractor/hand_extractor.cc
+  hand_extractor/hand_extractor.h
+  )
+  
+add_library(hand_particle_filter
+  hand_particle_filter/hand_depth_renderer.cc
+  hand_particle_filter/hand_depth_renderer.h
+  hand_particle_filter/hand_description.cc
+  hand_particle_filter/hand_description.h
+  hand_particle_filter/hand_hypothesis.cc
+  hand_particle_filter/hand_hypothesis.h
+  hand_particle_filter/hand_skeleton.cc
+  hand_particle_filter/hand_skeleton.h
+  hand_particle_filter/hand_tracker.cc
+  hand_particle_filter/hand_tracker.h
+  )
+  
+add_library(image
+  image/image_constants.cc
+  image/image_constants.h
+  image/image_utility.cc
+  image/image_utility.h
+  )
 
+add_library(kinect_replay
+  kinect_replay/kinect_recorder.cc
+  kinect_replay/kinect_recorder.h
+  kinect_replay/kinect_player.cc
+  kinect_replay/kinect_player.h
+  )
+  
 add_library(kinect_wrapper
   kinect_wrapper/constants.cc
   kinect_wrapper/constants.h
@@ -59,36 +91,17 @@ add_library(kinect_wrapper
   kinect_wrapper/utility.cc
   kinect_wrapper/utility.h
   )
- target_link_libraries(kinect_wrapper
-  base
-  $ENV{KINECTSDK10_DIR}/lib/x86/Kinect10.lib
-  )
 
-add_library(kinect_replay
-  kinect_replay/kinect_recorder.cc
-  kinect_replay/kinect_recorder.h
-  kinect_replay/kinect_player.cc
-  kinect_replay/kinect_player.h
-  )
- target_link_libraries(kinect_replay
-  base
-  kinect_wrapper
+add_library(maths
+  maths/maths.cc
+  maths/maths.h
+  maths/quaternion.cc
+  maths/quaternion.h
   )
   
-add_library(hands_tracker
-  hands_tracker/hands_tracker.cc
-  hands_tracker/hands_tracker.h
-  )
- target_link_libraries(hands_tracker
-  base
-  )
-  
- add_library(piano
+add_library(piano
   piano/piano.cc
   piano/piano.h
-  )
- target_link_libraries(hands_tracker
-  base
   )
   
 add_library(kinect_power SHARED
@@ -97,24 +110,21 @@ add_library(kinect_power SHARED
   )
 	
 target_link_libraries(kinect_power
-  hands_tracker
+  base
+  hand_extractor
+  hand_particle_filter
+  image
   kinect_replay
   kinect_wrapper
+  maths
   piano
   ${OpenCV_LIBS}
+  $ENV{KINECTSDK10_DIR}/lib/x86/Kinect10.lib
   )
 	
 ####################
 # Executables
 ####################
-
-add_executable (test_opencv
-  test_opencv/main.cc
-)
-
-target_link_libraries(test_opencv
-  ${OpenCV_LIBS}
-  )
 
 #include_external_msproject(
 #    sample sample/sample.csproj
@@ -124,4 +134,4 @@ target_link_libraries(test_opencv
 # Unittests
 ####################
 
-# none for now
+# coming soon...

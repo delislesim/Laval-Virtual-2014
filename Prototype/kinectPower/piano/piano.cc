@@ -6,9 +6,14 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include "base/logging.h"
+#include "image/image_constants.h"
+#include "image/image_utility.h"
 #include "kinect_wrapper/constants.h"
 #include "kinect_wrapper/kinect_wrapper.h"
 #include "kinect_wrapper/utility.h"
+#include "maths/maths.h"
+
+#include "hand_extractor/hand_extractor.h"
 
 using namespace cv;
 
@@ -18,19 +23,7 @@ namespace {
 
 const unsigned short kPlayDepth = 690;
 
-const int kBlueIndex = 0;
-const int kGreenIndex = 1;
-const int kRedIndex = 2;
-const int kAlphaIndex = 3;
-
-const Scalar kBlue(255, 0, 0);
-const Scalar kGreen(0, 255, 0);
-const Scalar kRed(0, 0, 255);
-const Scalar kGrey(150, 150, 150);
-const int kThickness1 = 1;
-
 const cv::Scalar kColors[] = {
-  /*
   cv::Scalar(176, 23, 31), // indian red
   cv::Scalar(70, 130, 180), // steel blue
   cv::Scalar(0, 201, 87), // emerald green
@@ -39,15 +32,6 @@ const cv::Scalar kColors[] = {
   cv::Scalar(255, 250, 250), // snow
   cv::Scalar(124, 252, 0), // lawn green
   cv::Scalar(255, 0, 255) // magenta
-  */
-  cv::Scalar(255, 255, 0),
-  cv::Scalar(255, 255, 1),
-  cv::Scalar(255, 255, 2),
-  cv::Scalar(255, 255, 3),
-  cv::Scalar(255, 255, 4),
-  cv::Scalar(255, 255, 5),
-  cv::Scalar(255, 255, 6),
-  cv::Scalar(255, 255, 7)
 };
 const int kNumColors = 8;
 
@@ -70,8 +54,6 @@ const int kPianoYMax = kPianoYMin + kPianoHeight;
 const int kPixelsToPlay = 150 /*250*/;
 const int kPixelsToRemove = 75;
 
-const double kPi = 3.14159265359;
-
 const int kMinFingerDepth = 20;
 const int kMaxFingerAngle = 60;
 
@@ -83,20 +65,12 @@ int GetIndexOfPixel(int x, int y) {
   return kinect_wrapper::kKinectDepthWidth * y + x;
 }
 
-double round(double number) {
-    return number < 0.0 ? ceil(number - 0.5) : floor(number + 0.5);
-}
-
 bool IsLeft(cv::Point line1, cv::Point line2, cv::Point point) {
   return ((line2.x - line1.x)*(point.y - line1.y) - (line2.y - line1.y)*(point.x - line1.x)) > 0;
 }
 
 bool IsBlack(const cv::Vec3i& color) {
   return color[0] == 0 && color[1] == 0 && color[2] == 0;
-}
-
-double RadToDegrees(double rad) {
-  return rad * 360 / (2*kPi);
 }
 
 double CalculateTilt(double m11, double m20, double m02) {
@@ -111,7 +85,7 @@ double CalculateTilt(double m11, double m20, double m02) {
   }
   
   double theta = 0.5 * std::atan2(2*m11, diff);
-  int tilt = (int)round(RadToDegrees(theta));
+  int tilt = (int)round(maths::RadToDegrees(theta));
   
   if ((diff > 0) && (m11 == 0))
     return 0;
@@ -128,16 +102,6 @@ double CalculateTilt(double m11, double m20, double m02) {
 
   NOTREACHED();
   return 0;
-}
-
-int AngleBetween(const cv::Point& tip, const cv::Point& before,
-                 const cv::Point& after) {
-  int angle =  abs(static_cast<int>(round(RadToDegrees(
-      atan2(static_cast<double>(before.x - tip.x),
-            static_cast<double>(before.y - tip.y)) -
-      atan2(static_cast<double>(after.x - tip.x),
-            static_cast<double>(after.y - tip.y))))));
-  return angle;
 }
 
 void ReduceTips(const std::vector<cv::Point>& contour, 
@@ -174,41 +138,15 @@ void ReduceTips(const std::vector<cv::Point>& contour,
     tips->push_back(defect_points[1]);
     folds->push_back(defect_points[2]);
   }
-}    
-
-float Area(const std::vector<cv::Point>& points) {
-  cv::RotatedRect rect = cv::minAreaRect(points);
-  float area = rect.size.width * rect.size.height;
-  return area;
-}
-
-std::vector<Vec4i> convexity_defects;
+}   
 
 void DrawConvexityDefects(const std::vector<cv::Point> contour,
                           const std::vector<Vec4i>& convexity_defects,
                           cv::Mat* image) {
   for (size_t i = 0; i < convexity_defects.size(); ++i) {
-    cv::circle(*image, contour[convexity_defects[i].val[0]], 2, kGreen);
-    cv::circle(*image, contour[convexity_defects[i].val[1]], 2, kGreen);
-    cv::circle(*image, contour[convexity_defects[i].val[2]], 2, kRed);
-  }
-}
-
-void RgbImageToRgbaImage(const cv::Mat& rgb, cv::Mat* rgba) {
-  assert(rgba);
-  assert(rgb.type() == CV_8UC3);
-
-  *rgba = cv::Mat(rgb.rows, rgb.cols, CV_8UC4);
-  unsigned char* rgba_ptr = rgba->ptr();
-  unsigned char const* rgb_ptr = rgb.ptr();
-  for (size_t i = 0; i < rgb.total(); ++i) {
-    rgba_ptr[0] = rgb_ptr[0];
-    rgba_ptr[1] = rgb_ptr[1];
-    rgba_ptr[2] = rgb_ptr[2];
-    rgba_ptr[3] = 255;
-
-    rgba_ptr += 4;
-    rgb_ptr += 3;
+    cv::circle(*image, contour[convexity_defects[i].val[0]], 2, image::kGreen);
+    cv::circle(*image, contour[convexity_defects[i].val[1]], 2, image::kGreen);
+    cv::circle(*image, contour[convexity_defects[i].val[2]], 2, image::kRed);
   }
 }
 
@@ -227,14 +165,40 @@ void Piano::ObserveDepth(
       const kinect_wrapper::KinectSensorState& sensor_state) {
   cv::Mat fingers_image;
   DrawFingers(depth_mat, &fingers_image);
-
-  cv::Mat image;
-  DrawDepth(depth_mat, &image);
-  //DrawFingers(depth_mat, &image)
-
   FindNotes(depth_mat, fingers_image, sensor_state);
 
-  //DrawMotion(depth_mat, sensor_state);
+
+  hand_extractor::HandExtractor extractor(kPianoZ, kPianoZTolerance);
+  std::vector<cv::Point> hand_positions;
+  cv::Mat simplified_depth_mat;
+  extractor.ExtractHands(depth_mat, &hand_positions, &simplified_depth_mat);
+
+  cv::Mat image = cv::Mat(depth_mat.rows, depth_mat.cols, CV_8UC4);
+
+  unsigned char* image_ptr = image.ptr();
+  unsigned char* simplified_depth_ptr = simplified_depth_mat.ptr();
+
+  for (size_t i = 0; i < image.total(); ++i) {
+    if (*simplified_depth_ptr == 0) {
+      image_ptr[image::kRedIndex] = 0;
+      image_ptr[image::kGreenIndex] = 0;
+      image_ptr[image::kBlueIndex] = 0;
+      image_ptr[image::kAlphaIndex] = 255;
+    } else {
+      int color_index = *simplified_depth_ptr % kNumColors;
+
+      image_ptr[image::kRedIndex] = kColors[color_index].val[0];
+      image_ptr[image::kGreenIndex] = kColors[color_index].val[1];
+      image_ptr[image::kBlueIndex] = kColors[color_index].val[2];
+      image_ptr[image::kAlphaIndex] = 255;
+    }
+
+    image_ptr += 4;
+    simplified_depth_ptr += 1;
+  }
+
+
+
   started_ = true;
 
   nice_image_.SetNext(image);
@@ -285,16 +249,16 @@ void Piano::DrawFingers(const cv::Mat& depth_mat, cv::Mat* rgba_image) {
         unsigned int normalized_depth = (((unsigned int)*depth_ptr) - kMinZ) * 255;
         normalized_depth /= (kMaxZ - kMinZ);
 
-        image_ptr[kRedIndex] = (unsigned char)normalized_depth;
-        image_ptr[kGreenIndex] = (unsigned char)normalized_depth;
-        image_ptr[kBlueIndex] = (unsigned char)normalized_depth;
+        image_ptr[image::kRedIndex] = (unsigned char)normalized_depth;
+        image_ptr[image::kGreenIndex] = (unsigned char)normalized_depth;
+        image_ptr[image::kBlueIndex] = (unsigned char)normalized_depth;
 
         *simple_hand_ptr = 1;
       }
       else {
-        image_ptr[kRedIndex] = 0;
-        image_ptr[kGreenIndex] = 0;
-        image_ptr[kBlueIndex] = 0;
+        image_ptr[image::kRedIndex] = 0;
+        image_ptr[image::kGreenIndex] = 0;
+        image_ptr[image::kBlueIndex] = 0;
 
         *simple_hand_ptr = 0;
       }
@@ -313,7 +277,7 @@ void Piano::DrawFingers(const cv::Mat& depth_mat, cv::Mat* rgba_image) {
     const std::vector<cv::Point>& contour = contours[contour_index];
 
     // Handle the contour only if it's big enough.
-    float area = Area(contours[contour_index]);
+    float area = maths::Area(contours[contour_index]);
 
     // Minimum area to consider that a contour is a hand contour.
     const float kMinContourArea = 1000.0;
@@ -328,8 +292,8 @@ void Piano::DrawFingers(const cv::Mat& depth_mat, cv::Mat* rgba_image) {
     // Draw the contour.
     std::vector<std::vector<cv::Point> > simple_contours;
     simple_contours.push_back(simple_contour);
-    cv::drawContours(image, simple_contours, 0, kBlue, kThickness1);
-    //cv::drawContours(image, contours, contour_index, kBlue, kThickness1);
+    cv::drawContours(image, simple_contours, 0, image::kBlue, image::kThickness1);
+    //cv::drawContours(image, contours, contour_index, image::kBlue, image::kThickness1);
 
     // Compute a convex hull for the hand.
     std::vector<int> convex_hull;
@@ -372,7 +336,7 @@ void Piano::DrawFingers(const cv::Mat& depth_mat, cv::Mat* rgba_image) {
           line2.y - line1.y);
 
         // Draw a line to separate the finger from the rest of the hand.
-        cv::line(image, line1, line2, kBlue, kThickness1);
+        cv::line(image, line1, line2, image::kBlue, image::kThickness1);
 
         // Compute a vector perpendicular to the separation line and that
         // points toward the finger tip.
@@ -410,7 +374,7 @@ void Piano::DrawFingers(const cv::Mat& depth_mat, cv::Mat* rgba_image) {
   }
 
   // Add an alpha channel to the image...
-  RgbImageToRgbaImage(image, rgba_image);
+  image::RgbImageToRgbaImage(image, rgba_image);
 
   // Draw the piano.
   DrawPiano(rgba_image);
@@ -462,17 +426,17 @@ void Piano::DrawMotion(const cv::Mat& depth_mat,
     }
 
     if (*depth_ptr == 0 || *past_ptr == 0 || *depth_ptr > 1400) {
-      img_ptr[kBlueIndex] = 0;
-      img_ptr[kGreenIndex] = 0;
-      img_ptr[kRedIndex] = 0;
+      img_ptr[image::kBlueIndex] = 0;
+      img_ptr[image::kGreenIndex] = 0;
+      img_ptr[image::kRedIndex] = 0;
     } else if (*motion_ptr > 0) {
-      img_ptr[kBlueIndex] = normalized_motion;
-      img_ptr[kGreenIndex] = 0;
-      img_ptr[kRedIndex] = 0;
+      img_ptr[image::kBlueIndex] = normalized_motion;
+      img_ptr[image::kGreenIndex] = 0;
+      img_ptr[image::kRedIndex] = 0;
     } else {
-      img_ptr[kBlueIndex] = normalized_motion;
-      img_ptr[kGreenIndex] = normalized_motion;
-      img_ptr[kRedIndex] = normalized_motion;
+      img_ptr[image::kBlueIndex] = normalized_motion;
+      img_ptr[image::kGreenIndex] = normalized_motion;
+      img_ptr[image::kRedIndex] = normalized_motion;
     }
 
     ++depth_ptr;
@@ -487,17 +451,17 @@ void Piano::DrawMotion(const cv::Mat& depth_mat,
 
 void Piano::DrawPiano(cv::Mat* image) {
   cv::line(*image, cv::Point(kPianoXMin, kPianoYMin),
-           cv::Point(kPianoXMax, kPianoYMin), kGrey);
+           cv::Point(kPianoXMax, kPianoYMin), image::kGrey);
   cv::line(*image, cv::Point(kPianoXMin, kPianoYMin),
-           cv::Point(kPianoXMin, kPianoYMax), kGrey);
+           cv::Point(kPianoXMin, kPianoYMax), image::kGrey);
   cv::line(*image, cv::Point(kPianoXMax, kPianoYMin),
-           cv::Point(kPianoXMax, kPianoYMax), kGrey);
+           cv::Point(kPianoXMax, kPianoYMax), image::kGrey);
   cv::line(*image, cv::Point(kPianoXMin, kPianoYMax),
-           cv::Point(kPianoXMax, kPianoYMax), kGrey);
+           cv::Point(kPianoXMax, kPianoYMax), image::kGrey);
 
   for (int i = 0; i < kPianoNumNotes; ++i) {
     cv::line(*image, cv::Point(kPianoXMin + i*kPianoNoteWidth, kPianoYMin),
-             cv::Point(kPianoXMin + i*kPianoNoteWidth, kPianoYMax), kGrey);
+             cv::Point(kPianoXMin + i*kPianoNoteWidth, kPianoYMax), image::kGrey);
   }
 }
 

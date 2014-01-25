@@ -111,6 +111,7 @@ bool GetBonesOrientation(int skeleton_id,
     return false;
 
   skeleton.CalculateBoneOrientations(bone_orientations);
+  return true;
 }
 
 bool GetPianoInfo(unsigned char* notes, unsigned int notes_size,
