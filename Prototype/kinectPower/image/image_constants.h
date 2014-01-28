@@ -18,6 +18,7 @@ extern const cv::Scalar kGrey;
 
 // Thickness of a border.
 extern const int kThickness1;
+extern const int kThickness2;
 
 
 }  // namespace image

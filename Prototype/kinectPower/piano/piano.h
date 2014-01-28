@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "base/base.h"
+#include "hand_extractor/hand_extractor.h"
 #include "kinect_wrapper/kinect_observer.h"
 #include "kinect_wrapper/kinect_switch.h"
 
@@ -22,15 +23,7 @@ class Piano : kinect_wrapper::KinectObserver {
   void QueryNiceImage(unsigned char* nice_image, size_t nice_image_size);
 
  private:
-  void DrawFingers(const cv::Mat& depth_mat, cv::Mat* image);
-  void DrawDepth(const cv::Mat& depth_mat, cv::Mat* image);
-  void DrawMotion(const cv::Mat& depth_mat,
-                  const kinect_wrapper::KinectSensorState& sensor_state,
-                  cv::Mat* image);
-  void DrawPiano(cv::Mat* image);
-  void FindNotes(const cv::Mat& depth_mat,
-                 const cv::Mat& fingers_mat,
-                 const kinect_wrapper::KinectSensorState& sensor_state);
+  hand_extractor::HandExtractor hand_extractor_;
 
   bool started_;
   kinect_wrapper::KinectSwitch<cv::Mat> nice_image_;

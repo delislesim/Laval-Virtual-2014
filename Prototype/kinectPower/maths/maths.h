@@ -21,4 +21,7 @@ double AngleBetween(const cv::Point& angle_point,
 // @returns the area of the rectangle.
 float Area(const std::vector<cv::Point>& points);
 
+int DistanceSquare(const cv::Point& point_a,
+                   const cv::Point& point_b);
+
 }  // maths

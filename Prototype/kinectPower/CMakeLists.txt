@@ -28,6 +28,11 @@ include_directories(
 # Libraries
 ####################
 
+add_library(algos
+  algos/stable_matching.cc
+  algos/stable_matching.h
+  )
+
 add_library(base
   base/base.h
   base/logging.h
@@ -40,8 +45,14 @@ add_library(base
   )
   
 add_library(hand_extractor
+  hand_extractor/finger_finder.cc
+  hand_extractor/finger_finder.h
+  hand_extractor/hand_2d_parameters.cc
+  hand_extractor/hand_2d_parameters.h
   hand_extractor/hand_extractor.cc
   hand_extractor/hand_extractor.h
+  hand_extractor/segmenter.cc
+  hand_extractor/segmenter.h
   )
   
 add_library(hand_particle_filter
@@ -58,6 +69,8 @@ add_library(hand_particle_filter
   )
   
 add_library(image
+  image/contour_center.cc
+  image/contour_center.h
   image/image_constants.cc
   image/image_constants.h
   image/image_utility.cc
@@ -134,6 +147,7 @@ add_library(kinect_power SHARED
 #####################################################
 	
 target_link_libraries(kinect_power
+  algos
   base
   hand_extractor
   hand_particle_filter

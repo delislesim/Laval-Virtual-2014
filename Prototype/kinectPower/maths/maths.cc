@@ -36,5 +36,11 @@ float Area(const std::vector<cv::Point>& points) {
   return area;
 }
 
+int DistanceSquare(const cv::Point& point_a,
+                   const cv::Point& point_b) {
+  cv::Point dist = point_a - point_b;
+  return dist.x * dist.x + dist.y * dist.y;
+}
+
 }  // namespace maths
 

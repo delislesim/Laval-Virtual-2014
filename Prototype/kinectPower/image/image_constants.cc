@@ -13,5 +13,6 @@ const cv::Scalar kRed(0, 0, 255);
 const cv::Scalar kGrey(150, 150, 150);
 
 const int kThickness1 = 1;
+const int kThickness2 = 2;
 
 }  // namespace image

@@ -3,27 +3,29 @@
 #include <opencv2/core/core.hpp>
 #include <vector>
 
+#include "base/base.h"
+#include "hand_extractor/finger_finder.h"
+#include "hand_extractor/hand_2d_parameters.h"
+#include "hand_extractor/segmenter.h"
+
 namespace hand_extractor {
 
 class HandExtractor {
  public:
   HandExtractor(int hands_depth, int hands_depth_tolerance);
 
-  // Generates a matrix in which each pixel belonging to an hand is identified
+  // Generates a matrix in which each pixel that belong to an hand is identified
   // with a different value.
   void ExtractHands(const cv::Mat& depth_mat,
-                    std::vector<cv::Point>* hand_positions,
-                    cv::Mat* simplified_depth_mat) const;
+                    cv::Mat* segmentation_mat);
 
  private:
-  // Generates a matrix in which pixels that are part of an hand are equal to
-  // 1 and other pixels are equal to 0. A pixel is considered to be part of an
-  // hand if it's in the range |hands_depth_| +/- |hands_depth_tolerance_|.
-  // TODO(fdoray): Not used?
-  void ComputeHandsMask(const cv::Mat& depth_mat, cv::Mat* hands_mat) const;
+  std::vector<Hand2dParameters> last_hands_parameters_;
 
-  int hands_depth_;
-  int hands_depth_tolerance_;
+  Segmenter segmenter_;
+  FingerFinder finger_finder_;
+
+  DISALLOW_COPY_AND_ASSIGN(HandExtractor);
 };
 
 }  // namespace hand_extractor

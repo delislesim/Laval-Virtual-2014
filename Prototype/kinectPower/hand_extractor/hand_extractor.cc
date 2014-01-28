@@ -1,9 +1,13 @@
 #include "hand_extractor/hand_extractor.h"
 
+#include <iostream>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include "algos/stable_matching.h"
 #include "base/logging.h"
+#include "hand_extractor/hand_2d_parameters.h"
+#include "image/contour_center.h"
 #include "image/image_constants.h"
 #include "maths/maths.h"
 
@@ -13,100 +17,91 @@ namespace hand_extractor {
 
 namespace {
 
-// Minimum area to consider that a contour is a hand contour, in pixels.
-const float kMinContourArea = 1000.0;
-
-// Distance tolerated between the real contour and the simplified contour.
-const int kSimpleContourTolerance = 3;
+const int kMaxSquareDistanceToMatchHands = 50;
 
 }  // namespace
 
 HandExtractor::HandExtractor(int hands_depth, int hands_depth_tolerance)
-    : hands_depth_(hands_depth),
-      hands_depth_tolerance_(hands_depth_tolerance) {
+    : segmenter_(hands_depth, hands_depth_tolerance) {
 }
 
 void HandExtractor::ExtractHands(const cv::Mat& depth_mat,
-                                 std::vector<cv::Point>* hand_positions,
-                                 cv::Mat* simplified_depth_mat) const {
-  assert(hand_positions);
-  assert(simplified_depth_mat);
-  assert(depth_mat.type() == CV_16U);
+                                 cv::Mat* segmentation_mat) {
+  assert(segmentation_mat);
 
-  *simplified_depth_mat = cv::Mat::zeros(depth_mat.rows, depth_mat.cols, CV_8U);
-
-  // Generate a matrix in which each pixel that is potentially a hand is "1" and
-  // all other pixels are "0".
-  cv::Mat hands_mask;
-  ComputeHandsMask(depth_mat, &hands_mask);
-
-  // Find the contour of each region in |hands_maks|.
+  // Find the contour of each hand.
   std::vector<std::vector<cv::Point> > contours;
-  cv::findContours(hands_mask, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
-    // TODO(fdoray): Find only the "parent" contours.
+  segmenter_.SegmentHands(depth_mat, &contours, segmentation_mat);
 
-  // Value assigned to the pixels of the next contour found.
-  unsigned char contour_pixel_value = 1;
-
-  // For each distinct contour...
-  for (size_t contour_index = 0; contour_index < contours.size();
-       ++contour_index) {
-    const std::vector<cv::Point>& contour = contours[contour_index];
-
-    // Handle the contour only if it's big enough.
-    float area = maths::Area(contours[contour_index]);
-    if (area < kMinContourArea)
-      continue;
-
-    // Simplify the contour.
-    std::vector<std::vector<cv::Point> > simple_contour;
-    simple_contour.push_back(std::vector<cv::Point>());
-    cv::approxPolyDP(contour, simple_contour[0], kSimpleContourTolerance, true);
-
-    // Remove the "arm" part from the contour.
-    // TODO(fdoray)
-
-    // Find the center of the hand.
-    cv::Point center(0, 0);
-    hand_positions->push_back(center);
-
-    // Draw the simplified contour.
-    cv::drawContours(*simplified_depth_mat, simple_contour, 0, contour_pixel_value,
-                     image::kThickness1);
-
-    // Fill the hand.
-    
-
-    // Pixel value for the next contour.
-    ++contour_pixel_value;
+  // Find the center of each hand.
+  std::vector<cv::Point> contours_centers;
+  for (size_t i = 0; i < contours.size(); ++i) {
+    cv::Point center = image::ContourCenter(contours[i]);
+    contours_centers.push_back(center);
   }
-}
 
-void HandExtractor::ComputeHandsMask(const cv::Mat& depth_mat,
-                                     cv::Mat* hands_mask) const {
-  assert(hands_mask);
-  assert(depth_mat.type() == CV_16U);
-
-  const int min_depth = hands_depth_ - hands_depth_tolerance_;
-  const int max_depth = hands_depth_ + hands_depth_tolerance_;
-
-  *hands_mask = Mat(depth_mat.rows, depth_mat.cols, CV_8U);
-
-  unsigned short const* depth_ptr =
-      reinterpret_cast<unsigned short const*>(depth_mat.ptr());
-  unsigned char* hands_ptr = hands_mask->ptr();
-
-  for (size_t pixel_index = 0;
-       pixel_index < depth_mat.total(); ++pixel_index) {
-
-    if (*depth_ptr > min_depth && *depth_ptr < max_depth)
-      *hands_ptr = 1;
-    else
-      *hands_ptr = 0;
-
-    ++depth_ptr;
-    ++hands_ptr;
+  // Match each hand from the previous frame with a contour from the current
+  // frame.
+  algos::StableMatchingQueue potential_pairs;
+  for (size_t previous_index = 0; 
+       previous_index < last_hands_parameters_.size();
+       ++previous_index) {
+    for (size_t current_index = 0;
+         current_index < contours.size();
+         ++current_index) {
+      algos::StableMatchingPair pair;
+      pair.left = current_index;
+      pair.right = previous_index;
+      pair.distance = maths::DistanceSquare(
+          last_hands_parameters_[previous_index].GetContourCenter(),
+          contours_centers[current_index]
+      );
+      potential_pairs.push(pair);
+    }
   }
+  std::vector<int> best_pairs;
+  algos::StableMatching(
+      contours.size(),
+      last_hands_parameters_.size(),
+      kMaxSquareDistanceToMatchHands,
+      &potential_pairs,
+      &best_pairs);
+
+  // Find the position of the fingers.
+  std::vector<Hand2dParameters> hands_parameters;
+
+  for (size_t i = 0; i < contours.size(); ++i) {
+    // Retrieve the parameters of the hand at last frame.
+    const Hand2dParameters* last_hand_parameters = NULL;
+    if (best_pairs[i] != -1)
+      last_hand_parameters = &last_hands_parameters_[best_pairs[i]];
+
+    // Compute the new hand parameters.
+    hands_parameters.push_back(Hand2dParameters());
+    finger_finder_.FindFingers(contours[i], static_cast<unsigned char>(i + 1),
+                               depth_mat, *segmentation_mat,
+                               last_hand_parameters, &hands_parameters[i]);
+
+    // Remember the center of the hand.
+    hands_parameters[i].SetContourCenter(contours_centers[i]);
+
+    // Draw a small circle on each fingertip.
+    const cv::Scalar kFingertipColor = 39;
+    for (size_t j = 0; j < Hand2dParameters::JOINTS_COUNT; ++j) {
+      Hand2dParameters::HandJoint joint =
+          static_cast<Hand2dParameters::HandJoint>(j);
+      cv::Point joint_position;
+      if (hands_parameters[i].GetJointPosition(joint, &joint_position)) {
+        cv::circle(*segmentation_mat, joint_position, 2,
+                   kFingertipColor, image::kThickness2);
+      }
+    }
+
+  }
+
+  // Remember the hand parameters.
+  last_hands_parameters_ = hands_parameters;
+
 }
 
 }  // namespace hand_extractor

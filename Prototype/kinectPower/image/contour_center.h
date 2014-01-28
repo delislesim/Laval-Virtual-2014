@@ -5,6 +5,6 @@
 
 namespace image {
 
-void RgbImageToRgbaImage(const cv::Mat& rgb, cv::Mat* rgba);
+cv::Point ContourCenter(const std::vector<cv::Point>& contour);
 
 }  // namespace image
