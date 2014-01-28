@@ -11,9 +11,8 @@ double RadToDegrees(double rad);
 double Round(double number);
 int RoundToInt(double number);
 
-double AngleBetween(const cv::Point& angle_point,
-                    const cv::Point& before_angle_point,
-                    const cv::Point& after_angle_point);
+double AngleBetween(const cv::Vec2i& vec_a,
+                    const cv::Vec2i& vec_b);
 
 // Calculates the area of the minimum rotated rectangle enclosing the
 // set of points passed as a parameter.

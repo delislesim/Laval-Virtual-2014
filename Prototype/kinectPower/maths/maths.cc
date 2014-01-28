@@ -19,14 +19,27 @@ int RoundToInt(double number) {
   return static_cast<int>(Round(number));
 }
 
-double AngleBetween(const cv::Point& angle_point,
-                    const cv::Point& before_angle_point,
-                    const cv::Point& after_angle_point) {
-  double angle = abs(static_cast<int>(round(maths::RadToDegrees(
-      atan2(static_cast<double>(before_angle_point.x - angle_point.x),
-      static_cast<double>(before_angle_point.y - angle_point.y)) -
-      atan2(static_cast<double>(after_angle_point.x - angle_point.x),
-      static_cast<double>(after_angle_point.y - angle_point.y))))));
+double AngleBetween(const cv::Vec2i& vec_a,
+                    const cv::Vec2i& vec_b) {
+  // Avoid division by 0.
+  if ((vec_a.val[0] == 0 && vec_a.val[1] == 0) ||
+      (vec_b.val[0] == 0 && vec_b.val[1] == 0)) {
+    return 0.0;
+  }
+
+  double cos_angle = static_cast<double>(vec_a.dot(vec_b)) /
+      (cv::norm(vec_a) * cv::norm(vec_b));
+  double angle = acos(cos_angle);
+
+  if (angle == 0.0)
+    return 0.0;
+
+  int determinant = (vec_a.val[0] * vec_b.val[1]) -
+                    (vec_a.val[1] * vec_b.val[0]);
+
+  if (determinant < 0)
+    angle = -angle;
+  
   return angle;
 }
 
