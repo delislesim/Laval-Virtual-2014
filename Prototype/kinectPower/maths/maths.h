@@ -24,4 +24,14 @@ float Area(const std::vector<cv::Point>& points);
 int DistanceSquare(const cv::Point& point_a,
                    const cv::Point& point_b);
 
+template<typename T>
+T Clamp(T val, T min, T max) {
+  assert(min < max);
+  if (val < min)
+    return min;
+  if (val > max)
+    return max;
+  return val;
+}
+
 }  // maths

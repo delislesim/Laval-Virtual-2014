@@ -22,43 +22,52 @@ const int kTipReduceThresholdDistanceSquare = 196;
 
 // Maximum distance to match two fingertips between the current and previous
 // frame.
-const int kTipMatchingThresholdDistanceSquare = 196;
+const int kTipMatchingThresholdDistanceSquare = 121;
 
-const int kMaximumLifetime = 10;
+const float kMaximumLifetime = 3;
+
+const float kLifetimeErosion = 0.6f;
 
 struct TipDescription {
   TipDescription()
       : tip_index(0),
         fold_before_index(0),
         fold_after_index(0),
+        matched(false),
         reputation_score(0),
         lifetime(0) {}
 
   size_t tip_index;
   size_t fold_before_index;
   size_t fold_after_index;
-  int reputation_score;
-  int lifetime;
+
+  bool matched;
+  float reputation_score;
+  float lifetime;
 };
 
-int ReputationScore(const cv::Point& position, int distance, int lifetime) {
-  int inverse_distance = 100 - distance;
-  if (inverse_distance < 0)
-    inverse_distance = 0;
-
-  int score = (2 * inverse_distance * (lifetime + 1)) - position.y;
+float ReputationScore(int distance, float lifetime) {
+  assert(distance >= 0);
+  float inverse_distance = 50.0f / (50.0f + static_cast<float>(distance + 1));
+  float score = inverse_distance * lifetime;
   return score;
 }
 
-struct TipDescriptionSorter {
-  TipDescriptionSorter(std::vector<cv::Point> const* contour)
-      : contour(contour) {}
+struct TipDescriptionPositionSorter {
+  TipDescriptionPositionSorter(std::vector<cv::Point> const* contour)
+  : contour(contour) {}
 
   bool operator() (const TipDescription& a, const TipDescription& b) {
-    return a.reputation_score > b.reputation_score;
+    return (*contour)[a.tip_index].y < (*contour)[b.tip_index].y;
   }
 
   std::vector<cv::Point> const* contour;
+};
+
+struct TipDescriptionReputationSorter {
+  bool operator() (const TipDescription& a, const TipDescription& b) {
+    return a.reputation_score > b.reputation_score;
+  }
 };
 
 void ProcessTip(const std::vector<cv::Point>& contour,
@@ -140,7 +149,7 @@ void FingerFinder::FindFingers(const std::vector<cv::Point>& contour,
   // Remove unwanted defects.
   std::vector<TipDescription> tips;
   ReduceTips(contour, convexity_defects, &tips);
-
+  
   // Find the distance between the tips from last frame and from this frame.
   if (previous_hand_parameters) {
     algos::StableMatchingQueue fingers_potential_pairs;
@@ -156,11 +165,11 @@ void FingerFinder::FindFingers(const std::vector<cv::Point>& contour,
             contour[tips[current_index].tip_index],
             previous_tips[previous_index].position
         );
+        fingers_potential_pairs.push(potential_pair);
       }
     }
 
     std::vector<int> fingers_best_pairs;
-
     algos::StableMatching(tips.size(), previous_tips.size(),
                           kTipMatchingThresholdDistanceSquare,
                           &fingers_potential_pairs,
@@ -168,34 +177,31 @@ void FingerFinder::FindFingers(const std::vector<cv::Point>& contour,
 
     for (size_t i = 0; i < tips.size(); ++i) {
       if (fingers_best_pairs[i] != -1) {
-        int previous_lifetime = previous_tips[fingers_best_pairs[i]].lifetime;
-
-        tips[i].reputation_score = ReputationScore(
+        float previous_lifetime = previous_tips[fingers_best_pairs[i]].lifetime;
+        int distance = maths::DistanceSquare(
             contour[tips[i].tip_index],
-            maths::DistanceSquare(
-                contour[tips[i].tip_index],
-                previous_tips[fingers_best_pairs[i]].position
-            ),
-            previous_lifetime
+            previous_tips[fingers_best_pairs[i]].position
         );
-        tips[i].lifetime = previous_lifetime + 1;
-        if (tips[i].lifetime > kMaximumLifetime)
-          tips[i].lifetime = kMaximumLifetime;
-      } else {
-        tips[i].reputation_score =
-          ReputationScore(contour[tips[i].tip_index], 100, 0);
+        tips[i].reputation_score = ReputationScore(distance, previous_lifetime);
+        tips[i].lifetime = previous_lifetime * kLifetimeErosion;
       }
-    }
-  } else {
-    for (size_t i = 0; i < tips.size(); ++i) {
-      tips[i].reputation_score =
-          ReputationScore(contour[tips[i].tip_index], 0, 0);
     }
   }
 
+  // Sort the tips by position.
+  TipDescriptionPositionSorter tip_position_sorter(&contour);
+  std::sort(tips.begin(), tips.end(), tip_position_sorter);
+
+  // Increase the lifetime and reputation of the highest tips.
+  for (size_t i = 0; i < Hand2dParameters::JOINTS_COUNT && i < tips.size();
+       ++i) {
+    tips[i].lifetime += 1;
+    tips[i].reputation_score += 0.5;
+  }
+
   // Sort the tips by reputation.
-  TipDescriptionSorter tip_description_sorter(&contour);
-  std::sort(tips.begin(), tips.end(), tip_description_sorter);
+  TipDescriptionReputationSorter tip_reputation_sorter;
+  std::sort(tips.begin(), tips.end(), tip_reputation_sorter);
 
   // Return the best finger positions.
   size_t tip_data_index = 0;
@@ -214,15 +220,12 @@ void FingerFinder::FindFingers(const std::vector<cv::Point>& contour,
     ++tip_data_index;
   }
 
-  for (size_t i = tip_data_index; i < tips.size(); ++i) {
-    tips[i].lifetime = 0;
-  }
-
   // Store all the fingertips in the hand parameters structure.
   for (size_t i = 0; i < tips.size(); ++i) {
     Hand2dParameters::PotentialTip potential_tip;
     potential_tip.position = contour[tips[i].tip_index];
-    potential_tip.lifetime = tips[i].lifetime;
+    potential_tip.lifetime =
+        maths::Clamp(tips[i].lifetime, 0.0f, kMaximumLifetime);
     hand_parameters->PushPotentialTip(potential_tip);
   }
 

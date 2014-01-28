@@ -22,7 +22,7 @@ class Hand2dParameters {
 
   struct PotentialTip {
     cv::Point position;
-    int lifetime;
+    float lifetime;
   };
 
   typedef std::vector<PotentialTip> PotentialTipVector;
