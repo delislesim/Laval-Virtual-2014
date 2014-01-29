@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
+using KinectHelpers;
 
 public class MoveJoints : MonoBehaviour {
-
 	//Public
 	public GameObject Hip_Center;
 	public GameObject Spine;
@@ -29,76 +29,53 @@ public class MoveJoints : MonoBehaviour {
 	private GameObject[] joints; 
 	private Vector3 posInitialOffset = Vector3.zero;
 	private bool initialPosInitialized = false;
-	private float[] jointPositions;
 
 	// Use this for initialization
 	void Start () {
-		joints = new GameObject[(int)KinectPowerInterop.NuiSkeletonPositionIndex.Count] {
+		joints = new GameObject[(int)Skeleton.Joint.Count] {
 			Hip_Center, Spine, Shoulder_Center, Head,
 			Shoulder_Left, Elbow_Left, Wrist_Left, Hand_Left,
 			Shoulder_Right, Elbow_Right, Wrist_Right, Hand_Right,
 			Hip_Left, Knee_Left, Ankle_Left, Foot_Left,
 			Hip_Right, Knee_Right, Ankle_Right, Foot_Right
 		};
-
-		jointPositions = new float[(int)KinectPowerInterop.NuiSkeletonPositionIndex.Count * 3] ;
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
 		//Get joints positions
-		bool bonesTracked = KinectPowerInterop.GetJointsPosition(0, jointPositions);
-		if(bonesTracked)
-			Debug.Log("skelette détecté");
-		else
-			Debug.Log("En attente d'un skelette");
-
+		Skeleton skeleton = new Skeleton(0);
 		//Set offset as soon as we see hip_center
-		if(initialPosInitialized == false && bonesTracked )
+		if(initialPosInitialized == false && skeleton.Exists() )
 		{
-			Vector3 hipPos = new Vector3(jointPositions[(int)KinectPowerInterop.NuiSkeletonPositionIndex.HipCenter],
-			                             jointPositions[(int)KinectPowerInterop.NuiSkeletonPositionIndex.HipCenter+1],
-			                             jointPositions[(int)KinectPowerInterop.NuiSkeletonPositionIndex.HipCenter+2]);
+			Vector3 hipPos = Vector3.zero;
+			Skeleton.JointStatus status = skeleton.GetJointPosition(Skeleton.Joint.HipCenter, out hipPos);
 
-			if(hipPos == Vector3.zero)
+			if(status != Skeleton.JointStatus.NotTracked)
 			{
 				posInitialOffset = Vector3.zero - hipPos;
+				Debug.Log ("Offset : " + posInitialOffset);
 				initialPosInitialized = true;
 			}
 		}
 
 		// update the local positions of the bones
-		int jointsCount = (int)KinectPowerInterop.NuiSkeletonPositionIndex.Count;
+		int jointsCount = (int)Skeleton.Joint.Count;
 
 		for(int i = 0; i < jointsCount; i++) 
 		{
 			if(joints[i] != null)
 			{
 				//int joint = MirroredMovement ? KinectWrapper.GetSkeletonMirroredJoint(i): i;
-				Vector3 posJoint = new Vector3(jointPositions[i],
-				                               jointPositions[i+1],
-				                               jointPositions[i+2]);
-				//posJoint.z = !MirroredMovement ? -posJoint.z : posJoint.z;
-				//Quaternion rotJoint = KinectManager.Instance.GetJointOrientation(playerID, joint, !MirroredMovement);
+				Vector3 posJoint = Vector3.zero;
+				Skeleton.JointStatus jointStatus = skeleton.GetJointPosition((Skeleton.Joint)i, out posJoint);
+				if(jointStatus != Skeleton.JointStatus.Tracked)
+					Debug.Log("joints" + i);
 				
-				//posJoint -= posPointMan;
-				//posJoint.z = -posJoint.z;
-				
-				//if(MirroredMovement)
-				//{
-				//	posJoint.x = -posJoint.x;
-				//}
-				
-				joints[i].transform.position = posJoint + posInitialOffset;
+				joints[i].transform.position = new Vector3(posJoint.x*5, posJoint.y*5, -5*posJoint.z) + posInitialOffset;
 				//joints[i].transform.localRotation = rotJoint;
 			}
 		}	
-/*	
-		Vector3 mdPos = new Vector3(positions[(int)KinectPowerInterop.NuiSkeletonPositionIndex.HandRight],
-		                                      positions[(int)KinectPowerInterop.NuiSkeletonPositionIndex.HandRight+1],
-		                                      positions[(int)KinectPowerInterop.NuiSkeletonPositionIndex.HandRight+2]);
-*/
-		//Hand_Right.transform.position = mdPos*100;
 	}
 }

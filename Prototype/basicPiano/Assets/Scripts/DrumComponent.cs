@@ -23,7 +23,11 @@ public class DrumComponent : MonoBehaviour {
 		
 	}
 
-	
+	void OnTriggerEnter()
+	{
+		audio.Play();
+	}
+
 	void OnMouseDown()
 	{
 		audio.Play();
