@@ -18,7 +18,7 @@ namespace {
 const float kMinContourArea = 1000.0;
 
 // Distance tolerated between the real contour and the simplified contour.
-const int kSimpleContourTolerance = 3;
+const int kSimpleContourTolerance = 5;
 
 }  // namespace
 

@@ -6,9 +6,9 @@ namespace hand_extractor {
 
 class Hand2dParameters;
 
-class FingerFinder {
+class FingerFinderConvex {
  public:
-  FingerFinder();
+  FingerFinderConvex();
 
   // Computes the position of the fingers in a 2D image.
   void FindFingers(const std::vector<cv::Point>& contour,

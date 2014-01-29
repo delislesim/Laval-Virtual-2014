@@ -1,4 +1,4 @@
-#include "hand_extractor/finger_finder.h"
+#include "hand_extractor/finger_finder_convex.h"
 
 #include <algorithm>
 #include <iostream>
@@ -127,15 +127,16 @@ void ReduceTips(const std::vector<cv::Point>& contour,
 
 }  // namespace
 
-FingerFinder::FingerFinder() {
+FingerFinderConvex::FingerFinderConvex() {
 }
 
-void FingerFinder::FindFingers(const std::vector<cv::Point>& contour,
+void FingerFinderConvex::FindFingers(const std::vector<cv::Point>& contour,
                                const unsigned char contour_pixel_value,
                                const cv::Mat& depth_mat,
                                const cv::Mat& segmentation_mat,
                                const Hand2dParameters* previous_hand_parameters,
                                Hand2dParameters* hand_parameters) const {
+  // |previous_hand_parameters| can be NULL.
   assert(hand_parameters);
 
   // Compute a convex hull for the hand.

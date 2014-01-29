@@ -4,7 +4,8 @@
 #include <vector>
 
 #include "base/base.h"
-#include "hand_extractor/finger_finder.h"
+#include "hand_extractor/finger_finder_convex.h"
+#include "hand_extractor/finger_finder_mountain.h"
 #include "hand_extractor/hand_2d_parameters.h"
 #include "hand_extractor/segmenter.h"
 
@@ -23,7 +24,8 @@ class HandExtractor {
   std::vector<Hand2dParameters> last_hands_parameters_;
 
   Segmenter segmenter_;
-  FingerFinder finger_finder_;
+  FingerFinderConvex finger_finder_convex_;
+  FingerFinderMountain finger_finder_mountain_;
 
   DISALLOW_COPY_AND_ASSIGN(HandExtractor);
 };

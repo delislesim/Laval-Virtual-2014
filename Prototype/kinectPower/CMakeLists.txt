@@ -5,6 +5,8 @@ set (OpenCV_DIR $ENV{OPENCV_DIR})
 FIND_PACKAGE(OpenCV REQUIRED)
 #FIND_PACKAGE(OpenCL REQUIRED)
 
+set(GMOCK_ROOT "../gmock/")
+
 set(CMAKE_SUPPRESS_REGENERATION TRUE)
 
 # Activate warning level 4.
@@ -22,6 +24,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D _UNICODE /D UNICODE")
 include_directories(
   .
   $ENV{KINECTSDK10_DIR}/inc
+  ${GMOCK_ROOT}/include
+  ${GMOCK_ROOT}
+  ${GMOCK_ROOT}/gtest/include
+  ${GMOCK_ROOT}/gtest
   )
 
 ####################
@@ -45,8 +51,10 @@ add_library(base
   )
   
 add_library(hand_extractor
-  hand_extractor/finger_finder.cc
-  hand_extractor/finger_finder.h
+  hand_extractor/finger_finder_convex.cc
+  hand_extractor/finger_finder_convex.h
+  hand_extractor/finger_finder_mountain.cc
+  hand_extractor/finger_finder_mountain.h
   hand_extractor/hand_2d_parameters.cc
   hand_extractor/hand_2d_parameters.h
   hand_extractor/hand_extractor.cc
@@ -174,4 +182,23 @@ target_link_libraries(kinect_power
 # Unittests
 ####################
 
-# coming soon...
+add_executable(unittests
+  maths/maths_unittests.cc
+  ${GMOCK_ROOT}/gtest/src/gtest-all.cc
+  ${GMOCK_ROOT}/src/gmock-all.cc
+  ${GMOCK_ROOT}/src/gmock_main.cc
+  )
+
+target_link_libraries(unittests
+  algos
+  base
+  hand_extractor
+  hand_particle_filter
+  image
+  kinect_replay
+  kinect_wrapper
+  maths
+  piano
+  ${OpenCV_LIBS}
+  $ENV{KINECTSDK10_DIR}/lib/x86/Kinect10.lib
+  )
