@@ -6,6 +6,16 @@ namespace maths {
 
 extern const double kPi;
 
+// Returns the previous index (circular).
+inline size_t Previous(const size_t& index, const size_t& size) {
+  return (index + size - 1) % size;
+}
+
+// Returns the next index (circular).
+inline size_t Next(const size_t& index, const size_t& size) {
+  return (index + 1) % size;
+}
+
 double RadToDegrees(double rad);
 
 double Round(double number);

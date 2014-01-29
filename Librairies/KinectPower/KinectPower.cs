@@ -1,0 +1,93 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class KinectPower : MonoBehaviour {
+
+	// Show the streams.
+	public bool showDepthMap;
+
+	// Replay mode.
+	public enum ReplayMode {
+		NO_REPLAY,
+		RECORD,
+		REPLAY
+	}
+	public ReplayMode replay = ReplayMode.NO_REPLAY;
+	public string replayFilename = "replay.boubou";
+
+	// Use this for initialization
+	void Start () {
+		if (replay != ReplayMode.REPLAY)
+    		KinectPowerInterop.Initialize();
+
+    	depthTexture = new Texture2D(kDepthWidth, kDepthHeight);
+    	depthMapRect = new Rect(Screen.width, Screen.height - depthTexture.height * 2,
+                                -depthTexture.width * 2, depthTexture.height * 2);
+
+		if (replay == ReplayMode.RECORD) {
+			KinectPowerInterop.RecordSensor(0, replayFilename);
+		} else if (replay == ReplayMode.REPLAY) {
+			KinectPowerInterop.StartPlaySensor(0, replayFilename);
+		}
+	}
+	
+	void Update () {
+
+		if (replay == ReplayMode.REPLAY) {
+			KinectPowerInterop.PlayNextFrame(0);
+		}
+
+		if (showDepthMap) {
+		    KinectPowerInterop.GetNiceDepthMap(depthBuffer, (uint)depthBuffer.Length);
+		    
+			BytesToColors(depthBuffer, depthColors);
+		    depthTexture.SetPixels32(depthColors);
+		    depthTexture.Apply();
+		}
+	}
+
+	void BytesToColors(byte[] bytes, Color32[] colors) {
+		for (int i = 0; i < colors.Length; ++i) {
+			int redIndex = i*4 + 2;
+			int greenIndex = i*4 + 1;
+			int blueIndex = i*4 + 0;
+			int alphaIndex = i*4 + 3;
+
+			int dst_index = ReverseIndex(i);
+			colors[dst_index] = new Color32(bytes[redIndex],
+			                                bytes[greenIndex],
+			                                bytes[blueIndex],
+			                                bytes[alphaIndex]);
+		}
+	}
+
+	private int ReverseIndex(int src_index) {
+		int row = src_index / kDepthWidth;
+		int col = src_index % kDepthWidth;
+
+		return (kDepthHeight - row - 1) * kDepthWidth +
+			   (kDepthWidth - col - 1);
+	}
+
+	void OnGUI()
+	{
+		if (showDepthMap)
+			GUI.DrawTexture(depthMapRect, depthTexture);
+	}
+
+	void OnDestroy () {
+ 		KinectPowerInterop.Shutdown();
+	}
+
+	void OnApplicationQuit() {
+		KinectPowerInterop.Shutdown();
+	}
+
+	// Depth stream.
+	private Rect depthMapRect;
+	private Texture2D depthTexture;
+	private byte[] depthBuffer = new byte[kDepthWidth * kDepthHeight * 4];
+	private Color32[] depthColors = new Color32[kDepthWidth * kDepthHeight];
+	private const int kDepthWidth = 640;
+	private const int kDepthHeight = 480;
+}
