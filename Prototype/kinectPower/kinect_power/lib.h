@@ -19,7 +19,8 @@ extern "C" bool __declspec(dllexport)
 GetNiceDepthMap(unsigned char* pixels, unsigned int pixels_size);
 
 extern "C" bool __declspec(dllexport)
-GetJointsPosition(int skeleton_id, float* joint_positions);
+GetJointsPosition(int skeleton_id, float* joint_positions,
+                  unsigned char* joint_status);
 
 extern "C" bool __declspec(dllexport)
 GetBonesOrientation(int skeleton_id,

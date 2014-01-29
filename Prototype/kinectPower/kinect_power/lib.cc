@@ -68,7 +68,8 @@ bool GetNiceDepthMap(unsigned char* pixels, unsigned int pixels_size) {
   return true;
 }
 
-bool GetJointsPosition(int skeleton_id, float* joint_positions) {
+bool GetJointsPosition(int skeleton_id, float* joint_positions,
+                       unsigned char* joint_status) {
   KinectWrapper* wrapper = KinectWrapper::instance();
 
   KinectSkeletonFrame skeleton_frame;
@@ -84,16 +85,14 @@ bool GetJointsPosition(int skeleton_id, float* joint_positions) {
     KinectSkeleton::JointIndex joint =
         static_cast<KinectSkeleton::JointIndex>(joint_index);
 
-    bool inferred = false;
-    if (skeleton.GetJointPosition(joint, &pos, &inferred)) { 
-      joint_positions[joint_index*3 + 0] = pos[0];
-      joint_positions[joint_index*3 + 1] = pos[1];
-      joint_positions[joint_index*3 + 2] = pos[2];
-    } else {
-      joint_positions[joint_index*3 + 0] = 0;
-      joint_positions[joint_index*3 + 1] = 0;
-      joint_positions[joint_index*3 + 2] = 0;
-    }
+    KinectSkeleton::JointStatus status = KinectSkeleton::NOT_TRACKED;
+    skeleton.GetJointPosition(joint, &pos, &status);
+
+    joint_status[joint_index] = static_cast<unsigned char>(status);
+
+    joint_positions[joint_index*3 + 0] = pos[0];
+    joint_positions[joint_index*3 + 1] = pos[1];
+    joint_positions[joint_index*3 + 2] = pos[2];
   }
 
   return true;
