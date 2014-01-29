@@ -78,7 +78,7 @@ void HandExtractor::ExtractHands(const cv::Mat& depth_mat,
 
     // Compute the new hand parameters.
     hands_parameters.push_back(Hand2dParameters());
-    finger_finder_convex_.FindFingers(
+    finger_finder_mountain_.FindFingers(
         contours[i], static_cast<unsigned char>(i + 1),
         depth_mat, *segmentation_mat,
         last_hand_parameters, &hands_parameters[i]);
