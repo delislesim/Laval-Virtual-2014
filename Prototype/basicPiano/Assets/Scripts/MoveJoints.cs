@@ -27,8 +27,8 @@ public class MoveJoints : MonoBehaviour {
 
 	//Public
 	private GameObject[] joints; 
-	private Vector3 posInitialOffset = Vector3.zero;
-	private bool initialPosInitialized = false;
+	private Vector3 pos_initial_offset = Vector3.zero;
+	private bool initial_position_initialized = false;
 
 	// Use this for initialization
 	void Start () {
@@ -47,16 +47,16 @@ public class MoveJoints : MonoBehaviour {
 		//Get joints positions
 		Skeleton skeleton = new Skeleton(0);
 		//Set offset as soon as we see hip_center
-		if(initialPosInitialized == false && skeleton.Exists() )
+		if(initial_position_initialized == false && skeleton.Exists() )
 		{
 			Vector3 hipPos = Vector3.zero;
 			Skeleton.JointStatus status = skeleton.GetJointPosition(Skeleton.Joint.HipCenter, out hipPos);
 
 			if(status != Skeleton.JointStatus.NotTracked)
 			{
-				posInitialOffset = Vector3.zero - hipPos;
+				pos_initial_offset = Vector3.zero - hipPos;
 				//Debug.Log ("Offset : " + posInitialOffset);
-				initialPosInitialized = true;
+				initial_position_initialized = true;
 			}
 		}
 
@@ -69,9 +69,10 @@ public class MoveJoints : MonoBehaviour {
 			{
 				//int joint = MirroredMovement ? KinectWrapper.GetSkeletonMirroredJoint(i): i;
 				Vector3 posJoint = Vector3.zero;
+				//TODO get joint rotations
 				Skeleton.JointStatus jointStatus = skeleton.GetJointPosition((Skeleton.Joint)i, out posJoint);
 				
-				joints[i].transform.position = new Vector3(posJoint.x*5, posJoint.y*5, -5*posJoint.z) + posInitialOffset;
+				joints[i].transform.position = new Vector3(posJoint.x*5, posJoint.y*5, -5*posJoint.z) + pos_initial_offset;
 				//joints[i].transform.localRotation = rotJoint;
 			}
 		}	
