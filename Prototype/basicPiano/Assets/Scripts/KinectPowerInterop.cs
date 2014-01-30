@@ -5,25 +5,25 @@ using System.Runtime.InteropServices;
 public class KinectPowerInterop
 {
 
-	[DllImport(@"kinect_power.dll", EntryPoint = "Initialize", CallingConvention = CallingConvention.Cdecl)]
+	[DllImport(@"kinect_lib.dll", EntryPoint = "Initialize", CallingConvention = CallingConvention.Cdecl)]
 	public static extern bool Initialize ();
 
-	[DllImport(@"kinect_power.dll", EntryPoint = "Shutdown", CallingConvention = CallingConvention.Cdecl)]
+	[DllImport(@"kinect_lib.dll", EntryPoint = "Shutdown", CallingConvention = CallingConvention.Cdecl)]
 	public static extern bool Shutdown ();
 
-	[DllImport(@"kinect_power.dll", EntryPoint = "RecordSensor", CallingConvention = CallingConvention.Cdecl)]
+	[DllImport(@"kinect_lib.dll", EntryPoint = "RecordSensor", CallingConvention = CallingConvention.Cdecl)]
 	public static extern bool RecordSensor (int sensor_index, [MarshalAs(UnmanagedType.LPStr)] string filename);
 
-	[DllImport(@"kinect_power.dll", EntryPoint = "StartPlaySensor", CallingConvention = CallingConvention.Cdecl)]
+	[DllImport(@"kinect_lib.dll", EntryPoint = "StartPlaySensor", CallingConvention = CallingConvention.Cdecl)]
 	public static extern bool StartPlaySensor (int sensor_index, [MarshalAs(UnmanagedType.LPStr)] string filename);
 
-	[DllImport(@"kinect_power.dll", EntryPoint = "PlayNextFrame", CallingConvention = CallingConvention.Cdecl)]
+	[DllImport(@"kinect_lib.dll", EntryPoint = "PlayNextFrame", CallingConvention = CallingConvention.Cdecl)]
 	public static extern bool PlayNextFrame (int sensor_index);
 
-	[DllImport(@"kinect_power.dll", EntryPoint = "GetNiceDepthMap", CallingConvention = CallingConvention.Cdecl)]
+	[DllImport(@"kinect_lib.dll", EntryPoint = "GetNiceDepthMap", CallingConvention = CallingConvention.Cdecl)]
 	public static extern bool GetNiceDepthMap (byte[] pixels, uint pixels_size);
 
-	[DllImport(@"kinect_power.dll", EntryPoint = "GetPianoInfo", CallingConvention = CallingConvention.Cdecl)]
+	[DllImport(@"kinect_lib.dll", EntryPoint = "GetPianoInfo", CallingConvention = CallingConvention.Cdecl)]
 	public static extern bool GetPianoInfo (byte[] notes, uint notes_size, byte[] pixels, uint pixels_size);
 
 	// Kinect SDK constants.
@@ -42,10 +42,10 @@ public class KinectPowerInterop
 	}
 
 	// Direct access to the Kinect SDK functions.
-	[DllImport(@"kinect_power.dll", EntryPoint = "GetJointsPosition", CallingConvention = CallingConvention.Cdecl)]
+	[DllImport(@"kinect_lib.dll", EntryPoint = "GetJointsPosition", CallingConvention = CallingConvention.Cdecl)]
 	public static extern bool GetJointsPositionInternal (int skeleton_id, float[] joint_positions, KinectHelpers.Skeleton.JointStatus[] joint_status);
 
-	[DllImport(@"kinect_power.dll", EntryPoint = "GetBonesOrientation")]
+	[DllImport(@"kinect_lib.dll", EntryPoint = "GetBonesOrientation")]
 	private static extern bool GetBonesOrientationInternal(int skeleton_id, NuiSkeletonBoneOrientation[] bone_orientations);
 
 	// Enumerations specific to Kinect Power.
