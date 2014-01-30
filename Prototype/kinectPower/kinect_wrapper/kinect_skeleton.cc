@@ -11,10 +11,20 @@ KinectSkeleton::KinectSkeleton() {
 KinectSkeleton::~KinectSkeleton() {
 }
 
-void KinectSkeleton::GetJointPosition(
-    JointIndex joint_index,
-    cv::Vec3f* position,
-    JointStatus* status) {
+void KinectSkeleton::GetJointPosition(JointIndex joint_index,
+                                      cv::Vec3f* position,
+                                      JointStatus* status) {
+  Vector4 position_raw;
+  GetJointPositionRaw(joint_index, &position_raw, status);
+
+  (*position)[0] = position_raw.x;
+  (*position)[1] = position_raw.y;
+  (*position)[2] = position_raw.z;
+}
+
+void KinectSkeleton::GetJointPositionRaw(JointIndex joint_index,
+                                         Vector4* position,
+                                         JointStatus* status) {
   assert(joint_index < JointCount);
   assert(position != NULL);
   assert(status != NULL);
@@ -25,22 +35,23 @@ void KinectSkeleton::GetJointPosition(
   }
 
   if (data_.eSkeletonPositionTrackingState[joint_index] ==
-          NUI_SKELETON_POSITION_NOT_TRACKED) {
+    NUI_SKELETON_POSITION_NOT_TRACKED) {
     *status = NOT_TRACKED;
-    (*position)[0] = 0;
-    (*position)[1] = 0;
-    (*position)[2] = 0;
+    position->x = 0;
+    position->y = 0;
+    position->z = 0;
+    position->w = 0;
     return;
-  } else if (data_.eSkeletonPositionTrackingState[joint_index] ==
-                 NUI_SKELETON_POSITION_INFERRED) {
+  }
+  else if (data_.eSkeletonPositionTrackingState[joint_index] ==
+    NUI_SKELETON_POSITION_INFERRED) {
     *status = INFERRED;
-  } else {
+  }
+  else {
     *status = TRACKED;
   }
 
-  (*position)[0] = data_.SkeletonPositions[joint_index].x; 
-  (*position)[1] = data_.SkeletonPositions[joint_index].y;
-  (*position)[2] = data_.SkeletonPositions[joint_index].z; 
+  *position = data_.SkeletonPositions[joint_index];
 }
 
 void KinectSkeleton::SetSkeletonData(const NUI_SKELETON_DATA& skeleton_data) {

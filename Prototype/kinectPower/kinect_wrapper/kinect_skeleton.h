@@ -46,6 +46,9 @@ class KinectSkeleton {
   void GetJointPosition(JointIndex joint_index,
                         cv::Vec3f* position, JointStatus* status);
 
+  void GetJointPositionRaw(JointIndex joint_index,
+                           Vector4* position, JointStatus* status);
+
   // Method to load the skeleton data from the sensor.
   void SetSkeletonData(const NUI_SKELETON_DATA& skeleton_data);
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <opencv2/core/core.hpp>
+
 #include "base/base.h"
 #include "base/scoped_ptr.h"
 #include "kinect_wrapper/constants.h"
@@ -13,6 +15,8 @@ class KinectSensor {
  public:
   KinectSensor(INuiSensor* native_sensor);
   ~KinectSensor();
+
+  void SetNearModeEnabled(bool near_mode_enabled);
 
   // Depth stream.
   bool OpenDepthStream();
@@ -34,6 +38,11 @@ class KinectSensor {
     return skeleton_frame_ready_event_;
   }
 
+  // Coordinate mapper.
+  bool MapSkeletonPointToDepthPoint(Vector4 skeleton_point,
+                                    cv::Vec2i* depth_point,
+                                    int* depth);
+
  private:
   INuiSensor* native_sensor_;
 
@@ -52,6 +61,9 @@ class KinectSensor {
   bool skeleton_stream_opened_;
   HANDLE skeleton_frame_ready_event_;
   DWORD skeleton_sticky_ids_[kNumTrackedSkeletons];
+
+  // Coordinate mapper.
+  INuiCoordinateMapper* coordinate_mapper_;
 
   DISALLOW_COPY_AND_ASSIGN(KinectSensor);
 };

@@ -8,7 +8,7 @@ namespace kinect_wrapper {
 KinectSkeletonFrame::KinectSkeletonFrame() {
   ZeroMemory(&frame_, sizeof(frame_));
   for (int i = 0; i < kNumTrackedSkeletons; ++i)
-    tracked_skeletons_[i] = 0;
+    tracked_skeletons_[i] = static_cast<DWORD>(-1);
 }
 
 KinectSkeletonFrame::~KinectSkeletonFrame() {
@@ -36,11 +36,6 @@ DWORD KinectSkeletonFrame::GetSkeletonTrackId(
     size_t tracked_skeleton_id) const {
   assert(tracked_skeleton_id < kNumTrackedSkeletons);
   return tracked_skeletons_[tracked_skeleton_id];
-}
-
-void KinectSkeletonFrame::SetSkeletonFrame(
-    const NUI_SKELETON_FRAME& frame) {
-  memcpy_s(&frame_, sizeof(frame_), &frame, sizeof(frame));
 }
 
 void KinectSkeletonFrame::SetTrackedSkeletons(DWORD track_id_1,

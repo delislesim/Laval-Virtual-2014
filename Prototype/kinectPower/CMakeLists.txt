@@ -34,11 +34,6 @@ include_directories(
 # Libraries
 ####################
 
-add_library(algos
-  algos/stable_matching.cc
-  algos/stable_matching.h
-  )
-
 add_library(base
   base/base.h
   base/logging.h
@@ -48,32 +43,6 @@ add_library(base
   base/scoped_handle.h
   base/timer.cc
   base/timer.h
-  )
-  
-add_library(hand_extractor
-  hand_extractor/finger_finder_convex.cc
-  hand_extractor/finger_finder_convex.h
-  hand_extractor/finger_finder_mountain.cc
-  hand_extractor/finger_finder_mountain.h
-  hand_extractor/hand_2d_parameters.cc
-  hand_extractor/hand_2d_parameters.h
-  hand_extractor/hand_extractor.cc
-  hand_extractor/hand_extractor.h
-  hand_extractor/segmenter.cc
-  hand_extractor/segmenter.h
-  )
-  
-add_library(hand_particle_filter
-  hand_particle_filter/hand_depth_renderer.cc
-  hand_particle_filter/hand_depth_renderer.h
-  hand_particle_filter/hand_description.cc
-  hand_particle_filter/hand_description.h
-  hand_particle_filter/hand_hypothesis.cc
-  hand_particle_filter/hand_hypothesis.h
-  hand_particle_filter/hand_skeleton.cc
-  hand_particle_filter/hand_skeleton.h
-  hand_particle_filter/hand_tracker.cc
-  hand_particle_filter/hand_tracker.h
   )
   
 add_library(image
@@ -120,63 +89,29 @@ add_library(maths
   maths/quaternion.cc
   maths/quaternion.h
   )
-  
-add_library(piano
-  piano/piano.cc
-  piano/piano.h
+
+add_library(kinect_lib SHARED
+  kinect_lib/lib.cc
+  kinect_lib/lib.h
   )
-  
-add_library(kinect_power SHARED
-  kinect_power/lib.cc
-  kinect_power/lib.h
-  )
-####################################################
-# À tester, car je ne suis pas sur que ça va marcher
-####################################################
-# FIND_PATH(OPENCL_INCLUDE_DIR
-	# NAMES
-		# CL\cl.h
-	# PATHS
-		# $ENV{CUDA_PATH}\include\)
-
-# SET(OPENCL_LIB_SEARCH_PATH
-		# ${OPENCL_LIB_SEARCH_PATH}
-		# $ENV{CUDA_PATH}\lib\Win32)
-
-# FIND_LIBRARY(
-    # OPENCL_LIBRARY
-    # NAMES OpenCL
-    # PATHS ${OPENCL_LIB_SEARCH_PATH})
-
-# include_directories( ${OPENCL_INCLUDE_DIR} )
-#include_directories( $ENV{CUDA_PATH}\include\CL\cl.h)
-
-#target_link_libraries(${OPENCL_LIBRARY})
-#####################################################
 	
-target_link_libraries(kinect_power
-  algos
+target_link_libraries(kinect_lib
   base
-  hand_extractor
-  hand_particle_filter
   image
   kinect_replay
   kinect_wrapper
   maths
-  piano
   ${OpenCV_LIBS}
   $ENV{KINECTSDK10_DIR}/lib/x86/Kinect10.lib
-  #${OPENCL_LIBRARY}
-  #$ENV{CUDA_PATH}\lib\Win32\OpenCL.lib
   )
 	
 ####################
 # Executables
 ####################
 
-#include_external_msproject(
-#    sample sample/sample.csproj
-#    TYPE FAE04EC0-301F-11D3-BF4B-00C04F79EFBC)
+include_external_msproject(
+    sample2013 sample2013/sample2013.csproj
+    TYPE FAE04EC0-301F-11D3-BF4B-00C04F79EFBC)
 	
 ####################
 # Unittests
@@ -190,15 +125,11 @@ add_executable(unittests
   )
 
 target_link_libraries(unittests
-  algos
   base
-  hand_extractor
-  hand_particle_filter
   image
   kinect_replay
   kinect_wrapper
   maths
-  piano
   ${OpenCV_LIBS}
   $ENV{KINECTSDK10_DIR}/lib/x86/Kinect10.lib
   )

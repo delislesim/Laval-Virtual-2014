@@ -22,7 +22,6 @@ class KinectSkeletonFrame {
   NUI_SKELETON_FRAME* GetSkeletonFramePtr() {
     return &frame_;
   }
-  void SetSkeletonFrame(const NUI_SKELETON_FRAME& frame);
   void SetTrackedSkeletons(DWORD track_id_1, DWORD track_id_2);
 
  private:

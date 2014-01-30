@@ -22,8 +22,7 @@ KinectSensor::KinectSensor(INuiSensor* native_sensor)
       depth_stream_handle_(INVALID_HANDLE_VALUE),
       depth_stream_width_(0),
       depth_stream_height_(0),
-      skeleton_seated_enabled_(true),
-      skeleton_near_enabled_(true),  
+      skeleton_seated_enabled_(false),
       skeleton_stream_opened_(false),
       skeleton_frame_ready_event_(INVALID_HANDLE_VALUE) {
   depth_frame_ready_event_ = ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
@@ -31,6 +30,12 @@ KinectSensor::KinectSensor(INuiSensor* native_sensor)
 
   skeleton_sticky_ids_[0] = 0;
   skeleton_sticky_ids_[1] = 0;
+
+  native_sensor_->NuiGetCoordinateMapper(&coordinate_mapper_);
+}
+
+void KinectSensor::SetNearModeEnabled(bool near_mode_enabled) {
+  near_mode_enabled_ = near_mode_enabled;
 }
 
 bool KinectSensor::OpenDepthStream() {
@@ -122,7 +127,7 @@ bool KinectSensor::OpenSkeletonStream() {
   DWORD flags = (
       (skeleton_seated_enabled_ ?
            NUI_SKELETON_TRACKING_FLAG_ENABLE_SEATED_SUPPORT : 0) |
-      (skeleton_near_enabled_ ?
+      (near_mode_enabled_ ?
            NUI_SKELETON_TRACKING_FLAG_ENABLE_IN_NEAR_RANGE : 0)
   );
 
@@ -191,6 +196,21 @@ bool KinectSensor::PollNextSkeletonFrame(KinectSensorState* state) {
   state->InsertSkeletonFrame(skeleton_frame);
 
   native_sensor_->NuiSkeletonSetTrackedSkeletons(track_ids);
+
+  return true;
+}
+
+bool KinectSensor::MapSkeletonPointToDepthPoint(Vector4 skeleton_point,
+                                                cv::Vec2i* depth_point,
+                                                int* depth) {
+  NUI_DEPTH_IMAGE_POINT depth_image_point;
+  HRESULT res = coordinate_mapper_->MapSkeletonPointToDepthPoint(
+      &skeleton_point, kDepthImageResolution, &depth_image_point);
+  if (FAILED(res))
+    return false;
+
+  *depth_point = cv::Vec2i(depth_image_point.x, depth_image_point.y);
+  *depth = depth_image_point.depth;
 
   return true;
 }

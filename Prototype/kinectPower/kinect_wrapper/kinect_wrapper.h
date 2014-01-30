@@ -25,6 +25,12 @@ class KinectWrapper {
   static KinectWrapper* instance();
   static void Release();
 
+  // Access the sensor.
+  KinectSensor* GetSensorByIndex(int index) {
+    assert(sensor_state_[index].GetSensor() != NULL);
+    return sensor_state_[index].GetSensor();
+  }
+
   // Initialization.
   void Initialize();
   void StartSensorThread(int sensor_index);
