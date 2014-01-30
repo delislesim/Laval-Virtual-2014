@@ -164,7 +164,7 @@ bool KinectSensor::PollNextColorFrame(KinectSensorState* state) {
     goto ReleaseFrame;
   }
 
-  INuiFrameTexture* texture = NULL;
+  INuiFrameTexture* texture = image_frame.pFrameTexture;
   NUI_LOCKED_RECT locked_rect;
 
   // Lock the frame data so the Kinect knows not to modify it while we're
@@ -176,7 +176,8 @@ bool KinectSensor::PollNextColorFrame(KinectSensorState* state) {
     goto ReleaseFrame;
   }
 
-  ////  state->Insert....
+  state->InsertColorFrame(reinterpret_cast<const char*>(locked_rect.pBits),
+                          locked_rect.size);
 
   image_frame.pFrameTexture->UnlockRect(0);
 

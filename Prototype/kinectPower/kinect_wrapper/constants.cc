@@ -11,4 +11,7 @@ const size_t kKinectDepthBytesPerPixel = 2;
 const size_t kKinectDepthWidth = 640;
 const size_t kKinectDepthHeight = 480;
 
+const size_t kKinectColorWidth = 640;
+const size_t kKinectColorHeight = 480;
+
 }  // namespace kinect_wrapper

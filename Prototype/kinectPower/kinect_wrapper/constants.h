@@ -9,6 +9,9 @@ extern const size_t kKinectDepthBytesPerPixel;
 extern const size_t kKinectDepthWidth;
 extern const size_t kKinectDepthHeight;
 
+extern const size_t kKinectColorWidth;
+extern const size_t kKinectColorHeight;
+
 #define kNumBuffers (10)
 
 #define kNumTrackedSkeletons (2)

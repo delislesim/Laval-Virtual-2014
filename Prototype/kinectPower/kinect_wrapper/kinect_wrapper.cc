@@ -97,6 +97,11 @@ bool KinectWrapper::QueryDepth(int sensor_index, cv::Mat* mat) const {
   return sensor_state_[sensor_index].QueryDepth(mat);
 }
 
+bool KinectWrapper::QueryColor(int sensor_index, cv::Mat* mat) const {
+  assert(mat != NULL);
+  return sensor_state_[sensor_index].QueryColor(mat);
+}
+
 bool KinectWrapper::StartPlaySensor(int sensor_index,
                                     const std::string& filename) {
   sensor_state_[sensor_index].CreateBuffers();
@@ -181,6 +186,7 @@ DWORD KinectWrapper::SensorThread(SensorThreadParams* params) {
 
   // Start the streams and create the buffers.
   sensor->OpenDepthStream();
+  sensor->OpenColorStream();
   sensor->OpenSkeletonStream();
   wrapper->sensor_state_[sensor_index].CreateBuffers();
 
@@ -188,7 +194,8 @@ DWORD KinectWrapper::SensorThread(SensorThreadParams* params) {
   HANDLE events[] = {
     wrapper->sensor_state_[sensor_index].GetCloseEvent(),
     sensor->GetDepthFrameReadyEvent(),
-    sensor->GetSkeletonFrameReadyEvent()
+    sensor->GetColorFrameReadyEvent(),
+    sensor->GetSkeletonFrameReadyEvent(),
   };
   DWORD nb_events = ARRAYSIZE(events);
 
@@ -208,10 +215,12 @@ DWORD KinectWrapper::SensorThread(SensorThreadParams* params) {
     bool depth_polled = sensor->PollNextDepthFrame(
         &wrapper->sensor_state_[sensor_index]);
 
+    sensor->PollNextColorFrame(&wrapper->sensor_state_[sensor_index]);
+
     // Poll the skeleton stream.
     sensor->PollNextSkeletonFrame(&wrapper->sensor_state_[sensor_index]);
 
-    // Record the frame.
+    // Record the frame when a new depth frame is ready.
     if (depth_polled)
       wrapper->sensor_state_[sensor_index].RecordFrame();
 

@@ -43,6 +43,7 @@ class KinectWrapper {
 
   // Access streams.
   bool QueryDepth(int sensor_index, cv::Mat* mat) const;
+  bool QueryColor(int sensor_index, cv::Mat* mat) const;
   bool QuerySkeletonFrame(int sensor_index,
                           KinectSkeletonFrame* skeleton_frame) const;
   void AddObserver(int sensor_index, KinectObserver* observer);

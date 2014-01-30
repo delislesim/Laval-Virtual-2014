@@ -46,12 +46,19 @@ class KinectSensorState {
   // @param mat the last depth matrix.
   // @returns true in case of success, false otherwise.
   bool QueryDepth(cv::Mat* mat) const;
+
+  // Retrieves the last color matrix.
+  // @param mat the last color matrix.
+  // @returns true in case of success, false otherwise.
+  bool QueryColor(cv::Mat* mat) const;
   
   bool QuerySkeletonFrame(KinectSkeletonFrame* skeleton_frame) const;
 
   void InsertDepthFrame(const char* depth_frame, size_t depth_frame_size);
   void InsertDepthFrame(const NUI_DEPTH_IMAGE_PIXEL* start,
                         const size_t& num_pixels);
+  void InsertColorFrame(const char* color_frame,
+                        const size_t& color_frame_size);
   void InsertSkeletonFrame(const KinectSkeletonFrame& skeleton_frame);
 
   void AddObserver(KinectObserver* obs);
@@ -59,6 +66,7 @@ class KinectSensorState {
  private:
   scoped_ptr<KinectSensor> sensor_;
   cv::Mat depth_buffer_;
+  cv::Mat color_buffer_;
   KinectSkeletonFrame skeleton_buffer_;
   
   base::ScopedHandle thread_;
