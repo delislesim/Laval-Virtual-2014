@@ -73,7 +73,9 @@ public class MoveJoints : MonoBehaviour {
 				Skeleton.JointStatus jointStatus = skeleton.GetJointPosition((Skeleton.Joint)i, out posJoint);
 				
 				joints[i].transform.position = new Vector3(posJoint.x*5, posJoint.y*5, -5*posJoint.z) + pos_initial_offset;
-				//joints[i].transform.localRotation = rotJoint;
+
+				if(i == (int)Skeleton.Joint.Head)
+					joints[i].transform.localRotation = skeleton.GetNeckOrientation();
 			}
 		}	
 	}

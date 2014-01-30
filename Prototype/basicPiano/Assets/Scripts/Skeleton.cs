@@ -52,10 +52,13 @@ namespace KinectHelpers {
 			return joint_status[(int)joint];
 		}
 
-		public void GetRotationQuaternions(Joint joint, out Quaternion rotationQuaternion)
+		public Quaternion GetNeckOrientation()
 		{
 			LoadSkeleton ();
-			rotationQuaternion = joint_rotations[(int)joint].rotationQuaternion;
+			Quaternion rot = bone_orientations[(int)Joint.Head].absoluteRotation.rotationQuaternion;
+			Vector3 eulerAngles = rot.eulerAngles;
+			Quaternion fixedRot = Quaternion.Euler(eulerAngles.x, -eulerAngles.y+180, -eulerAngles.z);
+			return fixedRot;
 		}
 
 		private void LoadSkeleton() {
@@ -64,15 +67,15 @@ namespace KinectHelpers {
 			
 			joint_positions = new float[3 * (int)Joint.Count];
 			joint_status = new JointStatus[(int)Joint.Count];
+			bone_orientations = new KinectPowerInterop.NuiSkeletonBoneOrientation[(int)Joint.Count];
 
 			skeleton_exists = KinectPowerInterop.GetJointsPosition(
 			    skeleton_id,
 				joint_positions,
 				joint_status);
-			
-			//TODO create right method inside KinectPowerInterupt 
-			//if(skeleton_exists)
-			//	KinectPowerInterop.GetBonesOrientation(skeleton_id, joint_status, out joint_rotations);
+
+			if(skeleton_exists)
+				KinectPowerInterop.GetBonesOrientation(skeleton_id, bone_orientations);
 
 			skeleton_loaded = true;
 		}
@@ -81,7 +84,7 @@ namespace KinectHelpers {
 		private bool skeleton_loaded;
 		private bool skeleton_exists;
 		private float[] joint_positions;
-		private KinectPowerInterop.NuiSkeletonBoneRotation[] joint_rotations;
+		private KinectPowerInterop.NuiSkeletonBoneOrientation[] bone_orientations;
 		private JointStatus[] joint_status;
 		private bool[] joints_tracked;
 	}
