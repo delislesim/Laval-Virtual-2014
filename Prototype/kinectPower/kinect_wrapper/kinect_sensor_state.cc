@@ -57,23 +57,15 @@ bool KinectSensorState::RecordFrame() {
 }
 
 void KinectSensorState::CreateBuffers() {
-  depth_buffer_.reset(new KinectBuffer(
-      kKinectDepthWidth, kKinectDepthHeight, CV_16U));
-  skeleton_buffer_.reset(new KinectSwitch<KinectSkeletonFrame>);
+  depth_buffer_ = cv::Mat(kKinectDepthHeight, kKinectDepthWidth, CV_16U);
 }
 
-void KinectSensorState::ReleaseBuffers() {
-  depth_buffer_.reset(NULL);
-  skeleton_buffer_.reset(NULL);
-}
-
-bool KinectSensorState::QueryDepth(int past_frame, cv::Mat* mat) const {
+bool KinectSensorState::QueryDepth(cv::Mat* mat) const {
   assert(past_frame < kNumBuffers);
   assert(mat != NULL);
 
-  if (depth_buffer_.get() == NULL)
-    return false;
-  depth_buffer_->GetMatrix(past_frame, mat);
+  *mat = depth_buffer_;
+
   return true;
 }
 
@@ -81,38 +73,44 @@ bool KinectSensorState::QuerySkeletonFrame(
     KinectSkeletonFrame* skeleton_frame) const {
   assert(skeleton_frame != NULL);
 
-  if (skeleton_buffer_.get() == NULL)
-    return false;
-  skeleton_buffer_->GetCurrent(skeleton_frame);
+  *skeleton_frame = skeleton_buffer_;
+
   return true;
 }
 
 void KinectSensorState::InsertDepthFrame(const char* depth_frame,
                                          size_t depth_frame_size) {
-  depth_buffer_->CopyData(depth_frame, depth_frame_size);
+  assert(depth_frame_size == depth_buffer_.total() * depth_buffer_.elemSize());
 
-  cv::Mat depth_mat;
-  QueryDepth(0, &depth_mat);
-  FOR_EACH_OBSERVER(KinectObserver, observers_, ObserveDepth(depth_mat, *this));
+  memcpy_s(depth_buffer_.ptr(), depth_buffer_.total() * depth_buffer_.elemSize(),
+           depth_frame, depth_frame_size);
+
+  FOR_EACH_OBSERVER(KinectObserver, observers_, ObserveDepth(depth_buffer_, *this));
 }
 
 void KinectSensorState::InsertDepthFrame(const NUI_DEPTH_IMAGE_PIXEL* start,
-                                         const NUI_DEPTH_IMAGE_PIXEL* end) {
-  depth_buffer_->CopyDepthTexture(start, end);
+                                         const size_t& num_pixels) {
+  unsigned short* buffer_run =
+    reinterpret_cast<unsigned short*>(depth_buffer_.ptr());
+  NUI_DEPTH_IMAGE_PIXEL const* src_run = start;
+  NUI_DEPTH_IMAGE_PIXEL const* end = start + num_pixels;
 
-  cv::Mat depth_mat;
-  QueryDepth(0, &depth_mat);
-  FOR_EACH_OBSERVER(KinectObserver, observers_, ObserveDepth(depth_mat, *this));
+  while (src_run < end) {
+    *buffer_run = src_run->depth;
+
+    ++buffer_run;
+    ++src_run;
+  }
+
+  FOR_EACH_OBSERVER(KinectObserver, observers_, ObserveDepth(depth_buffer_, *this));
 }
 
 void KinectSensorState::InsertSkeletonFrame(
     const KinectSkeletonFrame& skeleton_frame) {
-  skeleton_buffer_->SetNext(skeleton_frame);
+  skeleton_buffer_ = skeleton_frame;
 
-  cv::Mat depth_mat;
-  QueryDepth(0, &depth_mat);
   FOR_EACH_OBSERVER(KinectObserver, observers_,
-                    ObserveSkeleton(skeleton_frame, *this));
+                    ObserveSkeleton(skeleton_buffer_, *this));
 }
 
 void KinectSensorState::AddObserver(KinectObserver* obs) {

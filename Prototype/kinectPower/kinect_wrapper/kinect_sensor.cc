@@ -9,8 +9,10 @@ namespace kinect_wrapper {
 
 namespace {
 
+const NUI_IMAGE_TYPE kColorImageType = NUI_IMAGE_TYPE_COLOR;
 const NUI_IMAGE_TYPE kDepthImageType = NUI_IMAGE_TYPE_DEPTH_AND_PLAYER_INDEX;
 const NUI_IMAGE_RESOLUTION kDepthImageResolution = NUI_IMAGE_RESOLUTION_640x480;
+const NUI_IMAGE_RESOLUTION kColorImageResolution = NUI_IMAGE_RESOLUTION_640x480;
 
 }  // namespace
 
@@ -22,10 +24,16 @@ KinectSensor::KinectSensor(INuiSensor* native_sensor)
       depth_stream_handle_(INVALID_HANDLE_VALUE),
       depth_stream_width_(0),
       depth_stream_height_(0),
+      color_stream_opened_(false),
+      color_frame_ready_event_(INVALID_HANDLE_VALUE),
+      color_stream_handle_(INVALID_HANDLE_VALUE),
+      color_stream_width_(0),
+      color_stream_height_(0),
       skeleton_seated_enabled_(false),
       skeleton_stream_opened_(false),
       skeleton_frame_ready_event_(INVALID_HANDLE_VALUE) {
   depth_frame_ready_event_ = ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
+  color_frame_ready_event_ = ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
   skeleton_frame_ready_event_ = ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
 
   skeleton_sticky_ids_[0] = 0;
@@ -108,15 +116,72 @@ bool KinectSensor::PollNextDepthFrame(KinectSensorState* state) {
 
   const NUI_DEPTH_IMAGE_PIXEL* start =
       reinterpret_cast<const NUI_DEPTH_IMAGE_PIXEL*>(locked_rect.pBits);
-  const NUI_DEPTH_IMAGE_PIXEL* end =
-      start + depth_stream_width_ * depth_stream_height_;
-
-  state->InsertDepthFrame(start, end);
+  state->InsertDepthFrame(start, depth_stream_width_ * depth_stream_height_);
 
   image_frame.pFrameTexture->UnlockRect(0);
 
 ReleaseFrame:
   native_sensor_->NuiImageStreamReleaseFrame(depth_stream_handle_, &image_frame);
+  return res;
+}
+
+bool KinectSensor::OpenColorStream() {
+  if (color_stream_opened_)
+    return true;
+
+  HRESULT res = native_sensor_->NuiImageStreamOpen(
+    kColorImageType, kColorImageResolution, 0, 2, color_frame_ready_event_,
+    &color_stream_handle_);
+
+  if (FAILED(res))
+    return false;
+
+  DWORD width = 0;
+  DWORD height = 0;
+  ::NuiImageResolutionToSize(kColorImageResolution, width, height);
+  color_stream_width_ = width;
+  color_stream_height_ = height;
+
+  color_stream_opened_ = true;
+  return true;
+}
+
+bool KinectSensor::PollNextColorFrame(KinectSensorState* state) {
+  assert(state);
+  assert(color_stream_opened_);
+  assert(color_stream_handle_ != INVALID_HANDLE_VALUE);
+
+  if (WaitForSingleObject(color_frame_ready_event_, 0) != WAIT_OBJECT_0)
+    return false;
+
+  bool res = true;
+
+  NUI_IMAGE_FRAME image_frame;
+  HRESULT hr = native_sensor_->NuiImageStreamGetNextFrame(
+    color_stream_handle_, 0, &image_frame);
+  if (FAILED(hr)) {
+    res = false;
+    goto ReleaseFrame;
+  }
+
+  INuiFrameTexture* texture = NULL;
+  NUI_LOCKED_RECT locked_rect;
+
+  // Lock the frame data so the Kinect knows not to modify it while we're
+  // reading it.
+  texture->LockRect(0, &locked_rect, NULL, 0);
+
+  if (locked_rect.Pitch == 0) {
+    res = false;
+    goto ReleaseFrame;
+  }
+
+  ////  state->Insert....
+
+  image_frame.pFrameTexture->UnlockRect(0);
+
+ReleaseFrame:
+  native_sensor_->NuiImageStreamReleaseFrame(color_stream_handle_, &image_frame);
   return res;
 }
 

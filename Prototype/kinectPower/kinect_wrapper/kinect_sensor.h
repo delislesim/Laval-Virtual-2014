@@ -31,6 +31,19 @@ class KinectSensor {
     return depth_stream_height_;
   }
 
+  // Color stream.
+  bool OpenColorStream();
+  bool PollNextColorFrame(KinectSensorState* state);
+  HANDLE GetColorFrameReadyEvent() const {
+    return color_frame_ready_event_;
+  }
+  size_t color_stream_width() const {
+    return color_stream_width_;
+  }
+  size_t color_stream_height() const {
+    return color_stream_height_;
+  }
+
   // Skeleton stream.
   bool OpenSkeletonStream();
   bool PollNextSkeletonFrame(KinectSensorState* state);
@@ -54,6 +67,13 @@ class KinectSensor {
   HANDLE depth_stream_handle_;
   size_t depth_stream_width_;
   size_t depth_stream_height_;
+
+  // Color stream.
+  bool color_stream_opened_;
+  HANDLE color_frame_ready_event_;
+  HANDLE color_stream_handle_;
+  size_t color_stream_width_;
+  size_t color_stream_height_;
 
   // Skeleton stream.
   bool skeleton_seated_enabled_;

@@ -64,8 +64,6 @@ add_library(kinect_replay
 add_library(kinect_wrapper
   kinect_wrapper/constants.cc
   kinect_wrapper/constants.h
-  kinect_wrapper/kinect_buffer.cc
-  kinect_wrapper/kinect_buffer.h
   kinect_wrapper/kinect_include.h
   kinect_wrapper/kinect_observer.h
   kinect_wrapper/kinect_sensor.cc
@@ -76,7 +74,6 @@ add_library(kinect_wrapper
   kinect_wrapper/kinect_skeleton.h
   kinect_wrapper/kinect_skeleton_frame.cc
   kinect_wrapper/kinect_skeleton_frame.h
-  kinect_wrapper/kinect_switch.h
   kinect_wrapper/kinect_wrapper.cc
   kinect_wrapper/kinect_wrapper.h
   kinect_wrapper/utility.cc

@@ -6,7 +6,6 @@
 #include "base/timer.h"
 #include "kinect_replay/kinect_recorder.h"
 #include "kinect_wrapper/constants.h"
-#include "kinect_wrapper/kinect_buffer.h"
 #include "kinect_wrapper/kinect_include.h"
 #include "kinect_wrapper/kinect_sensor.h"
 #include "kinect_wrapper/kinect_skeleton_frame.h"
@@ -95,7 +94,7 @@ bool KinectWrapper::RecordSensor(int sensor_index,
 
 bool KinectWrapper::QueryDepth(int sensor_index, cv::Mat* mat) const {
   assert(mat != NULL);
-  return sensor_state_[sensor_index].QueryDepth(0, mat);
+  return sensor_state_[sensor_index].QueryDepth(mat);
 }
 
 bool KinectWrapper::StartPlaySensor(int sensor_index,
@@ -220,9 +219,6 @@ DWORD KinectWrapper::SensorThread(SensorThreadParams* params) {
     std::cout << "Elapsed time: " << timer.ElapsedTime() << " ms." << std::endl;
 #endif
   }
-
-  // Release the buffers.
-  wrapper->sensor_state_[sensor_index].ReleaseBuffers();
 
   return 1;
 }
