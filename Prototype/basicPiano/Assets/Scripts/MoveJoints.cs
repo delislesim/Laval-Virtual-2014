@@ -26,9 +26,8 @@ public class MoveJoints : MonoBehaviour {
 	public GameObject Foot_Right;
 
 	//Public
-	private GameObject[] joints; 
-	private Vector3 pos_initial_offset = Vector3.zero;
-	private bool initial_position_initialized = false;
+	private GameObject[] joints;
+	private Transform[] last_positions;
 
 	// Use this for initialization
 	void Start () {
@@ -39,26 +38,15 @@ public class MoveJoints : MonoBehaviour {
 			Hip_Left, Knee_Left, Ankle_Left, Foot_Left,
 			Hip_Right, Knee_Right, Ankle_Right, Foot_Right
 		};
+
+		last_positions = new Transform[(int)Skeleton.Joint.Count];
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
-		//Get joints positions
-		Skeleton skeleton = new Skeleton(0);
-		//Set offset as soon as we see hip_center
-		if(initial_position_initialized == false && skeleton.Exists() )
-		{
-			Vector3 hipPos = Vector3.zero;
-			Skeleton.JointStatus status = skeleton.GetJointPosition(Skeleton.Joint.HipCenter, out hipPos);
-
-			if(status != Skeleton.JointStatus.NotTracked)
-			{
-				pos_initial_offset = Vector3.zero - hipPos;
-				//Debug.Log ("Offset : " + posInitialOffset);
-				initial_position_initialized = true;
-			}
-		}
+		//Create valid skeleton with joints positions/rotations
+		Skeleton playerOne = new Skeleton(0);
 
 		// update the local positions of the bones
 		int jointsCount = (int)Skeleton.Joint.Count;
@@ -67,16 +55,26 @@ public class MoveJoints : MonoBehaviour {
 		{
 			if(joints[i] != null)
 			{
-				//int joint = MirroredMovement ? KinectWrapper.GetSkeletonMirroredJoint(i): i;
 				Vector3 posJoint = Vector3.zero;
-				//TODO get joint rotations
-				Skeleton.JointStatus jointStatus = skeleton.GetJointPosition((Skeleton.Joint)i, out posJoint);
-				
-				joints[i].transform.position = new Vector3(posJoint.x*5, posJoint.y*5, -5*posJoint.z) + pos_initial_offset;
+				Skeleton.JointStatus jointStatus = playerOne.GetJointPosition((Skeleton.Joint)i, out posJoint);
+				if(jointStatus != Skeleton.JointStatus.NotTracked)
+				{
+					joints[i].transform.position = new Vector3(posJoint.x*5, posJoint.y*5, -5*posJoint.z);
 
-				if(i == (int)Skeleton.Joint.Head)
-					joints[i].transform.localRotation = skeleton.GetNeckOrientation();
+					//Apply head rotation
+					if(i == (int)Skeleton.Joint.Head)
+						joints[i].transform.localRotation = playerOne.GetNeckOrientation();
+				}
+				//If not tracked, hide!
+				else
+					joints[i].transform.position = new Vector3(0,-10,0);
 			}
 		}	
+	}
+
+	void OnTriggerEnter(){
+
+		Debug.Log("YOLO");
+
 	}
 }
