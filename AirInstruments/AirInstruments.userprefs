@@ -1,9 +1,9 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace />
-  <MonoDevelop.Ide.Workbench ActiveDocument="..\..\AirInstruments\Assets\KinectPower\KinectPower.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\KinectPower\KinectPower.cs">
     <Files>
-      <File FileName="..\..\AirInstruments\Assets\KinectPower\KinectPower.cs" Line="93" Column="22" />
-      <File FileName="..\..\AirInstruments\Assets\KinectPower\KinectPowerInterop.cs" Line="26" Column="55" />
+      <File FileName="Assets\KinectPower\KinectPower.cs" Line="93" Column="22" />
+      <File FileName="Assets\KinectPower\KinectPowerInterop.cs" Line="26" Column="55" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

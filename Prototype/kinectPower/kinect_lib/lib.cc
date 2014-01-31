@@ -71,6 +71,8 @@ bool GetColorImage(unsigned char* pixels, unsigned int pixels_size) {
   assert(pixels_size == mat.total() * mat.elemSize());
 
   memcpy_s(pixels, pixels_size, mat.ptr(), mat.total() * mat.elemSize());
+  for (size_t i = 3; i < pixels_size; i += 4)
+    pixels[i] = 255;
 
   return true;
 }
