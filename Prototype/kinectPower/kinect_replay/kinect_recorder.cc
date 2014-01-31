@@ -27,7 +27,7 @@ bool KinectRecorder::StartRecording(const std::string& filename) {
     return false;
 
   // Write a nice header.
-  const char* kHeaderString = "BOUBOU V01";
+  const char* kHeaderString = "KINECT LIB REPLAY V01";
   out_.write(kHeaderString, strlen(kHeaderString) + 1);
 
   is_recording_ = true;
@@ -48,7 +48,7 @@ bool KinectRecorder::RecordFrame(
 
   // Query the depth frame.
   cv::Mat depth_mat;
-  sensor_state.QueryDepth(&depth_mat);
+  sensor_state.GetData()->QueryDepth(&depth_mat);
 
   // Write the depth frame.
   size_t depth_frame_size = depth_mat.total() *  depth_mat.elemSize();
@@ -59,22 +59,13 @@ bool KinectRecorder::RecordFrame(
              depth_frame_size);
 
   // Query the skeleton frame.
-  KinectSkeletonFrame skeleton_frame;
-  sensor_state.QuerySkeletonFrame(&skeleton_frame);
+  const KinectSkeletonFrame* skeleton_frame =
+      sensor_state.GetData()->GetSkeletonFrame();
 
   // Write the skeleton frame.
   out_.write(kSkeletonHeader, kSectionHeaderSize);
-  const size_t kSkeletonFrameSize =
-      sizeof(*skeleton_frame.GetSkeletonFramePtr());
-  out_.write(
-      reinterpret_cast<const char*>(skeleton_frame.GetSkeletonFramePtr()),
-      kSkeletonFrameSize);
-
-  for (int i = 0; i < kNumTrackedSkeletons; ++i) {
-    DWORD tracked_id = skeleton_frame.GetSkeletonTrackId(i);
-    out_.write(reinterpret_cast<const char*>(&tracked_id),
-               sizeof(tracked_id));
-  }
+  out_.write(reinterpret_cast<const char*>(skeleton_frame),
+             sizeof(*skeleton_frame));
 
   return true;
 }

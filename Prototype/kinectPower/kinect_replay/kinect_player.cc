@@ -26,7 +26,7 @@ bool KinectPlayer::LoadFile(const std::string& filename) {
     return false;
 
   // Read the header.
-  const std::string kHeaderString = "BOUBOU V01";
+  const std::string kHeaderString = "KINECT LIB REPLAY V01";
   const size_t kHeaderStringLen = 10;
   
   char header_buffer[kHeaderStringLen + 1];
@@ -53,7 +53,7 @@ bool KinectPlayer::ReadFrame(kinect_wrapper::KinectSensorState* sensor_state) {
   const std::string kSkeletonHeader = "SKELE";
 
   if (!in_.good()) {
-    // Play again!
+    // Loop!
     CloseFile();
     LoadFile(filename_);
     if (!in_.good())
@@ -75,7 +75,7 @@ bool KinectPlayer::ReadFrame(kinect_wrapper::KinectSensorState* sensor_state) {
 
   buffer.resize(depth_length);
   in_.read(&buffer[0], depth_length);
-  sensor_state->InsertDepthFrame(&buffer[0], depth_length);
+  sensor_state->GetData()->InsertDepthFrame(&buffer[0], depth_length);
 
   // Read the skeleton frame.
   buffer.resize(kSectionHeaderSize + 1);
@@ -86,19 +86,9 @@ bool KinectPlayer::ReadFrame(kinect_wrapper::KinectSensorState* sensor_state) {
     return false;
 
   kinect_wrapper::KinectSkeletonFrame skeleton_frame;
-  const size_t kSkeletonFrameSize =
-      sizeof(*skeleton_frame.GetSkeletonFramePtr());
-
-  in_.read(reinterpret_cast<char*>(skeleton_frame.GetSkeletonFramePtr()),
-           kSkeletonFrameSize);
-
-  DWORD tracked_ids[kNumTrackedSkeletons];
-  for (int i = 0; i < kNumTrackedSkeletons; ++i) {
-    in_.read(reinterpret_cast<char*>(&tracked_ids[i]), sizeof(DWORD));
-  }
-
-  skeleton_frame.SetTrackedSkeletons(tracked_ids[0], tracked_ids[1]);
-  sensor_state->InsertSkeletonFrame(skeleton_frame);
+  in_.read(reinterpret_cast<char*>(&skeleton_frame),
+           sizeof(skeleton_frame));
+  sensor_state->GetData()->InsertSkeletonFrame(skeleton_frame);
 
   return true;
 }

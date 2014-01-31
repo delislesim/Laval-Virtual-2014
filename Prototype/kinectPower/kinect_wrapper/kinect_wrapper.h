@@ -7,6 +7,7 @@
 #include "base/base.h"
 #include "kinect_replay/kinect_player.h"
 #include "kinect_replay/kinect_recorder.h"
+#include "kinect_wrapper/constants.h"
 #include "kinect_wrapper/kinect_include.h"
 #include "kinect_wrapper/kinect_sensor_state.h"
 
@@ -16,8 +17,6 @@ class KinectBuffer;
 class KinectObserver;
 class KinectSensor;
 class KinectSkeletonFrame;
-
-#define kMaxNumSensors (6)
 
 class KinectWrapper {
  public:
@@ -58,7 +57,7 @@ class KinectWrapper {
   };
   static DWORD SensorThread(SensorThreadParams* params);
 
-  KinectSensor* CreateSensorByIndex(int index, std::string* error);
+  KinectSensor* CreateSensorByIndex(int index);
   int GetSensorCount();
 
   static KinectWrapper* instance_;

@@ -68,6 +68,8 @@ add_library(kinect_wrapper
   kinect_wrapper/kinect_observer.h
   kinect_wrapper/kinect_sensor.cc
   kinect_wrapper/kinect_sensor.h
+  kinect_wrapper/kinect_sensor_data.cc
+  kinect_wrapper/kinect_sensor_data.h
   kinect_wrapper/kinect_sensor_state.cc
   kinect_wrapper/kinect_sensor_state.h
   kinect_wrapper/kinect_skeleton.cc
@@ -78,6 +80,10 @@ add_library(kinect_wrapper
   kinect_wrapper/kinect_wrapper.h
   kinect_wrapper/utility.cc
   kinect_wrapper/utility.h
+  )
+  
+target_link_libraries(kinect_wrapper
+  base
   )
 
 add_library(maths

@@ -1,6 +1,9 @@
 #include "kinect_wrapper/kinect_sensor.h"
 
+#include <iostream>
+
 #include "base/logging.h"
+#include "base/timer.h"
 #include "kinect_wrapper/constants.h"
 #include "kinect_wrapper/kinect_sensor_state.h"
 #include "kinect_wrapper/utility.h"
@@ -116,7 +119,7 @@ bool KinectSensor::PollNextDepthFrame(KinectSensorState* state) {
 
   const NUI_DEPTH_IMAGE_PIXEL* start =
       reinterpret_cast<const NUI_DEPTH_IMAGE_PIXEL*>(locked_rect.pBits);
-  state->InsertDepthFrame(start, depth_stream_width_ * depth_stream_height_);
+  state->GetData()->InsertDepthFrame(start, depth_stream_width_ * depth_stream_height_);
 
   image_frame.pFrameTexture->UnlockRect(0);
 
@@ -157,6 +160,7 @@ bool KinectSensor::PollNextColorFrame(KinectSensorState* state) {
   bool res = true;
 
   NUI_IMAGE_FRAME image_frame;
+
   HRESULT hr = native_sensor_->NuiImageStreamGetNextFrame(
     color_stream_handle_, 0, &image_frame);
   if (FAILED(hr)) {
@@ -176,8 +180,9 @@ bool KinectSensor::PollNextColorFrame(KinectSensorState* state) {
     goto ReleaseFrame;
   }
 
-  state->InsertColorFrame(reinterpret_cast<const char*>(locked_rect.pBits),
-                          locked_rect.size);
+  state->GetData()->InsertColorFrame(
+      reinterpret_cast<const char*>(locked_rect.pBits),
+      locked_rect.size);
 
   image_frame.pFrameTexture->UnlockRect(0);
 
@@ -259,7 +264,7 @@ bool KinectSensor::PollNextSkeletonFrame(KinectSensorState* state) {
   skeleton_sticky_ids_[1] = track_ids[1];
 
   skeleton_frame.SetTrackedSkeletons(track_ids[0], track_ids[1]);
-  state->InsertSkeletonFrame(skeleton_frame);
+  state->GetData()->InsertSkeletonFrame(skeleton_frame);
 
   native_sensor_->NuiSkeletonSetTrackedSkeletons(track_ids);
 

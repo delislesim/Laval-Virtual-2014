@@ -10,7 +10,7 @@
 #include "kinect_replay/kinect_recorder.h"
 #include "kinect_wrapper/constants.h"
 #include "kinect_wrapper/kinect_sensor.h"
-#include "kinect_wrapper/kinect_skeleton_frame.h"
+#include "kinect_wrapper/kinect_sensor_data.h"
 
 namespace kinect_wrapper {  
 
@@ -28,11 +28,26 @@ class KinectSensorState {
     sensor_.reset(sensor);
   }
 
+  KinectSensorData* GetData() {
+    return &data_;
+  }
+  const KinectSensorData* GetData() const {
+    return &data_;
+  }
+
   void SetThread(HANDLE thread);
   void SetCloseEvent(HANDLE close_event);
   HANDLE GetCloseEvent();
   void SendCloseEvent();
   void WaitThreadCloseAndDelete();
+
+  void SetStatus(const std::string& status) {
+    status_ = status;
+  }
+
+  std::string GetStatus() {
+    return status_;
+  }
 
   bool StartRecording(const std::string& filename);
   void StopRecording();
@@ -40,42 +55,19 @@ class KinectSensorState {
   bool ReplayFrame();
   bool RecordFrame();
 
-  void CreateBuffers();
-
-  // Retrieves the last depth matrix.
-  // @param mat the last depth matrix.
-  // @returns true in case of success, false otherwise.
-  bool QueryDepth(cv::Mat* mat) const;
-
-  // Retrieves the last color matrix.
-  // @param mat the last color matrix.
-  // @returns true in case of success, false otherwise.
-  bool QueryColor(cv::Mat* mat) const;
-  
-  bool QuerySkeletonFrame(KinectSkeletonFrame* skeleton_frame) const;
-
-  void InsertDepthFrame(const char* depth_frame, size_t depth_frame_size);
-  void InsertDepthFrame(const NUI_DEPTH_IMAGE_PIXEL* start,
-                        const size_t& num_pixels);
-  void InsertColorFrame(const char* color_frame,
-                        const size_t& color_frame_size);
-  void InsertSkeletonFrame(const KinectSkeletonFrame& skeleton_frame);
-
-  void AddObserver(KinectObserver* obs);
-
  private:
+
   scoped_ptr<KinectSensor> sensor_;
-  cv::Mat depth_buffer_;
-  cv::Mat color_buffer_;
-  KinectSkeletonFrame skeleton_buffer_;
   
+  KinectSensorData data_;
+
   base::ScopedHandle thread_;
   base::ScopedHandle close_event_;
 
+  std::string status_;
+
   kinect_replay::KinectRecorder recorder_;
   kinect_replay::KinectPlayer player_;
-
-  ObserverList<KinectObserver> observers_;
 
   DISALLOW_COPY_AND_ASSIGN(KinectSensorState);
 };

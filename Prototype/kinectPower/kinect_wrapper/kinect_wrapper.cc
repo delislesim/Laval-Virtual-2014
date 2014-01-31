@@ -57,8 +57,7 @@ void KinectWrapper::Initialize() {
   assert(num_sensors <= kMaxNumSensors);
 
   for (int i = 0; i < num_sensors; ++i) {
-    std::string error;
-    CreateSensorByIndex(i, &error);
+    CreateSensorByIndex(i);
   }
 }
 
@@ -94,17 +93,17 @@ bool KinectWrapper::RecordSensor(int sensor_index,
 
 bool KinectWrapper::QueryDepth(int sensor_index, cv::Mat* mat) const {
   assert(mat != NULL);
-  return sensor_state_[sensor_index].QueryDepth(mat);
+  return sensor_state_[sensor_index].GetData()->QueryDepth(mat);
 }
 
 bool KinectWrapper::QueryColor(int sensor_index, cv::Mat* mat) const {
   assert(mat != NULL);
-  return sensor_state_[sensor_index].QueryColor(mat);
+  return sensor_state_[sensor_index].GetData()->QueryColor(mat);
 }
 
 bool KinectWrapper::StartPlaySensor(int sensor_index,
                                     const std::string& filename) {
-  sensor_state_[sensor_index].CreateBuffers();
+  sensor_state_[sensor_index].GetData()->CreateBuffers();
   return sensor_state_[sensor_index].LoadReplayFile(filename);
 }
  
@@ -116,29 +115,28 @@ bool KinectWrapper::PlayNextFrame(int sensor_index) {
 bool KinectWrapper::QuerySkeletonFrame(
     int sensor_index, KinectSkeletonFrame* skeleton_frame) const {
   assert(skeleton_frame != NULL);
-  return sensor_state_[sensor_index].QuerySkeletonFrame(skeleton_frame);
+  *skeleton_frame = *sensor_state_[sensor_index].GetData()->GetSkeletonFrame();
+  return true;
 }
 
 void KinectWrapper::AddObserver(int sensor_index, KinectObserver* observer) {
-  sensor_state_[sensor_index].AddObserver(observer);
+  sensor_state_[sensor_index].GetData()->AddObserver(observer);
 }
 
-KinectSensor* KinectWrapper::CreateSensorByIndex(int index,
-                                                 std::string* error) {
-  assert(error != NULL);
-
+KinectSensor* KinectWrapper::CreateSensorByIndex(int index) {
   if (sensor_state_[index].GetSensor() != NULL)
     return sensor_state_[index].GetSensor();
 
   INuiSensor* native_sensor = NULL;
   if (FAILED(NuiCreateSensorByIndex(index, &native_sensor))) {
-    *error = "Could not create an instance of INuiSensor.";
+    sensor_state_[index].SetStatus(
+        "Could not create an instance of INuiSensor.");
     return NULL;
   }
 
   HRESULT hr = native_sensor->NuiStatus();
   if (hr != S_OK) {
-    *error = "Sensor not ready.";
+    sensor_state_[index].SetStatus("Sensor not ready.");
     SafeRelease(native_sensor);
     return NULL;
   }
@@ -153,7 +151,7 @@ KinectSensor* KinectWrapper::CreateSensorByIndex(int index,
     native_sensor->NuiSetForceInfraredEmitterOff(FALSE);
 
   if (!SUCCEEDED(hr) && hr != E_NUI_DEVICE_IN_USE) {
-    *error = "Sensor could not be initialized.";
+    sensor_state_[index].SetStatus("Sensor could not be initialized.");
     SafeRelease(native_sensor);
     return NULL;
   }
@@ -177,10 +175,8 @@ DWORD KinectWrapper::SensorThread(SensorThreadParams* params) {
   int sensor_index = params->sensor_index;
   delete params;
 
-  std::string error;
-  KinectSensor* sensor = wrapper->CreateSensorByIndex(sensor_index, &error);
+  KinectSensor* sensor = wrapper->CreateSensorByIndex(sensor_index);
   if (sensor == NULL) {
-    std::cout << "Error while starting sensor thread: " << error << std::endl;
     return 0;
   }
 
@@ -188,7 +184,7 @@ DWORD KinectWrapper::SensorThread(SensorThreadParams* params) {
   sensor->OpenDepthStream();
   sensor->OpenColorStream();
   sensor->OpenSkeletonStream();
-  wrapper->sensor_state_[sensor_index].CreateBuffers();
+  wrapper->sensor_state_[sensor_index].GetData()->CreateBuffers();
 
   // Wait for ready frames.
   HANDLE events[] = {
@@ -225,7 +221,8 @@ DWORD KinectWrapper::SensorThread(SensorThreadParams* params) {
       wrapper->sensor_state_[sensor_index].RecordFrame();
 
 #ifdef ENABLE_TIMER
-    std::cout << "Elapsed time: " << timer.ElapsedTime() << " ms." << std::endl;
+    double elapsed_time = timer.ElapsedTime();
+    std::cout << "Elapsed time: " << elapsed_time << " ms." << std::endl;
 #endif
   }
 

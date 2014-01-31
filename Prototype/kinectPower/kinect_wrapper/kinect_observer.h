@@ -4,17 +4,17 @@
 
 namespace kinect_wrapper {
 
-class KinectSensorState;
+class KinectSensorData;
 class KinectSkeletonFrame;
 
 class KinectObserver {
  public:
   virtual void ObserveDepth(const cv::Mat& /* depth_mat */,
-                            const KinectSensorState& /* sensor_state */) {}
+                            const KinectSensorData& /* sensor_data */) {}
   virtual void ObserveColor(const cv::Mat& /* color_mat */,
-                            const KinectSensorState& /* sensor_state */) {}
+                            const KinectSensorData& /* sensor_data */) {}
   virtual void ObserveSkeleton(const KinectSkeletonFrame& /* skeleton_frame */,
-                               const KinectSensorState& /* sensor_state */) {}
+                               const KinectSensorData& /* sensor_data */) {}
 };
 
 }  // namespace kinect_wrapper
