@@ -27,7 +27,7 @@ bool KinectPlayer::LoadFile(const std::string& filename) {
 
   // Read the header.
   const std::string kHeaderString = "KINECT LIB REPLAY V01";
-  const size_t kHeaderStringLen = 10;
+  const size_t kHeaderStringLen = 21;
   
   char header_buffer[kHeaderStringLen + 1];
   in_.read(header_buffer, kHeaderStringLen + 1);
@@ -51,6 +51,7 @@ bool KinectPlayer::ReadFrame(kinect_wrapper::KinectSensorState* sensor_state) {
   const size_t kSectionHeaderSize = 5;
   const std::string kDepthHeader =    "DEPTH";
   const std::string kSkeletonHeader = "SKELE";
+  const std::string kColorHeader =    "COLOR";
 
   if (!in_.good()) {
     // Loop!
@@ -76,6 +77,21 @@ bool KinectPlayer::ReadFrame(kinect_wrapper::KinectSensorState* sensor_state) {
   buffer.resize(depth_length);
   in_.read(&buffer[0], depth_length);
   sensor_state->GetData()->InsertDepthFrame(&buffer[0], depth_length);
+
+  // Read the color frame.
+  buffer.resize(kSectionHeaderSize + 1);
+  in_.read(&buffer[0], kSectionHeaderSize);
+  buffer[kSectionHeaderSize] = '\0';
+
+  if (kColorHeader != &buffer[0])
+    return false;
+
+  size_t color_length = 0;
+  in_.read(reinterpret_cast<char*>(&color_length), sizeof(color_length));
+
+  buffer.resize(color_length);
+  in_.read(&buffer[0], color_length);
+  sensor_state->GetData()->InsertColorFrame(&buffer[0], color_length);
 
   // Read the skeleton frame.
   buffer.resize(kSectionHeaderSize + 1);

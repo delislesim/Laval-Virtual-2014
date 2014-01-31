@@ -42,15 +42,15 @@ bool KinectRecorder::RecordFrame(
   const size_t kSectionHeaderSize = 5;
   const char* kDepthHeader =    "DEPTH";
   const char* kSkeletonHeader = "SKELE";
+  const char* kColorHeader =    "COLOR";
 
   if (!out_.good())
     return false;
 
-  // Query the depth frame.
+  // Write the depth frame.
   cv::Mat depth_mat;
   sensor_state.GetData()->QueryDepth(&depth_mat);
 
-  // Write the depth frame.
   size_t depth_frame_size = depth_mat.total() *  depth_mat.elemSize();
   out_.write(kDepthHeader, kSectionHeaderSize);
   out_.write(reinterpret_cast<const char*>(&depth_frame_size),
@@ -58,11 +58,21 @@ bool KinectRecorder::RecordFrame(
   out_.write(reinterpret_cast<const char*>(depth_mat.ptr()),
              depth_frame_size);
 
-  // Query the skeleton frame.
+  // Write the color frame.
+  cv::Mat color_mat;
+  sensor_state.GetData()->QueryColor(&color_mat);
+
+  size_t color_frame_size = color_mat.total() * color_mat.elemSize();
+  out_.write(kColorHeader, kSectionHeaderSize);
+  out_.write(reinterpret_cast<const char*>(&color_frame_size),
+             sizeof(color_frame_size));
+  out_.write(reinterpret_cast<const char*>(color_mat.ptr()),
+             color_frame_size);
+
+  // Write the skeleton frame.
   const KinectSkeletonFrame* skeleton_frame =
       sensor_state.GetData()->GetSkeletonFrame();
 
-  // Write the skeleton frame.
   out_.write(kSkeletonHeader, kSectionHeaderSize);
   out_.write(reinterpret_cast<const char*>(skeleton_frame),
              sizeof(*skeleton_frame));

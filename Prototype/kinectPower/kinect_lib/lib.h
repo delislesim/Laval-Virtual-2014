@@ -1,7 +1,7 @@
 #include "kinect_wrapper/kinect_sensor.h"
 
 extern "C" bool __declspec(dllexport)
-Initialize(bool near_mode);
+Initialize(bool near_mode, bool with_sensor_thread);
 
 extern "C" bool __declspec(dllexport)
 Shutdown();

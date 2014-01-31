@@ -6,8 +6,8 @@ public class KinectPowerInterop
 {
 
   [DllImport(@"kinect_lib.dll", EntryPoint = "Initialize", CallingConvention = CallingConvention.Cdecl)]
-  public static extern bool Initialize(bool near_mode);
-
+	public static extern bool Initialize(bool near_mode, bool with_sensor_thread);
+	
   [DllImport(@"kinect_lib.dll", EntryPoint = "Shutdown", CallingConvention = CallingConvention.Cdecl)]
   public static extern bool Shutdown();
 

@@ -24,9 +24,8 @@ public class KinectPower : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		if (replay != ReplayMode.REPLAY) {
-			KinectPowerInterop.Initialize(false /* pas de near mode */);
-		}
+		KinectPowerInterop.Initialize(false /* pas de near mode */,
+		                              replay != ReplayMode.REPLAY);
 
     	streamTexture = new Texture2D(kStreamWidth, kStreamHeight);
     	streamRect = new Rect(Screen.width, Screen.height - streamTexture.height,

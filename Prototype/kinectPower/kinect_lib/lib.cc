@@ -13,11 +13,16 @@
 
 using namespace kinect_wrapper;
 
-bool Initialize(bool near_mode) {
+bool Initialize(bool near_mode, bool with_sensor_thread) {
+  KinectWrapper::Release();
+
   KinectWrapper* wrapper = KinectWrapper::instance();
   wrapper->Initialize();
   wrapper->GetSensorByIndex(0)->SetNearModeEnabled(near_mode);
-  wrapper->StartSensorThread(0);
+
+  if (with_sensor_thread) {
+    wrapper->StartSensorThread(0);
+  }
   return true;
 }
 
