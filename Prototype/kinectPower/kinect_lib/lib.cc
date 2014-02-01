@@ -4,6 +4,7 @@
 #include <opencv2/core/core.hpp>
 
 #include "base/logging.h"
+#include "intel_hand_tracker/intel_hand_tracker.h"
 #include "kinect_interaction/interaction_client_menu.h"
 #include "kinect_interaction/interaction_frame.h"
 #include "kinect_wrapper/constants.h"
@@ -184,4 +185,16 @@ bool GetHandsInteraction(int skeleton_id, NUI_HANDPOINTER_INFO* hands) {
 
   return interaction_frame->GetHands(skeleton_id,
                                      &hands[0], &hands[1]);
+}
+
+bool InitializeHandTracker() {
+  return intel_hand_tracker::IntelHandTracker::instance()->Initialize();
+}
+
+bool GetHandsSkeletons(hskl::float3* positions,
+                       float* tracking_error) {
+  intel_hand_tracker::IntelHandTracker::instance()->GetFrame(
+      positions, tracking_error
+  );
+  return true;
 }

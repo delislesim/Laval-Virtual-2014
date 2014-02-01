@@ -179,4 +179,11 @@ public class KinectPowerInterop
   public static uint NuiHandPointerStateInteractive = 0x04;
   public static uint NuiHandPointerStatePressed = 0x08;
   public static uint NuiHandPointerStatePrimaryForUser = 0x10;
+
+  // Hand tracker.
+  [DllImport(@"kinect_lib.dll", EntryPoint = "InitializeHandTracker", CallingConvention = CallingConvention.Cdecl)]
+  public static extern bool InitializeHandTracker();
+  
+  [DllImport(@"kinect_lib.dll", EntryPoint = "GetHandsSkeletons", CallingConvention = CallingConvention.Cdecl)]
+  public static extern bool GetHandsSkeletons(float[] positions, float[] tracking_error);
 }

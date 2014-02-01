@@ -23,8 +23,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D _UNICODE /D UNICODE")
 # Includes search path
 include_directories(
   .
+  hskl/include
   $ENV{KINECTSDK10_DIR}/inc
   $ENV{KINECT_TOOLKIT_DIR}/inc
+  $ENV{PCSDK_DIR}/include
   ${GMOCK_ROOT}/include
   ${GMOCK_ROOT}
   ${GMOCK_ROOT}/gtest/include
@@ -53,6 +55,11 @@ add_library(image
   image/image_constants.h
   image/image_utility.cc
   image/image_utility.h
+  )
+  
+add_library(intel_hand_tracker
+  intel_hand_tracker/intel_hand_tracker.cc
+  intel_hand_tracker/intel_hand_tracker.h
   )
 
 add_library(kinect_interaction
@@ -110,13 +117,16 @@ add_library(kinect_lib SHARED
 target_link_libraries(kinect_lib
   base
   image
+  intel_hand_tracker
   kinect_interaction
   kinect_replay
   kinect_wrapper
   maths
+  hskl/lib/Win32/hskl
   ${OpenCV_LIBS}
   $ENV{KINECTSDK10_DIR}/lib/x86/Kinect10.lib
   $ENV{KINECT_TOOLKIT_DIR}/Lib/x86/KinectInteraction180_32.lib
+  $ENV{PCSDK_DIR}/lib/Win32/libpxc.lib
   )
 	
 ####################

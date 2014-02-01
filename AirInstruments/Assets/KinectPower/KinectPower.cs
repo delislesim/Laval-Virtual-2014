@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using KinectHelpers;
+using System.Runtime.InteropServices;
+using System;
+using System.Diagnostics;
 
 public class KinectPower : MonoBehaviour {
 
@@ -36,6 +39,8 @@ public class KinectPower : MonoBehaviour {
 		} else if (replay == ReplayMode.REPLAY) {
 			KinectPowerInterop.StartPlaySensor(0, replayFilename);
 		}
+
+		UnloadModule ("test");
 	}
 	
 	void Update () {
@@ -220,6 +225,24 @@ public class KinectPower : MonoBehaviour {
 		
 	}
 
+	// Unload a DLL.
+	[DllImport("kernel32", SetLastError=true)]
+	static extern bool FreeLibrary(IntPtr hModule);
+	
+	public static void UnloadModule(string moduleName)
+	{
+		ProcessModuleCollection col = Process.GetCurrentProcess ().Modules;
+
+
+		foreach(ProcessModule mod in Process.GetCurrentProcess().Modules)
+		{
+			if(mod.ModuleName == moduleName)
+			{
+				FreeLibrary(mod.BaseAddress);
+			}
+		}
+	}
+	
 	// Depth and color stream.
 	private Rect streamRect;
 	private Texture2D streamTexture;

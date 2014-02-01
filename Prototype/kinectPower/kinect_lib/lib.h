@@ -1,3 +1,4 @@
+#include "hsklu.h"
 #include "kinect_wrapper/kinect_include.h"
 
 extern "C" bool __declspec(dllexport)
@@ -34,3 +35,13 @@ GetJointsPositionDepth(int skeleton_id, int* joint_positions);
 
 extern "C" bool __declspec(dllexport)
 GetHandsInteraction(int skeleton_id, NUI_HANDPOINTER_INFO* hands);
+
+// Hand tracker.
+
+extern "C" bool __declspec(dllexport)
+InitializeHandTracker();
+
+extern "C" bool __declspec(dllexport)
+GetHandsSkeletons(hskl::float3* joint_positions, float* tracking_error);
+
+
