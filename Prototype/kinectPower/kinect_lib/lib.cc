@@ -4,6 +4,8 @@
 #include <opencv2/core/core.hpp>
 
 #include "base/logging.h"
+#include "kinect_interaction/interaction_client_menu.h"
+#include "kinect_interaction/interaction_frame.h"
 #include "kinect_wrapper/constants.h"
 #include "kinect_wrapper/kinect_sensor.h"
 #include "kinect_wrapper/kinect_skeleton.h"
@@ -18,9 +20,19 @@ bool Initialize(bool near_mode, bool with_sensor_thread) {
 
   KinectWrapper* wrapper = KinectWrapper::instance();
   wrapper->Initialize();
-  wrapper->GetSensorByIndex(0)->SetNearModeEnabled(near_mode);
 
   if (with_sensor_thread) {
+    // Check that the expected sensors are connected.
+    if (wrapper->GetSensorCount() != 1)
+      return false;
+
+    // Initialize sensor 0.
+    wrapper->GetSensorByIndex(0)->SetNearModeEnabled(near_mode);
+    wrapper->GetSensorByIndex(0)->OpenDepthStream();
+    wrapper->GetSensorByIndex(0)->OpenColorStream();
+    wrapper->GetSensorByIndex(0)->OpenSkeletonStream();
+    wrapper->GetSensorByIndex(0)->OpenInteractionStream(
+        kinect_interaction::InteractionClientMenu::instance());
     wrapper->StartSensorThread(0);
   }
   return true;
@@ -56,7 +68,7 @@ bool GetDepthImage(unsigned char* pixels, unsigned int pixels_size) {
 
   // Get the raw data from the Kinect.
   cv::Mat mat;
-  if (!wrapper->QueryDepth(0, &mat))
+  if (!wrapper->GetSensorData(0)->QueryDepth(&mat))
     return false;
 
   NiceImageFromDepthMat(mat, kMaxDepth, kMinDepth, kColorDepth,
@@ -70,7 +82,7 @@ bool GetColorImage(unsigned char* pixels, unsigned int pixels_size) {
 
   // Get the raw data from the Kinect.
   cv::Mat mat;
-  if (!wrapper->QueryColor(0, &mat))
+  if (!wrapper->GetSensorData(0)->QueryColor(&mat))
     return false;
 
   assert(pixels_size == mat.total() * mat.elemSize());
@@ -86,11 +98,11 @@ bool GetJointsPosition(int skeleton_id, float* joint_positions,
                        unsigned char* joint_status) {
   KinectWrapper* wrapper = KinectWrapper::instance();
 
-  KinectSkeletonFrame skeleton_frame;
-  wrapper->QuerySkeletonFrame(0, &skeleton_frame);
+  const KinectSkeletonFrame* skeleton_frame =
+      wrapper->GetSensorData(0)->GetSkeletonFrame();
  
   KinectSkeleton skeleton;
-  if (!skeleton_frame.GetTrackedSkeleton(skeleton_id, &skeleton))
+  if (!skeleton_frame->GetTrackedSkeleton(skeleton_id, &skeleton))
     return false;
 
   for (int joint_index = 0;
@@ -116,11 +128,11 @@ bool GetBonesOrientation(int skeleton_id,
                          NUI_SKELETON_BONE_ORIENTATION* bone_orientations) {
   KinectWrapper* wrapper = KinectWrapper::instance();
 
-  KinectSkeletonFrame skeleton_frame;
-  wrapper->QuerySkeletonFrame(0, &skeleton_frame);
+  const KinectSkeletonFrame* skeleton_frame =
+      wrapper->GetSensorData(0)->GetSkeletonFrame();
 
   KinectSkeleton skeleton;
-  if (!skeleton_frame.GetTrackedSkeleton(skeleton_id, &skeleton))
+  if (!skeleton_frame->GetTrackedSkeleton(skeleton_id, &skeleton))
     return false;
 
   skeleton.CalculateBoneOrientations(bone_orientations);
@@ -130,11 +142,11 @@ bool GetBonesOrientation(int skeleton_id,
 bool GetJointsPositionDepth(int skeleton_id, int* joint_positions) {
   KinectWrapper* wrapper = KinectWrapper::instance();
 
-  KinectSkeletonFrame skeleton_frame;
-  wrapper->QuerySkeletonFrame(0, &skeleton_frame);
+  const KinectSkeletonFrame* skeleton_frame =
+      wrapper->GetSensorData(0)->GetSkeletonFrame();
 
   KinectSkeleton skeleton;
-  if (!skeleton_frame.GetTrackedSkeleton(skeleton_id, &skeleton))
+  if (!skeleton_frame->GetTrackedSkeleton(skeleton_id, &skeleton))
     return false;
 
   KinectSensor* sensor = wrapper->GetSensorByIndex(0);
@@ -160,4 +172,16 @@ bool GetJointsPositionDepth(int skeleton_id, int* joint_positions) {
   }
 
   return true;
+}
+
+bool GetHandsInteraction(int skeleton_id, NUI_HANDPOINTER_INFO* hands) {
+  assert(hands);
+
+  KinectWrapper* wrapper = KinectWrapper::instance();
+
+  const kinect_interaction::InteractionFrame* interaction_frame =
+      wrapper->GetSensorData(0)->GetInteractionFrame();
+
+  return interaction_frame->GetHands(skeleton_id,
+                                     &hands[0], &hands[1]);
 }

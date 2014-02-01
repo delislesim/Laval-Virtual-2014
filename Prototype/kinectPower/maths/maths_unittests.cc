@@ -16,8 +16,6 @@ TEST(Maths, AngleBetween) {
   cv::Vec2i diago_left(-1, 1);
   cv::Vec2i diago_right(1, 1);
 
-
-
   EXPECT_DOUBLE_EQ(maths::kPi / 2.0, maths::AngleBetween(vec_left, vec_top));
   EXPECT_DOUBLE_EQ(maths::kPi, maths::AngleBetween(vec_left, vec_right));
   EXPECT_DOUBLE_EQ(

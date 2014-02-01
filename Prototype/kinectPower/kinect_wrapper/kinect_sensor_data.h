@@ -4,6 +4,7 @@
 
 #include "base/base.h"
 #include "base/observer_list.h"
+#include "kinect_interaction/interaction_frame.h"
 #include "kinect_wrapper/kinect_observer.h"
 #include "kinect_wrapper/kinect_skeleton_frame.h"
 
@@ -28,8 +29,16 @@ class KinectSensorData {
   // @returns true in case of success, false otherwise.
   bool QueryColor(cv::Mat* mat) const;
   
-  KinectSkeletonFrame* GetSkeletonFrame();
-  const KinectSkeletonFrame* GetSkeletonFrame() const;
+  const KinectSkeletonFrame* GetSkeletonFrame() const {
+    return &skeleton_buffer_;
+  }
+
+  kinect_interaction::InteractionFrame* GetInteractionFrame() {
+    return &interaction_buffer_;
+  }
+  const kinect_interaction::InteractionFrame* GetInteractionFrame() const {
+    return &interaction_buffer_;
+  }
 
   void InsertDepthFrame(const char* depth_frame, size_t depth_frame_size);
   void InsertDepthFrame(const NUI_DEPTH_IMAGE_PIXEL* start,
@@ -37,6 +46,7 @@ class KinectSensorData {
   void InsertColorFrame(const char* color_frame,
                         const size_t& color_frame_size);
   void InsertSkeletonFrame(const KinectSkeletonFrame& skeleton_frame);
+  void InsertInteractionFrame(const NUI_INTERACTION_FRAME& interaction_frame);
   
   void AddObserver(KinectObserver* obs);
 
@@ -44,6 +54,7 @@ class KinectSensorData {
   cv::Mat depth_buffer_;
   cv::Mat color_buffer_;
   KinectSkeletonFrame skeleton_buffer_;
+  kinect_interaction::InteractionFrame interaction_buffer_;
 
   ObserverList<KinectObserver> observers_;
 

@@ -7,3 +7,4 @@
 #include <Shlobj.h>
 
 #include <NuiApi.h>
+#include <KinectInteraction.h>

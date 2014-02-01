@@ -24,11 +24,12 @@ class KinectWrapper {
   static KinectWrapper* instance();
   static void Release();
 
-  // Access the sensor.
+  // Access the sensors.
   KinectSensor* GetSensorByIndex(int index) {
     assert(sensor_state_[index].GetSensor() != NULL);
     return sensor_state_[index].GetSensor();
   }
+  int GetSensorCount();
 
   // Initialization.
   void Initialize();
@@ -40,11 +41,10 @@ class KinectWrapper {
   bool StartPlaySensor(int sensor_index, const std::string& filename);
   bool PlayNextFrame(int sensor_index);
 
-  // Access streams.
-  bool QueryDepth(int sensor_index, cv::Mat* mat) const;
-  bool QueryColor(int sensor_index, cv::Mat* mat) const;
-  bool QuerySkeletonFrame(int sensor_index,
-                          KinectSkeletonFrame* skeleton_frame) const;
+  // Access data.
+  const KinectSensorData* GetSensorData(int sensor_index) const {
+    return sensor_state_[sensor_index].GetData();
+  }
   void AddObserver(int sensor_index, KinectObserver* observer);
 
  private:
@@ -58,7 +58,6 @@ class KinectWrapper {
   static DWORD SensorThread(SensorThreadParams* params);
 
   KinectSensor* CreateSensorByIndex(int index);
-  int GetSensorCount();
 
   static KinectWrapper* instance_;
 

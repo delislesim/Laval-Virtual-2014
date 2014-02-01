@@ -7,9 +7,13 @@
 #include "kinect_wrapper/constants.h"
 #include "kinect_wrapper/kinect_include.h"
 
+namespace kinect_interaction {
+class InteractionClientBase;
+}
+
 namespace kinect_wrapper {  
 
-class KinectSensorState;
+class KinectSensorData;
 
 class KinectSensor {
  public:
@@ -20,7 +24,7 @@ class KinectSensor {
 
   // Depth stream.
   bool OpenDepthStream();
-  bool PollNextDepthFrame(KinectSensorState* state);
+  bool PollNextDepthFrame(KinectSensorData* data);
   HANDLE GetDepthFrameReadyEvent() const {
     return depth_frame_ready_event_;
   }
@@ -33,7 +37,7 @@ class KinectSensor {
 
   // Color stream.
   bool OpenColorStream();
-  bool PollNextColorFrame(KinectSensorState* state);
+  bool PollNextColorFrame(KinectSensorData* data);
   HANDLE GetColorFrameReadyEvent() const {
     return color_frame_ready_event_;
   }
@@ -46,10 +50,19 @@ class KinectSensor {
 
   // Skeleton stream.
   bool OpenSkeletonStream();
-  bool PollNextSkeletonFrame(KinectSensorState* state);
+  bool PollNextSkeletonFrame(KinectSensorData* data);
   HANDLE GetSkeletonFrameReadyEvent() const {
     return skeleton_frame_ready_event_;
   }
+
+  // Interaction stream.
+  bool OpenInteractionStream(
+      kinect_interaction::InteractionClientBase* interaction_client);
+  bool PollNextInteractionFrame(KinectSensorData* data);
+  HANDLE GetInteractionFrameReadyEvent() const {
+    return interaction_frame_ready_event_;
+  }
+  void CloseInteractionStream();
 
   // Coordinate mapper.
   bool MapSkeletonPointToDepthPoint(Vector4 skeleton_point,
@@ -81,6 +94,11 @@ class KinectSensor {
   bool skeleton_stream_opened_;
   HANDLE skeleton_frame_ready_event_;
   DWORD skeleton_sticky_ids_[kNumTrackedSkeletons];
+
+  // Interaction stream.
+  bool interaction_stream_opened_;
+  INuiInteractionStream* interaction_stream_;
+  HANDLE interaction_frame_ready_event_;
 
   // Coordinate mapper.
   INuiCoordinateMapper* coordinate_mapper_;

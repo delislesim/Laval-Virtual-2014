@@ -14,6 +14,7 @@ extern const size_t kKinectDepthHeight;
 extern const size_t kKinectColorWidth;
 extern const size_t kKinectColorHeight;
 
+extern const unsigned int kNumSkeletons;
 #define kNumTrackedSkeletons (2)
 
 }  // namespace kinect_wrapper

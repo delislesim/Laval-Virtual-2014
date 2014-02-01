@@ -4,8 +4,9 @@
 
 #include "base/logging.h"
 #include "base/timer.h"
+#include "kinect_interaction/interaction_client_base.h"
 #include "kinect_wrapper/constants.h"
-#include "kinect_wrapper/kinect_sensor_state.h"
+#include "kinect_wrapper/kinect_sensor_data.h"
 #include "kinect_wrapper/utility.h"
 
 namespace kinect_wrapper {
@@ -34,10 +35,15 @@ KinectSensor::KinectSensor(INuiSensor* native_sensor)
       color_stream_height_(0),
       skeleton_seated_enabled_(false),
       skeleton_stream_opened_(false),
-      skeleton_frame_ready_event_(INVALID_HANDLE_VALUE) {
+      skeleton_frame_ready_event_(INVALID_HANDLE_VALUE),
+      interaction_stream_opened_(false),
+      interaction_stream_(NULL),
+      interaction_frame_ready_event_(INVALID_HANDLE_VALUE) {
   depth_frame_ready_event_ = ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
   color_frame_ready_event_ = ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
   skeleton_frame_ready_event_ = ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
+  interaction_frame_ready_event_ =
+      ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
 
   skeleton_sticky_ids_[0] = 0;
   skeleton_sticky_ids_[1] = 0;
@@ -80,8 +86,8 @@ bool KinectSensor::OpenDepthStream() {
   return true;
 }
 
-bool KinectSensor::PollNextDepthFrame(KinectSensorState* state) {
-  assert(state);
+bool KinectSensor::PollNextDepthFrame(KinectSensorData* data) {
+  assert(data);
   assert(depth_stream_opened_);
   assert(depth_stream_handle_ != INVALID_HANDLE_VALUE);
 
@@ -119,7 +125,14 @@ bool KinectSensor::PollNextDepthFrame(KinectSensorState* state) {
 
   const NUI_DEPTH_IMAGE_PIXEL* start =
       reinterpret_cast<const NUI_DEPTH_IMAGE_PIXEL*>(locked_rect.pBits);
-  state->GetData()->InsertDepthFrame(start, depth_stream_width_ * depth_stream_height_);
+  data->InsertDepthFrame(start, depth_stream_width_ * depth_stream_height_);
+
+  if (interaction_stream_opened_) {
+    // Provide the data to the interaction stream.
+    interaction_stream_->ProcessDepth(locked_rect.size,
+                                      locked_rect.pBits,
+                                      image_frame.liTimeStamp);
+  }
 
   image_frame.pFrameTexture->UnlockRect(0);
 
@@ -149,8 +162,8 @@ bool KinectSensor::OpenColorStream() {
   return true;
 }
 
-bool KinectSensor::PollNextColorFrame(KinectSensorState* state) {
-  assert(state);
+bool KinectSensor::PollNextColorFrame(KinectSensorData* data) {
+  assert(data);
   assert(color_stream_opened_);
   assert(color_stream_handle_ != INVALID_HANDLE_VALUE);
 
@@ -180,7 +193,7 @@ bool KinectSensor::PollNextColorFrame(KinectSensorState* state) {
     goto ReleaseFrame;
   }
 
-  state->GetData()->InsertColorFrame(
+  data->InsertColorFrame(
       reinterpret_cast<const char*>(locked_rect.pBits),
       locked_rect.size);
 
@@ -212,8 +225,8 @@ bool KinectSensor::OpenSkeletonStream() {
   return true;
 }
 
-bool KinectSensor::PollNextSkeletonFrame(KinectSensorState* state) {
-  assert(state);
+bool KinectSensor::PollNextSkeletonFrame(KinectSensorData* data) {
+  assert(data);
   assert(skeleton_stream_opened_);
 
   if (WaitForSingleObject(skeleton_frame_ready_event_, 0) != WAIT_OBJECT_0)
@@ -264,10 +277,61 @@ bool KinectSensor::PollNextSkeletonFrame(KinectSensorState* state) {
   skeleton_sticky_ids_[1] = track_ids[1];
 
   skeleton_frame.SetTrackedSkeletons(track_ids[0], track_ids[1]);
-  state->GetData()->InsertSkeletonFrame(skeleton_frame);
+  data->InsertSkeletonFrame(skeleton_frame);
 
   native_sensor_->NuiSkeletonSetTrackedSkeletons(track_ids);
 
+  if (interaction_stream_opened_) {
+    // Provide the data to the interaction stream.
+    Vector4 gravity = { 0 };
+    native_sensor_->NuiAccelerometerGetCurrentReading(&gravity);
+    interaction_stream_->ProcessSkeleton(kNumSkeletons, frame->SkeletonData,
+                                         &gravity, frame->liTimeStamp);
+    data->GetInteractionFrame()->SetTrackedSkeletons(track_ids[0],
+                                                     track_ids[1]);
+  }
+
+  return true;
+}
+
+bool KinectSensor::OpenInteractionStream(
+    kinect_interaction::InteractionClientBase* interaction_client) {
+  assert(interaction_client);
+
+  if (interaction_stream_opened_)
+    return true;
+
+  HRESULT hr = ::NuiCreateInteractionStream(native_sensor_,
+                                            interaction_client,
+                                            &interaction_stream_);
+  if (FAILED(hr))
+    return false;
+
+  hr = interaction_stream_->Enable(interaction_frame_ready_event_);
+
+  if (FAILED(hr)) {
+    SafeRelease(interaction_stream_);
+    return false;
+  }
+
+  interaction_stream_opened_ = true;
+
+  return true;
+}
+
+bool KinectSensor::PollNextInteractionFrame(KinectSensorData* data) {
+  assert(data);
+  assert(interaction_stream_opened_);
+
+  if (WaitForSingleObject(interaction_frame_ready_event_, 0) != WAIT_OBJECT_0)
+    return false;
+
+  NUI_INTERACTION_FRAME interaction_frame;
+  HRESULT hr = interaction_stream_->GetNextFrame(0, &interaction_frame);
+  if (FAILED(hr))
+    return false;
+
+  data->InsertInteractionFrame(interaction_frame);
   return true;
 }
 
@@ -286,10 +350,23 @@ bool KinectSensor::MapSkeletonPointToDepthPoint(Vector4 skeleton_point,
   return true;
 }
 
+void KinectSensor::CloseInteractionStream() {
+  if (!interaction_stream_opened_)
+    return;
+
+  interaction_stream_->Disable();
+  SafeRelease(interaction_stream_);
+}
+
 KinectSensor::~KinectSensor() {
   // TODO(fdoray): Release the depth stream?
   native_sensor_->NuiShutdown();
   SafeRelease(native_sensor_);
+
+  ::CloseHandle(depth_frame_ready_event_);
+  ::CloseHandle(color_frame_ready_event_);
+  ::CloseHandle(skeleton_frame_ready_event_);
+  ::CloseHandle(interaction_frame_ready_event_);
 }
 
 }  // namespace kinect_wrapper

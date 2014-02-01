@@ -1,4 +1,4 @@
-#include "kinect_wrapper/kinect_sensor.h"
+#include "kinect_wrapper/kinect_include.h"
 
 extern "C" bool __declspec(dllexport)
 Initialize(bool near_mode, bool with_sensor_thread);
@@ -29,6 +29,8 @@ extern "C" bool __declspec(dllexport)
 GetBonesOrientation(int skeleton_id,
                     NUI_SKELETON_BONE_ORIENTATION* bone_orientations);
 
-// Coordinates in 2D.
 extern "C" bool __declspec(dllexport)
 GetJointsPositionDepth(int skeleton_id, int* joint_positions);
+
+extern "C" bool __declspec(dllexport)
+GetHandsInteraction(int skeleton_id, NUI_HANDPOINTER_INFO* hands);

@@ -1,15 +1,12 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace />
-  <MonoDevelop.Ide.Workbench ActiveDocument="..\..\AirInstruments\Assets\KinectPower\KinectPower.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="C:\Users\François\Documents\New Unity Project 1\Assets\KinectScripts\KinectWrapper.cs">
     <Files>
-      <File FileName="..\..\AirInstruments\Assets\KinectPower\KinectPower.cs" Line="93" Column="22" />
-      <File FileName="..\..\AirInstruments\Assets\KinectPower\KinectPowerInterop.cs" Line="26" Column="55" />
+      <File FileName="C:\Users\François\Documents\New Unity Project 1\Assets\KinectScripts\KinectWrapper.cs" Line="187" Column="5" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="D:\laval\Laval-Virtual-2014\AirInstruments\Assets\KinectPower\KinectPower.cs" line="55" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

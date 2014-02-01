@@ -2,6 +2,10 @@
 
 #include <opencv2/core/core.hpp>
 
+namespace kinect_interaction {
+class InteractionFrame;
+}  // namespace kinect_interaction
+
 namespace kinect_wrapper {
 
 class KinectSensorData;
@@ -15,6 +19,9 @@ class KinectObserver {
                             const KinectSensorData& /* sensor_data */) {}
   virtual void ObserveSkeleton(const KinectSkeletonFrame& /* skeleton_frame */,
                                const KinectSensorData& /* sensor_data */) {}
+  virtual void ObserveInteraction(
+      const kinect_interaction::InteractionFrame& /* interaction_frame */,
+      const KinectSensorData& /* sensor_data */) {}
 };
 
 }  // namespace kinect_wrapper

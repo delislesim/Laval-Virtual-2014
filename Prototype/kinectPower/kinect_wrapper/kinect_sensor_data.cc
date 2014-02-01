@@ -40,14 +40,6 @@ bool KinectSensorData::QueryColor(cv::Mat* mat) const {
   return true;
 }
 
-KinectSkeletonFrame* KinectSensorData::GetSkeletonFrame() {
-  return &skeleton_buffer_;
-}
-
-const KinectSkeletonFrame* KinectSensorData::GetSkeletonFrame() const {
-  return &skeleton_buffer_;
-}
-
 void KinectSensorData::InsertDepthFrame(const char* depth_frame,
                                          size_t depth_frame_size) {
   assert(depth_frame_size == depth_buffer_.total() * depth_buffer_.elemSize());
@@ -91,6 +83,14 @@ void KinectSensorData::InsertSkeletonFrame(
 
   FOR_EACH_OBSERVER(KinectObserver, observers_,
                     ObserveSkeleton(skeleton_buffer_, *this));
+}
+
+void KinectSensorData::InsertInteractionFrame(
+    const NUI_INTERACTION_FRAME& interaction_frame) {
+  *interaction_buffer_.GetInteractionFramePtr() = interaction_frame;
+
+  FOR_EACH_OBSERVER(KinectObserver, observers_,
+                    ObserveInteraction(interaction_buffer_, *this));
 }
 
 void KinectSensorData::AddObserver(KinectObserver* obs) {

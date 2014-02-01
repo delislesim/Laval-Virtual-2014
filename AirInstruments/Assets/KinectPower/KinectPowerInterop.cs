@@ -26,6 +26,9 @@ public class KinectPowerInterop
   [DllImport(@"kinect_lib.dll", EntryPoint = "GetColorImage", CallingConvention = CallingConvention.Cdecl)]
   public static extern bool GetColorImage(byte[] pixels, uint pixels_size);
 
+  [DllImport(@"kinect_lib.dll", EntryPoint = "GetHandsInteraction")]
+  public static extern bool GetHandsInteraction(int skeleton_id, NuiHandPointerInfo[] hands);
+
   // Kinect SDK constants.
   public const int NUI_SKELETON_POSITION_COUNT = 20;
 
@@ -143,4 +146,37 @@ public class KinectPowerInterop
     Top = 4,
     Bottom = 8
   }
+
+  // Interaction.
+  public struct NuiHandPointerInfo
+  {
+  	public uint State;
+  	public NuiHandType HandType;
+  	public float X;
+  	public float Y;
+  	public float PressExtent;
+  	public float RawX;
+  	public float RawY;
+  	public float RawZ;
+  	public NuiHandEventType HandEventType;    
+  }
+  
+  public enum NuiHandEventType {
+  	None = 0,
+  	Grip,
+  	GripRelease
+  }
+  
+  public enum NuiHandType {
+  	None = 0,
+  	Left,
+  	Right
+  }
+  
+  public static uint NuiHandpointerStateNotTracked = 0x00;
+  public static uint NuiHandPointerStateTracked = 0x01;
+  public static uint NuiHandPointerStateActive = 0x02;
+  public static uint NuiHandPointerStateInteractive = 0x04;
+  public static uint NuiHandPointerStatePressed = 0x08;
+  public static uint NuiHandPointerStatePrimaryForUser = 0x10;
 }

@@ -32,12 +32,6 @@ bool KinectSkeletonFrame::GetTrackedSkeleton(size_t tracked_skeleton_id,
   return false;
 }
 
-DWORD KinectSkeletonFrame::GetSkeletonTrackId(
-    size_t tracked_skeleton_id) const {
-  assert(tracked_skeleton_id < kNumTrackedSkeletons);
-  return tracked_skeletons_[tracked_skeleton_id];
-}
-
 void KinectSkeletonFrame::SetTrackedSkeletons(DWORD track_id_1,
                                               DWORD track_id_2) {
   tracked_skeletons_[0] = track_id_1;

@@ -24,6 +24,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D _UNICODE /D UNICODE")
 include_directories(
   .
   $ENV{KINECTSDK10_DIR}/inc
+  $ENV{KINECT_TOOLKIT_DIR}/inc
   ${GMOCK_ROOT}/include
   ${GMOCK_ROOT}
   ${GMOCK_ROOT}/gtest/include
@@ -54,6 +55,14 @@ add_library(image
   image/image_utility.h
   )
 
+add_library(kinect_interaction
+  kinect_interaction/interaction_client_base.h
+  kinect_interaction/interaction_client_menu.cc
+  kinect_interaction/interaction_client_menu.h
+  kinect_interaction/interaction_frame.cc
+  kinect_interaction/interaction_frame.h
+  )
+  
 add_library(kinect_replay
   kinect_replay/kinect_recorder.cc
   kinect_replay/kinect_recorder.h
@@ -101,11 +110,13 @@ add_library(kinect_lib SHARED
 target_link_libraries(kinect_lib
   base
   image
+  kinect_interaction
   kinect_replay
   kinect_wrapper
   maths
   ${OpenCV_LIBS}
   $ENV{KINECTSDK10_DIR}/lib/x86/Kinect10.lib
+  $ENV{KINECT_TOOLKIT_DIR}/Lib/x86/KinectInteraction180_32.lib
   )
 	
 ####################
@@ -128,11 +139,5 @@ add_executable(unittests
   )
 
 target_link_libraries(unittests
-  base
-  image
-  kinect_replay
-  kinect_wrapper
-  maths
-  ${OpenCV_LIBS}
-  $ENV{KINECTSDK10_DIR}/lib/x86/Kinect10.lib
+  kinect_lib
   )
