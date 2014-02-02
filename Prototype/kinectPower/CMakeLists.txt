@@ -128,6 +128,8 @@ add_library(maths
   maths/maths.h
   maths/quaternion.cc
   maths/quaternion.h
+  maths/smooth.cc
+  maths/smooth.h
   )
   
 add_library(piano
@@ -172,6 +174,7 @@ include_external_msproject(
 
 add_executable(unittests
   maths/maths_unittests.cc
+  maths/smooth_unittests.cc
   ${GMOCK_ROOT}/gtest/src/gtest-all.cc
   ${GMOCK_ROOT}/src/gmock-all.cc
   ${GMOCK_ROOT}/src/gmock_main.cc

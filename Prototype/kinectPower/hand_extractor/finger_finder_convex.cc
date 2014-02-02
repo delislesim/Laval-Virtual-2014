@@ -130,6 +130,7 @@ void ReduceTips(const std::vector<cv::Point>& contour,
 FingerFinderConvex::FingerFinderConvex() {
 }
 
+/*
 void FingerFinderConvex::FindFingers(const std::vector<cv::Point>& contour,
                                const unsigned char contour_pixel_value,
                                const cv::Mat& depth_mat,
@@ -231,7 +232,7 @@ void FingerFinderConvex::FindFingers(const std::vector<cv::Point>& contour,
         maths::Clamp(tips[i].lifetime, 0.0f, kMaximumLifetime);
     hand_parameters->PushPotentialTip(potential_tip);
   }
-
 }
+*/
 
 }  // namespace hand_extractor

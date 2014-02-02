@@ -16,8 +16,8 @@ namespace hand_extractor {
 
 namespace {
 
-const int kMinDistanceBetweenJoints = 11;
-const int kMinSquareDistanceBetweenJoints = 11*11;
+const int kMinDistanceBetweenTips = 11;
+const int kMinSquareDistanceBetweenTips = 11*11;
 
 bool IsMountain(const cv::Point& point,
                 const cv::Point& before,
@@ -37,11 +37,6 @@ void FindMountainsInContour(const std::vector<cv::Point>& contour,
       mountains->push_back(i);
     }
   }
-}
-
-cv::Point FindFingerTip(const cv::Point& guess_fingertip,
-                        const cv::Mat& depth_mat) {
-  return cv::Point(0, 0);
 }
 
 struct TipPositionSorter {
@@ -85,45 +80,39 @@ void FingerFinderMountain::FindFingers(
   std::sort(mountains.begin(), mountains.end(), position_sorter);
 
   // Return the best fingertips guesses.
-  size_t joint_index = 0;
   for (size_t i = 0; i < mountains.size(); ++i) {
-    if (joint_index >= Hand2dParameters::JOINTS_COUNT)
-      break;
+    cv::Point tip_position = contour[mountains[i]];
 
-    Hand2dParameters::HandJoint joint =
-        static_cast<Hand2dParameters::HandJoint>(joint_index);
-    cv::Point joint_position = contour[mountains[i]];
-
-    // Make sure that the joint is not too close from previous joints.
-    bool joint_ok = true;
-    if (joint_index != 0) {
-      for (int previous_joint_index = joint_index - 1;
-           previous_joint_index >= 0; --previous_joint_index) {
-        Hand2dParameters::HandJoint previous_joint =
-            static_cast<Hand2dParameters::HandJoint>(previous_joint_index);
-
-        cv::Point previous_joint_position;
-        hand_parameters->GetJointPosition(previous_joint, &previous_joint_position);
-
-        if (previous_joint_position.y - joint_position.y > kMinDistanceBetweenJoints) {
+    // Make sure that the tip is not too close from previous tips.
+    bool tip_ok = true;
+    if (hand_parameters->TipSize() != 0) {
+      for (int previous_tip_index = hand_parameters->TipSize() - 1;
+           previous_tip_index >= 0; --previous_tip_index) {
+    
+        Hand2dParameters::Tip previous_tip =
+            hand_parameters->TipAtIndex(previous_tip_index);
+    
+        if (previous_tip.position.y - tip_position.y > kMinDistanceBetweenTips)
           break;
-        }
-
-        if (maths::DistanceSquare(joint_position, previous_joint_position) < kMinSquareDistanceBetweenJoints) {
-          joint_ok = false;
-          continue;
+    
+        if (maths::DistanceSquare(tip_position, previous_tip.position) < kMinSquareDistanceBetweenTips) {
+          tip_ok = false;
+          break;
         }
       }
     }
 
-    // Insert the joint.
-    if (joint_ok) {
-      hand_parameters->SetJointPosition(joint,
-                                        joint_position,
-                                        depth_mat.at<unsigned short>(joint_position));
-      ++joint_index;
+    // Insert the tip.
+    if (tip_ok) {
+      Hand2dParameters::Tip tip;
+      tip.position = tip_position;
+      tip.depth = depth_mat.at<unsigned short>(tip_position);
+      hand_parameters->PushTip(tip);
     }
   }
+
+  // Smooth the result.
+  hand_parameters->SmoothUsingPreviousParameters(previous_hand_parameters);
 }
 
 }  // namespace hand_extractor

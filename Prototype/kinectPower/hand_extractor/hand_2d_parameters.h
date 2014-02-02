@@ -9,24 +9,17 @@ namespace hand_extractor {
 
 class Hand2dParameters {
  public:
-   Hand2dParameters();
-
-  enum HandJoint {
-    THUMB_TIP = 0,
-    INDEX_TIP,
-    MIDDLE_TIP,
-    RING_TIP,
-    LITTLE_TIP,
-    A, B,  // TODO(fdoray): Remove this.
-    JOINTS_COUNT
-  };
-
-  struct PotentialTip {
+  struct Tip {
     cv::Point position;
-    float lifetime;
+    int depth;
+    cv::Point smoothed_position;
+    int smoothed_depth;
   };
 
-  typedef std::vector<PotentialTip> PotentialTipVector;
+  typedef std::vector<Tip> TipVector;
+  typedef std::vector<Tip>::const_iterator TipIterator;
+
+  Hand2dParameters();
 
   cv::Point GetContourCenter() const {
     return contour_center_;
@@ -36,45 +29,32 @@ class Hand2dParameters {
     contour_center_ = center;
   }
 
-  bool GetJointPosition(HandJoint joint, cv::Point* position) const {
-    assert(position);
-    *position = joints_positions_[joint];
-    return joints_known_[joint];
+  TipIterator TipBegin() const {
+    return tips_.begin();
   }
 
-  bool GetJointDepth(HandJoint joint, int* depth) const {
-    assert(depth);
-    *depth = joints_depths_[joint];
-    return joints_known_[joint];
+  TipIterator TipEnd() const {
+    return tips_.end();
   }
 
-  void SetJointPosition(HandJoint joint, const cv::Point& position, int depth) {
-    joints_known_[joint] = true;
-    joints_positions_[joint] = position;
-    joints_depths_[joint] = depth;
+  size_t TipSize() const {
+    return tips_.size();
   }
 
-  void PushPotentialTip(const PotentialTip& potential_tip) {
-    potential_tips_.push_back(potential_tip);
+  const Tip& TipAtIndex(size_t index) {
+    return tips_[index];
   }
 
-  const PotentialTipVector& GetPotentialTips() const {
-    return potential_tips_;
+  void PushTip(const Tip& tip) {
+    tips_.push_back(tip);
   }
+
+  void SmoothUsingPreviousParameters(const Hand2dParameters* previous_parameters);
 
  private:
   cv::Point contour_center_;
 
-  // Position of each point of the hand skeleton.
-  std::vector<cv::Point> joints_positions_;
-
-  // Position of each point of the hand skeleton.
-  std::vector<int> joints_depths_;
-
-  // Indicates whether the position of each joint is known.
-  std::vector<bool> joints_known_;
-
-  PotentialTipVector potential_tips_;
+  TipVector tips_;
 };
 
 }  // namespace hand_extractor

@@ -7,8 +7,8 @@
 namespace algos {
 
 struct StableMatchingPair {
-  size_t left;
-  size_t right;
+  int left;
+  int right;
   int distance;
 
   bool operator<(const StableMatchingPair& other) const;

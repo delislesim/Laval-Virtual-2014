@@ -217,22 +217,13 @@ bool GetPianoHands(unsigned int* positions, unsigned char* known) {
 
   int out_index = 0;
 
-  for (int i = 0; i < hand_parameters.size(); ++i) {
-    for (int j = 0; j < hand_extractor::Hand2dParameters::JOINTS_COUNT; ++j) {
-      cv::Point position;
-      hand_extractor::Hand2dParameters::HandJoint joint = static_cast<hand_extractor::Hand2dParameters::HandJoint>(j);
-
-      if (hand_parameters[i].GetJointPosition(joint, &position)) {
-        int depth = 0;
-        hand_parameters[i].GetJointDepth(joint, &depth);
-        positions[out_index * 3 + 0] = position.x;
-        positions[out_index * 3 + 1] = position.y;
-        positions[out_index * 3 + 2] = depth;
-        known[out_index] = 1;
-        ++out_index;
-      } else {
-        known[out_index] = 0;
-      }
+  for (size_t i = 0; i < hand_parameters.size() && i < 30; ++i) {
+    for (auto it = hand_parameters[i].TipBegin(); it != hand_parameters[i].TipEnd(); ++it) {
+      positions[out_index * 3 + 0] = it->position.x;
+      positions[out_index * 3 + 1] = it->position.y;
+      positions[out_index * 3 + 2] = it->depth;
+      known[out_index] = 1;
+      ++out_index;
     }
   }
 

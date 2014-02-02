@@ -89,14 +89,10 @@ void HandExtractor::ExtractHands(const cv::Mat& depth_mat,
 
     // Draw a small circle on each fingertip.
     const cv::Scalar kFingertipColor = 39;
-    for (size_t j = 0; j < Hand2dParameters::JOINTS_COUNT; ++j) {
-      Hand2dParameters::HandJoint joint =
-          static_cast<Hand2dParameters::HandJoint>(j);
-      cv::Point joint_position;
-      if ((*hand_parameters)[i].GetJointPosition(joint, &joint_position)) {
-        cv::circle(*segmentation_mat, joint_position, 2,
-                   kFingertipColor, image::kThickness2);
-      }
+    for (Hand2dParameters::TipIterator it = (*hand_parameters)[i].TipBegin();
+         it != (*hand_parameters)[i].TipEnd(); ++it) {
+      cv::circle(*segmentation_mat, it->position, 2,
+                 kFingertipColor, image::kThickness2);
     }
 
   }
