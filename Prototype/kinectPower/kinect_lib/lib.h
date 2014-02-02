@@ -44,4 +44,11 @@ InitializeHandTracker();
 extern "C" bool __declspec(dllexport)
 GetHandsSkeletons(hskl::float3* joint_positions, float* tracking_error);
 
+// Piano experiments.
+extern "C" bool __declspec(dllexport)
+GetPianoImage(unsigned char* pixels, unsigned int pixels_size);
+
+extern "C" bool __declspec(dllexport)
+GetPianoHands(unsigned int* positions, unsigned char* known);
+
 

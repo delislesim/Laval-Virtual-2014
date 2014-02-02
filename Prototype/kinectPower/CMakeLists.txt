@@ -37,6 +37,11 @@ include_directories(
 # Libraries
 ####################
 
+add_library(algos
+  algos/stable_matching.cc
+  algos/stable_matching.h
+  )
+
 add_library(base
   base/base.h
   base/logging.h
@@ -46,6 +51,21 @@ add_library(base
   base/scoped_handle.h
   base/timer.cc
   base/timer.h
+  )
+  
+add_library(hand_extractor
+  hand_extractor/depth_difference_finder.cc
+  hand_extractor/depth_difference_finder.h
+  hand_extractor/finger_finder_convex.cc
+  hand_extractor/finger_finder_convex.h
+  hand_extractor/finger_finder_mountain.cc
+  hand_extractor/finger_finder_mountain.h
+  hand_extractor/hand_2d_parameters.cc
+  hand_extractor/hand_2d_parameters.h
+  hand_extractor/hand_extractor.cc
+  hand_extractor/hand_extractor.h
+  hand_extractor/segmenter.cc
+  hand_extractor/segmenter.h
   )
   
 add_library(image
@@ -92,6 +112,7 @@ add_library(kinect_wrapper
   kinect_wrapper/kinect_skeleton.h
   kinect_wrapper/kinect_skeleton_frame.cc
   kinect_wrapper/kinect_skeleton_frame.h
+  kinect_wrapper/kinect_switch.h
   kinect_wrapper/kinect_wrapper.cc
   kinect_wrapper/kinect_wrapper.h
   kinect_wrapper/utility.cc
@@ -108,6 +129,11 @@ add_library(maths
   maths/quaternion.cc
   maths/quaternion.h
   )
+  
+add_library(piano
+  piano/piano.cc
+  piano/piano.h
+  )
 
 add_library(kinect_lib SHARED
   kinect_lib/lib.cc
@@ -115,13 +141,16 @@ add_library(kinect_lib SHARED
   )
 	
 target_link_libraries(kinect_lib
+  algos
   base
+  hand_extractor
   image
   intel_hand_tracker
   kinect_interaction
   kinect_replay
   kinect_wrapper
   maths
+  piano
   hskl/lib/Win32/hskl
   ${OpenCV_LIBS}
   $ENV{KINECTSDK10_DIR}/lib/x86/Kinect10.lib

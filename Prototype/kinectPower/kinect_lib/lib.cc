@@ -13,14 +13,21 @@
 #include "kinect_wrapper/kinect_skeleton_frame.h"
 #include "kinect_wrapper/kinect_wrapper.h"
 #include "kinect_wrapper/utility.h"
+#include "piano/piano.h"
 
 using namespace kinect_wrapper;
+
+namespace {
+// TODO(fdoray)
+static piano::Piano the_piano;
+}  // namespace
 
 bool Initialize(bool near_mode, bool with_sensor_thread) {
   KinectWrapper::Release();
 
   KinectWrapper* wrapper = KinectWrapper::instance();
   wrapper->Initialize();
+  wrapper->AddObserver(0, &the_piano);
 
   if (with_sensor_thread) {
     // Check that the expected sensors are connected.
@@ -196,5 +203,43 @@ bool GetHandsSkeletons(hskl::float3* positions,
   intel_hand_tracker::IntelHandTracker::instance()->GetFrame(
       positions, tracking_error
   );
+  return true;
+}
+
+bool GetPianoImage(unsigned char* pixels, unsigned int pixels_size) {
+  the_piano.QueryNiceImage(pixels, pixels_size);
+  return true;
+}
+
+bool GetPianoHands(unsigned int* positions, unsigned char* known) {
+  std::vector<hand_extractor::Hand2dParameters> hand_parameters;
+  the_piano.QueryHandParameters(&hand_parameters);
+
+  int out_index = 0;
+
+  for (int i = 0; i < hand_parameters.size(); ++i) {
+    for (int j = 0; j < hand_extractor::Hand2dParameters::JOINTS_COUNT; ++j) {
+      cv::Point position;
+      hand_extractor::Hand2dParameters::HandJoint joint = static_cast<hand_extractor::Hand2dParameters::HandJoint>(j);
+
+      if (hand_parameters[i].GetJointPosition(joint, &position)) {
+        int depth = 0;
+        hand_parameters[i].GetJointDepth(joint, &depth);
+        positions[out_index * 3 + 0] = position.x;
+        positions[out_index * 3 + 1] = position.y;
+        positions[out_index * 3 + 2] = depth;
+        known[out_index] = 1;
+        ++out_index;
+      } else {
+        known[out_index] = 0;
+      }
+    }
+  }
+
+  while (out_index < 30) {
+    known[out_index] = 0;
+    ++out_index;
+  }
+
   return true;
 }
