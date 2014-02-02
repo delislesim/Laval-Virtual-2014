@@ -60,16 +60,16 @@ void Piano::ObserveDepth(
   hand_parameters_.SetNext(hand_parameters_tmp);
 
   // Generate an RGBA image from the computed information.
-  cv::Mat image = cv::Mat(depth_mat.rows, depth_mat.cols, CV_8UC4);
+  cv::Mat image = cv::Mat::zeros(depth_mat.rows, depth_mat.cols, CV_8UC4);
 
   unsigned char* image_ptr = image.ptr();
   unsigned char* segmentation_ptr = segmentation_mat.ptr();
   unsigned short const* depth_ptr = reinterpret_cast<unsigned short const*>(depth_mat.ptr());
-
+  
   for (size_t i = 0; i < image.total(); ++i) {
     if (*segmentation_ptr == 0) {
       // Depth.
-      if (false && *depth_ptr < kMaxZ && *depth_ptr > kMinZ) {
+      if (*depth_ptr < kMaxZ && *depth_ptr > kMinZ) {
         int normalized_depth = static_cast<int>(*depth_ptr - kMinZ) * 255;
         normalized_depth /= (kMaxZ - kMinZ);
         unsigned char char_normalized_depth = static_cast<unsigned char>(normalized_depth);
@@ -88,19 +88,24 @@ void Piano::ObserveDepth(
 
     } else {
       // Special colors.
-      int color_index = *segmentation_ptr % kNumColors;
-
-      image_ptr[image::kRedIndex] = static_cast<unsigned char>(kColors[color_index].val[0]);
-      image_ptr[image::kGreenIndex] = static_cast<unsigned char>(kColors[color_index].val[1]);
-      image_ptr[image::kBlueIndex] = static_cast<unsigned char>(kColors[color_index].val[2]);
+      int color_index = *segmentation_ptr;
+  
+      if (color_index > 128) {
+        image_ptr[image::kRedIndex] = 255 -(color_index - 127) * 2;
+        image_ptr[image::kGreenIndex] = 0;
+        image_ptr[image::kBlueIndex] = 0;
+      } else if (color_index < 127) {
+        image_ptr[image::kRedIndex] = 0;
+        image_ptr[image::kGreenIndex] = color_index * 2;
+        image_ptr[image::kBlueIndex] = 0;
+      }
       image_ptr[image::kAlphaIndex] = 255;
     }
-
     image_ptr += 4;
     segmentation_ptr += 1;
     depth_ptr += 1;
   }
-
+  
   started_ = true;
 
   nice_image_.SetNext(image);

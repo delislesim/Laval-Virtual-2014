@@ -31,8 +31,8 @@ double AngleBetween(const cv::Vec2i& vec_a,
       (cv::norm(vec_a) * cv::norm(vec_b));
   double angle = acos(cos_angle);
 
-  if (angle == 0.0)
-    return 0.0;
+  if (angle != angle)
+    angle = maths::kPi;
 
   int determinant = (vec_a.val[0] * vec_b.val[1]) -
                     (vec_a.val[1] * vec_b.val[0]);
@@ -41,6 +41,13 @@ double AngleBetween(const cv::Vec2i& vec_a,
     angle = -angle;
   
   return angle;
+}
+
+double AngleBetween(const cv::Point& point_before,
+                    const cv::Point& point_center,
+                    const cv::Point& point_after) {
+  return AngleBetween(cv::Vec2i(point_before - point_center),
+                      cv::Vec2i(point_after - point_center));
 }
 
 float Area(const std::vector<cv::Point>& points) {

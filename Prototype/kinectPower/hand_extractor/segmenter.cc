@@ -4,7 +4,6 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include "algos/contour_walk.h"
 #include "base/logging.h"
 #include "image/image_constants.h"
 #include "maths/maths.h"
@@ -74,13 +73,6 @@ void Segmenter::SegmentHands(const cv::Mat& depth_mat,
     contours->push_back(std::vector<cv::Point>());
     cv::approxPolyDP(contour, contours->at(simple_contour_index),
                      kSimpleContourTolerance, true);
-
-    // Draw points at regular intervals on the contour.
-    std::vector<cv::Point> walk;
-    algos::ContourWalk(5, contours->at(simple_contour_index), &walk);
-    for (size_t i = 0; i < walk.size(); ++i) {
-      cv::circle(*segmentation_mat, walk[i], 1, contour_pixel_value, image::kThickness2);
-    }
 
     // Remove the arm from the contour.
     // TODO(fdoray)

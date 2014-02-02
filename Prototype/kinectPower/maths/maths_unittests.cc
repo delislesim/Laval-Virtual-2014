@@ -31,6 +31,11 @@ TEST(Maths, AngleBetween) {
       -maths::kPi / 4.0, maths::AngleBetween(vec_top, diago_right));
   EXPECT_DOUBLE_EQ(-maths::kPi / 4.0, maths::AngleBetween(diago_left, vec_top));
   EXPECT_DOUBLE_EQ(maths::kPi / 4.0, maths::AngleBetween(diago_right, vec_top));
+
+  cv::Vec2i top_right(4, 9);
+  cv::Vec2i bottom_left(-4, -9);
+  EXPECT_DOUBLE_EQ(maths::kPi, maths::AngleBetween(top_right, bottom_left));
+  EXPECT_DOUBLE_EQ(maths::kPi, maths::AngleBetween(bottom_left, top_right));
 }
 
 }  // namespace maths

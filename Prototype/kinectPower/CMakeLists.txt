@@ -60,6 +60,8 @@ add_library(hand_extractor
   hand_extractor/depth_difference_finder.h
   hand_extractor/finger_finder_convex.cc
   hand_extractor/finger_finder_convex.h
+  hand_extractor/finger_finder_curve.cc
+  hand_extractor/finger_finder_curve.h
   hand_extractor/finger_finder_mountain.cc
   hand_extractor/finger_finder_mountain.h
   hand_extractor/hand_2d_parameters.cc
@@ -126,6 +128,8 @@ target_link_libraries(kinect_wrapper
   )
 
 add_library(maths
+  maths/curve.cc
+  maths/curve.h
   maths/maths.cc
   maths/maths.h
   maths/quaternion.cc

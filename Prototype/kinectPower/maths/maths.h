@@ -7,13 +7,22 @@ namespace maths {
 extern const double kPi;
 
 // Returns the previous index (circular).
+inline size_t Previous(const size_t& num, const size_t& index,
+                       const size_t& size) {
+  assert(num <= size);
+  return (index + size - num) % size;
+}
 inline size_t Previous(const size_t& index, const size_t& size) {
-  return (index + size - 1) % size;
+  return Previous(1, index, size);
 }
 
 // Returns the next index (circular).
+inline size_t Next(const size_t& num, const size_t& index,
+                   const size_t& size) {
+  return (index + num) % size;
+}
 inline size_t Next(const size_t& index, const size_t& size) {
-  return (index + 1) % size;
+  return Next(1, index, size);
 }
 
 double RadToDegrees(double rad);
@@ -21,8 +30,10 @@ double RadToDegrees(double rad);
 double Round(double number);
 int RoundToInt(double number);
 
-double AngleBetween(const cv::Vec2i& vec_a,
-                    const cv::Vec2i& vec_b);
+double AngleBetween(const cv::Vec2i& vec_a, const cv::Vec2i& vec_b);
+double AngleBetween(const cv::Point& point_before,
+                    const cv::Point& point_center,
+                    const cv::Point& point_after);
 
 // Calculates the area of the minimum rotated rectangle enclosing the
 // set of points passed as a parameter.
