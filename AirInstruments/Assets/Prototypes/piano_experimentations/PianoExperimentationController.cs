@@ -57,8 +57,6 @@ public class PianoExperimentationController : MonoBehaviour {
 		SetJointPosition (positions, known, 17, joint17);
 		SetJointPosition (positions, known, 18, joint18);
 		SetJointPosition (positions, known, 19, joint19);
-
-		Debug.Log (num_known);
 	}
 
 	void SetJointPosition(int[] positions, byte[] known, int index, Transform joint) {
@@ -68,11 +66,9 @@ public class PianoExperimentationController : MonoBehaviour {
 			double z = positions[index * 3 + 2];
 			x = (x - 320.0) * 15.0 / 320.0;
 			y = -((y - 240.0) * 15.0 / 320.0);
-			z = -(z - 750.0) / 6.0;
+			z = -(z - 930.0) / 7.0;
 
 			joint.position = new Vector3 ((float)x, (float)y, (float)z);
-			Debug.Log("joint " + index + ": " + joint.position);
-
 			++num_known;
 		} else {
 			joint.position = new Vector3 (-100, -100, 0);

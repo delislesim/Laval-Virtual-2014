@@ -35,7 +35,7 @@ const int kNumColors = 8;
 const cv::Scalar kFloodFillTolerance(5, 5, 5);
 
 // Piano image
-const int kPianoZ = 800;
+const int kPianoZ = 930;
 const int kPianoZTolerance = 140;
 const int kMinZ = kPianoZ - kPianoZTolerance;
 const int kMaxZ = kPianoZ + kPianoZTolerance;
@@ -68,8 +68,8 @@ void Piano::ObserveDepth(
 
   for (size_t i = 0; i < image.total(); ++i) {
     if (*segmentation_ptr == 0) {
-
-      if (*depth_ptr < kMaxZ && *depth_ptr > kMinZ) {
+      // Depth.
+      if (false && *depth_ptr < kMaxZ && *depth_ptr > kMinZ) {
         int normalized_depth = static_cast<int>(*depth_ptr - kMinZ) * 255;
         normalized_depth /= (kMaxZ - kMinZ);
         unsigned char char_normalized_depth = static_cast<unsigned char>(normalized_depth);
@@ -87,6 +87,7 @@ void Piano::ObserveDepth(
       }
 
     } else {
+      // Special colors.
       int color_index = *segmentation_ptr % kNumColors;
 
       image_ptr[image::kRedIndex] = static_cast<unsigned char>(kColors[color_index].val[0]);

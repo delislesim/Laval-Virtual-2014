@@ -30,8 +30,8 @@ double AngleBetween(const cv::Vec2i& vec_a,
 // @returns the area of the rectangle.
 float Area(const std::vector<cv::Point>& points);
 
-int DistanceSquare(const cv::Point& point_a,
-                   const cv::Point& point_b);
+int DistanceSquare(const cv::Point& point_a, const cv::Point& point_b);
+double Distance(const cv::Point& point_a, const cv::Point& point_b);
 
 template<typename T>
 T Clamp(T val, T min, T max) {

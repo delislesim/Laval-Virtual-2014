@@ -49,10 +49,17 @@ float Area(const std::vector<cv::Point>& points) {
   return area;
 }
 
-int DistanceSquare(const cv::Point& point_a,
-                   const cv::Point& point_b) {
+int DistanceSquare(const cv::Point& point_a, const cv::Point& point_b) {
   cv::Point dist = point_a - point_b;
   return dist.x * dist.x + dist.y * dist.y;
+}
+
+double Distance(const cv::Point& point_a, const cv::Point& point_b) {
+  int distance_square = DistanceSquare(point_a, point_b);
+  if (distance_square == 0)
+    return 0.0;
+  double distance = sqrt(static_cast<double>(distance_square));
+  return distance;
 }
 
 }  // namespace maths

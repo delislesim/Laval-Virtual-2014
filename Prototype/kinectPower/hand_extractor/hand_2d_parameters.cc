@@ -1,5 +1,7 @@
 #include "hand_extractor/hand_2d_parameters.h"
 
+#include <iostream>
+
 #include "algos/stable_matching.h"
 #include "maths/maths.h"
 #include "maths/smooth.h"
@@ -10,10 +12,10 @@ namespace {
 
 const int kStableMatchingMaxDistance = 225;
 
-const double min_speed_distance = 2;
-const double min_speed = 1;
-const double max_speed_distance = 8;
-const double max_speed = 6;
+const double min_speed_distance = 3;
+const double min_speed = 0.1;
+const double max_speed_distance = 12;
+const double max_speed = 7;
 
 }  // namespace
 
@@ -43,12 +45,17 @@ void Hand2dParameters::SmoothUsingPreviousParameters(const Hand2dParameters* pre
   algos::StableMatching(tips_.size(), previous->tips_.size(), kStableMatchingMaxDistance,
                         &stable_matching_queue, &best_pairs);
 
+  int smooth = 0;
+  int not_smooth = 0;
+
   // Smooth each fingertip.
   for (int i = 0; i < tips_.size(); ++i) {
     if (best_pairs[i] == -1) {
       tips_[i].smoothed_position = tips_[i].position;
+      ++not_smooth;
       continue;
     }
+    ++smooth;
 
     cv::Point position = tips_[i].position;
     cv::Point previous_position = previous->tips_[best_pairs[i]].smoothed_position;
@@ -71,7 +78,6 @@ void Hand2dParameters::SmoothUsingPreviousParameters(const Hand2dParameters* pre
       max_speed_distance, max_speed);
 
   }
-
 }
 
 }  // namespace hand_extractor

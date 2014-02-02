@@ -24,4 +24,4 @@ void StableMatching(size_t num_left, size_t num_right,
                     StableMatchingQueue* potential_pairs,
                     std::vector<int>* best_pairs);
 
-}  // namespace hand_extractor
+}  // namespace algos
