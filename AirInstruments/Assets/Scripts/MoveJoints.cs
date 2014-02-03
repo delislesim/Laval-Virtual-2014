@@ -29,9 +29,11 @@ public class MoveJoints : MonoBehaviour {
 
 	//Public
 	private GameObject[] joints;
-	private Transform[] current_transforms;
-	private Transform[] last_transforms;
+	private Vector3[] current_positions;
+	private Vector3[] last_positions;
 	private bool high_hat_opened;
+	private const float KICK_SPEED = 0.35f;
+	private bool kick_ready;
 
 	// Use this for initialization
 	void Start () {
@@ -43,9 +45,10 @@ public class MoveJoints : MonoBehaviour {
 			Hip_Right, Knee_Right, Ankle_Right, Foot_Right
 		};
 
-		last_transforms = new Transform[(int)Skeleton.Joint.Count];
-		current_transforms = new Transform[(int)Skeleton.Joint.Count];
+		last_positions = new Vector3[(int)Skeleton.Joint.Count];
+		current_positions = new Vector3[(int)Skeleton.Joint.Count];
 		high_hat_opened = false;
+		kick_ready = true;
 	}
 	
 	// Update is called once per frame
@@ -53,7 +56,6 @@ public class MoveJoints : MonoBehaviour {
 		//Create valid skeleton with joints positions/rotations
 		Skeleton playerOne = new Skeleton(0);
 		moveJoints (playerOne);
-
 	}
 
 	void moveJoints(Skeleton player)
@@ -64,8 +66,11 @@ public class MoveJoints : MonoBehaviour {
 		for(int i = 0; i < jointsCount; i++) 
 		{
 			//Store last positions/rotations
-			last_transforms[i] = current_transforms[i];
+			last_positions[i] = current_positions[i];
+		}
 
+		for(int i = 0; i < jointsCount; i++) 
+		{
 			if(joints[i] != null)
 			{
 				Vector3 posJoint = Vector3.zero;
@@ -88,27 +93,30 @@ public class MoveJoints : MonoBehaviour {
 					joints[i].transform.position = new Vector3(0,-10,0);
 
 				//Store new current position/rotation
-				current_transforms[i] = joints[i].transform;
+				current_positions[i] = joints[i].transform.position;
 			}
 		}
 
 		//Predict sounds
-		manageMouvementsAndSounds(current_transforms, last_transforms);
+		manageMouvementsAndSounds(current_positions, last_positions);
 	}
 
-	void manageMouvementsAndSounds(Transform[] currentPos, Transform[] pastPos)
+	void manageMouvementsAndSounds(Vector3[] currentPos, Vector3[] pastPos)
 	{
 		//Play bass kick
-		//if(pastPos[(int)Skeleton.Joint.KneeRight] != null){
-		//	if(Mathf.Abs(pastPos[(int)Skeleton.Joint.KneeRight].position.y - currentPos[(int)Skeleton.Joint.KneeRight].position.y) > (0.002 * Time.deltaTime))
-		//	{
-		//		Bass_Kick.PlaySound();
-				//Debug.Log ("Delta Y : " + Mathf.Abs(pastPos[(int)Skeleton.Joint.KneeRight].position.y - currentPos[(int)Skeleton.Joint.KneeRight].position.y)* Time.deltaTime);
-		//	}
+		if(pastPos[(int)Skeleton.Joint.KneeRight] != null){
+			if(pastPos[(int)Skeleton.Joint.KneeRight].y - currentPos[(int)Skeleton.Joint.KneeRight].y > (KICK_SPEED * Time.deltaTime)
+			   && kick_ready == true){
+				Bass_Kick.PlaySound();
+				kick_ready = false;
+			}
 
-		//
-
-
+			if(pastPos[(int)Skeleton.Joint.KneeRight].y - currentPos[(int)Skeleton.Joint.KneeRight].y < (-KICK_SPEED/2 * Time.deltaTime)
+			   && kick_ready == false){
+				kick_ready = true;
+			}
+		}
+		           
 	}
 
 }
