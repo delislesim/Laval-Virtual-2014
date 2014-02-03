@@ -28,6 +28,7 @@ public class MoveJoints : MonoBehaviour {
 	//Public
 	private GameObject[] joints;
 	private Transform[] last_positions;
+	private bool high_hat_opened;
 
 	// Use this for initialization
 	void Start () {
@@ -40,6 +41,7 @@ public class MoveJoints : MonoBehaviour {
 		};
 
 		last_positions = new Transform[(int)Skeleton.Joint.Count];
+		high_hat_opened = false;
 	}
 	
 	// Update is called once per frame
@@ -47,23 +49,28 @@ public class MoveJoints : MonoBehaviour {
 
 		//Create valid skeleton with joints positions/rotations
 		Skeleton playerOne = new Skeleton(0);
+		moveJoints (playerOne);
 
+	}
+
+	void moveJoints(Skeleton player)
+	{
 		// update the local positions of the bones
 		int jointsCount = (int)Skeleton.Joint.Count;
-
+		
 		for(int i = 0; i < jointsCount; i++) 
 		{
 			if(joints[i] != null)
 			{
 				Vector3 posJoint = Vector3.zero;
-				Skeleton.JointStatus jointStatus = playerOne.GetJointPosition((Skeleton.Joint)i, out posJoint);
+				Skeleton.JointStatus jointStatus = player.GetJointPosition((Skeleton.Joint)i, out posJoint);
 				if(jointStatus != Skeleton.JointStatus.NotTracked)
 				{
 					joints[i].transform.position = new Vector3(posJoint.x*5, posJoint.y*5, -5*posJoint.z);
-
+					
 					//Apply head rotation
 					if(i == (int)Skeleton.Joint.Head)
-						joints[i].transform.localRotation = playerOne.GetNeckOrientation();
+						joints[i].transform.localRotation = player.GetNeckOrientation();
 				}
 				//If not tracked, hide!
 				else
@@ -72,9 +79,4 @@ public class MoveJoints : MonoBehaviour {
 		}	
 	}
 
-	void OnTriggerEnter(){
-
-		Debug.Log("YOLO");
-
-	}
 }
