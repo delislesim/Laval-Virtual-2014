@@ -52,7 +52,6 @@ public class HandController : MonoBehaviour {
 	}
 
 	void SetJointPosition(float[] positions, int index, Transform joint) {
-		Debug.Log (-positions [index * 3 + 2] * 30 + 12);
 		joint.position = new Vector3 (-positions [index * 3 + 0] * 30,
 		                              -positions [index * 3 + 1] * 30 + 3,
 		                              -positions [index * 3 + 2] * 30 + 12);
