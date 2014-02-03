@@ -76,6 +76,12 @@ public class MoveJoints : MonoBehaviour {
 					//Apply head rotation
 					if(i == (int)Skeleton.Joint.Head)
 						joints[i].transform.localRotation = player.GetNeckOrientation();
+
+					//Apply hand rotation
+					if(i == (int)Skeleton.Joint.HandRight)
+						joints[i].transform.localRotation = player.GetBoneOrientation(Skeleton.Joint.HandRight);
+					if(i == (int)Skeleton.Joint.HandLeft)
+						joints[i].transform.localRotation = player.GetBoneOrientation(Skeleton.Joint.HandLeft);
 				}
 				//If not tracked, hide!
 				else
