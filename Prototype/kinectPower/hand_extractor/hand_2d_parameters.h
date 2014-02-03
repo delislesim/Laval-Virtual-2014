@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "base/logging.h"
+#include "algos/kalman_filter.h"
 
 namespace hand_extractor {
 
@@ -14,6 +15,8 @@ class Hand2dParameters {
     int depth;
     cv::Point smoothed_position;
     int smoothed_depth;
+    bool matched;
+    algos::KalmanFilter kalman;
   };
 
   typedef std::vector<Tip> TipVector;

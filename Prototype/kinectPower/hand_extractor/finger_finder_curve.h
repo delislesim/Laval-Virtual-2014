@@ -8,7 +8,7 @@ class Hand2dParameters;
 
 class FingerFinderCurve {
  public:
-  FingerFinderCurve();
+  FingerFinderCurve(int hands_depth, int hands_depth_tolerance);
 
   // Computes the position of the fingers in a 2D image.
   void FindFingers(const std::vector<cv::Point>& contour,
@@ -19,7 +19,10 @@ class FingerFinderCurve {
                    Hand2dParameters* hand_parameters) const;
 
  private:
-  
+  int AverageDepth(const cv::Point& position, const cv::Mat& depth_mat) const;
+
+  int min_z;
+  int max_z;
 };
 
 }  // namespace hand_extractor

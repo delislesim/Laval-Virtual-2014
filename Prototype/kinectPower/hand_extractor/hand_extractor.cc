@@ -22,7 +22,8 @@ const int kMaxSquareDistanceToMatchHands = 50;
 }  // namespace
 
 HandExtractor::HandExtractor(int hands_depth, int hands_depth_tolerance)
-    : segmenter_(hands_depth, hands_depth_tolerance) {
+    : segmenter_(hands_depth, hands_depth_tolerance),
+      finger_finder_curve_(hands_depth, hands_depth_tolerance) {
 }
 
 void HandExtractor::ExtractHands(const cv::Mat& depth_mat,

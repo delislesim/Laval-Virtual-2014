@@ -5,8 +5,9 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include "algos/stable_matching.h"
 #include "algos/contour_walk.h"
+#include "algos/kalman_filter.h"
+#include "algos/stable_matching.h"
 #include "base/logging.h"
 #include "hand_extractor/hand_2d_parameters.h"
 #include "image/image_constants.h"
@@ -46,6 +47,9 @@ const double kFilterThreshold = maths::kPi / 4.0;
 // Count runs of red points.
 const size_t kNumPreCount = 20;
 
+// Distance de chaque cote pour faire une moyenne de profondeur.
+const int kDistanceDepth = 6;
+
 double AverageAngle(size_t index, const std::vector<double>& point_curve) {
   double sum = 0.0;
   
@@ -81,10 +85,22 @@ void CountDirection(size_t index, const std::vector<double>& point_curve, int* n
   }
 }
 
+struct TipLeftToRightSorter {
+  bool operator()(const Hand2dParameters::Tip& a, const Hand2dParameters::Tip& b) const {
+    return a.position.x < b.position.x;
+  }
+};
+
 }  // namespace
 
-FingerFinderCurve::FingerFinderCurve() {
+FingerFinderCurve::FingerFinderCurve(int hands_depth, int hands_depth_tolerance)
+    : min_z(hands_depth - hands_depth_tolerance),
+      max_z(hands_depth + hands_depth_tolerance) {
 }
+
+// #######################################################################################
+// TODO(fdoray) Choisir le point au milieu de la run comme bout du doigt!!!!!!!!!!
+// ------------------------------------------------------------===========================
 
 void FingerFinderCurve::FindFingers(const std::vector<cv::Point>& contour,
                                     const unsigned char contour_pixel_value,
@@ -224,23 +240,32 @@ void FingerFinderCurve::FindFingers(const std::vector<cv::Point>& contour,
         algos::StableMatchingPair pair;
         pair.left = i;
         pair.right = j;
-        pair.distance = maths::DistanceSquare(potential_fingertips[i].position, previous_hand_parameters->TipAtIndex(j).position);
+        pair.distance = maths::DistanceSquare(potential_fingertips[i].position,
+                                              previous_hand_parameters->TipAtIndex(j).position);
         stable_matching_queue.push(pair);
       }
     }
     std::vector<int> best_pairs;
-    algos::StableMatching(potential_fingertips.size(), previous_hand_parameters->TipSize(), 100,
+    algos::StableMatching(potential_fingertips.size(), previous_hand_parameters->TipSize(), 1000,
                           &stable_matching_queue, &best_pairs);
 
     for (int i = 0; i < best_pairs.size(); ++i) {
       if (best_pairs[i] != -1) {
-        Hand2dParameters::Tip tip;
-        tip.position = potential_fingertips[i].position;
-        tip.depth = depth_mat.at<unsigned short>(tip.position);
         potential_fingertips[i].selected = true;
-        hand_parameters->PushTip(tip);
+        Hand2dParameters::Tip tip;
 
-        // TODO(fdoray): Smooth here.
+        // Smooth.
+        Hand2dParameters::Tip previous_tip = previous_hand_parameters->TipAtIndex(best_pairs[i]);
+        tip.kalman = previous_tip.kalman;
+        cv::Vec3d smoothed = tip.kalman.Update(cv::Vec3d(potential_fingertips[i].position.x,
+                                                         potential_fingertips[i].position.y,
+                                                         AverageDepth(potential_fingertips[i].position, depth_mat)));
+       
+        // Insert smoothed value.
+        tip.position = cv::Point(smoothed.val[0], smoothed.val[1]);
+        tip.depth = smoothed.val[2];
+
+        hand_parameters->PushTip(tip);
       }
     }
   }
@@ -254,7 +279,8 @@ void FingerFinderCurve::FindFingers(const std::vector<cv::Point>& contour,
     // Compute distance from all existing fingertips.
     bool ok = true;
     for (size_t j = 0; j < hand_parameters->TipSize(); ++j) {
-      int distance_square = maths::DistanceSquare(potential_fingertips[i].position, hand_parameters->TipAtIndex(j).position);
+      int distance_square = maths::DistanceSquare(potential_fingertips[i].position,
+                                                  hand_parameters->TipAtIndex(j).position);
       if (distance_square < 121) {
         ok = false;
         break;
@@ -265,11 +291,27 @@ void FingerFinderCurve::FindFingers(const std::vector<cv::Point>& contour,
     if (ok) {
       Hand2dParameters::Tip tip;
       tip.position = potential_fingertips[i].position;
-      tip.depth = depth_mat.at<unsigned short>(tip.position);
+      tip.depth = AverageDepth(tip.position, depth_mat);
+      tip.kalman = algos::KalmanFilter();
+      tip.kalman.LoadInitialObservation(cv::Vec3d(tip.position.x, tip.position.y, tip.depth));
       hand_parameters->PushTip(tip);
     }
   }
 
+  /*
+  // Print debug information.
+  std::vector<Hand2dParameters::Tip> sorted_tips;
+  for (int i = 0; i < hand_parameters->TipSize(); ++i) {
+    sorted_tips.push_back(hand_parameters->TipAtIndex(i));
+  }
+  TipLeftToRightSorter sorter;
+  std::sort(sorted_tips.begin(), sorted_tips.end(), sorter);
+
+  for (int i = 0; i < sorted_tips.size(); ++i) {
+    std::cout << "Doigt: x=" << sorted_tips[i].position.x << " y=" << sorted_tips[i].position.y << " depth=" << sorted_tips[i].depth << std::endl;
+  }
+  std::cout << "-------------------------------" << std::endl;
+  */
   // Draw circles with colors indicating the curve.
   /*
   for (size_t i = 0; i < point_curve_filtered.size(); ++i) {
@@ -279,7 +321,29 @@ void FingerFinderCurve::FindFingers(const std::vector<cv::Point>& contour,
     }
   }
   */
-  std::cout << hand_parameters->TipSize() << std::endl;
+}
+
+int FingerFinderCurve::AverageDepth(const cv::Point& position, const cv::Mat& depth_mat) const {
+  int depth_sum = 0;
+  int depth_num_pixels = 0;
+
+  for (int i = position.x - kDistanceDepth; i < position.x + kDistanceDepth; ++i) {
+    for (int j = position.y - kDistanceDepth; j < position.y + kDistanceDepth; ++j) {
+      if (i < 0 || i >= depth_mat.cols || j < 0 || j >= depth_mat.rows)
+        continue;
+
+      int depth = depth_mat.at<unsigned short>(cv::Point(i, j));
+      if (depth > min_z && depth < max_z) {
+        depth_sum += depth;
+        ++depth_num_pixels;
+      }
+    }
+  }
+
+  if (depth_num_pixels == 0)
+    return 0;
+
+  return depth_sum / depth_num_pixels;
 }
 
 }  // namespace hand_extractor

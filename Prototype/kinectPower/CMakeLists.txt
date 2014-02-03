@@ -40,6 +40,8 @@ include_directories(
 add_library(algos
   algos/contour_walk.cc
   algos/contour_walk.h
+  algos/kalman_filter.cc
+  algos/kalman_filter.h
   algos/stable_matching.cc
   algos/stable_matching.h
   )

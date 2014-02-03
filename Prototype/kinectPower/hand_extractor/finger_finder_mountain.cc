@@ -112,7 +112,8 @@ void FingerFinderMountain::FindFingers(
   }
 
   // Smooth the result.
-  hand_parameters->SmoothUsingPreviousParameters(previous_hand_parameters);
+  // TODO(fdoray): Remove this.
+  // hand_parameters->SmoothUsingPreviousParameters(previous_hand_parameters);
 }
 
 }  // namespace hand_extractor
