@@ -176,6 +176,14 @@ include_external_msproject(
     sample2013 sample2013/sample2013.csproj
     TYPE FAE04EC0-301F-11D3-BF4B-00C04F79EFBC)
 	
+add_executable(test_cpp
+  test_cpp/main.cc
+  )
+
+target_link_libraries(test_cpp
+  kinect_lib
+  )
+	
 ####################
 # Unittests
 ####################
