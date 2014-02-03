@@ -5,6 +5,8 @@
 
 namespace image {
 
+void InitializeBlackImage(cv::Mat* image);
+
 void RgbImageToRgbaImage(const cv::Mat& rgb, cv::Mat* rgba);
 
 }  // namespace image

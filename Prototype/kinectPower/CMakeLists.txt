@@ -170,7 +170,7 @@ add_library(kinect_lib SHARED
 target_link_libraries(kinect_lib
   algos
   base
-  hand_extractor
+  finger_finder
   image
   intel_hand_tracker
   kinect_interaction

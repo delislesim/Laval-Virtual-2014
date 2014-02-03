@@ -15,14 +15,11 @@ class FingerFinder {
   FingerFinder(int hands_depth, int hands_depth_tolerance);
 
   // Computes the position of the fingers from a 2D image.
-  void FindFingers(const cv::Mat& depth_mat);
+  void FindFingers(const cv::Mat& depth_mat,
+                   cv::Mat* nice_image);
 
  private:
-  kinect_wrapper::KinectSwitch<HandParametersVector> hands_;
-
-  cv::Mat nice_image_;
-
-
+  HandParametersVector hands_;
 
   // Profondeur minimale et maximale permise pour les mains.
   int min_hands_depth_;
@@ -30,4 +27,4 @@ class FingerFinder {
 
 };
 
-}  // namespace hand_extractor
+}  // namespace finger_finder

@@ -55,7 +55,7 @@ namespace sample
       }
       catch (Exception exception)
       {
-        //Console.WriteLine("Exception dans aTime_Elapsed: " + exception.Message);
+        Console.WriteLine("Exception dans aTime_Elapsed: " + exception.Message);
       }
     }
 

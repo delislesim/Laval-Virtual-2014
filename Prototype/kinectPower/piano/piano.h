@@ -4,7 +4,8 @@
 #include <vector>
 
 #include "base/base.h"
-#include "hand_extractor/hand_extractor.h"
+#include "finger_finder/finger_finder.h"
+#include "finger_finder/hand_parameters.h"
 #include "kinect_wrapper/kinect_observer.h"
 #include "kinect_wrapper/kinect_switch.h"
 
@@ -20,14 +21,14 @@ class Piano : public kinect_wrapper::KinectObserver {
       const kinect_wrapper::KinectSensorData& data) override;
 
   void QueryNiceImage(unsigned char* nice_image, size_t nice_image_size);
-  void QueryHandParameters(std::vector<hand_extractor::Hand2dParameters>* hand_parameters);
+  void QueryHandParameters(std::vector<finger_finder::HandParameters>* hand_parameters);
 
  private:
-  hand_extractor::HandExtractor hand_extractor_;
+  finger_finder::FingerFinder finger_finder_;
 
   bool started_;
   kinect_wrapper::KinectSwitch<cv::Mat> nice_image_;
-  kinect_wrapper::KinectSwitch<std::vector<hand_extractor::Hand2dParameters> > hand_parameters_;
+  kinect_wrapper::KinectSwitch<std::vector<finger_finder::HandParameters> > hand_parameters_;
 };
 
 }  // namespace piano
