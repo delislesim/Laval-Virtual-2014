@@ -125,6 +125,15 @@ namespace KinectHelpers
 		Quaternion fixedRot = Quaternion.Euler(eulerAngles.x, -eulerAngles.y+180, -eulerAngles.z);
 		return fixedRot;
 	}
+
+	public Quaternion GetBoneOrientation(Joint joint)
+	{
+			LoadSkeleton ();
+			Quaternion rotation = bone_orientations [(int)joint].absoluteRotation.rotationQuaternion;
+			Vector3 eulerAngles = rotation.eulerAngles;
+			Quaternion fixedRot = Quaternion.Euler (eulerAngles.x, -eulerAngles.y + 180, -eulerAngles.z);
+			return fixedRot;
+	}
 	
 	private void LoadSkeleton() {
 		if (skeleton_loaded)

@@ -3,7 +3,13 @@ using System.Collections;
 
 public class DrumComponent : MonoBehaviour {
 	public string inputNote;
-	
+
+
+	public void PlaySound()
+	{
+		audio.Play();
+	}
+
 	// Use this for initialization
 	void Start () {
 	}
@@ -11,7 +17,7 @@ public class DrumComponent : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if(Input.GetButtonDown(inputNote)){
-			audio.Play();
+			PlaySound();
 			//renderer.material=touchee;
 		}
 		
@@ -25,12 +31,12 @@ public class DrumComponent : MonoBehaviour {
 
 	void OnTriggerEnter()
 	{
-		audio.Play();
+		PlaySound();
 	}
 
 	void OnMouseDown()
 	{
-		audio.Play();
+		PlaySound();
 	}
 	
 	void OnMouseUp()
