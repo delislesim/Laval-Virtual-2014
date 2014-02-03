@@ -6,15 +6,15 @@
 namespace algos {
 
 namespace {
-const cv::Matx33d identity = { 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 };
+const cv::Matx33d identity(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 
 // Matrice de covariance du bruit sur l'état
 // Plus c'est gros, plus ça bouge (moins on fait confiance à l'hypothèse que ça ne bouge pas).
-cv::Matx33d q = { 1.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 2.0 };
+cv::Matx33d q(1.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 2.0);
 
 // Matrice de covariance de l'erreur sur l'observation.
 // Si l'observation shake beaucoup, le mettre gros.
-cv::Matx33d r = { 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 4.0 };
+cv::Matx33d r(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 4.0);
 
 }  // namespace
 

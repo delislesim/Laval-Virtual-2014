@@ -57,6 +57,23 @@ add_library(base
   base/timer.h
   )
   
+add_library(finger_finder
+  finger_finder/contour_curve.cc
+  finger_finder/contour_curve.h
+  finger_finder/contour_curve_filter.cc
+  finger_finder/contour_curve_filter.h
+  finger_finder/find_fingers_in_contour.cc
+  finger_finder/find_fingers_in_contour.h
+  finger_finder/finger_finder.cc
+  finger_finder/finger_finder.h
+  finger_finder/hand_parameters.cc
+  finger_finder/hand_parameters.h
+  finger_finder/match_contours_to_previous_hands.cc
+  finger_finder/match_contours_to_previous_hands.h
+  finger_finder/segmenter.cc
+  finger_finder/segmenter.h
+  )
+  
 add_library(hand_extractor
   hand_extractor/depth_difference_finder.cc
   hand_extractor/depth_difference_finder.h
