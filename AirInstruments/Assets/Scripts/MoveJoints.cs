@@ -26,6 +26,7 @@ public class MoveJoints : MonoBehaviour {
 	public GameObject Foot_Right;
 
 	public DrumComponent Bass_Kick; 
+	public HighHatComponent High_Hat;
 
 	//Public
 	private GameObject[] joints;
@@ -33,7 +34,9 @@ public class MoveJoints : MonoBehaviour {
 	private Vector3[] last_positions;
 	private bool high_hat_opened;
 	private const float KICK_SPEED = 0.35f;
+	private const float HH_SPEED = 1.0f;
 	private bool kick_ready;
+	private bool hit_hat_ready;
 
 	// Use this for initialization
 	void Start () {
@@ -114,6 +117,21 @@ public class MoveJoints : MonoBehaviour {
 			if(pastPos[(int)Skeleton.Joint.KneeRight].y - currentPos[(int)Skeleton.Joint.KneeRight].y < (-KICK_SPEED/2 * Time.deltaTime)
 			   && kick_ready == false){
 				kick_ready = true;
+			}
+		}
+
+		//Manage High-Hat state
+		if(pastPos[(int)Skeleton.Joint.KneeLeft] != null){
+			if(pastPos[(int)Skeleton.Joint.KneeLeft].y - currentPos[(int)Skeleton.Joint.KneeLeft].y > (HH_SPEED * Time.deltaTime)
+			   && hit_hat_ready == true){
+				High_Hat.opened = false;
+				hit_hat_ready = false;
+			}
+			
+			if(pastPos[(int)Skeleton.Joint.KneeLeft].y - currentPos[(int)Skeleton.Joint.KneeLeft].y < (-HH_SPEED * Time.deltaTime)
+			   && hit_hat_ready == false){
+				High_Hat.opened = true;
+				hit_hat_ready = true;
 			}
 		}
 		           
