@@ -88,14 +88,12 @@ void HandExtractor::ExtractHands(const cv::Mat& depth_mat,
     (*hand_parameters)[i].SetContourCenter(contours_centers[i]);
 
     // Draw a small circle on each fingertip.
-  /*
     const cv::Scalar kFingertipColor = 39;
     for (Hand2dParameters::TipIterator it = (*hand_parameters)[i].TipBegin();
          it != (*hand_parameters)[i].TipEnd(); ++it) {
       cv::circle(*segmentation_mat, it->position, 2,
                  kFingertipColor, image::kThickness2);
     }
-    */
   }
 
   // Remember the hand parameters.

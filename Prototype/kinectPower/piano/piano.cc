@@ -91,12 +91,12 @@ void Piano::ObserveDepth(
       int color_index = *segmentation_ptr;
   
       if (color_index > 128) {
-        image_ptr[image::kRedIndex] = 255 -(color_index - 127) * 2;
+        image_ptr[image::kRedIndex] = 255 - (color_index - 127) * 2;
         image_ptr[image::kGreenIndex] = 0;
         image_ptr[image::kBlueIndex] = 0;
       } else if (color_index < 127) {
         image_ptr[image::kRedIndex] = 0;
-        image_ptr[image::kGreenIndex] = color_index * 2;
+        image_ptr[image::kGreenIndex] = (127 - color_index) * 2;
         image_ptr[image::kBlueIndex] = 0;
       }
       image_ptr[image::kAlphaIndex] = 255;

@@ -66,7 +66,7 @@ public class PianoExperimentationController : MonoBehaviour {
 			double z = positions[index * 3 + 2];
 			x = (x - 320.0) * 15.0 / 320.0;
 			y = -((y - 240.0) * 15.0 / 320.0);
-			z = -(z - 930.0) / 7.0;
+			z = -(z - 930.0) / 10.0;
 
 			joint.position = new Vector3 ((float)x, (float)y, (float)z);
 			++num_known;

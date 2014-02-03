@@ -41,7 +41,7 @@ class Hand2dParameters {
     return tips_.size();
   }
 
-  const Tip& TipAtIndex(size_t index) {
+  const Tip& TipAtIndex(size_t index) const {
     return tips_[index];
   }
 
