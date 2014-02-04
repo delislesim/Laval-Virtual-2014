@@ -27,6 +27,8 @@ public class MoveJoints : MonoBehaviour {
 
 	public DrumComponent Bass_Kick; 
 	public HighHatComponent High_Hat;
+	public TipCollider tip_left;
+	public TipCollider tip_right;
 
 	//Public
 	private GameObject[] joints;
@@ -78,7 +80,13 @@ public class MoveJoints : MonoBehaviour {
 				Skeleton.JointStatus jointStatus = player.GetJointPosition((Skeleton.Joint)i, out posJoint);
 				if(jointStatus != Skeleton.JointStatus.NotTracked)
 				{
-					joints[i].transform.position = new Vector3(posJoint.x*5, posJoint.y*5, -5*posJoint.z);
+					if ( ( i == (int)Skeleton.Joint.HandRight && tip_right.IsCollided() )
+					    || (i == (int)Skeleton.Joint.HandLeft && tip_left.IsCollided()) )
+						joints[i].transform.position = last_positions[i];
+				
+					else
+						joints[i].transform.position = new Vector3(posJoint.x*5, posJoint.y*5, -5*posJoint.z);
+
 					//Apply head rotation
 					if(i == (int)Skeleton.Joint.Head)
 						joints[i].transform.localRotation = player.GetNeckOrientation();
