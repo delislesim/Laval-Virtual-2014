@@ -27,12 +27,13 @@ public class MoveJoints : MonoBehaviour {
 
 	public DrumComponent Bass_Kick; 
 	public HighHatComponent High_Hat;
+	public TipCollider tip_left;
+	public TipCollider tip_right;
 
 	//Public
 	private GameObject[] joints;
 	private Vector3[] current_positions;
 	private Vector3[] last_positions;
-	private bool high_hat_opened;
 	private const float KICK_SPEED = 0.35f;
 	private const float HH_SPEED = 1.0f;
 	private bool kick_ready;
@@ -50,7 +51,6 @@ public class MoveJoints : MonoBehaviour {
 
 		last_positions = new Vector3[(int)Skeleton.Joint.Count];
 		current_positions = new Vector3[(int)Skeleton.Joint.Count];
-		high_hat_opened = false;
 		kick_ready = true;
 	}
 	
@@ -80,7 +80,13 @@ public class MoveJoints : MonoBehaviour {
 				Skeleton.JointStatus jointStatus = player.GetJointPosition((Skeleton.Joint)i, out posJoint);
 				if(jointStatus != Skeleton.JointStatus.NotTracked)
 				{
-					joints[i].transform.position = new Vector3(posJoint.x*5, posJoint.y*5, -5*posJoint.z);
+					if ( ( i == (int)Skeleton.Joint.HandRight && tip_right.IsCollided() )
+					    || (i == (int)Skeleton.Joint.HandLeft && tip_left.IsCollided()) )
+						joints[i].transform.position = last_positions[i];
+				
+					else
+						joints[i].transform.position = new Vector3(posJoint.x*5, posJoint.y*5, -5*posJoint.z);
+
 					//Apply head rotation
 					if(i == (int)Skeleton.Joint.Head)
 						joints[i].transform.localRotation = player.GetNeckOrientation();

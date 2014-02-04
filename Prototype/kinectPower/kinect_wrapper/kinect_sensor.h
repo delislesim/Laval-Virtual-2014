@@ -69,6 +69,13 @@ class KinectSensor {
                                     cv::Vec2i* depth_point,
                                     int* depth);
 
+  // Color and depth stream types
+  NUI_IMAGE_TYPE color_stream_type() const { return color_stream_type_; }
+  void color_stream_type(NUI_IMAGE_TYPE val) { color_stream_type_ = val; }
+
+  NUI_IMAGE_TYPE depth_stream_type() const { return depth_stream_type_; }
+  void depth_stream_type(NUI_IMAGE_TYPE val) { depth_stream_type_ = val; }
+
  private:
   INuiSensor* native_sensor_;
 
@@ -80,6 +87,7 @@ class KinectSensor {
   HANDLE depth_stream_handle_;
   size_t depth_stream_width_;
   size_t depth_stream_height_;
+  NUI_IMAGE_TYPE depth_stream_type_;
 
   // Color stream.
   bool color_stream_opened_;
@@ -87,6 +95,7 @@ class KinectSensor {
   HANDLE color_stream_handle_;
   size_t color_stream_width_;
   size_t color_stream_height_;
+  NUI_IMAGE_TYPE color_stream_type_;
 
   // Skeleton stream.
   bool skeleton_seated_enabled_;
