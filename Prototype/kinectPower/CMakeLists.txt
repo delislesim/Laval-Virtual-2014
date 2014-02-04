@@ -103,6 +103,8 @@ add_library(image
 add_library(intel_hand_tracker
   intel_hand_tracker/intel_hand_tracker.cc
   intel_hand_tracker/intel_hand_tracker.h
+  intel_hand_tracker/hskl.h
+  intel_hand_tracker/hsklu.h
   )
 
 add_library(kinect_interaction
