@@ -5,6 +5,8 @@ set (OpenCV_DIR $ENV{OPENCV_DIR})
 FIND_PACKAGE(OpenCV REQUIRED)
 #FIND_PACKAGE(OpenCL REQUIRED)
 
+#set(USE_INTEL_CAMERA 1)
+
 set(GMOCK_ROOT "../gmock/")
 
 set(CMAKE_SUPPRESS_REGENERATION TRUE)
@@ -15,6 +17,17 @@ if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
   string(REGEX REPLACE "/W[0-4]" "/W4 /wd4481" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+endif()
+
+if(USE_INTEL_CAMERA)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D USE_INTEL_CAMERA")
+  set(INTEL_HAND_TRACKER_DEPENDENCY
+        intel_hand_tracker
+        hskl/lib/Win32/hskl
+        $ENV{PCSDK_DIR}/lib/Win32/libpxc.lib
+  )
+else()
+  set(INTEL_HAND_TRACKER_DEPENDENCY "")  
 endif()
 
 # Force a unicode project
@@ -176,17 +189,15 @@ target_link_libraries(kinect_lib
   base
   finger_finder
   image
-  intel_hand_tracker
   kinect_interaction
   kinect_replay
   kinect_wrapper
   maths
   piano
-  hskl/lib/Win32/hskl
   ${OpenCV_LIBS}
   $ENV{KINECTSDK10_DIR}/lib/x86/Kinect10.lib
   $ENV{KINECT_TOOLKIT_DIR}/Lib/x86/KinectInteraction180_32.lib
-  $ENV{PCSDK_DIR}/lib/Win32/libpxc.lib
+  ${INTEL_HAND_TRACKER_DEPENDENCY}
   )
 	
 ####################

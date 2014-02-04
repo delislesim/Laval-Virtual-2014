@@ -1,3 +1,5 @@
+#ifdef USE_INTEL_CAMERA
+
 /*******************************************************************************
 
 INTEL CORPORATION PROPRIETARY INFORMATION
@@ -208,5 +210,7 @@ namespace hskl
 		return false;
 	}
 }
+
+#endif
 
 #endif

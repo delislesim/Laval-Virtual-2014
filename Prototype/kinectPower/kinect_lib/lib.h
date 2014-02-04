@@ -1,4 +1,7 @@
+#ifdef USE_INTEL_CAMERA
 #include "hsklu.h"
+#endif
+
 #include "kinect_wrapper/kinect_include.h"
 
 extern "C" bool __declspec(dllexport)
@@ -37,12 +40,15 @@ extern "C" bool __declspec(dllexport)
 GetHandsInteraction(int skeleton_id, NUI_HANDPOINTER_INFO* hands);
 
 // Hand tracker.
+#ifdef USE_INTEL_CAMERA
 
 extern "C" bool __declspec(dllexport)
 InitializeHandTracker();
 
 extern "C" bool __declspec(dllexport)
 GetHandsSkeletons(hskl::float3* joint_positions, float* tracking_error);
+
+#endif
 
 // Piano experiments.
 extern "C" bool __declspec(dllexport)

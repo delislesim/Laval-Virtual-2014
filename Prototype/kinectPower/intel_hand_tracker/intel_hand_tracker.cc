@@ -1,3 +1,5 @@
+#ifdef USE_INTEL_CAMERA
+
 #include "intel_hand_tracker/intel_hand_tracker.h"
 
 namespace intel_hand_tracker {
@@ -45,3 +47,5 @@ void IntelHandTracker::GetFrame(hskl::float3* positions,
 }
 
 }  // namespace intel_hand_tracker
+
+#endif

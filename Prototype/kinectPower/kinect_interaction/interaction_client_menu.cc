@@ -24,8 +24,8 @@ void InteractionClientMenu::ReleaseInstance() {
 STDMETHODIMP InteractionClientMenu::GetInteractionInfoAtLocation(
     DWORD skeletonTrackingId,
     NUI_HAND_TYPE handType,
-    FLOAT x,
-    FLOAT y,
+    FLOAT /*x */,
+    FLOAT /* y */,
     NUI_INTERACTION_INFO* pInteractionInfo) {
   if (!pInteractionInfo)
     return E_POINTER;
