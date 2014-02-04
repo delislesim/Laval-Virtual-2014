@@ -42,6 +42,8 @@ add_library(algos
   algos/contour_walk.h
   algos/kalman_filter.cc
   algos/kalman_filter.h
+  algos/sliding_window.cc
+  algos/sliding_window.h
   algos/stable_matching.cc
   algos/stable_matching.h
   )
@@ -190,7 +192,7 @@ target_link_libraries(kinect_lib
 ####################
 
 include_external_msproject(
-    sample2013 sample2013/sample2013.csproj
+    sample sample/sample.csproj
     TYPE FAE04EC0-301F-11D3-BF4B-00C04F79EFBC)
 	
 add_executable(test_cpp
@@ -206,6 +208,7 @@ target_link_libraries(test_cpp
 ####################
 
 add_executable(unittests
+  algos/sliding_window_unittests.cc
   maths/maths_unittests.cc
   maths/smooth_unittests.cc
   ${GMOCK_ROOT}/gtest/src/gtest-all.cc

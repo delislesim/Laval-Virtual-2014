@@ -38,4 +38,13 @@ TEST(Maths, AngleBetween) {
   EXPECT_DOUBLE_EQ(maths::kPi, maths::AngleBetween(bottom_left, top_right));
 }
 
+TEST(Maths, AngleBetweenPoints) {
+  cv::Vec2i vertical_line_a(0, 0);
+  cv::Vec2i vertical_line_b(0, 5);
+  cv::Vec2i vertical_line_c(0, 10);
+
+  EXPECT_DOUBLE_EQ(maths::kPi, maths::AngleBetween(vertical_line_a, vertical_line_b, vertical_line_c));
+
+}
+
 }  // namespace maths

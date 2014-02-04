@@ -25,3 +25,8 @@ CMakeCache.txt
 *.vcxproj.filters
 CMakeFiles/
 cmake_install.cmake
+*.dir
+kinect_power.sdf
+kinect_power.v12.suo
+Prototype/kinectPower/sample/bin/
+Prototype/kinectPower/Debug/

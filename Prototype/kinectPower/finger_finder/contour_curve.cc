@@ -8,7 +8,7 @@ namespace finger_finder {
 namespace {
   
 const double kMultipliers[] = {
-  0.05, 0.2, 1.0, 0.9, 0.7, 0.7, 0.7, 0.7, 0.6, 0.2, 0.1, 0.1
+    0.05, 0.2, 1.0, 0.9, 0.7, 0.7, 0.7, 0.7, 0.6, 0.2, 0.1, 0.1
 };
 
 }  // namespace
@@ -38,12 +38,12 @@ double ContourCurve::ComputePointCurve(
     return 0.0;
 
   double sum_angle = 0;
-  for (size_t i = 0; i < multipliers_.size(); ++i) {
+  for (size_t i = 1; i < multipliers_.size(); ++i) {
     double angle = maths::AngleBetween(
         contour[maths::Previous(i, point_index, contour.size())],
         contour[point_index],
         contour[maths::Next(i, point_index, contour.size())]);
-    sum_angle += multipliers_[i] * angle;
+    sum_angle += multipliers_[i - 1] * angle;
   }
   double curve = sum_angle / multipliers_sum_;
   return curve;
