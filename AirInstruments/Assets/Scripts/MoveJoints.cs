@@ -49,7 +49,6 @@ public class MoveJoints : MonoBehaviour {
 
 		last_positions = new Vector3[(int)Skeleton.Joint.Count];
 		current_positions = new Vector3[(int)Skeleton.Joint.Count];
-		high_hat_opened = false;
 		kick_ready = true;
 	}
 	
