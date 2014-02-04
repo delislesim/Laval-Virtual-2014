@@ -5,7 +5,7 @@ set (OpenCV_DIR $ENV{OPENCV_DIR})
 FIND_PACKAGE(OpenCV REQUIRED)
 #FIND_PACKAGE(OpenCL REQUIRED)
 
-#set(USE_INTEL_CAMERA 1)
+set(USE_INTEL_CAMERA 1)
 
 set(GMOCK_ROOT "../gmock/")
 
@@ -205,7 +205,7 @@ target_link_libraries(kinect_lib
 ####################
 
 include_external_msproject(
-    sample sample/sample.csproj
+    sample sample2010/sample/sample.csproj
     TYPE FAE04EC0-301F-11D3-BF4B-00C04F79EFBC)
 	
 add_executable(test_cpp

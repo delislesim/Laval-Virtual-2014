@@ -22,7 +22,7 @@ void InteractionClientMenu::ReleaseInstance() {
 }
 
 STDMETHODIMP InteractionClientMenu::GetInteractionInfoAtLocation(
-    DWORD skeletonTrackingId,
+    DWORD /* skeletonTrackingId */,
     NUI_HAND_TYPE handType,
     FLOAT /*x */,
     FLOAT /* y */,
