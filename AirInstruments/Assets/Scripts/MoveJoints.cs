@@ -32,7 +32,6 @@ public class MoveJoints : MonoBehaviour {
 	private GameObject[] joints;
 	private Vector3[] current_positions;
 	private Vector3[] last_positions;
-	private bool high_hat_opened;
 	private const float KICK_SPEED = 0.35f;
 	private const float HH_SPEED = 1.0f;
 	private bool kick_ready;
