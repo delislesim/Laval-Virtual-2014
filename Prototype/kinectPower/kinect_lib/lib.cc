@@ -212,6 +212,7 @@ bool GetPianoImage(unsigned char* pixels, unsigned int pixels_size) {
 }
 
 bool GetPianoHands(unsigned int* positions, unsigned char* known) {
+  /*
   std::vector<hand_extractor::Hand2dParameters> hand_parameters;
   the_piano.QueryHandParameters(&hand_parameters);
 
@@ -231,6 +232,6 @@ bool GetPianoHands(unsigned int* positions, unsigned char* known) {
     known[out_index] = 0;
     ++out_index;
   }
-
+  */
   return true;
 }
