@@ -19,6 +19,13 @@ class KinectSensorData {
 
   void CreateBuffers();
 
+  void SetSensorIndex(size_t sensor_index) {
+    sensor_index_ = sensor_index;    
+  }
+  size_t sensor_index() const {
+    return sensor_index_;
+  }
+
   // Retrieves the last depth matrix.
   // @param mat the last depth matrix.
   // @returns true in case of success, false otherwise.
@@ -51,6 +58,8 @@ class KinectSensorData {
   void AddObserver(KinectObserver* obs);
 
  private:
+  size_t sensor_index_;
+
   cv::Mat depth_buffer_;
   cv::Mat color_buffer_;
   KinectSkeletonFrame skeleton_buffer_;

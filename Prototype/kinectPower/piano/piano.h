@@ -6,6 +6,7 @@
 #include "base/base.h"
 #include "finger_finder/finger_finder.h"
 #include "finger_finder/hand_parameters.h"
+#include "finger_finder_thinning/finger_finder.h"
 #include "kinect_wrapper/kinect_observer.h"
 #include "kinect_wrapper/kinect_switch.h"
 
@@ -24,7 +25,7 @@ class Piano : public kinect_wrapper::KinectObserver {
   void QueryHandParameters(std::vector<finger_finder::HandParameters>* hand_parameters);
 
  private:
-  finger_finder::FingerFinder finger_finder_;
+  finger_finder_thinning::FingerFinder finger_finder_;
 
   bool started_;
   kinect_wrapper::KinectSwitch<cv::Mat> nice_image_;

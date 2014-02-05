@@ -39,11 +39,11 @@ Piano::~Piano() {
 }
 
 void Piano::ObserveDepth(
-      const cv::Mat& depth_mat,
-      const kinect_wrapper::KinectSensorData& /* data */) {
+      const cv::Mat& /* depth_mat */,
+      const kinect_wrapper::KinectSensorData& data) {
   // Find the fingers in the depth matrix.
   cv::Mat image;
-  finger_finder_.FindFingers(depth_mat, &image);
+  finger_finder_.FindFingers(data, &image);
   nice_image_.SetNext(image);
 
   started_ = true;

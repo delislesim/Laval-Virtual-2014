@@ -1,10 +1,13 @@
 #include "finger_finder/finger_finder.h"
 
 #include "finger_finder/find_fingers_in_contour.h"
+#include "finger_finder/find_fingers_in_color.h"
 #include "finger_finder/match_contours_to_previous_hands.h"
 #include "finger_finder/segmenter.h"
 #include "image/image_utility.h"
 #include "kinect_wrapper/constants.h"
+#include "kinect_wrapper/kinect_sensor.h"
+#include "kinect_wrapper/kinect_wrapper.h"
 
 namespace finger_finder {
 
@@ -13,20 +16,29 @@ FingerFinder::FingerFinder(int hands_depth, int hands_depth_tolerance)
       max_hands_depth_(hands_depth + hands_depth_tolerance) {
 }
 
-void FingerFinder::FindFingers(const cv::Mat& depth_mat,
+void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
                                cv::Mat* nice_image) {
+  assert(nice_image);
+
+  cv::Mat depth_mat;
+  cv::Mat color_mat;
+  if (!data.QueryDepth(&depth_mat) || !data.QueryColor(&color_mat))
+    return;
+
   assert(depth_mat.type() == CV_16U);
   assert(depth_mat.cols == static_cast<int>(kinect_wrapper::kKinectDepthWidth));
   assert(depth_mat.rows == static_cast<int>(kinect_wrapper::kKinectDepthHeight));
-  assert(nice_image);
 
   *nice_image = cv::Mat::zeros(depth_mat.size(), CV_8UC4);
   image::InitializeBlackImage(nice_image);
 
+  // Trouver des doigts potentiels dans l'image couleur.
+
+
   // Find contours in the depth image.
   std::vector<std::vector<cv::Point> > contours;
   Segmenter(depth_mat, min_hands_depth_, max_hands_depth_, &contours);
-  
+
   // Match each contour from this image with a hand from the previous image.
   std::vector<cv::Point> contours_centers;
   std::vector<int> contour_to_hands_match;
@@ -46,8 +58,12 @@ void FingerFinder::FindFingers(const cv::Mat& depth_mat,
 
   // Find the position of the fingers in each hand.
   for (size_t i = 0; i < contours.size(); ++i) {
+    /*
     FindFingersInContour(depth_mat, contours[i],
                          &hands_[i], nice_image);
+    */
+
+    FindFingersInColor(color_mat, depth_mat, contours[i], &hands_[i], nice_image);
   }
 }
 
