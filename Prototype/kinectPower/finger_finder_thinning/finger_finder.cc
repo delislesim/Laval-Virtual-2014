@@ -140,10 +140,22 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
   cv::Mat laplacian_result;
   cv::Laplacian(distance_mat_char, laplacian_result, CV_16S, 3, 1, 0);
 
-  cv::Mat laplacian_result_char;
+  // Éliminer les lignes trop pâles sur le résultat de Laplace.
+  cv::threshold(laplacian_result, laplacian_result, 2, 0, 4); // 3: tresh_tozero
+
+  cv::Mat laplacian_result_char(laplacian_result.size(), CV_8U);
   cv::convertScaleAbs(laplacian_result, laplacian_result_char);
-  int tt = laplacian_result_char.elemSize();
-  int ii = laplacian_result_char.size().width;
+
+  unsigned char* laplacian_result_run = laplacian_result_char.ptr();
+  for (size_t i = 0; i < laplacian_result_char.total(); ++i) {
+    if (*laplacian_result_run > 0 && *laplacian_result_run < 127)
+      *laplacian_result_run *= 2;
+    else if (*laplacian_result_run > 0)
+      *laplacian_result_run = 255;
+    ++laplacian_result_run;
+  }
+
+ 
 
   // Essayer remplir les trous et d'éliminer les lignes double en
   // dilatant / érodant.
