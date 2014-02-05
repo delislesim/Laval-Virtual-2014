@@ -5,7 +5,7 @@ set (OpenCV_DIR $ENV{OPENCV_DIR})
 FIND_PACKAGE(OpenCV REQUIRED)
 #FIND_PACKAGE(OpenCL REQUIRED)
 
-#set(USE_INTEL_CAMERA 1)
+set(USE_INTEL_CAMERA 1)
 
 set(GMOCK_ROOT "../gmock/")
 
@@ -129,6 +129,7 @@ add_library(intel_hand_tracker
   intel_hand_tracker/intel_hand_tracker.h
   intel_hand_tracker/hskl.h
   intel_hand_tracker/hsklu.h
+  intel_hand_tracker/hsklu.cc
   )
 
 add_library(kinect_interaction

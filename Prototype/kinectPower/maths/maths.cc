@@ -11,6 +11,12 @@ double RadToDegrees(double rad) {
   return rad * 360 / (2 * maths::kPi);
 }
 
+
+double DegreesToRad( double degrees )
+{
+	return (degrees / 360) * (2 * maths::kPi);
+}
+
 double Round(double number) {
   return number < 0.0 ? ceil(number - 0.5) : floor(number + 0.5);
 }
@@ -68,6 +74,5 @@ double Distance(const cv::Point& point_a, const cv::Point& point_b) {
   double distance = sqrt(static_cast<double>(distance_square));
   return distance;
 }
-
 }  // namespace maths
 
