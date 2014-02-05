@@ -90,10 +90,12 @@ add_library(finger_finder
   )
   
 add_library(finger_finder_thinning
+  finger_finder_thinning/canny_contour.cc
+  finger_finder_thinning/canny_contour.h
   finger_finder_thinning/finger_finder.cc
   finger_finder_thinning/finger_finder.h
-  finger_finder_thinning/extract_hands_canny.cc
-  finger_finder_thinning/extract_hands_canny.h
+  finger_finder_thinning/segmenter.cc
+  finger_finder_thinning/segmenter.h
   )
   
 add_library(hand_extractor
@@ -223,10 +225,7 @@ add_executable(test_cpp
 target_link_libraries(test_cpp
   kinect_lib
   )
-  
-ADD_EXECUTABLE( voronoi voronoi/test_voronoi.cpp voronoi/voronoi.h)
-TARGET_LINK_LIBRARIES( voronoi ${OpenCV_LIBS} )
-	
+
 ####################
 # Unittests
 ####################

@@ -25,9 +25,9 @@ namespace sample
     {
       InitializeComponent();
 
-      KinectPowerInterop.Initialize(false, true);
+      KinectPowerInterop.Initialize(false, false);
       //KinectPowerInterop.RecordSensor(0, "test.txt");
-      //KinectPowerInterop.StartPlaySensor(0, "test.txt");
+      KinectPowerInterop.StartPlaySensor(0, "test.txt");
 
       aTimer = new System.Timers.Timer(20);
       aTimer.Elapsed += new System.Timers.ElapsedEventHandler(aTimer_Elapsed);
