@@ -62,6 +62,7 @@ namespace hskl
 		unsigned short *						depth;
 		int										dimx,dimy;
 		float									fovx,fovy;
+		cv::Mat									
 
 												Tracker(const Tracker &);							// Disallow copy-construction
 		Tracker &								operator = (const Tracker &);						// Disallow assignment
@@ -99,6 +100,7 @@ namespace hskl
 		const unsigned char *					GetSegmentationMask() const							{ return hsklGetSegmentationMask(tracker); }
 		float4x4								GetSensorPerspectiveMatrix(float nearZ, float farZ) const; // Obtain a view matrix from the perspective of the sensor
 		void									ObserveDepth(const cv::Mat& depthMat, const kinect_wrapper::KinectSensorData& data);
+		void									ObserveColor(const cv::Mat& irMat, const kinect_wrapper::KinectSensorData& sensorData);
 	};
 
 	///////////////////////////

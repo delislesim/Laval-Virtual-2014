@@ -1,4 +1,5 @@
 #include "intel_hand_tracker/intel_hand_tracker.h"
+#include "kinect_wrapper/kinect_wrapper.h"
 
 namespace intel_hand_tracker {
 
@@ -23,6 +24,10 @@ IntelHandTracker::~IntelHandTracker() {
 bool IntelHandTracker::Initialize() {
   if (initialized_)
     return true;
+
+  // Initialize kinect to feed the tracking algorithm with kinect values
+  kinect_wrapper::KinectWrapper::instance()->GetSensorByIndex(0)->color_stream_type(NUI_IMAGE_TYPE_COLOR_INFRARED);
+  kinect_wrapper::KinectWrapper::instance()->GetSensorByIndex(0)->depth_stream_type(NUI_IMAGE_TYPE_DEPTH);
 
   if (!tracker_.Init())
     return false;
