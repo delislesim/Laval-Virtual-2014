@@ -1,3 +1,5 @@
+#ifdef USE_INTEL_CAMERA
+
 /*******************************************************************************
 
 INTEL CORPORATION PROPRIETARY INFORMATION
@@ -59,4 +61,6 @@ enum hskl_sensor_ {             HSKL_SENSOR_IDEAL                , /* Ideal sens
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

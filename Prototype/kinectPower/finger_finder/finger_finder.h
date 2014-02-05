@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "finger_finder/hand_parameters.h"
+#include "kinect_wrapper/kinect_sensor_data.h"
 #include "kinect_wrapper/kinect_switch.h"
 
 namespace finger_finder {
@@ -15,7 +16,7 @@ class FingerFinder {
   FingerFinder(int hands_depth, int hands_depth_tolerance);
 
   // Computes the position of the fingers from a 2D image.
-  void FindFingers(const cv::Mat& depth_mat,
+  void FindFingers(const kinect_wrapper::KinectSensorData& data,
                    cv::Mat* nice_image);
 
  private:

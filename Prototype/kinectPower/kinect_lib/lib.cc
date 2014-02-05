@@ -194,6 +194,8 @@ bool GetHandsInteraction(int skeleton_id, NUI_HANDPOINTER_INFO* hands) {
                                      &hands[0], &hands[1]);
 }
 
+#ifdef USE_INTEL_CAMERA
+
 bool InitializeHandTracker() {
   return intel_hand_tracker::IntelHandTracker::instance()->Initialize();
 }
@@ -206,12 +208,14 @@ bool GetHandsSkeletons(hskl::float3* positions,
   return true;
 }
 
+#endif
+
 bool GetPianoImage(unsigned char* pixels, unsigned int pixels_size) {
   the_piano.QueryNiceImage(pixels, pixels_size);
   return true;
 }
 
-bool GetPianoHands(unsigned int* positions, unsigned char* known) {
+bool GetPianoHands(unsigned int* /* positions */, unsigned char* /* known */) {
   /*
   std::vector<hand_extractor::Hand2dParameters> hand_parameters;
   the_piano.QueryHandParameters(&hand_parameters);

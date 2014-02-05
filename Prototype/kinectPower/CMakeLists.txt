@@ -5,6 +5,8 @@ set (OpenCV_DIR $ENV{OPENCV_DIR})
 FIND_PACKAGE(OpenCV REQUIRED)
 #FIND_PACKAGE(OpenCL REQUIRED)
 
+#set(USE_INTEL_CAMERA 1)
+
 set(GMOCK_ROOT "../gmock/")
 
 set(CMAKE_SUPPRESS_REGENERATION TRUE)
@@ -15,6 +17,17 @@ if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
   string(REGEX REPLACE "/W[0-4]" "/W4 /wd4481" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+endif()
+
+if(USE_INTEL_CAMERA)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D USE_INTEL_CAMERA")
+  set(INTEL_HAND_TRACKER_DEPENDENCY
+        intel_hand_tracker
+        hskl/lib/Win32/hskl
+        $ENV{PCSDK_DIR}/lib/Win32/libpxc.lib
+  )
+else()
+  set(INTEL_HAND_TRACKER_DEPENDENCY "")  
 endif()
 
 # Force a unicode project
@@ -42,6 +55,8 @@ add_library(algos
   algos/contour_walk.h
   algos/kalman_filter.cc
   algos/kalman_filter.h
+  algos/sliding_window.cc
+  algos/sliding_window.h
   algos/stable_matching.cc
   algos/stable_matching.h
   )
@@ -56,7 +71,7 @@ add_library(base
   base/timer.cc
   base/timer.h
   )
-  
+
 add_library(finger_finder
   finger_finder/contour_curve.cc
   finger_finder/contour_curve.h
@@ -72,6 +87,15 @@ add_library(finger_finder
   finger_finder/match_contours_to_previous_hands.h
   finger_finder/segmenter.cc
   finger_finder/segmenter.h
+  )
+  
+add_library(finger_finder_thinning
+  finger_finder_thinning/canny_contour.cc
+  finger_finder_thinning/canny_contour.h
+  finger_finder_thinning/finger_finder.cc
+  finger_finder_thinning/finger_finder.h
+  finger_finder_thinning/segmenter.cc
+  finger_finder_thinning/segmenter.h
   )
   
 add_library(hand_extractor
@@ -113,6 +137,11 @@ add_library(kinect_interaction
   kinect_interaction/interaction_client_menu.h
   kinect_interaction/interaction_frame.cc
   kinect_interaction/interaction_frame.h
+  )
+  
+add_library(kinect_face_tracker
+  kinect_face_tracker/face_tracker.cc
+  kinect_face_tracker/face_tracker.h
   )
   
 add_library(kinect_replay
@@ -173,27 +202,27 @@ target_link_libraries(kinect_lib
   algos
   base
   finger_finder
+  finger_finder_thinning
   image
-  intel_hand_tracker
   kinect_interaction
+  kinect_face_tracker
   kinect_replay
   kinect_wrapper
   maths
   piano
-  hskl/lib/Win32/hskl
   ${OpenCV_LIBS}
   $ENV{KINECTSDK10_DIR}/lib/x86/Kinect10.lib
   $ENV{KINECT_TOOLKIT_DIR}/Lib/x86/KinectInteraction180_32.lib
-  $ENV{PCSDK_DIR}/lib/Win32/libpxc.lib
+  ${INTEL_HAND_TRACKER_DEPENDENCY}
   )
 	
 ####################
 # Executables
 ####################
 
-include_external_msproject(
-    sample2013 sample2013/sample2013.csproj
-    TYPE FAE04EC0-301F-11D3-BF4B-00C04F79EFBC)
+#include_external_msproject(
+#    sample sample2010/sample/sample.csproj
+#    TYPE FAE04EC0-301F-11D3-BF4B-00C04F79EFBC)
 	
 add_executable(test_cpp
   test_cpp/main.cc
@@ -202,12 +231,13 @@ add_executable(test_cpp
 target_link_libraries(test_cpp
   kinect_lib
   )
-	
+
 ####################
 # Unittests
 ####################
 
 add_executable(unittests
+  algos/sliding_window_unittests.cc
   maths/maths_unittests.cc
   maths/smooth_unittests.cc
   ${GMOCK_ROOT}/gtest/src/gtest-all.cc
