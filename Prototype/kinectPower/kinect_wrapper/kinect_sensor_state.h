@@ -24,8 +24,9 @@ class KinectSensorState {
   KinectSensor* GetSensor() {
     return sensor_.get();
   }
-  void SetSensor(KinectSensor* sensor) {
+  void SetSensor(size_t sensor_index, KinectSensor* sensor) {
     sensor_.reset(sensor);
+    data_.SetSensorIndex(sensor_index);
   }
 
   KinectSensorData* GetData() {

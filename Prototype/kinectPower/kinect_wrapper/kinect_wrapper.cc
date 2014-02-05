@@ -138,7 +138,7 @@ KinectSensor* KinectWrapper::CreateSensorByIndex(int index) {
     return NULL;
   }
 
-  sensor_state_[index].SetSensor(new KinectSensor(native_sensor));
+  sensor_state_[index].SetSensor(index, new KinectSensor(native_sensor));
   return sensor_state_[index].GetSensor();
 }
 

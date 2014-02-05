@@ -5,7 +5,8 @@
 
 namespace kinect_wrapper {
 
-KinectSensorData::KinectSensorData() {
+KinectSensorData::KinectSensorData()
+    : sensor_index_(static_cast<size_t>(-1)) {
 }
 
 KinectSensorData::~KinectSensorData() {

@@ -5,7 +5,7 @@ set (OpenCV_DIR $ENV{OPENCV_DIR})
 FIND_PACKAGE(OpenCV REQUIRED)
 #FIND_PACKAGE(OpenCL REQUIRED)
 
-set(USE_INTEL_CAMERA 1)
+#set(USE_INTEL_CAMERA 1)
 
 set(GMOCK_ROOT "../gmock/")
 
@@ -71,7 +71,7 @@ add_library(base
   base/timer.cc
   base/timer.h
   )
-  
+
 add_library(finger_finder
   finger_finder/contour_curve.cc
   finger_finder/contour_curve.h
@@ -87,6 +87,13 @@ add_library(finger_finder
   finger_finder/match_contours_to_previous_hands.h
   finger_finder/segmenter.cc
   finger_finder/segmenter.h
+  )
+  
+add_library(finger_finder_thinning
+  finger_finder_thinning/finger_finder.cc
+  finger_finder_thinning/finger_finder.h
+  finger_finder_thinning/extract_hands_canny.cc
+  finger_finder_thinning/extract_hands_canny.h
   )
   
 add_library(hand_extractor
@@ -188,6 +195,7 @@ target_link_libraries(kinect_lib
   algos
   base
   finger_finder
+  finger_finder_thinning
   image
   kinect_interaction
   kinect_replay
@@ -204,9 +212,9 @@ target_link_libraries(kinect_lib
 # Executables
 ####################
 
-include_external_msproject(
-    sample sample2010/sample/sample.csproj
-    TYPE FAE04EC0-301F-11D3-BF4B-00C04F79EFBC)
+#include_external_msproject(
+#    sample sample2010/sample/sample.csproj
+#    TYPE FAE04EC0-301F-11D3-BF4B-00C04F79EFBC)
 	
 add_executable(test_cpp
   test_cpp/main.cc
@@ -215,6 +223,9 @@ add_executable(test_cpp
 target_link_libraries(test_cpp
   kinect_lib
   )
+  
+ADD_EXECUTABLE( voronoi voronoi/test_voronoi.cpp voronoi/voronoi.h)
+TARGET_LINK_LIBRARIES( voronoi ${OpenCV_LIBS} )
 	
 ####################
 # Unittests

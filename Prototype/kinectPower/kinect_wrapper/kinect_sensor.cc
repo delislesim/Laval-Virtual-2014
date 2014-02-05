@@ -350,6 +350,16 @@ bool KinectSensor::MapSkeletonPointToDepthPoint(Vector4 skeleton_point,
   return true;
 }
 
+bool KinectSensor::MapDepthPointToColorPoint(NUI_DEPTH_IMAGE_POINT& depth_point,
+                                             NUI_COLOR_IMAGE_POINT* color_point) {
+  HRESULT res = coordinate_mapper_->MapDepthPointToColorPoint(kDepthImageResolution,
+                                                              &depth_point,
+                                                              kColorImageType,
+                                                              kColorImageResolution,
+                                                              color_point);
+  return SUCCEEDED(res);
+}
+
 void KinectSensor::CloseInteractionStream() {
   if (!interaction_stream_opened_)
     return;
