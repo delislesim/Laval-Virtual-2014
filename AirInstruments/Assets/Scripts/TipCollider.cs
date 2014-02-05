@@ -19,15 +19,21 @@ public class TipCollider : MonoBehaviour {
 		return isCollided;
 	}
 
-	void OnCollisionEnter(Collision collide)
+	void OnCollisionEnter(Collision col)
 	{
-		if(collide.collider.gameObject.tag == "tip")
+		if(col.collider.gameObject.tag == "DrumComponent")
+		{
+			//Debug.Log ("tip entered collision");
 			isCollided = true;
+		}
 	}
 	
-	void OnCollisionExit(Collision collide)
+	void OnCollisionExit(Collision col)
 	{
-		if(collide.collider.gameObject.tag == "tip")
+		if(col.collider.gameObject.tag == "DrumComponent")
+		{
+			//Debug.Log ("tip EXITED collision");
 			isCollided = false;
+		}
 	}
 }

@@ -27,6 +27,8 @@ Copyright(c) 2013 Intel Corporation. All Rights Reserved.
 #include <cmath>
 #include "kinect_wrapper/kinect_observer.h"
 #include "kinect_wrapper/kinect_wrapper.h"
+#include "maths/maths.h"
+#include "kinect_wrapper/kinect_include.h"
 
 namespace hskl
 {
@@ -62,13 +64,17 @@ namespace hskl
 		PXCSmartPtr<PXCScheduler::SyncPoint>	sp;			// Used to asynchronously request the next frame
 		unsigned char *							color;
 		unsigned short *						depth;
+		const unsigned short *					kinectColor;
+		const unsigned short *					kinectDepth;
 		int										dimx,dimy;
 		float									fovx,fovy;
+		bool									IsKinectActivated;
+		//cv::Mat									
 
 												Tracker(const Tracker &);							// Disallow copy-construction
 		Tracker &								operator = (const Tracker &);						// Disallow assignment
 	public:
-												Tracker()											: tracker(), dimx(), dimy(), fovx(), fovy(), color(), depth() {kinect_wrapper::KinectWrapper::instance()->AddObserver(0, this);}
+												Tracker()											: tracker(), dimx(), dimy(), fovx(), fovy(), color(), depth(), IsKinectActivated(false){}
 												~Tracker()											{ if(tracker) hsklDestroyTracker(tracker); if(sp) sp->Synchronize(); delete[] color; delete[] depth; }
 
 		bool									Init();												// Initialize tracking, and return true if successful, false if an error occurred
@@ -101,6 +107,7 @@ namespace hskl
 		const unsigned char *					GetSegmentationMask() const							{ return hsklGetSegmentationMask(tracker); }
 		float4x4								GetSensorPerspectiveMatrix(float nearZ, float farZ) const; // Obtain a view matrix from the perspective of the sensor
 		void									ObserveDepth(const cv::Mat& depthMat, const kinect_wrapper::KinectSensorData& data);
+		void									ActivateKinect();
 	};
 
 	///////////////////////////
@@ -145,12 +152,19 @@ namespace hskl
 	{ 
 		if(sp && sp->Synchronize() >= PXC_STATUS_NO_ERROR)
 		{
-			PXCImage::ImageData depthData; image->AcquireAccess(PXCImage::ACCESS_READ, &depthData);
-			memcpy_s(depth, sizeof(unsigned short)*dimx*dimy, depthData.planes[0], sizeof(unsigned short)*dimx*dimy);
-			const unsigned short * conf = reinterpret_cast<const unsigned short *>(depthData.planes[1]);
-			for(int i=0; i<dimx*dimy; ++i) color[3*i+2] = color[3*i+1] = color[3*i] = conf[i]>>2; // Can we just use IR here?
-			hsklTrackOneFrame(tracker, depth, conf); // Pass data to tracking library
-			image->ReleaseAccess(&depthData);	
+			if(!IsKinectActivated)
+			{
+				PXCImage::ImageData depthData; image->AcquireAccess(PXCImage::ACCESS_READ, &depthData);
+				memcpy_s(depth, sizeof(unsigned short)*dimx*dimy, depthData.planes[0], sizeof(unsigned short)*dimx*dimy);
+				const unsigned short * conf = reinterpret_cast<const unsigned short *>(depthData.planes[1]);
+				for(int i=0; i<dimx*dimy; ++i) color[3*i+2] = color[3*i+1] = color[3*i] = conf[i]>>2; // Can we just use IR here?
+				hsklTrackOneFrame(tracker, depth, conf); // Pass data to tracking library
+				image->ReleaseAccess(&depthData);	
+			}
+			else
+			{
+				hsklTrackOneFrame(tracker, kinectDepth, kinectColor);
+			}
 		}
 
 		stream->ReadStreamAsync(image.ReleaseRef(), sp.ReleaseRef());

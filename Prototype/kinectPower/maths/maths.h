@@ -26,6 +26,7 @@ inline size_t Next(const size_t& index, const size_t& size) {
 }
 
 double RadToDegrees(double rad);
+double DegreesToRad(double degrees);
 
 double Round(double number);
 int RoundToInt(double number);

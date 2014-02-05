@@ -13,11 +13,20 @@ class InteractionClientBase;
 
 namespace kinect_wrapper {  
 
+namespace {
+
+  const NUI_IMAGE_TYPE kColorImageType = NUI_IMAGE_TYPE_COLOR;
+  const NUI_IMAGE_TYPE kDepthImageType = NUI_IMAGE_TYPE_DEPTH_AND_PLAYER_INDEX;
+  const NUI_IMAGE_RESOLUTION kDepthImageResolution = NUI_IMAGE_RESOLUTION_640x480;
+  const NUI_IMAGE_RESOLUTION kColorImageResolution = NUI_IMAGE_RESOLUTION_640x480;
+
+}  // namespace
+
 class KinectSensorData;
 
 class KinectSensor {
  public:
-  KinectSensor(INuiSensor* native_sensor);
+  KinectSensor(INuiSensor* native_sensor, NUI_IMAGE_TYPE color_stream_type = kColorImageType, NUI_IMAGE_TYPE depth_stream_type = kDepthImageType);
   ~KinectSensor();
 
   void SetNearModeEnabled(bool near_mode_enabled);

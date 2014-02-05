@@ -11,16 +11,7 @@
 
 namespace kinect_wrapper {
 
-namespace {
-
-const NUI_IMAGE_TYPE kColorImageType = NUI_IMAGE_TYPE_COLOR;
-const NUI_IMAGE_TYPE kDepthImageType = NUI_IMAGE_TYPE_DEPTH_AND_PLAYER_INDEX;
-const NUI_IMAGE_RESOLUTION kDepthImageResolution = NUI_IMAGE_RESOLUTION_640x480;
-const NUI_IMAGE_RESOLUTION kColorImageResolution = NUI_IMAGE_RESOLUTION_640x480;
-
-}  // namespace
-
-KinectSensor::KinectSensor(INuiSensor* native_sensor)
+KinectSensor::KinectSensor(INuiSensor* native_sensor, NUI_IMAGE_TYPE color_stream_type, NUI_IMAGE_TYPE depth_stream_type)
     : native_sensor_(native_sensor),
       near_mode_enabled_(false),
       depth_stream_opened_(false),
@@ -38,7 +29,9 @@ KinectSensor::KinectSensor(INuiSensor* native_sensor)
       skeleton_frame_ready_event_(INVALID_HANDLE_VALUE),
       interaction_stream_opened_(false),
       interaction_stream_(NULL),
-      interaction_frame_ready_event_(INVALID_HANDLE_VALUE) {
+      interaction_frame_ready_event_(INVALID_HANDLE_VALUE),
+      depth_stream_type_(depth_stream_type),
+      color_stream_type_(color_stream_type) {
   depth_frame_ready_event_ = ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
   color_frame_ready_event_ = ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
   skeleton_frame_ready_event_ = ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
@@ -60,7 +53,7 @@ bool KinectSensor::OpenDepthStream() {
     return true;
 
   HRESULT res = native_sensor_->NuiImageStreamOpen(
-      kDepthImageType, kDepthImageResolution, 0, 2, depth_frame_ready_event_,
+      depth_stream_type_, kDepthImageResolution, 0, 2, depth_frame_ready_event_,
       &depth_stream_handle_);
 
   if (FAILED(res))
@@ -146,7 +139,7 @@ bool KinectSensor::OpenColorStream() {
     return true;
 
   HRESULT res = native_sensor_->NuiImageStreamOpen(
-    kColorImageType, kColorImageResolution, 0, 2, color_frame_ready_event_,
+    color_stream_type_, kColorImageResolution, 0, 2, color_frame_ready_event_,
     &color_stream_handle_);
 
   if (FAILED(res))

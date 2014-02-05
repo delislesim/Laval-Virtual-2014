@@ -29,18 +29,14 @@ public class DrumComponent : MonoBehaviour {
 		
 	}
 
-	void OnTriggerEnter()
-	{
-		PlaySound();
-	}
-
 	void OnMouseDown()
 	{
 		PlaySound();
 	}
 	
-	void OnMouseUp()
+	void OnCollisionEnter(Collision col)
 	{
-		//audio.Stop();
+		if(col.gameObject.tag == "Tip")
+			PlaySound();
 	}
 }
