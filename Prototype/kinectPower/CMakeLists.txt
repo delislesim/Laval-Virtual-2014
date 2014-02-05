@@ -139,6 +139,11 @@ add_library(kinect_interaction
   kinect_interaction/interaction_frame.h
   )
   
+add_library(kinect_face_tracker
+  kinect_face_tracker/face_tracker.cc
+  kinect_face_tracker/face_tracker.h
+  )
+  
 add_library(kinect_replay
   kinect_replay/kinect_recorder.cc
   kinect_replay/kinect_recorder.h
@@ -200,6 +205,7 @@ target_link_libraries(kinect_lib
   finger_finder_thinning
   image
   kinect_interaction
+  kinect_face_tracker
   kinect_replay
   kinect_wrapper
   maths
