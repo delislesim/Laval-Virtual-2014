@@ -149,7 +149,7 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
   cv::convertScaleAbs(laplacian_result, laplacian_result_positif);
 
   // Soustraire le contour dilaté (et éventuellement tout ce qui n'est pas dans le depth TODO(fdoray))
-  cv::dilate(all_contours, all_contours, cv::Mat(), cv::Point(-1, -1), 2);
+  cv::dilate(all_contours, all_contours, cv::Mat(), cv::Point(-1, -1), 1);
   
   unsigned char* dilated_contour_run = all_contours.ptr();
   unsigned char* laplace_run = laplacian_result_positif.ptr();
