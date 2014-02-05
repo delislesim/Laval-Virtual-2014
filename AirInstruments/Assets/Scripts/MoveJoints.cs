@@ -34,10 +34,23 @@ public class MoveJoints : MonoBehaviour {
 	private GameObject[] joints;
 	private Vector3[] current_positions;
 	private Vector3[] last_positions;
-	private const float KICK_SPEED = 0.35f;
+	private Quaternion[] current_rotations;
+	private Quaternion[] last_rotations;
+	private const float KICK_SPEED = 1.0f;
 	private const float HH_SPEED = 1.0f;
+	private Vector3 HIDING_POS = new Vector3(0,-10,0);
 	private bool kick_ready;
 	private bool hit_hat_ready;
+	private const float PLAYER_HIGHT = 5.0f;
+
+	//Hand freeze info
+	private float right_hand_freez_posy;
+	private float left_hand_freez_posy;
+	private bool right_hand_freez_speedY_positive;
+	private bool left_hand_freez_speedY_positive;
+	private bool left_hand_is_frozen;
+	private bool right_hand_is_frozen;
+
 
 	// Use this for initialization
 	void Start () {
@@ -51,7 +64,15 @@ public class MoveJoints : MonoBehaviour {
 
 		last_positions = new Vector3[(int)Skeleton.Joint.Count];
 		current_positions = new Vector3[(int)Skeleton.Joint.Count];
+
+		last_rotations = new Quaternion[(int)Skeleton.Joint.Count];
+		current_rotations = new Quaternion[(int)Skeleton.Joint.Count];
 		kick_ready = true;
+
+		right_hand_freez_posy = 0;
+	    left_hand_freez_posy= 0;
+		left_hand_is_frozen = false;
+		right_hand_is_frozen = false;
 	}
 	
 	// Update is called once per frame
@@ -70,39 +91,85 @@ public class MoveJoints : MonoBehaviour {
 		{
 			//Store last positions/rotations
 			last_positions[i] = current_positions[i];
-		}
+			last_rotations[i] = current_rotations[i];
 
-		for(int i = 0; i < jointsCount; i++) 
-		{
 			if(joints[i] != null)
 			{
 				Vector3 posJoint = Vector3.zero;
 				Skeleton.JointStatus jointStatus = player.GetJointPosition((Skeleton.Joint)i, out posJoint);
 				if(jointStatus != Skeleton.JointStatus.NotTracked)
 				{
-					if ( ( i == (int)Skeleton.Joint.HandRight && tip_right.IsCollided() )
-					    || (i == (int)Skeleton.Joint.HandLeft && tip_left.IsCollided()) )
-						joints[i].transform.position = last_positions[i];
-				
-					else
-						joints[i].transform.position = new Vector3(posJoint.x*5, posJoint.y*5, -5*posJoint.z);
+					// // POSITIONS
+					//*****************************Freeze hands! *************************************************\\\
+					if ( i == (int)Skeleton.Joint.HandRight && tip_right.IsCollided() )
+					{
+						if(!right_hand_is_frozen)
+						{
+							right_hand_is_frozen = true;
+							right_hand_freez_posy = last_positions[i].y;
+							joints[i].transform.position = last_positions[i];
+						}//Frozen
+						else
+						{
+							float posY = posJoint.y*PLAYER_HIGHT;
+							if((posY > right_hand_freez_posy)){
+								right_hand_is_frozen = false;
+								joints[i].transform.position = new Vector3(posJoint.x*PLAYER_HIGHT, posJoint.y*PLAYER_HIGHT, -posJoint.z*PLAYER_HIGHT);
+							}
+						}//Not frozen
+					}//if collided
 
+					else if ( i == (int)Skeleton.Joint.HandLeft && tip_left.IsCollided() )
+					{
+						if(!left_hand_is_frozen)
+						{
+							left_hand_is_frozen = true;
+							left_hand_freez_posy = last_positions[i].y;
+							joints[i].transform.position = last_positions[i];
+						}
+						else
+						{
+							float posY = posJoint.y*PLAYER_HIGHT;
+							if((posY > left_hand_freez_posy)){
+								left_hand_is_frozen = false;
+								joints[i].transform.position = new Vector3(posJoint.x*PLAYER_HIGHT, posJoint.y*PLAYER_HIGHT, -posJoint.z*PLAYER_HIGHT);
+							}
+						}
+					}
+					//*********************************************************************************\\\
+				
+					else {
+						joints[i].transform.position = new Vector3(posJoint.x*PLAYER_HIGHT, posJoint.y*PLAYER_HIGHT, -posJoint.z*PLAYER_HIGHT);
+					}
+
+					// // ROTATIONS
 					//Apply head rotation
 					if(i == (int)Skeleton.Joint.Head)
 						joints[i].transform.localRotation = player.GetNeckOrientation();
 
-					//Apply hand rotation
+					//Apply hand rotation if needed
 					if(i == (int)Skeleton.Joint.HandRight)
-						joints[i].transform.localRotation = player.GetBoneOrientation(Skeleton.Joint.HandRight);
+					{
+						if(tip_right.IsCollided())
+							joints[i].transform.localRotation = last_rotations[i];
+						else
+							joints[i].transform.localRotation = player.GetBoneOrientation(Skeleton.Joint.HandRight);
+					}
 					if(i == (int)Skeleton.Joint.HandLeft)
-						joints[i].transform.localRotation = player.GetBoneOrientation(Skeleton.Joint.HandLeft);
+					{
+						if(tip_left.IsCollided())
+							joints[i].transform.localRotation = last_rotations[i];
+						else
+							joints[i].transform.localRotation = player.GetBoneOrientation(Skeleton.Joint.HandLeft);
+					}
 				}
 				//If not tracked, hide!
 				else
-					joints[i].transform.position = new Vector3(0,-10,0);
+					joints[i].transform.position = HIDING_POS;
 
 				//Store new current position/rotation
 				current_positions[i] = joints[i].transform.position;
+				current_rotations[i] = joints[i].transform.localRotation;
 			}
 		}
 
@@ -113,7 +180,7 @@ public class MoveJoints : MonoBehaviour {
 	void manageMouvementsAndSounds(Vector3[] currentPos, Vector3[] pastPos)
 	{
 		//Play bass kick
-		if(pastPos[(int)Skeleton.Joint.KneeRight] != null){
+		if(pastPos[(int)Skeleton.Joint.KneeRight] != HIDING_POS){
 			if(pastPos[(int)Skeleton.Joint.KneeRight].y - currentPos[(int)Skeleton.Joint.KneeRight].y > (KICK_SPEED * Time.deltaTime)
 			   && kick_ready == true){
 				Bass_Kick.PlaySound();
@@ -127,7 +194,7 @@ public class MoveJoints : MonoBehaviour {
 		}
 
 		//Manage High-Hat state
-		if(pastPos[(int)Skeleton.Joint.KneeLeft] != null){
+		if(pastPos[(int)Skeleton.Joint.KneeLeft] != HIDING_POS){
 			if(pastPos[(int)Skeleton.Joint.KneeLeft].y - currentPos[(int)Skeleton.Joint.KneeLeft].y > (HH_SPEED * Time.deltaTime)
 			   && hit_hat_ready == true){
 				High_Hat.opened = false;

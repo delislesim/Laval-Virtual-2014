@@ -32,7 +32,7 @@ public class KinectPower : MonoBehaviour {
 
     	streamTexture = new Texture2D(kStreamWidth, kStreamHeight);
     	streamRect = new Rect(Screen.width, Screen.height - streamTexture.height,
-                                -streamTexture.width, streamTexture.height);
+                                -streamTexture.width/2, streamTexture.height/2);
 
 		if (replay == ReplayMode.RECORD) {
 			KinectPowerInterop.RecordSensor(0, replayFilename);

@@ -39,18 +39,14 @@ public class HighHatComponent : MonoBehaviour {
 		
 	}
 	
-	void OnTriggerEnter()
+	void OnCollisionEnter(Collision col)
 	{
-		PlaySound();
+		if(col.gameObject.tag == "Tip")
+			PlaySound();
 	}
 	
 	void OnMouseDown()
 	{
 		PlaySound();
-	}
-	
-	void OnMouseUp()
-	{
-		//audio.Stop();
 	}
 }
