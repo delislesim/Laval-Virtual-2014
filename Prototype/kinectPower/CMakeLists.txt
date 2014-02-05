@@ -213,6 +213,7 @@ target_link_libraries(kinect_lib
   ${OpenCV_LIBS}
   $ENV{KINECTSDK10_DIR}/lib/x86/Kinect10.lib
   $ENV{KINECT_TOOLKIT_DIR}/Lib/x86/KinectInteraction180_32.lib
+  $ENV{KINECT_TOOLKIT_DIR}/Lib/x86/FaceTrackLib.lib
   ${INTEL_HAND_TRACKER_DEPENDENCY}
   )
 	

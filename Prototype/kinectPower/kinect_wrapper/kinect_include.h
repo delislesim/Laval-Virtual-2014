@@ -8,3 +8,4 @@
 
 #include <NuiApi.h>
 #include <KinectInteraction.h>
+#include <FaceTrackLib.h>

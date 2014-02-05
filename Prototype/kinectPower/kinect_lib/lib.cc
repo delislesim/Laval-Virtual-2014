@@ -7,6 +7,7 @@
 #include "intel_hand_tracker/intel_hand_tracker.h"
 #include "kinect_interaction/interaction_client_menu.h"
 #include "kinect_interaction/interaction_frame.h"
+#include "kinect_face_tracker/face_tracker.h"
 #include "kinect_wrapper/constants.h"
 #include "kinect_wrapper/kinect_sensor.h"
 #include "kinect_wrapper/kinect_skeleton.h"
@@ -20,6 +21,9 @@ using namespace kinect_wrapper;
 namespace {
 // TODO(fdoray)
 static piano::Piano the_piano;
+
+static kinect_face_tracker::FaceTracker the_face_tracker;
+
 }  // namespace
 
 bool Initialize(bool near_mode, bool with_sensor_thread) {
@@ -28,6 +32,7 @@ bool Initialize(bool near_mode, bool with_sensor_thread) {
   KinectWrapper* wrapper = KinectWrapper::instance();
   wrapper->Initialize();
   wrapper->AddObserver(0, &the_piano);
+  wrapper->AddObserver(0, &the_face_tracker);
 
   if (with_sensor_thread) {
     // Check that the expected sensors are connected.
@@ -192,6 +197,21 @@ bool GetHandsInteraction(int skeleton_id, NUI_HANDPOINTER_INFO* hands) {
 
   return interaction_frame->GetHands(skeleton_id,
                                      &hands[0], &hands[1]);
+}
+
+bool GetFaceRotation(float* face_rotation) {
+	assert(face_rotation);
+
+	if (the_face_tracker.isTracking()) {
+		cv::Vec3f rotation = the_face_tracker.FaceRotation();
+		face_rotation[0] = rotation[0];
+		face_rotation[1] = rotation[1];
+		face_rotation[2] = rotation[2];
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 #ifdef USE_INTEL_CAMERA
