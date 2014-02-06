@@ -30,7 +30,8 @@ public class MoveJoints : MonoBehaviour {
 	public TipCollider tip_left;
 	public TipCollider tip_right;
 
-	//Public
+	//Private
+	private Skeleton m_player_one;
 	private GameObject[] joints;
 	private Vector3[] current_positions;
 	private Vector3[] last_positions;
@@ -42,6 +43,10 @@ public class MoveJoints : MonoBehaviour {
 	private bool kick_ready;
 	private bool hit_hat_ready;
 	private const float PLAYER_HIGHT = 5.0f;
+	private const float DELTA_CHECK_TIME = 5.0f;
+	private float accumulated_time;
+	private const float DIST_MAX_KINECT = 10.0f; //2m
+	private const float DIST_MIN_KINECT = 2.0f; //dist min...
 
 	//Hand freeze info
 	private float right_hand_freez_posy;
@@ -68,6 +73,7 @@ public class MoveJoints : MonoBehaviour {
 		last_rotations = new Quaternion[(int)Skeleton.Joint.Count];
 		current_rotations = new Quaternion[(int)Skeleton.Joint.Count];
 		kick_ready = true;
+		accumulated_time = 0.0f;
 
 		right_hand_freez_posy = 0;
 	    left_hand_freez_posy= 0;
@@ -78,8 +84,21 @@ public class MoveJoints : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		//Create valid skeleton with joints positions/rotations
-		Skeleton playerOne = new Skeleton(0);
-		moveJoints (playerOne);
+		m_player_one = new Skeleton(0);
+		if (SkeletonIsTrackedAndValid(m_player_one))
+			moveJoints (m_player_one);
+	}
+
+	bool SkeletonIsTrackedAndValid(Skeleton player)
+	{
+		accumulated_time += Time.deltaTime;
+		if(accumulated_time > DELTA_CHECK_TIME)
+		{
+			//Check if hip joint is at reasonable distance from kinect (drum)
+
+			//Check if dist hip to head is reasonable (no mini ghost) skeleton
+		}
+		return true;
 	}
 
 	void moveJoints(Skeleton player)
