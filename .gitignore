@@ -8,6 +8,7 @@
 *.csproj
 *.unityproj
 *.sln
+*.userprefs
 
 Thumbs.db
 .DS_Store
