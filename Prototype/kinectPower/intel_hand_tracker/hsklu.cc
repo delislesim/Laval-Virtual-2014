@@ -1,3 +1,5 @@
+#ifdef USE_INTEL_CAMERA
+
 #include "hsklu.h"
 #include "kinect_wrapper/constants.h"
 
@@ -33,3 +35,5 @@ void Tracker::ActivateKinect()
 }
 
 }
+
+#endif
