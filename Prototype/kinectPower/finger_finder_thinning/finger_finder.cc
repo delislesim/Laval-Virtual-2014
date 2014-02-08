@@ -11,7 +11,6 @@
 #include "kinect_wrapper/constants.h"
 #include "kinect_wrapper/kinect_sensor.h"
 #include "kinect_wrapper/kinect_wrapper.h"
-#include "voronoi/voronoi.h"
 
 namespace finger_finder_thinning {
 
@@ -72,7 +71,7 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
   }
   cv::dilate(dilated_depth_contours_img, dilated_depth_contours_img, cv::Mat(), cv::Point(-1, -1), 5);
 
-  // Retrouver les contours dans l'image dilatée.
+  // Retrouver les contours dans l'image de profondeur dilatée.
   std::vector<std::vector<cv::Point> > dilated_depth_contours_color_coordinates;
   cv::findContours(dilated_depth_contours_img, 
                    dilated_depth_contours_color_coordinates,
@@ -83,23 +82,7 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
   cv::Mat all_contours;
   CannyContour(color_mat, &all_contours);
 
-  // Dessiner les contours de profondeur sur la même image que les contours canny.
-  assert(all_contours.type() == CV_8U);
-  /*
-  for (size_t i = 0; i < dilated_depth_contours_color_coordinates.size(); ++i) {
-    for (size_t j = 0; j < dilated_depth_contours_color_coordinates[i].size(); ++j) {
-      cv::Point a = dilated_depth_contours_color_coordinates[i][j];
-      cv::Point b = dilated_depth_contours_color_coordinates[i][(j + 1) %dilated_depth_contours_color_coordinates[i].size()];
-
-      if (!image::OutOfBoundaries(*nice_image, a) &&
-          !image::OutOfBoundaries(*nice_image, b)) {
-        cv::line(all_contours, a, b, cv::Scalar(255), image::kThickness1);
-      }
-    }
-  }
-  */
-
-  // Enlever tous les contours qui ne sont pas à la bonne profondeur.
+  // Enlever tous les contours de couleur qui ne sont pas à la bonne profondeur.
   unsigned char* dilated_run = dilated_depth_contours_img.ptr();
   unsigned char* contours_run = all_contours.ptr();
   for (size_t i = 0; i < dilated_depth_contours_img.total(); ++i) {
@@ -109,17 +92,17 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
     ++contours_run;
   }
 
+  // Dilater un peu canny.
+  cv::dilate(all_contours, all_contours, cv::Mat(), cv::Point(-1, -1), 1);
+
   // Inverser les valeurs pour faire plaisir à l'algorithme.
   cv::Mat all_contours_inverse = cv::Mat(all_contours.size(), CV_8U, 255) - all_contours;
 
-  // Éliminer les contours trop petits.
-  /*
-  cv::Mat all_contours_tmp;
-  all_contours.copyTo(all_contours_tmp);
-  */
+  // Calculer la distance de chaque point par rapport au contour le plus proche.
   cv::Mat distance_mat;
   cv::distanceTransform(all_contours_inverse, distance_mat, CV_DIST_L1, 3);
 
+  // Convertir la matrice de distance de float --> char.
   cv::Mat distance_mat_char(distance_mat.size(), CV_8U);
   float* distance_src_run = reinterpret_cast<float*>(distance_mat.ptr());
   unsigned char* distance_dst_run = distance_mat_char.ptr();
@@ -127,8 +110,6 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
   for (size_t i = 0; i < distance_mat.total(); ++i) {
     if (*distance_src_run > 127)
       *distance_src_run = 127;
-    else
-      int boubou = 4;
 
     *distance_dst_run = *distance_src_run * 2;
 
@@ -171,45 +152,9 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
     ++laplacian_result_run;
   }
 
- 
-
-  // Essayer remplir les trous et d'éliminer les lignes double en
-  // dilatant / érodant.
-  /*
-  cv::dilate(all_contours, all_contours, cv::Mat(), cv::Point(-1, -1), 2);
-  cv::erode(all_contours, all_contours, cv::Mat(), cv::Point(-1, -1), 2);
-  */
-  // TODO(fdoray): Ajouter les contours dûs au trop gros changements de profondeur.
-
-  /*
-  
-  // Extraire des squelettes de l'image de contours inversée.
-  VoronoiSkeleton skel;
-  bool ok = skel.thin(all_contours_inverse, "morph", false);
-  if (!ok) {
-    std::cout << "oups" << std::endl;
-  }
-  cv::Mat1b skeletons = skel.get_skeleton();
-  */
-
   // Copier les contours de l'image couleur dans nice_image.
   cv::cvtColor(laplacian_result_positif, *nice_image, CV_GRAY2RGBA);
 
-  /*
-  // Dessiner les contours dilatés trouvés dans l'image de profondeur
-  // dans nice_image (en coordonnées couleur)
-  for (size_t i = 0; i < dilated_depth_contours_color_coordinates.size(); ++i) {
-    for (size_t j = 0; j < dilated_depth_contours_color_coordinates[i].size(); ++j) {
-      cv::Point a = dilated_depth_contours_color_coordinates[i][j];
-      cv::Point b = dilated_depth_contours_color_coordinates[i][(j + 1) %dilated_depth_contours_color_coordinates[i].size()];
-
-      if (!image::OutOfBoundaries(*nice_image, a) &&
-          !image::OutOfBoundaries(*nice_image, b)) {
-            cv::line(*nice_image, a, b, cv::Scalar(255, 0, 0, 255), image::kThickness1);
-      }
-    }
-  }
-  */
 }
 
 }  // namespace hand_extractor

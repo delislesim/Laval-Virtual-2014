@@ -71,6 +71,15 @@ add_library(base
   base/timer.cc
   base/timer.h
   )
+  
+add_library(bitmap_graph
+  bitmap_graph/bitmap_graph.cc
+  bitmap_graph/bitmap_graph.h
+  bitmap_graph/bitmap_graph_builder.cc
+  bitmap_graph/bitmap_graph_builder.h
+  bitmap_graph/bitmap_run.cc
+  bitmap_graph/bitmap_run.h
+  )
 
 add_library(finger_finder
   finger_finder/contour_curve.cc
@@ -202,6 +211,7 @@ add_library(kinect_lib SHARED
 target_link_libraries(kinect_lib
   algos
   base
+  bitmap_graph
   finger_finder
   finger_finder_thinning
   image
@@ -240,6 +250,9 @@ target_link_libraries(test_cpp
 
 add_executable(unittests
   algos/sliding_window_unittests.cc
+  bitmap_graph/bitmap_graph_unittest.cc
+  bitmap_graph/bitmap_graph_builder_unittest.cc
+  bitmap_graph/bitmap_run_unittest.cc
   maths/maths_unittests.cc
   maths/smooth_unittests.cc
   ${GMOCK_ROOT}/gtest/src/gtest-all.cc
