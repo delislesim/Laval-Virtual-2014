@@ -25,9 +25,9 @@ namespace sample
     {
       InitializeComponent();
 
-      KinectPowerInterop.Initialize(false, false);
+      KinectPowerInterop.Initialize(false, true);
       //KinectPowerInterop.RecordSensor(0, "test.txt");
-      KinectPowerInterop.StartPlaySensor(0, "test.txt");
+      //KinectPowerInterop.StartPlaySensor(0, "test.txt");
 
       aTimer = new System.Timers.Timer(20);
       aTimer.Elapsed += new System.Timers.ElapsedEventHandler(aTimer_Elapsed);
@@ -36,14 +36,14 @@ namespace sample
       aTimer.Enabled = true;
     }
 
-    bool pause_ = true;
+    bool pause_ = false;
 
     [MethodImpl(MethodImplOptions.Synchronized)]
     void aTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
     {
       if (pause_)
         return;
-      pause_ = true;
+      //pause_ = true;
 
       KinectPowerInterop.PlayNextFrame(0);
 

@@ -426,9 +426,21 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
 
   squelette_mat = squelette_mat & (all_contours == 0);
 
-  cv::dilate(squelette_mat, squelette_mat, cv::Mat(), cv::Point(-1, -1), 2);
+  unsigned char dilater[] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+  cv::Mat rounded_dilater(cv::Size(3, 3), CV_8U, dilater);
+  cv::dilate(squelette_mat, squelette_mat, rounded_dilater, cv::Point(-1, -1), 2);
 
   // Détection de coins.
+  int blockSize = 2;
+  int apertureSize = 3;
+  double k = 0.04;
+
+  cv::Mat corners_mat = cv::Mat::zeros( squelette_mat.size(), CV_32FC1 );
+
+  cv::cornerHarris(squelette_mat, corners_mat, blockSize, apertureSize, k, cv::BORDER_DEFAULT);
+
+  cv::Mat corners_mat_normalized;
+  cv::normalize(corners_mat, corners_mat_normalized, 0, 255, cv::NORM_MINMAX, CV_32FC1, cv::Mat());
 
   // Créer une image pour montrer le résultat.
 
@@ -451,19 +463,27 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
 
   unsigned char* nice_image_run = nice_image->ptr();
   unsigned char* contours_run = all_contours.ptr();
+  float* corners_run = reinterpret_cast<float*>(corners_mat_normalized.ptr());
   squelette_run = squelette_mat.ptr();
+
   for (size_t i = 0; i < nice_image->total(); ++i) {
     /*if (*contours_run != 0) {
       nice_image_run[image::kBlueIndex] = 0;
       nice_image_run[image::kRedIndex] = 255;
       nice_image_run[image::kGreenIndex] = 0;*/
     if (*squelette_run != 0) {
-      nice_image_run[image::kRedIndex] = 255;
-      nice_image_run[image::kGreenIndex] = 255;
-      nice_image_run[image::kBlueIndex] = 0;
+      nice_image_run[image::kRedIndex] = 0;
+      nice_image_run[image::kGreenIndex] = 0;
+      nice_image_run[image::kBlueIndex] = 255;
     }
+    /*
+    if (*corners_run > 100) {
+      cv::circle(*nice_image, PositionOf(i, nice_image->cols), 1, cv::Scalar(255, 255, 0), 1);
+    }
+    */
     nice_image_run += 4;
     ++contours_run;
+    ++corners_run;
     ++squelette_run;
   }
 }
