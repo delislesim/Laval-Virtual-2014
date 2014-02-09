@@ -22,13 +22,18 @@ class Piano : public kinect_wrapper::KinectObserver {
       const kinect_wrapper::KinectSensorData& data) override;
 
   void QueryNiceImage(unsigned char* nice_image, size_t nice_image_size);
+  void QueryHandsDepth(unsigned char* hands_depth, size_t hands_depth_size);
   void QueryHandParameters(std::vector<finger_finder::HandParameters>* hand_parameters);
 
  private:
+  unsigned short min_hands_depth_;
+  unsigned short max_hands_depth_;
+
   finger_finder_thinning::FingerFinder finger_finder_;
 
   bool started_;
   kinect_wrapper::KinectSwitch<cv::Mat> nice_image_;
+  kinect_wrapper::KinectSwitch<cv::Mat> hands_depth_;
   kinect_wrapper::KinectSwitch<std::vector<finger_finder::HandParameters> > hand_parameters_;
 };
 

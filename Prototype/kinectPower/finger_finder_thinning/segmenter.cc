@@ -17,7 +17,7 @@ const float kMinContourArea = 1000.0;
 const int kSimpleContourTolerance = 1;
 
 bool PixelInDepthRange(unsigned short depth, int min_depth, int max_depth) {
-  return depth > min_depth && depth < max_depth;
+  return depth >= min_depth && depth <= max_depth;
 }
 
 // Calcule une matrice dans laquelle les pixels de |depth_max| dont la

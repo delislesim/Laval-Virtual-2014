@@ -235,6 +235,11 @@ bool GetPianoImage(unsigned char* pixels, unsigned int pixels_size) {
   return true;
 }
 
+bool GetPianoDepth(unsigned char* pixels, unsigned int pixels_size) {
+  the_piano.QueryHandsDepth(pixels, pixels_size);
+  return true;
+}
+
 bool GetPianoHands(unsigned int* /* positions */, unsigned char* /* known */) {
   /*
   std::vector<hand_extractor::Hand2dParameters> hand_parameters;

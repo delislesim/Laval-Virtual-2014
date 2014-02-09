@@ -24,13 +24,13 @@ public class PrototypeInteractions : MonoBehaviour {
 			if ((hands[1].State & KinectPowerInterop.NuiHandpointerStateNotTracked) == 0) {
 				right_hand_position.x = hands[1].X;
 				right_hand_position.y = hands[1].Y;
-				right_hand_visible = true;
+				//right_hand_visible = true;
 			} else {
-				right_hand_visible = false;
+				//right_hand_visible = false;
 			}
 		} else {
 			left_hand_visible = false;
-			right_hand_visible = false;
+			//right_hand_visible = false;
 		}
 	}
 
@@ -40,7 +40,7 @@ public class PrototypeInteractions : MonoBehaviour {
 	}
 
 	bool left_hand_visible = false;
-	bool right_hand_visible = false;
+	//bool right_hand_visible = false;
 
 	Vector2 left_hand_position = new Vector2 ();
 	Vector2 right_hand_position = new Vector2 ();
