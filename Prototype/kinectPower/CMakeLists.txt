@@ -53,6 +53,7 @@ include_directories(
 add_library(algos
   algos/contour_walk.cc
   algos/contour_walk.h
+  algos/disjoint_set.h
   algos/kalman_filter.cc
   algos/kalman_filter.h
   algos/sliding_window.cc
@@ -249,6 +250,7 @@ target_link_libraries(test_cpp
 ####################
 
 add_executable(unittests
+  algos/disjoint_set_unittests.cc
   algos/sliding_window_unittests.cc
   bitmap_graph/bitmap_graph_unittest.cc
   bitmap_graph/bitmap_graph_builder_unittest.cc

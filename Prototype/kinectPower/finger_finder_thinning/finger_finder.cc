@@ -57,58 +57,11 @@ class SmallContourRemover {
   std::vector<int> component_indexes_;
 };
 
-class SkeletonConnector {
- public:
-  SkeletonConnector(const cv::Mat* depth_mat, cv::Mat* mat_with_skeleton_to_remove)
-      : depth_mat_(depth_mat), mat_with_skeleton_to_remove_(mat_with_skeleton_to_remove) {}
+void ConnectSkeleton(const cv::Mat& distances, cv::Mat* skeleton) {
+  assert(distances.type() == CV_32F);
+  assert(skeleton->type() == CV_8U);
 
-  void ObserveComponentStart() {
-    component_indexes_.clear();
-    num_bad_depth_ = 0;
-  }
-  void ObserveComponentEnd() {
-    if (num_bad_depth_ > 10 || (num_bad_depth_ > 0 && component_indexes_.size() < 15)) {
-      // Remove the component.
-      for (size_t i = 0; i < component_indexes_.size(); ++i) {
-        mat_with_skeleton_to_remove_->ptr()[component_indexes_[i]] = 0;
-      }
-    }
-  }
-
-  void ObserveIntersectionStart(int index) {
-    component_indexes_.push_back(index);
-    if (depth_mat_->ptr()[index] == 0) {
-      ++num_bad_depth_;
-    }
-  }
-  void ObserveIntersectionEnd() {
-  }
-
-  void ObservePixel(int index) {
-    component_indexes_.push_back(index);
-    if (depth_mat_->ptr()[index] == 0) {
-      ++num_bad_depth_;
-    }
-  }
-  void ObserveLeaf(int index) {
-    component_indexes_.push_back(index);
-    if (depth_mat_->ptr()[index] == 0) {
-      ++num_bad_depth_;
-    }
-  }
-
- private:
-  cv::Mat* mat_with_skeleton_to_remove_;
-  const cv::Mat* depth_mat_;
-  std::vector<int> component_indexes_;
-  int num_bad_depth_;
-};
-
-void CloseContours(cv::Mat* contours) {
-  int rows = contours->rows;
-  int cols = contours->cols;
-
-  
+  //cv::connec
 }
 
 }  // namespace
@@ -326,6 +279,7 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
   }
 
   // Essayer de compléter les lignes du squelette.
+  ConnectSkeleton(distance_mat, &squelette_mat);
 
   //cv::dilate(squelette_mat, squelette_mat, cv::Mat(), cv::Point(-1, -1), 1);
   /*
