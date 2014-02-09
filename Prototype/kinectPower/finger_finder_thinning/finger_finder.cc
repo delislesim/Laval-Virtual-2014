@@ -321,7 +321,7 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
   CannyContour(color_mat, &all_contours);
 
   // Enlever tous les contours de couleur qui ne sont pas à la bonne profondeur.
-  all_contours = all_contours & dilated_depth_contours_mat;
+  all_contours = all_contours &dilated_depth_contours_mat;
 
   // Réduire la taille région à traiter.
   all_contours = all_contours(kRegionOfInterest);
@@ -334,6 +334,7 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
   bitmap_graph::BitmapRun contour_remover_run;
   contour_remover_run.Run(&all_contours_copy, &contour_remover);
 
+  /*
   // Inverser les valeurs pour faire plaisir à l'algorithme.
   cv::Mat all_contours_inverse = 255 - all_contours;
 
@@ -411,39 +412,46 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
     }
     ++squelette_run;
   }
+  */
+  
+  // Dilater le contour.
+  unsigned char dilater[] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+  cv::Mat rounded_dilater(cv::Size(3, 3), CV_8U, dilater);
 
+  cv::dilate(all_contours, all_contours, rounded_dilater, cv::Point(-1, -1), 1);
+
+  /*
   // Essayer de compléter les lignes du squelette.
-  cv::dilate(all_contours, all_contours, cv::Mat(), cv::Point(-1, -1), 1);
   ConnectSkeleton(distance_mat, all_contours, &squelette_mat);
 
   // Enlever ce qui est trop petit ou touche au contour et dilater le squelette.
   cv::Mat squelette_mat_copy;
   squelette_mat.copyTo(squelette_mat_copy);
 
-  SmallContourRemover squelette_remover(&squelette_mat, 100);
+  SmallContourRemover squelette_remover(&squelette_mat, 60);
   bitmap_graph::BitmapRun squelette_remover_run;
   squelette_remover_run.Run(&squelette_mat_copy, &squelette_remover);
 
   squelette_mat = squelette_mat & (all_contours == 0);
 
-  unsigned char dilater[] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
-  cv::Mat rounded_dilater(cv::Size(3, 3), CV_8U, dilater);
   cv::dilate(squelette_mat, squelette_mat, rounded_dilater, cv::Point(-1, -1), 3);
 
   // Détection de coins.
-  int blockSize = 5;
+  int blockSize = 2;
   int apertureSize = 3;
   double k = 0.02;
 
   cv::Mat corners_mat = cv::Mat::zeros( squelette_mat.size(), CV_32FC1 );
 
-  cv::cornerHarris(squelette_mat, corners_mat, blockSize, apertureSize, k, cv::BORDER_DEFAULT);
+  cv::cornerHarris(all_contours, corners_mat, blockSize, apertureSize, k, cv::BORDER_DEFAULT);
 
   cv::Mat corners_mat_normalized;
   cv::normalize(corners_mat, corners_mat_normalized, 0, 255, cv::NORM_MINMAX, CV_32FC1, cv::Mat());
 
-  // Créer une image pour montrer le résultat.
+  // Essayer de faire le ménage des coins.
 
+  
+  // Créer une image pour montrer le résultat.
   cv::Mat distance_mat_char(distance_mat.size(), CV_8U);
   float* distance_src_run = reinterpret_cast<float*>(distance_mat.ptr());
   unsigned char* distance_dst_run = distance_mat_char.ptr();
@@ -457,36 +465,41 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
     ++distance_src_run;
     ++distance_dst_run;
   }
-
+  */
 
   //cv::cvtColor( distance_mat_char, *nice_image, CV_GRAY2RGBA);
-  *nice_image = cv::Mat(squelette_mat.size(), CV_8UC4, cv::Scalar(0));
+  *nice_image = cv::Mat(all_contours.size(), CV_8UC4, cv::Scalar(0));
 
   unsigned char* nice_image_run = nice_image->ptr();
   unsigned char* contours_run = all_contours.ptr();
-  float* corners_run = reinterpret_cast<float*>(corners_mat_normalized.ptr());
-  squelette_run = squelette_mat.ptr();
+  //float* corners_run = reinterpret_cast<float*>(corners_mat_normalized.ptr());
+  //squelette_run = squelette_mat.ptr();
 
   for (size_t i = 0; i < nice_image->total(); ++i) {
-    /*if (*contours_run != 0) {
+    if (*contours_run != 0) {
       nice_image_run[image::kBlueIndex] = 0;
       nice_image_run[image::kRedIndex] = 255;
-      nice_image_run[image::kGreenIndex] = 0;*/
-    /*
-    if (*squelette_run != 0) {
+      nice_image_run[image::kGreenIndex] = 0;
+      nice_image_run[image::kAlphaIndex] = 255;
+    }
+    
+    
+    /*else if (*squelette_run != 0) {
       nice_image_run[image::kRedIndex] = 0;
       nice_image_run[image::kGreenIndex] = 0;
       nice_image_run[image::kBlueIndex] = 255;
+    }*/
+
+    /*
+    if (*corners_run > 100) {
+      cv::circle(*nice_image, PositionOf(i, nice_image->cols), 1, cv::Scalar(255, 255, 0), 4);
     }
     */
-    if (*corners_run > 100) {
-      cv::circle(*nice_image, PositionOf(i, nice_image->cols), 1, cv::Scalar(255, 255, 0), 1);
-    }
 
     nice_image_run += 4;
     ++contours_run;
-    ++corners_run;
-    ++squelette_run;
+    //++corners_run;
+    //++squelette_run;
   }
 }
 

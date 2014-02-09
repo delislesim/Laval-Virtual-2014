@@ -220,7 +220,7 @@ bool KinectSensor::OpenSkeletonStream() {
 
 bool KinectSensor::PollNextSkeletonFrame(KinectSensorData* data) {
   assert(data);
-  assert(skeleton_stream_opened_);
+  //assert(skeleton_stream_opened_);
 
   if (WaitForSingleObject(skeleton_frame_ready_event_, 0) != WAIT_OBJECT_0)
     return false;
