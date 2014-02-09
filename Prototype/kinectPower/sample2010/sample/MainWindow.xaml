@@ -1,9 +1,9 @@
 ﻿<Window x:Class="sample.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="530" Width="670">
+        Title="MainWindow" Height="530" Width="670"  MouseWheel="image_MouseWheel">
     <Grid>
-    <Image HorizontalAlignment="Left" Height="480" VerticalAlignment="Top" Width="640" Margin="10,10,0,0" Name="image"/>
+    <Image HorizontalAlignment="Left" Height="480" VerticalAlignment="Top" Width="640" Margin="10,10,0,0" Name="image" MouseWheel="image_MouseWheel" />
 
   </Grid>
 </Window>

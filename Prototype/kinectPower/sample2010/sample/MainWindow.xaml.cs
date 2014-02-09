@@ -26,7 +26,7 @@ namespace sample
       InitializeComponent();
 
       KinectPowerInterop.Initialize(false, true);
-      //KinectPowerInterop.RecordSensor(0, "test.txt");
+      KinectPowerInterop.RecordSensor(0, "test.txt");
       //KinectPowerInterop.StartPlaySensor(0, "test.txt");
 
       aTimer = new System.Timers.Timer(20);
@@ -36,9 +36,15 @@ namespace sample
       aTimer.Enabled = true;
     }
 
+    bool pause_ = false;
+
     [MethodImpl(MethodImplOptions.Synchronized)]
     void aTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
     {
+      if (pause_)
+        return;
+      //pause_ = true;
+
       KinectPowerInterop.PlayNextFrame(0);
 
       KinectPowerInterop.GetPianoImage(buffer, (uint)buffer.Length);
@@ -60,10 +66,15 @@ namespace sample
     }
 
     private const int kImageWidth = 640;
-    private const int kImageHeight = 480;
+    private const int kImageHeight = 280;
     private const int kPixelSize = 4;
 
     private static System.Timers.Timer aTimer;
     private byte[] buffer = new byte[kImageWidth * kImageHeight * kPixelSize];
+
+    private void image_MouseWheel(object sender, MouseWheelEventArgs e)
+    {
+      pause_ = false;
+    }
   }
 }

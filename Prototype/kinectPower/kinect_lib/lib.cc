@@ -43,7 +43,7 @@ bool Initialize(bool near_mode, bool with_sensor_thread) {
     wrapper->GetSensorByIndex(0)->SetNearModeEnabled(near_mode);
     wrapper->GetSensorByIndex(0)->OpenDepthStream();
     wrapper->GetSensorByIndex(0)->OpenColorStream();
-    wrapper->GetSensorByIndex(0)->OpenSkeletonStream();
+    //wrapper->GetSensorByIndex(0)->OpenSkeletonStream();
     wrapper->GetSensorByIndex(0)->OpenInteractionStream(
         kinect_interaction::InteractionClientMenu::instance());
     wrapper->StartSensorThread(0);
@@ -232,6 +232,11 @@ bool GetHandsSkeletons(hskl::float3* positions,
 
 bool GetPianoImage(unsigned char* pixels, unsigned int pixels_size) {
   the_piano.QueryNiceImage(pixels, pixels_size);
+  return true;
+}
+
+bool GetPianoDepth(unsigned char* pixels, unsigned int pixels_size) {
+  the_piano.QueryHandsDepth(pixels, pixels_size);
   return true;
 }
 

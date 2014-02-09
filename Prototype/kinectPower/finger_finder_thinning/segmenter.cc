@@ -17,7 +17,7 @@ const float kMinContourArea = 1000.0;
 const int kSimpleContourTolerance = 1;
 
 bool PixelInDepthRange(unsigned short depth, int min_depth, int max_depth) {
-  return depth > min_depth && depth < max_depth;
+  return depth >= min_depth && depth <= max_depth;
 }
 
 // Calcule une matrice dans laquelle les pixels de |depth_max| dont la
@@ -63,13 +63,6 @@ void Segmenter(const cv::Mat& depth_mat, int min_depth, int max_depth,
   // main sont à 1 et les autres à 0.
   cv::Mat hands_mask;
   ComputeHandsMask(depth_mat, min_depth, max_depth, &hands_mask);
-
-  ///////////////////////////
-
-  // Dilater les mains.
-  //cv::dilate(hands_mask, hands_mask, cv::Mat());
-
-  ///////////////////////////
 
   // Trouver le contour de chaque region de pixels à 1 dans |hands_mask|.
   std::vector<std::vector<cv::Point> > complex_contours;
