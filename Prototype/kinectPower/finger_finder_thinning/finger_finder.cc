@@ -18,8 +18,17 @@ namespace finger_finder_thinning {
 
 namespace {
 
+const cv::Rect kRegionOfInterest(0, 100, 640, 280);
+
 int IndexOf(int x, int y) {
   return y*640 + x;
+}
+
+cv::Point PositionOf(int index, int cols) {
+  cv::Point position;
+  position.x = index % cols;
+  position.y = index / cols;
+  return position;
 }
 
 class SmallContourRemover {
@@ -57,15 +66,159 @@ class SmallContourRemover {
   std::vector<int> component_indexes_;
 };
 
-void ConnectSkeleton(const cv::Mat& distances, cv::Mat* skeleton) {
+const unsigned char kBelongsToComponent = 255;
+const unsigned char kAlreadyAdded = 1;
+
+const int kNeighboursOffsets[4][2] = {
+  /*{-1, -1},*/ { 0, -1}, /*{ 1, -1},*/
+    {-1,  0},               { 1,  0},
+  /*{-1,  1},*/ { 0,  1}, /*{ 1,  1}*/
+};
+const int kNumNeighbours = 4;
+
+class SkeletonConnector {
+ public:
+  SkeletonConnector(const cv::Mat* distance, const cv::Mat* contours, cv::Mat* skeleton)
+      : distance_(distance), contours_(contours), skeleton_(skeleton) {
+    skeleton_ptr_ = skeleton_->ptr();
+    distance_ptr_ = reinterpret_cast<const float*>(distance_->ptr());
+    contours_ptr_ = contours_->ptr();
+
+    component_ = cv::Mat(skeleton->size(), CV_8U);
+    component_ptr_ = component_.ptr();
+  }
+
+  void ObserveComponentStart() {
+    leaf_queue_ = std::priority_queue<LeafInfo>();
+    component_ = cv::Scalar(0);
+  }
+  void ObserveComponentEnd() {
+    ConnectComponent();
+  }
+
+  void ObserveIntersectionStart(int index) {
+    component_ptr_[index] = kBelongsToComponent;
+  }
+
+  void ObserveIntersectionEnd() {
+  }
+
+  void ObservePixel(int index) {
+    component_ptr_[index] = kBelongsToComponent;
+  }
+
+  void ObserveLeaf(int index) {
+    AddLeaf(index, index);
+    component_ptr_[index] = kBelongsToComponent;
+  }
+
+  void DrawConnexions() {
+    for (size_t i = 0; i < connexions_.size(); ++i) {
+      ConnexionInfo connexion = connexions_[i];
+      cv::line(*skeleton_,
+               PositionOf(connexion.source, skeleton_->cols),
+               PositionOf(connexion.destination, skeleton_->cols),
+               cv::Scalar(255), 1);
+    }
+  }
+
+ private:
+  void AddLeaf(int source, int index) {
+    // Ajouter la feuille seulement si elle ne fait pas partie du contour
+    // ni de la composante, et qu'elle n'a pas déjà été ajoutée.
+    if (component_ptr_[index] == 0 && contours_ptr_[index] == 0) {
+      leaf_queue_.push(LeafInfo(source, index, distance_ptr_[index]));
+      component_ptr_[index] = kAlreadyAdded;
+    }
+  }
+
+  void ConnectComponent() {
+    const int kNumSkeletonConnectorSteps = 400;
+
+    int num_essais = 0;
+    while (num_essais < kNumSkeletonConnectorSteps && !leaf_queue_.empty()) {
+      // Prendre le point le plus clair rencontré jusqu'ici.
+      LeafInfo info = leaf_queue_.top();
+      leaf_queue_.pop();
+
+      // Si le point appartient au squelette, mais pas à cette composante,
+      // on a une connexion!
+      if (skeleton_ptr_[info.index] != 0 && component_ptr_[info.index] != kBelongsToComponent) {
+        connexions_.push_back(ConnexionInfo(info.source, info.index));
+        break;
+      }
+
+      // Ajouter tous les voisins de ce point aux candidats.
+      cv::Point position = PositionOf(info.index, skeleton_->cols);
+      
+      for (int i = 0; i < kNumNeighbours; ++i) {
+        cv::Point neighbour_position(position.x + kNeighboursOffsets[i][0],
+                                     position.y + kNeighboursOffsets[i][1]);
+        if (neighbour_position.x >= 0 && neighbour_position.x < skeleton_->cols &&
+            neighbour_position.y >= 0 && neighbour_position.y < skeleton_->rows) {
+          AddLeaf(info.source, IndexOf(neighbour_position.x, neighbour_position.y));
+        }
+      }
+
+      ++num_essais;
+    }
+  }
+  
+  struct ConnexionInfo {
+    ConnexionInfo(int source, int destination)
+        : source(source), destination(destination) {}
+    int source;
+    int destination;
+  };
+
+  struct LeafInfo {
+    LeafInfo(int source, int index, float distance)
+        : source(source), index(index), distance(distance) {}
+    int source;
+    int index;
+    float distance;
+
+    bool operator<(const LeafInfo& other) const {
+      return distance < other.distance;
+    }
+  };
+
+  cv::Mat* skeleton_;
+  unsigned char* skeleton_ptr_;
+
+  const cv::Mat* distance_;
+  const float* distance_ptr_;
+
+  const cv::Mat* contours_;
+  const unsigned char* contours_ptr_;
+
+  cv::Mat component_;
+  unsigned char* component_ptr_;
+
+  std::priority_queue<LeafInfo> leaf_queue_;
+
+  std::vector<ConnexionInfo> connexions_;
+};
+
+void ConnectSkeleton(const cv::Mat& distances, const cv::Mat& contours, cv::Mat* skeleton) {
   assert(distances.type() == CV_32F);
+  assert(contours.type() == CV_8U);
   assert(skeleton->type() == CV_8U);
 
-  // 1. Copier le squelette pour le donner au runner.
+  assert(distances.size() == contours.size());
+  assert(distances.size() == skeleton->size());
+
+  // 1. Faire une copie du squelette que le runner pourra utiliser.
   cv::Mat skeleton_copy;
   skeleton->copyTo(skeleton_copy);
 
+  // 2. Parcourir le squelette à l'aide du runner.
+  SkeletonConnector connector(&distances, &contours, skeleton);
+  bitmap_graph::BitmapRun connector_run;
+  connector_run.Run(&skeleton_copy, &connector);
 
+  // 3. Dessiner les connexions trouvées.
+  connector.DrawConnexions();
 }
 
 }  // namespace
@@ -92,7 +245,8 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
   assert(color_mat.cols == static_cast<int>(kinect_wrapper::kKinectColorWidth));
   assert(color_mat.rows == static_cast<int>(kinect_wrapper::kKinectColorHeight));
 
-  // Extraire des zones potentielles de mains de l'image de profondeur.
+  // Trouver dans l'image de profondeur des contours de mains à la bonne
+  // profondeur.
   std::vector<std::vector<cv::Point> > depth_contours;
   finger_finder::Segmenter(depth_mat, 1, max_hands_depth_,
                            &depth_contours);
@@ -136,6 +290,9 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
   // Enlever tous les contours de couleur qui ne sont pas à la bonne profondeur.
   all_contours = all_contours & dilated_depth_contours_mat;
 
+  // Réduire la taille région à traiter.
+  all_contours = all_contours(kRegionOfInterest);
+
   // Enlever les contours trop courts.
   cv::Mat all_contours_copy;
   all_contours.copyTo(all_contours_copy);
@@ -157,8 +314,6 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
   int ddepth = CV_16S;
   cv::Mat grad_x, grad_y;
 
-  cv::Mat distance_mat_2 = distance_mat * 2;
-
   /// Gradient X
   //Scharr( src_gray, grad_x, ddepth, 1, 0, scale, delta, BORDER_DEFAULT );
   cv::Sobel( distance_mat, grad_x, ddepth, 1, 0, 1, scale, delta, cv::BORDER_DEFAULT );
@@ -168,13 +323,13 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
   cv::Sobel( distance_mat, grad_y, ddepth, 0, 1, 1, scale, delta, cv::BORDER_DEFAULT );
 
   // Générer une image avec le squelette.
-  cv::Mat squelette_mat(depth_mat.size(), CV_8U);
+  cv::Mat squelette_mat(all_contours.size(), CV_8U);
   unsigned char* squelette_run = squelette_mat.ptr();
   short* sobel_x_run = reinterpret_cast<short*>(grad_x.ptr());
   short* sobel_y_run = reinterpret_cast<short*>(grad_y.ptr());
 
-  for (int y = 1; y < depth_mat.rows - 1; ++y) {
-    for (int x = 1; x < depth_mat.cols -1; ++x) {
+  for (int y = 1; y < all_contours.rows - 1; ++y) {
+    for (int x = 1; x < all_contours.cols -1; ++x) {
       int index = IndexOf(x, y);
       short sobel_x = sobel_x_run[index];
       short sobel_y = sobel_y_run[index];
@@ -218,16 +373,21 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
   // TODO(fdoray): Aussi enlever les squelettes qui touchent trop aux bordures.
   squelette_run = squelette_mat.ptr();
   for (size_t i = 0; i < squelette_mat.total(); ++i) {
-    if (depth_contours_mat.ptr()[i] != 255) {
+    if (depth_contours_mat.ptr()[i + 640*kRegionOfInterest.y] != 255) {
       *squelette_run = 0;
     }
     ++squelette_run;
   }
 
   // Essayer de compléter les lignes du squelette.
-  ConnectSkeleton(distance_mat, &squelette_mat);
+  cv::dilate(all_contours, all_contours, cv::Mat(), cv::Point(-1, -1), 2);
+   cv::dilate(squelette_mat, squelette_mat, cv::Mat(), cv::Point(-1, -1), 2);
+  ConnectSkeleton(distance_mat, all_contours, &squelette_mat);
 
-  // Convertir la matrice de distance de float --> char.
+  // Dilater le squelette.
+  cv::dilate(squelette_mat, squelette_mat, cv::Mat(), cv::Point(-1, -1), 1);
+
+  // Créer une image pour montrer le résultat.
   cv::Mat distance_mat_char(distance_mat.size(), CV_8U);
   float* distance_src_run = reinterpret_cast<float*>(distance_mat.ptr());
   unsigned char* distance_dst_run = distance_mat_char.ptr();
@@ -242,18 +402,18 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
     ++distance_dst_run;
   }
 
-  // Mettre le squelette en blanc sur l'image résultat.
   cv::cvtColor( distance_mat_char, *nice_image, CV_GRAY2RGBA);
-  
-  // Mettre du rouge sur les contours.
+
   unsigned char* nice_image_run = nice_image->ptr();
   unsigned char* contours_run = all_contours.ptr();
   squelette_run = squelette_mat.ptr();
   for (size_t i = 0; i < nice_image->total(); ++i) {
     if (*contours_run != 0) {
+      /*
       nice_image_run[image::kBlueIndex] = 0;
       nice_image_run[image::kRedIndex] = 255;
       nice_image_run[image::kGreenIndex] = 0;
+      */
     } else if (*squelette_run == 255) {
       nice_image_run[image::kBlueIndex] = 0;
       nice_image_run[image::kRedIndex] = 0;

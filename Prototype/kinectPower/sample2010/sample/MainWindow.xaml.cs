@@ -60,7 +60,7 @@ namespace sample
     }
 
     private const int kImageWidth = 640;
-    private const int kImageHeight = 480;
+    private const int kImageHeight = 280;
     private const int kPixelSize = 4;
 
     private static System.Timers.Timer aTimer;
