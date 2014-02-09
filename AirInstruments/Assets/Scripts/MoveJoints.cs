@@ -164,7 +164,7 @@ public class MoveJoints : MonoBehaviour {
 					// // ROTATIONS
 					//Apply head rotation
 					if(i == (int)Skeleton.Joint.Head)
-						joints[i].transform.localRotation = player.GetNeckOrientation();
+						joints[i].transform.localRotation = player.GetFaceRotation();
 
 					//Apply hand rotation if needed
 					if(i == (int)Skeleton.Joint.HandRight)

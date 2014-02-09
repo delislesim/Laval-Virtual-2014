@@ -117,13 +117,13 @@ namespace KinectHelpers
 		return Joint.HipCenter;
 	}
 
-	public Quaternion GetNeckOrientation()
+	public Quaternion GetFaceRotation()
 	{
-		LoadSkeleton ();
-		Quaternion rot = bone_orientations[(int)Joint.Head].absoluteRotation.rotationQuaternion;
-		Vector3 eulerAngles = rot.eulerAngles;
-		Quaternion fixedRot = Quaternion.Euler(eulerAngles.x, -eulerAngles.y+180, -eulerAngles.z);
-		return fixedRot;
+			float[] faceRotationXYZ = new float[3];
+			bool isTracking;
+			isTracking = KinectPowerInterop.GetFaceRotation (faceRotationXYZ);
+			Quaternion rotation = Quaternion.Euler (faceRotationXYZ [0], faceRotationXYZ [1], faceRotationXYZ [2]);
+			return rotation;
 	}
 
 	public Quaternion GetBoneOrientation(Joint joint)
