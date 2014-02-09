@@ -64,13 +64,6 @@ void Segmenter(const cv::Mat& depth_mat, int min_depth, int max_depth,
   cv::Mat hands_mask;
   ComputeHandsMask(depth_mat, min_depth, max_depth, &hands_mask);
 
-  ///////////////////////////
-
-  // Dilater les mains.
-  //cv::dilate(hands_mask, hands_mask, cv::Mat());
-
-  ///////////////////////////
-
   // Trouver le contour de chaque region de pixels à 1 dans |hands_mask|.
   std::vector<std::vector<cv::Point> > complex_contours;
   cv::findContours(hands_mask, complex_contours,

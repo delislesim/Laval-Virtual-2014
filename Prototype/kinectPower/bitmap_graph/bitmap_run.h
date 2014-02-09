@@ -45,6 +45,7 @@ inline void PushPixelIfWhite(int index, std::stack<int>* pile_pixels_a_traiter,
 }
 
 // Runner.
+// |bitmap| est modifié au cours de l'exécution de l'algorithme.
 template <typename BuilderType>
 void BitmapRun::Run(cv::Mat* bitmap, BuilderType* builder) {
   assert(bitmap->type() == CV_8U);
