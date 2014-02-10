@@ -14,6 +14,8 @@
 #include "maths/maths.h"
 
 #include "bitmap_graph/bitmap_run.h"
+#include "bitmap_graph/bitmap_graph.h"
+#include "bitmap_graph/bitmap_graph_builder.h"
 
 namespace finger_finder_thinning {
 
@@ -32,51 +34,71 @@ cv::Point PositionOf(int index, int cols) {
   return position;
 }
 
+void GraphToContoursLists(cv::Mat* graph, std::vector<std::vector<int> >* contours_lists) {
+  assert(graph);
+  assert(graph->type() == CV_32S);
+  assert(contours_lists);
+  assert(contours_lists->empty());
+
+  contours_lists->reserve(500);
+
+  int* graph_ptr = reinterpret_cast<int*>(graph->ptr());
+
+  // Commencer de la fin. C'est important de commencer du même endroit
+  // que le constructeur de graphe.
+  for (size_t i = graph->total() - 1; i < graph->total(); --i) {
+    if (graph_ptr[i] == -1)
+      continue;
+
+    // Parcourir le contour.
+    size_t contour_index = contours_lists->size();
+    contours_lists->push_back(std::vector<int>());
+    std::vector<int>& contour = (*contours_lists)[contour_index];
+    contour.reserve(20);
+
+    int next_pixel = static_cast<int>(i);
+    while (next_pixel != -1) {
+      int current_pixel = next_pixel;
+
+      // Ajouter le contour à la liste.
+      contour.push_back(current_pixel);
+      next_pixel = graph_ptr[current_pixel];
+
+      // Se rappeler que ce pixel a été traité.
+      graph_ptr[current_pixel] = -1;
+    }
+  }
+}
+
 void BitmapDijkstra(const cv::Mat& contours, const cv::Mat& depth, cv::Mat* resultat) {
   assert(contours.type() == CV_8U);
   assert(depth.type() == CV_8U);
   
   cv::Mat truncated_depth = depth(kRegionOfInterest);
 
-  cv::Mat dilated_depth;
-  cv::dilate(truncated_depth, dilated_depth, cv::Mat(), cv::Point(-1, -1), 5);
-  assert(dilated_depth.size() == contours.size());
-  assert(dilated_depth.type() == CV_8U);
-
-  // Calculer la distance de chaque point par rapport aux rebords de
-  // l'image de profondeur.
-  cv::Mat depth_inverse = 255 - truncated_depth;
-  cv::Mat distance;
-  cv::distanceTransform(truncated_depth, distance, CV_DIST_L1, 3);
-  assert(distance.type() == CV_32F);
-  assert(distance.size() == contours.size());
-  /*
   // Dessiner les contours sur l'image resultat.
-  cv::cvtColor(dilated_depth, *resultat, CV_GRAY2RGBA);
-  */
+  //cv::cvtColor(contours, *resultat, CV_GRAY2RGBA);
+  *resultat = cv::Mat(contours.size(), CV_8UC4, cv::Scalar(0, 0, 0, 255));
 
-  // Dessiner les contours sur l'image resultat.
-  cv::cvtColor(dilated_depth, *resultat, CV_GRAY2RGBA);
+  // Créer un graphe du contour.
+  cv::Mat graph;
+  bitmap_graph::BuildBitmapGraph(contours, &graph);
 
-  // Trouver le point ayant la profondeur maximale.
-  float* distance_ptr = reinterpret_cast<float*>(distance.ptr());
-  unsigned char* dilated_depth_ptr = dilated_depth.ptr();
-  
-  cv::Point middle(-1, -1);
-  const float kInvalidDistance = -1.0f;
-  float best_distance = kInvalidDistance;
-  
-  for (size_t i = 0; i < distance.total(); ++i) {
+  // Créer des listes de contours.
+  std::vector<std::vector<int> > contours_lists;
+  GraphToContoursLists(&graph, &contours_lists);
 
-    if (dilated_depth.ptr()[i] == 0)
-      continue;
-    
-    if (best_distance == kInvalidDistance || distance_ptr[i] > best_distance) {
-      best_distance = distance_ptr[i];
-      middle = PositionOf(i, distance.cols);
+  // Afficher tous les contours d'au moins 4 éléments.
+  unsigned char* resultat_ptr = resultat->ptr();
+  for (size_t i = 0; i < contours_lists.size(); ++i) {
+    if (contours_lists[i].size() >= 10) {
+      for (size_t j = 0; j < contours_lists[i].size(); ++j) {
+        resultat_ptr[contours_lists[i][j] * 4 + 0] = 255;
+         resultat_ptr[contours_lists[i][j] * 4 + 1] = 0;
+          resultat_ptr[contours_lists[i][j] * 4 + 2] = 0;
+      }
     }
   }
-  cv::circle(*resultat, middle, 4, cv::Scalar(255, 0, 0), 2);
 }
 
 class SmallContourRemover {

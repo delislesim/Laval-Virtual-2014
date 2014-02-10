@@ -5,6 +5,17 @@
 
 namespace bitmap_graph {
 
+
+void BuildBitmapGraph(const cv::Mat& bitmap, cv::Mat* graph);
+
+
+
+///////////////////////////////////////////////////////////////////////
+
+
+
+
+
 class BitmapGraphBuilder;
 
 class BitmapRun {

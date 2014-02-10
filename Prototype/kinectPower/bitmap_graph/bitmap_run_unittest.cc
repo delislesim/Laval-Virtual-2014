@@ -34,4 +34,20 @@ TEST(BitmapRun, Bitmap8x8) {
   run.Run(&test_mat, &builder);
 }
 
+TEST(BitmapRun, NiceAlgo) {
+  unsigned char values[] = {0, 0, 0, 
+                            0, 1, 0, 
+                            1, 1, 1, 
+                            1, 0, 1, 
+                            1, 0, 1, 
+                            1, 0, 0, 
+                            1, 1, 1};
+  cv::Mat test_mat(7, 3, CV_8U, values);
+
+  cv::Mat graph;
+  BuildBitmapGraph(test_mat, &graph);
+
+  std::cout << "M = " << graph << std::endl;
+}
+
 }  // bitmap_graph
