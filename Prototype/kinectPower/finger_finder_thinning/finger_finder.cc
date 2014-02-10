@@ -32,6 +32,53 @@ cv::Point PositionOf(int index, int cols) {
   return position;
 }
 
+void BitmapDijkstra(const cv::Mat& contours, const cv::Mat& depth, cv::Mat* resultat) {
+  assert(contours.type() == CV_8U);
+  assert(depth.type() == CV_8U);
+  
+  cv::Mat truncated_depth = depth(kRegionOfInterest);
+
+  cv::Mat dilated_depth;
+  cv::dilate(truncated_depth, dilated_depth, cv::Mat(), cv::Point(-1, -1), 5);
+  assert(dilated_depth.size() == contours.size());
+  assert(dilated_depth.type() == CV_8U);
+
+  // Calculer la distance de chaque point par rapport aux rebords de
+  // l'image de profondeur.
+  cv::Mat depth_inverse = 255 - truncated_depth;
+  cv::Mat distance;
+  cv::distanceTransform(truncated_depth, distance, CV_DIST_L1, 3);
+  assert(distance.type() == CV_32F);
+  assert(distance.size() == contours.size());
+  /*
+  // Dessiner les contours sur l'image resultat.
+  cv::cvtColor(dilated_depth, *resultat, CV_GRAY2RGBA);
+  */
+
+  // Dessiner les contours sur l'image resultat.
+  cv::cvtColor(dilated_depth, *resultat, CV_GRAY2RGBA);
+
+  // Trouver le point ayant la profondeur maximale.
+  float* distance_ptr = reinterpret_cast<float*>(distance.ptr());
+  unsigned char* dilated_depth_ptr = dilated_depth.ptr();
+  
+  cv::Point middle(-1, -1);
+  const float kInvalidDistance = -1.0f;
+  float best_distance = kInvalidDistance;
+  
+  for (size_t i = 0; i < distance.total(); ++i) {
+
+    if (dilated_depth.ptr()[i] == 0)
+      continue;
+    
+    if (best_distance == kInvalidDistance || distance_ptr[i] > best_distance) {
+      best_distance = distance_ptr[i];
+      middle = PositionOf(i, distance.cols);
+    }
+  }
+  cv::circle(*resultat, middle, 4, cv::Scalar(255, 0, 0), 2);
+}
+
 class SmallContourRemover {
  public:
   SmallContourRemover(cv::Mat* mat_with_contours_to_remove, int num_pixels)
@@ -333,7 +380,6 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
   SmallContourRemover contour_remover(&all_contours, 25);
   bitmap_graph::BitmapRun contour_remover_run;
   contour_remover_run.Run(&all_contours_copy, &contour_remover);
-
   /*
   // Inverser les valeurs pour faire plaisir à l'algorithme.
   cv::Mat all_contours_inverse = 255 - all_contours;
@@ -413,13 +459,13 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
     ++squelette_run;
   }
   */
-  
   // Dilater le contour.
+  /*
   unsigned char dilater[] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
   cv::Mat rounded_dilater(cv::Size(3, 3), CV_8U, dilater);
 
   cv::dilate(all_contours, all_contours, rounded_dilater, cv::Point(-1, -1), 1);
-
+  */
   /*
   // Essayer de compléter les lignes du squelette.
   ConnectSkeleton(distance_mat, all_contours, &squelette_mat);
@@ -433,7 +479,7 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
   squelette_remover_run.Run(&squelette_mat_copy, &squelette_remover);
 
   squelette_mat = squelette_mat & (all_contours == 0);
-
+  
   cv::dilate(squelette_mat, squelette_mat, rounded_dilater, cv::Point(-1, -1), 3);
 
   // Détection de coins.
@@ -469,7 +515,9 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
 
   //cv::cvtColor( distance_mat_char, *nice_image, CV_GRAY2RGBA);
   *nice_image = cv::Mat(all_contours.size(), CV_8UC4, cv::Scalar(0));
+  BitmapDijkstra(all_contours, depth_contours_mat, nice_image);
 
+  /*
   unsigned char* nice_image_run = nice_image->ptr();
   unsigned char* contours_run = all_contours.ptr();
   //float* corners_run = reinterpret_cast<float*>(corners_mat_normalized.ptr());
@@ -483,24 +531,23 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
       nice_image_run[image::kAlphaIndex] = 255;
     }
     
-    
-    /*else if (*squelette_run != 0) {
+    else if (*squelette_run != 0) {
       nice_image_run[image::kRedIndex] = 0;
       nice_image_run[image::kGreenIndex] = 0;
       nice_image_run[image::kBlueIndex] = 255;
-    }*/
+      nice_image_run[image::kAlphaIndex] = 255;
+    }
 
-    /*
     if (*corners_run > 100) {
       cv::circle(*nice_image, PositionOf(i, nice_image->cols), 1, cv::Scalar(255, 255, 0), 4);
     }
-    */
 
     nice_image_run += 4;
     ++contours_run;
     //++corners_run;
     //++squelette_run;
   }
+  */
 }
 
 }  // namespace hand_extractor
