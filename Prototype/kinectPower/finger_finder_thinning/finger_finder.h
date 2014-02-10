@@ -7,13 +7,19 @@
 
 namespace finger_finder_thinning {
 
+struct FingerDescription {
+  int x;
+  int y;
+  int depth;
+};
+
 class FingerFinder {
  public:
   FingerFinder(int hands_depth, int hands_depth_tolerance);
 
   // Computes the position of the fingers from a 2D image.
   void FindFingers(const kinect_wrapper::KinectSensorData& data,
-                   cv::Mat* nice_image);
+                   cv::Mat* nice_image, std::vector<FingerDescription>* fingers);
 
  private:
   // Profondeur minimale et maximale permise pour les mains.

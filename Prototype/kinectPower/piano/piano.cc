@@ -49,9 +49,13 @@ void Piano::ObserveDepth(
   
   
   // Find the fingers in the depth matrix.
+  std::vector<finger_finder_thinning::FingerDescription> fingers;
+
   cv::Mat image;
-  finger_finder_.FindFingers(data, &image);
+  finger_finder_.FindFingers(data, &image, &fingers);
   nice_image_.SetNext(image);
+
+  fingers_.SetNext(fingers);
 
         /*
   // Obtenir les données requises.
@@ -180,6 +184,15 @@ void Piano::QueryHandParameters(std::vector<finger_finder::HandParameters>* hand
     return;
 
   hand_parameters_.GetCurrent(hand_parameters);
+}
+
+void Piano::QueryFingers(std::vector<finger_finder_thinning::FingerDescription>* fingers) {
+  assert(fingers);
+
+  if (!started_)
+    return;
+
+  fingers_.GetCurrent(fingers); 
 }
 
 }  // namespace piano

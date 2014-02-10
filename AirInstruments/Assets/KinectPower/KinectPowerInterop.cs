@@ -199,4 +199,7 @@ public class KinectPowerInterop
 
   [DllImport(@"kinect_lib.dll", EntryPoint = "GetPianoHands", CallingConvention = CallingConvention.Cdecl)]
   public static extern bool GetPianoHands(int[] positions, byte[] known);
+	
+  [DllImport(@"kinect_lib.dll", EntryPoint = "GetPianoFingers", CallingConvention = CallingConvention.Cdecl)]
+  public static extern bool GetPianoFingers(uint[] positions, byte[] known);
 }

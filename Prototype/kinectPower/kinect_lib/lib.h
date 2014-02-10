@@ -63,4 +63,7 @@ GetPianoDepth(unsigned char* pixels, unsigned int pixels_size);
 extern "C" bool __declspec(dllexport)
 GetPianoHands(unsigned int* positions, unsigned char* known);
 
+extern "C" bool __declspec(dllexport)
+GetPianoFingers(unsigned int* values, unsigned char* known);
+
 

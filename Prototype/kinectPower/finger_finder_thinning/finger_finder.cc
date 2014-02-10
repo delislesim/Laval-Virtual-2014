@@ -70,11 +70,41 @@ void GraphToContoursLists(cv::Mat* graph, std::vector<std::vector<int> >* contou
   }
 }
 
-void BitmapDijkstra(const cv::Mat& contours, const cv::Mat& depth, cv::Mat* resultat) {
+/*
+int AverageDepth(const cv::Point& position, const cv::Mat& depth_mask, const cv::Mat& depth) {
+  int depth_sum = 0;
+  int depth_num_pixels = 0;
+
+  const int kDistanceDepth = 10;
+
+  for (int i = position.x - kDistanceDepth; i < position.x + kDistanceDepth; ++i) {
+    for (int j = position.y - kDistanceDepth; j < position.y + kDistanceDepth; ++j) {
+      if (i < 0 || i >= depth.cols || j < 0 || j >= depth.rows)
+        continue;
+
+      int depth_val = depth.at<unsigned short>(cv::Point(i, j));
+      if (depth.at<unsigned char>(cv::Point(i, j)) != 0) {
+        depth_sum += depth_val;
+        ++depth_num_pixels;
+      }
+    }
+  }
+
+  if (depth_num_pixels == 0)
+    return 0;
+
+  return depth_sum / depth_num_pixels;
+}
+
+*/
+
+void BitmapDijkstra(const cv::Mat& contours,
+                    cv::Mat* resultat, std::vector<FingerDescription>* fingers) {
   assert(contours.type() == CV_8U);
-  assert(depth.type() == CV_8U);
+
+  // TODO(fdoray): Calculer la profondeur après un changement de coordonnées...
   
-  cv::Mat truncated_depth = depth(kRegionOfInterest);
+  //cv::Mat truncated_depth = depth(kRegionOfInterest);
 
   // Dessiner les contours sur l'image resultat.
   //cv::cvtColor(contours, *resultat, CV_GRAY2RGBA);
@@ -88,17 +118,105 @@ void BitmapDijkstra(const cv::Mat& contours, const cv::Mat& depth, cv::Mat* resu
   std::vector<std::vector<int> > contours_lists;
   GraphToContoursLists(&graph, &contours_lists);
 
+  // Calculer les angles en chaque endroit du contour.
+  const int kNumPixelsForAngle = 20;
+  std::vector<std::vector<double> > angles;
+
+  for (size_t contour_index = 0; contour_index < contours_lists.size(); ++contour_index) {
+    angles.push_back(std::vector<double>(contours_lists[contour_index].size(), 0.0));
+
+    // Calculer l'angle en chaque point du contour.
+    for (size_t point_index = kNumPixelsForAngle;
+         static_cast<int>(point_index) < static_cast<int>(contours_lists[contour_index].size()) - kNumPixelsForAngle;
+         ++point_index) {
+      cv::Point before(PositionOf(contours_lists[contour_index][point_index - kNumPixelsForAngle], contours.cols));
+      cv::Point center(PositionOf(contours_lists[contour_index][point_index], contours.cols));
+      cv::Point after(PositionOf(contours_lists[contour_index][point_index + kNumPixelsForAngle], contours.cols));
+
+      angles[contour_index][point_index] = abs(maths::AngleBetween(before, center, after));  // TODO(fdoray): Valeur absolue...
+    }
+  }
+
+  // Tuer les angles qui sont inférieurs à un voisin proche.
+  for (size_t contour_index = 0; contour_index < contours_lists.size(); ++contour_index) {
+
+    for (size_t point_index = kNumPixelsForAngle;
+         static_cast<int>(point_index) < static_cast<int>(contours_lists[contour_index].size()) - kNumPixelsForAngle;
+         ++point_index) {
+      double angle = angles[contour_index][point_index];
+      if (angle == 0.0)
+        continue;
+
+      for (size_t neighbour_index = point_index - kNumPixelsForAngle;
+           neighbour_index < point_index + kNumPixelsForAngle;
+           ++neighbour_index) {
+        if (angles[contour_index][neighbour_index] > angle) {
+          angles[contour_index][neighbour_index] = 0.0;
+        }
+      }
+
+      // Tant qu'à y être, aussi enlever les trop gros angles.
+      if (angle > maths::kPi / 4.0)
+        angles[contour_index][point_index] = 0.0;
+
+    }
+  }
+
+  // Retourner les meilleurs points.
+  for (size_t contour_index = 0; contour_index < contours_lists.size(); ++contour_index) {
+    for (size_t point_index = kNumPixelsForAngle;
+         static_cast<int>(point_index) < static_cast<int>(contours_lists[contour_index].size()) - kNumPixelsForAngle;
+         ++point_index) {
+      double angle = angles[contour_index][point_index]; 
+      int index = contours_lists[contour_index][point_index];
+
+      if (angle != 0) {
+        cv::Point position(PositionOf(index, contours.cols));
+
+        FingerDescription description;
+        description.x = position.x;
+        description.y = position.y;
+        description.depth = 0;
+
+        fingers->push_back(description);
+      }
+    }
+  }
+
+
+
+  /*
+  ////////////////// AFFICHAGE ///////////////////
+
+  // Afficher les angles.
+  for (size_t contour_index = 0; contour_index < contours_lists.size(); ++contour_index) {
+    for (size_t point_index = kNumPixelsForAngle;
+         static_cast<int>(point_index) < static_cast<int>(contours_lists[contour_index].size()) - kNumPixelsForAngle;
+         ++point_index) {
+      double angle = angles[contour_index][point_index];
+      
+      if (angle != 0.0) {
+        cv::Point position(PositionOf(contours_lists[contour_index][point_index], contours.cols));
+        
+        unsigned char normalized_angle = 255.0 - 255.0 * abs(angle) / maths::kPi;
+
+        cv::circle(*resultat, position, 2, cv::Scalar(0, normalized_angle, 0), 2);
+      }
+    }
+  }
+
   // Afficher tous les contours d'au moins 4 éléments.
   unsigned char* resultat_ptr = resultat->ptr();
   for (size_t i = 0; i < contours_lists.size(); ++i) {
     if (contours_lists[i].size() >= 10) {
       for (size_t j = 0; j < contours_lists[i].size(); ++j) {
         resultat_ptr[contours_lists[i][j] * 4 + 0] = 255;
-         resultat_ptr[contours_lists[i][j] * 4 + 1] = 0;
-          resultat_ptr[contours_lists[i][j] * 4 + 2] = 0;
+        resultat_ptr[contours_lists[i][j] * 4 + 1] = 0;
+        resultat_ptr[contours_lists[i][j] * 4 + 2] = 0;
       }
     }
   }
+  */
 }
 
 class SmallContourRemover {
@@ -331,7 +449,7 @@ FingerFinder::FingerFinder(int hands_depth, int hands_depth_tolerance)
 }
 
 void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
-                               cv::Mat* nice_image) {
+                               cv::Mat* nice_image, std::vector<FingerDescription>* fingers) {
   assert(nice_image);
 
   cv::Mat depth_mat;
@@ -537,7 +655,7 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
 
   //cv::cvtColor( distance_mat_char, *nice_image, CV_GRAY2RGBA);
   *nice_image = cv::Mat(all_contours.size(), CV_8UC4, cv::Scalar(0));
-  BitmapDijkstra(all_contours, depth_contours_mat, nice_image);
+  BitmapDijkstra(all_contours, nice_image, fingers);
 
   /*
   unsigned char* nice_image_run = nice_image->ptr();

@@ -264,3 +264,25 @@ bool GetPianoHands(unsigned int* /* positions */, unsigned char* /* known */) {
   */
   return true;
 }
+
+bool GetPianoFingers(unsigned int* values, unsigned char* known) {
+  const int kNumFingers = 25;
+
+  std::vector<finger_finder_thinning::FingerDescription> fingers;
+  the_piano.QueryFingers(&fingers);
+
+  int i = 0;
+  for (; i < kNumFingers && i < fingers.size(); ++i) {
+    finger_finder_thinning::FingerDescription desc = fingers[i];
+    values[i*3 + 0] = desc.x;
+    values[i*3 + 1] = desc.y;
+    values[i*3 + 2] = desc.depth;
+    known[i] = 1;
+  }
+
+  for (; i < kNumFingers; ++i) {
+    known[i] = 0;
+  }
+
+  return true;
+}
