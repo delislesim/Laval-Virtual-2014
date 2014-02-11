@@ -1,23 +1,23 @@
 #pragma once
 
 #include <opencv2/core/core.hpp>
+#include <vector>
 
 namespace finger_finder {
 
 class FingerInfo {
  public:
-  FingerInfo(int x, int y, int depth)
-      : x_(x), y_(y), depth_(depth) {}
+  FingerInfo(const cv::Point& position, int depth)
+      : position_(position), depth_(depth) {}
 
-  int x() const { return x_; }
-  int y() const { return y_; }
+  const cv::Point& position() const { return position_; }
   int depth() const { return depth_; }
 
  private:
-  int x_;
-  int y_;
+  cv::Point position_;
   int depth_;
-
 };
+
+typedef std::vector<FingerInfo> FingerInfoVector;
 
 }  // namespace finger_finder

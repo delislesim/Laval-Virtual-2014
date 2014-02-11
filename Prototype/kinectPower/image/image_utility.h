@@ -13,6 +13,22 @@
 
 namespace image {
 
+inline cv::Point PositionOfIndex(int index, cv::Mat* mat) {
+  return cv::Point(index % mat->cols, index / mat->cols);
+}
+
+inline cv::Point PositionOfIndex(int index, const cv::Mat& mat) {
+  return cv::Point(index % mat.cols, index / mat.cols);
+}
+
+inline int IndexOfPosition(const cv::Point& position, cv::Mat* mat) {
+  return mat->cols * position.y + position.x;
+}
+
+inline int IndexOfPosition(const cv::Point& position, const cv::Mat& mat) {
+  return mat.cols * position.y + position.x;
+}
+
 // Indique si les coordonnées du point spécifié sont à l'extérieur des limites
 // de l'image fournie.
 inline bool OutOfBoundaries(const cv::Mat& image, const cv::Point& point) {

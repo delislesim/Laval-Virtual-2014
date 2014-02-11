@@ -19,7 +19,7 @@ class FingerFinder {
   
   // Permet d'obtenir les positions de doigts calculées pour la dernière
   // image reçue.
-  void QueryFingers(std::vector<FingerInfo>* fingers);
+  void QueryFingers(FingerInfoVector* fingers);
 
  private:
   // Cette méthode s'attend à recevoir 2 matrices dans le même système de
@@ -32,7 +32,7 @@ class FingerFinder {
   unsigned short max_hands_depth_;
 
   // Doigts trouvés.
-  std::vector<FingerInfo> fingers_;
+  FingerInfoVector fingers_;
 
 };
 

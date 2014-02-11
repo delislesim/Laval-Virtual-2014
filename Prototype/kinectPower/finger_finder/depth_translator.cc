@@ -1,4 +1,4 @@
-#include "finger_finder/bitmap_graph.h"
+#include "finger_finder/depth_translator.h"
 
 #include <vector>
 

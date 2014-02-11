@@ -20,14 +20,14 @@ class Piano : public kinect_wrapper::KinectObserver {
       const kinect_wrapper::KinectSensorData& data) override;
 
   void QueryNiceImage(unsigned char* nice_image, size_t nice_image_size);
-  //void QueryFingers(std::vector<finger_finder_thinning::FingerDescription>* fingers);
+  void QueryFingers(finger_finder::FingerInfoVector* fingers);
 
  private:
   finger_finder::FingerFinder finger_finder_;
 
   bool started_;
   kinect_wrapper::KinectSwitch<cv::Mat> nice_image_;
-  //kinect_wrapper::KinectSwitch<std::vector<finger_finder_thinning::FingerDescription> > fingers_;
+  kinect_wrapper::KinectSwitch<finger_finder::FingerInfoVector> fingers_;
 };
 
 }  // namespace piano

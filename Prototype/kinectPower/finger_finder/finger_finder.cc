@@ -2,7 +2,10 @@
 
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include "finger_finder/average_depth.h"
+#include "finger_finder/bitmap_graph_to_contours_list.h"
 #include "finger_finder/canny_contour.h"
+#include "finger_finder/contour_angle.h"
 #include "finger_finder/depth_translator.h"
 #include "image/image_constants.h"
 #include "image/image_utility.h"
@@ -11,6 +14,10 @@
 namespace finger_finder {
 
 namespace {
+
+// TODO(fdoray): Ceci est un doublon de la constante déclarée dans
+// contour_angle.cc.
+const int kNumPixelsForAngle = 20;
 
 // Région de l'image de couleur qui nous intéresse pour la détection des
 // mains.
@@ -80,6 +87,57 @@ void FingerFinder::ObserveDataInternal(const cv::Mat& depth_mat,
   cv::dilate(target_depth, target_depth, image::kRoundedDilater,
              image::kRoundedDilaterCenter, image::kIteration6);
   contours = contours & target_depth;
+
+  // Calculer les angles de chaque point des contours.
+  ContoursList contours_list;
+  ContourAngle(contours, &contours_list);
+
+  // Créer une liste de doigts.
+  FingerInfoVector finger_info_vector;
+
+  for (size_t contour_index = 0; contour_index < contours_list.size();
+       ++contour_index) {
+    int end_point = static_cast<int>(contours_list[contour_index].size()) -
+        kNumPixelsForAngle;
+
+    for (int point_index = kNumPixelsForAngle; point_index < end_point;
+         ++point_index) {
+      // Considérer le point si son angle est non nul et qu'il est plus haut
+      // que ses voisins.
+      ContourPointInfo& contour_point_info =
+          contours_list[contour_index][point_index];
+
+      int current_index = contour_point_info.index;
+      int previous_index =
+          contours_list[contour_index][point_index - kNumPixelsForAngle].index;
+      int next_index =
+          contours_list[contour_index][point_index + kNumPixelsForAngle].index;
+
+      cv::Point current_position(
+          image::PositionOfIndex(current_index, depth_mat));
+      cv::Point previous_position(
+          image::PositionOfIndex(previous_index, depth_mat));
+      cv::Point next_position(
+          image::PositionOfIndex(next_index, depth_mat));
+
+      if (contour_point_info.angle != 0.0 &&
+          current_position.y < previous_position.y &&
+          current_position.y < next_position.y) {
+        // On a trouvé un doigt potentiel.
+
+        // Calculer sa profondeur.
+        int depth = AverageDepth(current_position, depth_mat,
+                                 min_hands_depth_, max_hands_depth_);
+
+        // L'ajouter à la liste des doigts potentiels.
+        FingerInfo finger_info(current_position, depth);
+        finger_info_vector.push_back(finger_info);
+      }
+    }
+  }
+
+  // Copier la liste de doigts résultante.
+  fingers_ = finger_info_vector;
 
   // Affichage.
   cv::cvtColor(contours, *nice_image, CV_GRAY2RGBA);

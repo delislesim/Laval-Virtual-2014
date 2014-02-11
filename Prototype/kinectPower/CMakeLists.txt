@@ -85,8 +85,12 @@ add_library(bitmap_graph
   )
 
 add_library(finger_finder
+  finger_finder/average_depth.cc
+  finger_finder/average_depth.h
   finger_finder/bitmap_graph.cc
   finger_finder/bitmap_graph.h
+  finger_finder/bitmap_graph_to_contours_list.cc
+  finger_finder/bitmap_graph_to_contours_list.h
   finger_finder/canny_contour.cc
   finger_finder/canny_contour.h
   finger_finder/continuity_filter.cc

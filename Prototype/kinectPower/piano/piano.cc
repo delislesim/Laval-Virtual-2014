@@ -52,12 +52,19 @@ void Piano::ObserveDepth(
   // Find the fingers.
   cv::Mat image;
   finger_finder_.ObserveData(depth_mat, color_mat, &image);
+
+  finger_finder::FingerInfoVector fingers;
+  finger_finder_.QueryFingers(&fingers);
+  fingers_.SetNext(fingers);
+
+  // Enjoliver l'image.
+  for (size_t i = 0; i < fingers.size(); ++i) {
+    cv::circle(image, fingers[i].position(), 2, image::kBlue, 2);
+  }
+
   nice_image_.SetNext(image);
 
-  //fingers_.SetNext(fingers);
-
-  // Enregistrer le résultat.
-  nice_image_.SetNext(image);
+  // Donner la permission de faire des requêtes.
   started_ = true;
 }
 
@@ -73,8 +80,7 @@ void Piano::QueryNiceImage(unsigned char* nice_image, size_t nice_image_size) {
   memcpy_s(nice_image, nice_image_size, nice_mat.ptr(), nice_mat.total() * 4);
 }
 
-/*
-void Piano::QueryFingers(std::vector<finger_finder_thinning::FingerDescription>* fingers) {
+void Piano::QueryFingers(finger_finder::FingerInfoVector* fingers) {
   assert(fingers);
 
   if (!started_)
@@ -82,6 +88,5 @@ void Piano::QueryFingers(std::vector<finger_finder_thinning::FingerDescription>*
 
   fingers_.GetCurrent(fingers); 
 }
-*/
 
 }  // namespace piano
