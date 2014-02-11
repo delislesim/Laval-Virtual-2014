@@ -20,5 +20,15 @@ extern const cv::Scalar kGrey;
 extern const int kThickness1;
 extern const int kThickness2;
 
+// Matrice à utiliser comme kernel de la fonction cv::dilate pour avoir
+// une forme arrondie.
+extern const cv::Mat kRoundedDilater;
+extern const cv::Point kRoundedDilaterCenter;
+extern const int kIteration1;
+extern const int kIteration2;
+extern const int kIteration3;
+extern const int kIteration4;
+extern const int kIteration5;
+extern const int kIteration6;
 
 }  // namespace image

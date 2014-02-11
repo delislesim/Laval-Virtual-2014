@@ -13,8 +13,6 @@
 
 namespace image {
 
-void InitializeBlackImage(cv::Mat* image);
-
 // Indique si les coordonnées du point spécifié sont à l'extérieur des limites
 // de l'image fournie.
 inline bool OutOfBoundaries(const cv::Mat& image, const cv::Point& point) {
@@ -24,7 +22,5 @@ inline bool OutOfBoundaries(const cv::Mat& image, const cv::Point& point) {
   }
   return false;
 }
-
-void RgbImageToRgbaImage(const cv::Mat& rgb, cv::Mat* rgba);
 
 }  // namespace image

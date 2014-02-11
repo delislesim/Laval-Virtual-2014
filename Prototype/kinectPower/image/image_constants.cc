@@ -15,4 +15,15 @@ const cv::Scalar kGrey(150, 150, 150);
 const int kThickness1 = 1;
 const int kThickness2 = 2;
 
+unsigned char kRoundedDilaterData[] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+const cv::Mat kRoundedDilater(cv::Size(3, 3), CV_8U, kRoundedDilaterData);
+const cv::Point kRoundedDilaterCenter(-1, -1);
+
+const int kIteration1 = 1;
+const int kIteration2 = 2;
+const int kIteration3 = 3;
+const int kIteration4 = 4;
+const int kIteration5 = 5;
+const int kIteration6 = 6;
+
 }  // namespace image

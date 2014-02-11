@@ -2,7 +2,7 @@
 
 #include <opencv2/imgproc/imgproc.hpp>
 
-namespace finger_finder_thinning {
+namespace finger_finder {
 
 namespace {
 

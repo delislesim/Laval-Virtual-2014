@@ -2,6 +2,7 @@
 
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include "finger_finder/canny_contour.h"
 #include "finger_finder/depth_translator.h"
 #include "image/image_constants.h"
 #include "image/image_utility.h"
@@ -18,10 +19,11 @@ const cv::Rect kRegionOfInterest(0, 100,
 
 }  // namespace
 
-FingerFinder::FingerFinder(unsigned short min_hands_depth,
-                           unsigned short max_hands_depth)
-    : min_hands_depth_(min_hands_depth),
-      max_hands_depth_(max_hands_depth) {
+FingerFinder::FingerFinder(unsigned short target_depth,
+                           unsigned short depth_tolerance)
+    : min_hands_depth_(target_depth - depth_tolerance),
+      max_hands_depth_(target_depth + depth_tolerance) {
+  assert(depth_tolerance <= target_depth);
 }
 
 void FingerFinder::ObserveData(const cv::Mat& depth_mat,
@@ -52,25 +54,36 @@ void FingerFinder::ObserveData(const cv::Mat& depth_mat,
   cv::Mat depth_mat_truncated = depth_mat_color_coordinates(kRegionOfInterest);
   cv::Mat color_mat_truncated = color_mat(kRegionOfInterest);
 
-  // Retourner une nice image temporaire.
-  *nice_image = cv::Mat(depth_mat_truncated.size(), CV_8UC4);
-  
-  MAT_PTR(depth_mat_truncated, unsigned short);
-  MAT_PTR_PTR(nice_image, unsigned char);
+  // Passer le résultat à la méthode qui exécute le coeur de l'algorithme.
+  ObserveDataInternal(depth_mat_truncated, color_mat_truncated, nice_image);
+}
 
-  FOR_MATRIX(i, *nice_image) {
-    unsigned char normalized_depth = 0;
-    if (depth_mat_truncated_ptr[i] < 2000) {
-      normalized_depth = (unsigned char)((double)depth_mat_truncated_ptr[i] * 255.0 / 2000.0);
-    } else {
-      normalized_depth = 255;
-    }
+void FingerFinder::ObserveDataInternal(const cv::Mat& depth_mat,
+                                       const cv::Mat& color_mat,
+                                       cv::Mat* nice_image) {
+  assert(depth_mat.size() == kRegionOfInterest.size());
+  assert(depth_mat.type() == CV_16U);
 
-    nice_image_ptr[i * 4 + image::kRedIndex] = normalized_depth;
-    nice_image_ptr[i * 4 + image::kBlueIndex] = normalized_depth;
-    nice_image_ptr[i * 4 + image::kGreenIndex] = normalized_depth;
-    nice_image_ptr[i * 4 + image::kAlphaIndex] = 255;
-  }
+  assert(color_mat.size() == kRegionOfInterest.size());
+  assert(color_mat.type() == CV_8UC4);
+
+  assert(nice_image);
+
+  // Extraire des contours de l'image de couleur.
+  cv::Mat contours;
+  CannyContour(color_mat, &contours);
+
+  // Enlever tout ce qui n'est pas à la bonne profondeur. Étant donné que
+  // l'image de profondeur n'est pas très précise, on la dilate un peu avant
+  // d'appliquer le masque.
+  cv::Mat target_depth = depth_mat < max_hands_depth_ & depth_mat > 0;
+  cv::dilate(target_depth, target_depth, image::kRoundedDilater,
+             image::kRoundedDilaterCenter, image::kIteration6);
+  contours = contours & target_depth;
+
+  // Affichage.
+  cv::cvtColor(contours, *nice_image, CV_GRAY2RGBA);
+
 }
 
 void FingerFinder::QueryFingers(std::vector<FingerInfo>* fingers) {
