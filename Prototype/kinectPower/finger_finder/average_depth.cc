@@ -6,55 +6,90 @@ namespace finger_finder {
 
 namespace {
 
-// Rayon (carré) dans lequel faire la moyenne.
-const int kRadius = 5;
+// Nombre de points à obtenir pour une bonne moyenne.
+const int kNumPoints = 20;
 
-int AverageDepthInternal(const cv::Point& position, const cv::Mat& depth_mat,
-                         unsigned short min_depth, unsigned short max_depth,
-                         int radius) {
-  assert(depth_mat.type() == CV_16U);
+// Distance maximum à parcourir.
+const int kMaxDistance = 25;
 
-  int sum = 0;
-  int num_points = 0;
+// Largeur à considérer de chaque côté de la ligne de direction.
+const int kAverageWidth = 5;
 
-  for (int y = position.y - radius; y < position.y + radius; ++y) {
-    for (int x = position.x - radius; x < position.x + radius; ++x) {
-      cv::Point at(x, y);
-      if (!image::OutOfBoundaries(depth_mat, at)) {
-        int depth = depth_mat.at<unsigned short>(at);
-        if (depth > min_depth && depth < max_depth) {
-          sum += depth;
-          ++num_points;
-        }
-      }
+inline bool AddPoint(const cv::Point& point, const cv::Mat& depth_mat,
+                     unsigned short min_depth, unsigned short max_depth,
+                     int* sum, int* num_points) {
+  if (!image::OutOfBoundaries(depth_mat, point)) {
+    unsigned short depth = depth_mat.at<unsigned short>(point);
+    if (depth > min_depth && depth < max_depth) {
+      *sum += depth;
+      *num_points += 1;
+      return true;
     }
   }
-
-  if (num_points == 0)
-    return 0;
-
-  int average_depth = sum / num_points;
-  return average_depth;
+  return false;
 }
 
 }  // namespace
 
-int AverageDepth(const cv::Point& position, const cv::Mat& depth_mat,
+int AverageDepth(const cv::Point& position, const cv::Vec2i direction,
+                 const cv::Mat& depth_mat,
                  unsigned short min_depth, unsigned short max_depth) {
   assert(depth_mat.type() == CV_16U);
 
-  int average_depth = AverageDepthInternal(position, depth_mat,
-                                           min_depth, max_depth,
-                                           kRadius);
+  if (direction.val[0] == 0 && direction.val[1] == 0)
+    return (min_depth + max_depth) / 2;
 
-  // Si jamais aucun point n'était à la bonne profondeur, doubler le rayon
-  // de recherche.
-  if (average_depth == 0) {
-    average_depth = AverageDepthInternal(position, depth_mat,
-                                         min_depth, max_depth,
-                                         kRadius * 2);
+  // Normaliser le vecteur de direction.
+  double norm_direction = cv::norm(direction);
+  cv::Vec2d normalized_direction(
+    static_cast<double>(direction.val[0]) / norm_direction,
+    static_cast<double>(direction.val[1]) / norm_direction
+  );
+  cv::Vec2d position_double(
+    static_cast<double>(position.x),
+    static_cast<double>(position.y)
+  );
+
+  int num_points = 0;
+  int sum = 0;
+  int distance = 0;
+
+  int last_y = -1;
+
+  while (distance < kMaxDistance && num_points < kNumPoints) {
+    cv::Vec2d middle = position_double + normalized_direction * distance;
+    cv::Point middle_point(
+      static_cast<int>(middle.val[0]),
+      static_cast<int>(middle.val[1])
+    );
+    distance += 1.0;
+
+    if (middle_point.y == last_y)
+      continue;
+
+    // Le point milieu.
+    AddPoint(middle_point, depth_mat, min_depth, max_depth, &sum, &num_points);
+
+    // Vers la gauche.
+    for (int x = middle_point.x - 1; x > middle_point.x - kAverageWidth; --x) {
+      if (!AddPoint(cv::Point(x, middle_point.y), depth_mat, min_depth, max_depth, &sum, &num_points))
+        break;
+    }
+
+    // Vers la droite.
+    for (int x = middle_point.x + 1; x < middle_point.x + kAverageWidth; ++x) {
+      if (!AddPoint(cv::Point(x, middle_point.y), depth_mat, min_depth, max_depth, &sum, &num_points))
+        break;
+    }
+
+    // Se rappeler du y qu'on vient de visiter.
+    last_y = middle_point.y;
   }
 
+  if (num_points == 0)
+    return (min_depth + max_depth) / 2;
+
+  int average_depth = sum / num_points;
   return average_depth;
 }
 

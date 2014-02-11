@@ -126,7 +126,13 @@ void FingerFinder::ObserveDataInternal(const cv::Mat& depth_mat,
         // On a trouvé un doigt potentiel.
 
         // Calculer sa profondeur.
-        int depth = AverageDepth(current_position, depth_mat,
+        cv::Vec2i direction_previous = previous_position - current_position;
+        cv::Vec2i direction_next = next_position - current_position;
+        cv::Vec2i direction_average = (direction_previous + direction_next) / 2;
+
+        cv::Point depth_center(current_position.x, current_position.y - 10);
+
+        int depth = AverageDepth(depth_center, direction_average, depth_mat,
                                  min_hands_depth_, max_hands_depth_);
 
         // L'ajouter à la liste des doigts potentiels.
@@ -140,7 +146,26 @@ void FingerFinder::ObserveDataInternal(const cv::Mat& depth_mat,
   fingers_ = finger_info_vector;
 
   // Affichage.
-  cv::cvtColor(contours, *nice_image, CV_GRAY2RGBA);
+  *nice_image = cv::Mat(depth_mat.size(), CV_8UC4);
+
+  MAT_PTR(depth_mat, const unsigned short);
+  MAT_PTR_PTR(nice_image, unsigned char);
+
+  FOR_MATRIX(i, depth_mat) {
+    unsigned short depth = depth_mat_ptr[i];
+    unsigned char normalized_depth = 0;
+    if (normalized_depth < 1000)
+      normalized_depth = (unsigned char)((double)depth * 255.0 / 1000.0);
+    else
+      normalized_depth = 255;
+
+    nice_image_ptr[i * 4 + image::kRedIndex] = normalized_depth;
+    nice_image_ptr[i * 4 + image::kGreenIndex] = normalized_depth;
+    nice_image_ptr[i * 4 + image::kBlueIndex] = normalized_depth;
+    nice_image_ptr[i * 4 + image::kAlphaIndex] = 255;
+  }
+  
+  //cv::cvtColor(contours, *nice_image, CV_GRAY2RGBA);
 
 }
 
