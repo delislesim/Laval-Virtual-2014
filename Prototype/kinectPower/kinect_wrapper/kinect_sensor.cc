@@ -353,6 +353,18 @@ bool KinectSensor::MapDepthPointToColorPoint(NUI_DEPTH_IMAGE_POINT& depth_point,
   return SUCCEEDED(res);
 }
 
+bool KinectSensor::MapColorFrameToDepthFrame(NUI_DEPTH_IMAGE_PIXEL* depth_pixels,
+                                             NUI_DEPTH_IMAGE_POINT* depth_points) {
+  HRESULT res = coordinate_mapper_->MapColorFrameToDepthFrame(kColorImageType,
+                                                              kColorImageResolution,
+                                                              kDepthImageResolution,
+                                                              kKinectDepthWidth * kKinectDepthHeight,
+                                                              depth_pixels,
+                                                              kKinectDepthWidth * kKinectDepthHeight,
+                                                              depth_points);
+  return SUCCEEDED(res);
+}
+
 void KinectSensor::CloseInteractionStream() {
   if (!interaction_stream_opened_)
     return;

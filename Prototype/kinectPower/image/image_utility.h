@@ -3,6 +3,14 @@
 #include <opencv2/core/core.hpp>
 #include <vector>
 
+#define MAT_PTR(variable, type) type* variable ## _ptr = reinterpret_cast<type*>(( variable ).ptr());
+#define MAT_PTR_PTR(variable, type) type* variable ## _ptr = reinterpret_cast<type*>(( variable )->ptr());
+
+#define FOR_MATRIX(iteration_variable, matrix_variable) \
+  int num_elements_iteration_ ## __LINE__ = ( matrix_variable ).total();  \
+  for (int iteration_variable = 0; iteration_variable < num_elements_iteration_ ## __LINE__ ; ++ iteration_variable )
+
+
 namespace image {
 
 void InitializeBlackImage(cv::Mat* image);

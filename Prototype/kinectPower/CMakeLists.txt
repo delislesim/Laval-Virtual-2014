@@ -84,6 +84,22 @@ add_library(bitmap_graph
   bitmap_graph/bitmap_run.h
   )
 
+add_library(finger_finder
+  finger_finder/bitmap_graph.cc
+  finger_finder/bitmap_graph.h
+  finger_finder/canny_contour.cc
+  finger_finder/canny_contour.h
+  finger_finder/continuity_filter.cc
+  finger_finder/continuity_filter.h
+  finger_finder/contour_angle.cc
+  finger_finder/contour_angle.h
+  finger_finder/depth_translator.cc
+  finger_finder/depth_translator.h
+  finger_finder/finger_finder.cc
+  finger_finder/finger_finder.h
+  finger_finder/finger_info.h
+  )
+  
 add_library(finger_finder_thinning
   finger_finder_thinning/canny_contour.cc
   finger_finder_thinning/canny_contour.h
@@ -170,6 +186,7 @@ target_link_libraries(kinect_lib
   algos
   base
   bitmap_graph
+  finger_finder
   finger_finder_thinning
   image
   kinect_interaction

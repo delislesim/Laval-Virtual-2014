@@ -43,7 +43,7 @@ bool Initialize(bool near_mode, bool with_sensor_thread) {
     wrapper->GetSensorByIndex(0)->SetNearModeEnabled(near_mode);
     wrapper->GetSensorByIndex(0)->OpenDepthStream();
     wrapper->GetSensorByIndex(0)->OpenColorStream();
-    //wrapper->GetSensorByIndex(0)->OpenSkeletonStream();
+    wrapper->GetSensorByIndex(0)->OpenSkeletonStream();
     wrapper->GetSensorByIndex(0)->OpenInteractionStream(
         kinect_interaction::InteractionClientMenu::instance());
     wrapper->StartSensorThread(0);
@@ -235,7 +235,8 @@ bool GetPianoImage(unsigned char* pixels, unsigned int pixels_size) {
   return true;
 }
 
-bool GetPianoFingers(unsigned int* values, unsigned char* known) {
+bool GetPianoFingers(unsigned int* /*values*/, unsigned char* /*known*/) {
+  /*
   const int kNumFingers = 25;
 
   std::vector<finger_finder_thinning::FingerDescription> fingers;
@@ -253,6 +254,6 @@ bool GetPianoFingers(unsigned int* values, unsigned char* known) {
   for (; i < kNumFingers; ++i) {
     known[i] = 0;
   }
-
+  */
   return true;
 }

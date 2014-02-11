@@ -80,6 +80,9 @@ class KinectSensor {
   bool MapDepthPointToColorPoint(NUI_DEPTH_IMAGE_POINT& depth_point,
                                  NUI_COLOR_IMAGE_POINT* color_point);
 
+  bool MapColorFrameToDepthFrame(NUI_DEPTH_IMAGE_PIXEL* depth_pixels,
+                                 NUI_DEPTH_IMAGE_POINT* depth_points);
+
   // Color and depth stream types
   NUI_IMAGE_TYPE color_stream_type() const { return color_stream_type_; }
   void color_stream_type(NUI_IMAGE_TYPE val) { color_stream_type_ = val; }
