@@ -27,7 +27,7 @@ Copyright(c) 2013 Intel Corporation. All Rights Reserved.
 #include <cmath>
 #include "kinect_wrapper/kinect_observer.h"
 #include "kinect_wrapper/kinect_wrapper.h"
-#include "maths/maths.h"
+#include "algos/maths.h"
 #include "kinect_wrapper/kinect_include.h"
 
 namespace hskl

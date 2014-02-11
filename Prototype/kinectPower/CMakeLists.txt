@@ -5,7 +5,7 @@ set (OpenCV_DIR $ENV{OPENCV_DIR})
 FIND_PACKAGE(OpenCV REQUIRED)
 #FIND_PACKAGE(OpenCL REQUIRED)
 
-set(USE_INTEL_CAMERA 1)
+#set(USE_INTEL_CAMERA 1)
 
 set(GMOCK_ROOT "../gmock/")
 
@@ -56,6 +56,8 @@ add_library(algos
   algos/disjoint_set.h
   algos/kalman_filter.cc
   algos/kalman_filter.h
+  algos/maths.cc
+  algos/maths.h
   algos/sliding_window.cc
   algos/sliding_window.h
   algos/stable_matching.cc
@@ -82,23 +84,6 @@ add_library(bitmap_graph
   bitmap_graph/bitmap_run.h
   )
 
-add_library(finger_finder
-  finger_finder/contour_curve.cc
-  finger_finder/contour_curve.h
-  finger_finder/contour_curve_filter.cc
-  finger_finder/contour_curve_filter.h
-  finger_finder/find_fingers_in_contour.cc
-  finger_finder/find_fingers_in_contour.h
-  finger_finder/finger_finder.cc
-  finger_finder/finger_finder.h
-  finger_finder/hand_parameters.cc
-  finger_finder/hand_parameters.h
-  finger_finder/match_contours_to_previous_hands.cc
-  finger_finder/match_contours_to_previous_hands.h
-  finger_finder/segmenter.cc
-  finger_finder/segmenter.h
-  )
-  
 add_library(finger_finder_thinning
   finger_finder_thinning/canny_contour.cc
   finger_finder_thinning/canny_contour.h
@@ -106,23 +91,6 @@ add_library(finger_finder_thinning
   finger_finder_thinning/finger_finder.h
   finger_finder_thinning/segmenter.cc
   finger_finder_thinning/segmenter.h
-  )
-  
-add_library(hand_extractor
-  hand_extractor/depth_difference_finder.cc
-  hand_extractor/depth_difference_finder.h
-  hand_extractor/finger_finder_convex.cc
-  hand_extractor/finger_finder_convex.h
-  hand_extractor/finger_finder_curve.cc
-  hand_extractor/finger_finder_curve.h
-  hand_extractor/finger_finder_mountain.cc
-  hand_extractor/finger_finder_mountain.h
-  hand_extractor/hand_2d_parameters.cc
-  hand_extractor/hand_2d_parameters.h
-  hand_extractor/hand_extractor.cc
-  hand_extractor/hand_extractor.h
-  hand_extractor/segmenter.cc
-  hand_extractor/segmenter.h
   )
   
 add_library(image
@@ -188,17 +156,6 @@ target_link_libraries(kinect_wrapper
   base
   )
 
-add_library(maths
-  maths/curve.cc
-  maths/curve.h
-  maths/maths.cc
-  maths/maths.h
-  maths/quaternion.cc
-  maths/quaternion.h
-  maths/smooth.cc
-  maths/smooth.h
-  )
-  
 add_library(piano
   piano/piano.cc
   piano/piano.h
@@ -213,14 +170,12 @@ target_link_libraries(kinect_lib
   algos
   base
   bitmap_graph
-  finger_finder
   finger_finder_thinning
   image
   kinect_interaction
   kinect_face_tracker
   kinect_replay
   kinect_wrapper
-  maths
   piano
   ${OpenCV_LIBS}
   $ENV{KINECTSDK10_DIR}/lib/x86/Kinect10.lib
@@ -251,12 +206,11 @@ target_link_libraries(test_cpp
 
 add_executable(unittests
   algos/disjoint_set_unittests.cc
+  algos/maths_unittests.cc
   algos/sliding_window_unittests.cc
   bitmap_graph/bitmap_graph_unittest.cc
   bitmap_graph/bitmap_graph_builder_unittest.cc
   bitmap_graph/bitmap_run_unittest.cc
-  maths/maths_unittests.cc
-  maths/smooth_unittests.cc
   ${GMOCK_ROOT}/gtest/src/gtest-all.cc
   ${GMOCK_ROOT}/src/gmock-all.cc
   ${GMOCK_ROOT}/src/gmock_main.cc

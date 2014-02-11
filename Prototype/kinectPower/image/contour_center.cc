@@ -2,7 +2,7 @@
 
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include "maths/maths.h"
+#include "algos/maths.h"
 
 namespace image {
 

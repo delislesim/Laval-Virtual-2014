@@ -3,10 +3,10 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include "algos/maths.h"
 #include "kinect_wrapper/constants.h"
-#include "maths/maths.h"
 
-namespace finger_finder {
+namespace finger_finder_thinning {
 
 namespace {
 

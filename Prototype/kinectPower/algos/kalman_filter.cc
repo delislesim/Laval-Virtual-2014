@@ -1,7 +1,7 @@
 #include "algos/kalman_filter.h"
 
 #include "base/logging.h"
-#include "maths/maths.h"
+#include "algos/maths.h"
 
 namespace algos {
 

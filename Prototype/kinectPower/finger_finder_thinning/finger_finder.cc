@@ -4,14 +4,14 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <queue>
 
-#include "finger_finder/segmenter.h"
+#include "algos/maths.h"
+#include "finger_finder_thinning/segmenter.h"
 #include "finger_finder_thinning/canny_contour.h"
 #include "image/image_constants.h"
 #include "image/image_utility.h"
 #include "kinect_wrapper/constants.h"
 #include "kinect_wrapper/kinect_sensor.h"
 #include "kinect_wrapper/kinect_wrapper.h"
-#include "maths/maths.h"
 
 #include "bitmap_graph/bitmap_run.h"
 #include "bitmap_graph/bitmap_graph.h"
@@ -70,34 +70,6 @@ void GraphToContoursLists(cv::Mat* graph, std::vector<std::vector<int> >* contou
   }
 }
 
-/*
-int AverageDepth(const cv::Point& position, const cv::Mat& depth_mask, const cv::Mat& depth) {
-  int depth_sum = 0;
-  int depth_num_pixels = 0;
-
-  const int kDistanceDepth = 10;
-
-  for (int i = position.x - kDistanceDepth; i < position.x + kDistanceDepth; ++i) {
-    for (int j = position.y - kDistanceDepth; j < position.y + kDistanceDepth; ++j) {
-      if (i < 0 || i >= depth.cols || j < 0 || j >= depth.rows)
-        continue;
-
-      int depth_val = depth.at<unsigned short>(cv::Point(i, j));
-      if (depth.at<unsigned char>(cv::Point(i, j)) != 0) {
-        depth_sum += depth_val;
-        ++depth_num_pixels;
-      }
-    }
-  }
-
-  if (depth_num_pixels == 0)
-    return 0;
-
-  return depth_sum / depth_num_pixels;
-}
-
-*/
-
 void BitmapDijkstra(const cv::Mat& contours,
                     cv::Mat* resultat, std::vector<FingerDescription>* fingers) {
   assert(contours.type() == CV_8U);
@@ -107,8 +79,8 @@ void BitmapDijkstra(const cv::Mat& contours,
   //cv::Mat truncated_depth = depth(kRegionOfInterest);
 
   // Dessiner les contours sur l'image resultat.
-  //cv::cvtColor(contours, *resultat, CV_GRAY2RGBA);
-  *resultat = cv::Mat(contours.size(), CV_8UC4, cv::Scalar(0, 0, 0, 255));
+  cv::cvtColor(contours, *resultat, CV_GRAY2RGBA);
+  //*resultat = cv::Mat(contours.size(), CV_8UC4, cv::Scalar(0, 0, 0, 255));
 
   // Créer un graphe du contour.
   cv::Mat graph;
@@ -183,9 +155,6 @@ void BitmapDijkstra(const cv::Mat& contours,
     }
   }
 
-
-
-  /*
   ////////////////// AFFICHAGE ///////////////////
 
   // Afficher les angles.
@@ -216,7 +185,7 @@ void BitmapDijkstra(const cv::Mat& contours,
       }
     }
   }
-  */
+
 }
 
 class SmallContourRemover {
@@ -468,8 +437,8 @@ void FingerFinder::FindFingers(const kinect_wrapper::KinectSensorData& data,
   // Trouver dans l'image de profondeur des contours de mains à la bonne
   // profondeur.
   std::vector<std::vector<cv::Point> > depth_contours;
-  finger_finder::Segmenter(depth_mat, 1, max_hands_depth_,
-                           &depth_contours);
+  finger_finder_thinning::Segmenter(depth_mat, 1, max_hands_depth_,
+                                    &depth_contours);
 
   // Convertir les contours trouvés dans l'image de profondeur en
   // coordonnées de l'image couleur.

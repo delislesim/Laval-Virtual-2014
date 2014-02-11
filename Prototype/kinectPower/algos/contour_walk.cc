@@ -1,7 +1,7 @@
 #include "algos/contour_walk.h"
 
 #include "base/logging.h"
-#include "maths/maths.h"
+#include "algos/maths.h"
 
 namespace algos {
 

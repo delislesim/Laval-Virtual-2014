@@ -235,36 +235,6 @@ bool GetPianoImage(unsigned char* pixels, unsigned int pixels_size) {
   return true;
 }
 
-bool GetPianoDepth(unsigned char* pixels, unsigned int pixels_size) {
-  the_piano.QueryHandsDepth(pixels, pixels_size);
-  return true;
-}
-
-bool GetPianoHands(unsigned int* /* positions */, unsigned char* /* known */) {
-  /*
-  std::vector<hand_extractor::Hand2dParameters> hand_parameters;
-  the_piano.QueryHandParameters(&hand_parameters);
-
-  int out_index = 0;
-
-  for (size_t i = 0; i < hand_parameters.size() && i < 30; ++i) {
-    for (auto it = hand_parameters[i].TipBegin(); it != hand_parameters[i].TipEnd(); ++it) {
-      positions[out_index * 3 + 0] = it->position.x;
-      positions[out_index * 3 + 1] = it->position.y;
-      positions[out_index * 3 + 2] = it->depth;
-      known[out_index] = 1;
-      ++out_index;
-    }
-  }
-
-  while (out_index < 30) {
-    known[out_index] = 0;
-    ++out_index;
-  }
-  */
-  return true;
-}
-
 bool GetPianoFingers(unsigned int* values, unsigned char* known) {
   const int kNumFingers = 25;
 
@@ -272,7 +242,7 @@ bool GetPianoFingers(unsigned int* values, unsigned char* known) {
   the_piano.QueryFingers(&fingers);
 
   int i = 0;
-  for (; i < kNumFingers && i < fingers.size(); ++i) {
+  for (; i < kNumFingers && i < static_cast<int>(fingers.size()); ++i) {
     finger_finder_thinning::FingerDescription desc = fingers[i];
     values[i*3 + 0] = desc.x;
     values[i*3 + 1] = desc.y;

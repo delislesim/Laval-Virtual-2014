@@ -1,4 +1,4 @@
-#include "maths/maths.h"
+#include "algos/maths.h"
 
 #include <cmath>
 #include <opencv2/imgproc/imgproc.hpp>
