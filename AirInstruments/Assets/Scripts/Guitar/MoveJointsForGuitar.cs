@@ -147,7 +147,7 @@ public class MoveJointsForGuitar : MonoBehaviour {
 		//http://answers.unity3d.com/questions/336755/line-renderer-collision-detection.html
 		RaycastHit hit;
 		if (Physics.Raycast (current_positions[(int)Skeleton.Joint.HipCenter],
-		                     current_positions[(int)Skeleton.Joint.HandLeft] - 2*current_positions[(int)Skeleton.Joint.HipCenter],
+		                     current_positions[(int)Skeleton.Joint.HandLeft] - current_positions[(int)Skeleton.Joint.HipCenter],
 		                     out hit)) {
 			if(hit.transform.gameObject.tag == "PlayHand")
 			{
