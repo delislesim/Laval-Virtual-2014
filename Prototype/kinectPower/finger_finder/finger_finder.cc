@@ -145,27 +145,50 @@ void FingerFinder::ObserveDataInternal(const cv::Mat& depth_mat,
   // Copier la liste de doigts résultante.
   fingers_ = finger_info_vector;
 
-  // Affichage.
-  *nice_image = cv::Mat(depth_mat.size(), CV_8UC4);
+  // --- Affichage ---
+
+  // Faire un contour avec seulement les éléments significatifs
+  // (au moins 10 pixels).
+  cv::Mat contours_clean(depth_mat.size(), CV_8U, cv::Scalar(0));
+  MAT_PTR(contours_clean, unsigned char);
+
+  for (size_t i = 0; i < contours_list.size(); ++i) {
+    if (contours_list[i].size() >= 10) {
+      for (size_t j = 0; j < contours_list[i].size(); ++j) {
+        contours_clean_ptr[contours_list[i][j].index] = 255;
+      }
+    }
+  }
+
+  // Afficher l'image de profondeur en RGB.
+  *nice_image = cv::Mat(depth_mat.size(), CV_8UC4, cv::Scalar(0, 0, 0, 255));
 
   MAT_PTR(depth_mat, const unsigned short);
   MAT_PTR_PTR(nice_image, unsigned char);
 
   FOR_MATRIX(i, depth_mat) {
-    unsigned short depth = depth_mat_ptr[i];
-    unsigned char normalized_depth = 0;
-    if (normalized_depth < 1000)
-      normalized_depth = (unsigned char)((double)depth * 255.0 / 1000.0);
-    else
-      normalized_depth = 255;
+    unsigned short depth_val = depth_mat_ptr[i];
+    if (depth_val > min_hands_depth_ && depth_val < max_hands_depth_) {
+      unsigned char normalized_depth = 255.0 -
+          static_cast<double>(depth_val - min_hands_depth_) * 255.0 /
+          (max_hands_depth_ - min_hands_depth_);
+      
+      nice_image_ptr[i * 4 + image::kRedIndex] = 0;
+      nice_image_ptr[i * 4 + image::kGreenIndex] = 0;
+      nice_image_ptr[i * 4 + image::kBlueIndex] = normalized_depth;
+    }
 
-    nice_image_ptr[i * 4 + image::kRedIndex] = normalized_depth;
-    nice_image_ptr[i * 4 + image::kGreenIndex] = normalized_depth;
-    nice_image_ptr[i * 4 + image::kBlueIndex] = normalized_depth;
-    nice_image_ptr[i * 4 + image::kAlphaIndex] = 255;
+    if (contours_clean_ptr[i] != 0) {
+      nice_image_ptr[i * 4 + image::kRedIndex] = 255;
+      nice_image_ptr[i * 4 + image::kGreenIndex] = 0;
+      nice_image_ptr[i * 4 + image::kBlueIndex] = 0;
+    }
   }
-  
-  //cv::cvtColor(contours, *nice_image, CV_GRAY2RGBA);
+
+
+  //cv::cvtColor(contours_clean, *nice_image, CV_GRAY2RGBA);
+
+  // Afficher l'im
 
 }
 

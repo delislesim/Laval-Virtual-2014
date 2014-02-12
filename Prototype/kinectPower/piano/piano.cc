@@ -57,7 +57,7 @@ void Piano::ObserveDepth(
   finger_finder_.QueryFingers(&fingers);
   fingers_.SetNext(fingers);
 
-  // Enjoliver l'image.
+  // Enjoliver l'image
   for (size_t i = 0; i < fingers.size(); ++i) {
     cv::circle(image, fingers[i].position(), 2, image::kBlue, 2);
   }
