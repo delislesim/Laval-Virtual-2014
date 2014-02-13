@@ -25,9 +25,9 @@ namespace sample
     {
       InitializeComponent();
 
-      KinectPowerInterop.Initialize(false, false);
+      KinectPowerInterop.Initialize(false, true);
       //KinectPowerInterop.RecordSensor(0, "test.txt");
-      KinectPowerInterop.StartPlaySensor(0, "test.txt");
+      //KinectPowerInterop.StartPlaySensor(0, "test.txt");
 
       aTimer = new System.Timers.Timer(20);
       aTimer.Elapsed += new System.Timers.ElapsedEventHandler(aTimer_Elapsed);
@@ -39,6 +39,9 @@ namespace sample
     [MethodImpl(MethodImplOptions.Synchronized)]
     void aTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
     {
+        float[] rotation = new float[3];
+        KinectPowerInterop.GetFaceRotation(rotation);
+
       KinectPowerInterop.PlayNextFrame(0);
 
       KinectPowerInterop.GetPianoImage(buffer, (uint)buffer.Length);

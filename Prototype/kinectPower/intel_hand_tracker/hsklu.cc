@@ -1,3 +1,4 @@
+#undef USE_INTEL_CAMERA
 #ifdef USE_INTEL_CAMERA
 
 #include "hsklu.h"
