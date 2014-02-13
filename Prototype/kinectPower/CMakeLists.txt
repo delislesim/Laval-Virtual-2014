@@ -5,7 +5,7 @@ set (OpenCV_DIR $ENV{OPENCV_DIR})
 FIND_PACKAGE(OpenCV REQUIRED)
 #FIND_PACKAGE(OpenCL REQUIRED)
 
-#set(USE_INTEL_CAMERA 1)
+set(USE_INTEL_CAMERA 1)
 
 set(GMOCK_ROOT "../gmock/")
 
@@ -73,6 +73,13 @@ add_library(base
   base/scoped_handle.h
   base/timer.cc
   base/timer.h
+  )
+  
+add_library(creative
+  creative/creative_wrapper.cc
+  creative/creative_wrapper.h
+  creative/hand_info.h
+  creative/joint_info.h
   )
   
 add_library(bitmap_graph
