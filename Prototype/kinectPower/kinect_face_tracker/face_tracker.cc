@@ -4,22 +4,19 @@
 
 namespace kinect_face_tracker {
 	FaceTracker::FaceTracker(){
-    /*
+		is_tracking_ = false;
 		face_tracker_ = FTCreateFaceTracker();
 		color_image_ = FTCreateImage();
 		depth_image_ = FTCreateImage();
-		face_tracker_->CreateFTResult(&face_tracker_result_);
-		is_tracking_ = false;
-    */
+		HRESULT result_result;
+		result_result = face_tracker_->CreateFTResult(&face_tracker_result_);
 	}
 
 	FaceTracker::~FaceTracker(){
-    /*
 		color_image_->Release();
 		depth_image_->Release();
 		face_tracker_result_->Release();
 		face_tracker_->Release();
-    */
 	}
 
 	cv::Vec3f FaceTracker::FaceRotation(){
@@ -35,7 +32,6 @@ namespace kinect_face_tracker {
 	}
 
 	void FaceTracker::ObserveDepth(const cv::Mat& depth_mat, const kinect_wrapper::KinectSensorData& sensor_data){
-    /*
 		cv::Mat color_mat;
 		if (!sensor_data.QueryColor(&color_mat))
 			return;
@@ -80,7 +76,6 @@ namespace kinect_face_tracker {
 				is_tracking_ = false;
 			}
 		}
-    */
 	}
 
 
