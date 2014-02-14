@@ -85,20 +85,23 @@ public class MoveJoints : MonoBehaviour {
 	void Update () {
 		//Create valid skeleton with joints positions/rotations
 		m_player_one = new Skeleton(0);
-		if (SkeletonIsTrackedAndValid(m_player_one))
+		//if (SkeletonIsTrackedAndValid(m_player_one))
 			moveJoints (m_player_one);
 	}
 
-	bool SkeletonIsTrackedAndValid(Skeleton player)
+	bool SkeletonIsTrackedAndValid()
 	{
-		accumulated_time += Time.deltaTime;
-		if(accumulated_time > DELTA_CHECK_TIME)
-		{
-			//Check if hip joint is at reasonable distance from kinect (drum)
+		float distHipHead = Vector3.Distance(current_positions[(int)Skeleton.Joint.HipCenter], current_positions[(int)Skeleton.Joint.Head]);
+		//Debug.Log ("Hip pos : z" + current_positions[(int)Skeleton.Joint.HipCenter].z);
+		Debug.Log ("Dist Hip-Head : " + distHipHead);
 
-			//Check if dist hip to head is reasonable (no mini ghost) skeleton
-		}
-		return true;
+		//Check if hip joint is at reasonable distance from kinect (drum)
+		//Check if dist hip to head is reasonable (no mini ghost) skeleton
+			return current_positions[(int)Skeleton.Joint.HipCenter].z < -7
+				&& current_positions[(int)Skeleton.Joint.HipCenter].z > -11
+				&& distHipHead > 1.8
+				&& distHipHead < 5;
+			
 	}
 
 	void moveJoints(Skeleton player)
@@ -192,6 +195,19 @@ public class MoveJoints : MonoBehaviour {
 			}
 		}
 
+		//Check if these positions are worth rendering -> Valid Skeleton
+		//accumulated_time += Time.deltaTime;
+		//if(accumulated_time > DELTA_CHECK_TIME)
+		//{
+		if(!SkeletonIsTrackedAndValid()){
+			//Hide everything
+			for(int i = 0; i < jointsCount; i++) 
+			{
+				joints[i].transform.position = HIDING_POS;
+			}
+			//TODO place camera so we don't see shit
+		}
+		//}
 		//Predict sounds
 		manageMouvementsAndSounds(current_positions, last_positions);
 	}
