@@ -44,7 +44,7 @@ public class MoveJoints : MonoBehaviour {
 	private bool hit_hat_ready;
 	private const float PLAYER_HIGHT = 5.0f;
 	private const float DELTA_CHECK_TIME = 5.0f;
-	private float accumulated_time;
+	//private float accumulated_time;
 	private const float DIST_MAX_KINECT = 10.0f; //2m
 	private const float DIST_MIN_KINECT = 2.0f; //dist min...
 
@@ -73,7 +73,6 @@ public class MoveJoints : MonoBehaviour {
 		last_rotations = new Quaternion[(int)Skeleton.Joint.Count];
 		current_rotations = new Quaternion[(int)Skeleton.Joint.Count];
 		kick_ready = true;
-		accumulated_time = 0.0f;
 
 		right_hand_freez_posy = 0;
 	    left_hand_freez_posy= 0;

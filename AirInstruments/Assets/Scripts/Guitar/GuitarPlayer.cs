@@ -35,4 +35,11 @@ public class GuitarPlayer : MonoBehaviour {
 		else
 			Debug.LogError ("No notes found!!!");
 	}
+
+	void OnTriggerEnter(Collider col)
+	{
+		//Debug.Log ("Trigger with guitar player! : " + col.gameObject.tag);
+		if(col.gameObject.tag == "PlayHand")
+			PlayNextRandomNote();
+	}
 }

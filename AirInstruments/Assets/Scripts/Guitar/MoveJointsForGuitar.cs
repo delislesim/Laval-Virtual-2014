@@ -25,8 +25,9 @@ public class MoveJointsForGuitar : MonoBehaviour {
 	public GameObject Ankle_Right;
 	public GameObject Foot_Right;
 
-	public GuitarPlayer GuitPlayer;
+	//public GuitarPlayer GuitPlayer;
 	public LineRenderer GuitarLine;
+	public Transform GuitarContainer;
 
 	//Private
 	private Skeleton m_player_one;
@@ -102,13 +103,13 @@ public class MoveJointsForGuitar : MonoBehaviour {
 					//POSITIONS
 					joints[i].transform.position = new Vector3(posJoint.x*PLAYER_HIGHT, posJoint.y*PLAYER_HIGHT, -posJoint.z*PLAYER_HIGHT);
 
-
 					// // ROTATIONS
 					//Apply head rotation
 					if(i == (int)Skeleton.Joint.Head)
 						joints[i].transform.localRotation = player.GetFaceRotation();
 
 					//Apply hand rotation if needed
+					/*
 					if(i == (int)Skeleton.Joint.HandRight)
 					{
 						joints[i].transform.localRotation = player.GetBoneOrientation(Skeleton.Joint.HandRight);
@@ -117,6 +118,7 @@ public class MoveJointsForGuitar : MonoBehaviour {
 					{
 						joints[i].transform.localRotation = player.GetBoneOrientation(Skeleton.Joint.HandLeft);
 					}
+					*/
 				}
 				//If not tracked, hide!
 				else
@@ -129,8 +131,8 @@ public class MoveJointsForGuitar : MonoBehaviour {
 		}
 
 		//Update line render
-		GuitarLine.SetPosition(0, current_positions[(int)Skeleton.Joint.HipCenter]);
-		GuitarLine.SetPosition(1, current_positions[(int)Skeleton.Joint.HandLeft]);
+		//GuitarLine.SetPosition(0, current_positions[(int)Skeleton.Joint.HipCenter]);
+		//GuitarLine.SetPosition(1, current_positions[(int)Skeleton.Joint.HandLeft]);
 
 		//Predict sounds
 		manageMouvementsAndSounds(current_positions, last_positions);
@@ -145,7 +147,7 @@ public class MoveJointsForGuitar : MonoBehaviour {
 		//GuitarPlayer.PlayNextRandomNote();
 
 		//http://answers.unity3d.com/questions/336755/line-renderer-collision-detection.html
-		Ray ray = new Ray(current_positions[(int)Skeleton.Joint.HandLeft], 
+		/*Ray ray = new Ray(current_positions[(int)Skeleton.Joint.HandLeft], 
 		                 current_positions[(int)Skeleton.Joint.HipCenter] - current_positions[(int)Skeleton.Joint.HandLeft]);
 		RaycastHit hit;
 		if (Physics.Raycast (ray, out hit)) {
@@ -154,6 +156,9 @@ public class MoveJointsForGuitar : MonoBehaviour {
 				GuitPlayer.PlayNextRandomNote();
 			}
 		}
+		*/
+		GuitarContainer.position = current_positions[(int)Skeleton.Joint.HipCenter];
+
 	}
 
 }
