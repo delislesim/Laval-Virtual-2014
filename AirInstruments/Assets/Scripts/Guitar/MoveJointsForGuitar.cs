@@ -107,18 +107,6 @@ public class MoveJointsForGuitar : MonoBehaviour {
 					//Apply head rotation
 					if(i == (int)Skeleton.Joint.Head)
 						joints[i].transform.localRotation = player.GetFaceRotation();
-
-					//Apply hand rotation if needed
-					/*
-					if(i == (int)Skeleton.Joint.HandRight)
-					{
-						joints[i].transform.localRotation = player.GetBoneOrientation(Skeleton.Joint.HandRight);
-					}
-					if(i == (int)Skeleton.Joint.HandLeft)
-					{
-						joints[i].transform.localRotation = player.GetBoneOrientation(Skeleton.Joint.HandLeft);
-					}
-					*/
 				}
 				//If not tracked, hide!
 				else
@@ -130,11 +118,7 @@ public class MoveJointsForGuitar : MonoBehaviour {
 			}
 		}
 
-		//Update line render
-		//GuitarLine.SetPosition(0, current_positions[(int)Skeleton.Joint.HipCenter]);
-		//GuitarLine.SetPosition(1, current_positions[(int)Skeleton.Joint.HandLeft]);
-
-		//Predict sounds
+		//Predict sounds?
 		manageMouvementsAndSounds(current_positions, last_positions);
 	}
 
@@ -155,10 +139,7 @@ public class MoveJointsForGuitar : MonoBehaviour {
 		Vector3 hipPosXY = new Vector3(hipPos.x, hipPos.y, 0);
 		Vector3 lHandPosXY = new Vector3(lHandPos.x, lHandPos.y, 0);
 		float AngleRotZ = Vector3.Angle(new Vector3(0,1,0), hipPosXY-lHandPosXY);
-		//Debug.Log ("lHand : "+ lHandPosY);
-		//Debug.Log ("Hip : "+ hipPosY);
-		//Debug.Log ("Angle Y : "+ AngleRotY);
-		//WTF
+
 		Quaternion GuitarRotation = Quaternion.Euler (0, -AngleRotY-90, AngleRotZ);
 		GuitarContainer.rotation = GuitarRotation;
 
