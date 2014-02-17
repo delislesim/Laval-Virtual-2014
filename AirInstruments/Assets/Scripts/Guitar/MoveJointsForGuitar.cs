@@ -25,8 +25,9 @@ public class MoveJointsForGuitar : MonoBehaviour {
 	public GameObject Ankle_Right;
 	public GameObject Foot_Right;
 
-	public GuitarPlayer GuitPlayer;
+	//public GuitarPlayer GuitPlayer;
 	public LineRenderer GuitarLine;
+	public Transform GuitarContainer;
 
 	//Private
 	private Skeleton m_player_one;
@@ -102,21 +103,10 @@ public class MoveJointsForGuitar : MonoBehaviour {
 					//POSITIONS
 					joints[i].transform.position = new Vector3(posJoint.x*PLAYER_HIGHT, posJoint.y*PLAYER_HIGHT, -posJoint.z*PLAYER_HIGHT);
 
-
 					// // ROTATIONS
 					//Apply head rotation
 					if(i == (int)Skeleton.Joint.Head)
 						joints[i].transform.localRotation = player.GetFaceRotation();
-
-					//Apply hand rotation if needed
-					if(i == (int)Skeleton.Joint.HandRight)
-					{
-						joints[i].transform.localRotation = player.GetBoneOrientation(Skeleton.Joint.HandRight);
-					}
-					if(i == (int)Skeleton.Joint.HandLeft)
-					{
-						joints[i].transform.localRotation = player.GetBoneOrientation(Skeleton.Joint.HandLeft);
-					}
 				}
 				//If not tracked, hide!
 				else
@@ -128,32 +118,31 @@ public class MoveJointsForGuitar : MonoBehaviour {
 			}
 		}
 
-		//Update line render
-		GuitarLine.SetPosition(0, current_positions[(int)Skeleton.Joint.HipCenter]);
-		GuitarLine.SetPosition(1, current_positions[(int)Skeleton.Joint.HandLeft]);
-
-		//Predict sounds
+		//Predict sounds?
 		manageMouvementsAndSounds(current_positions, last_positions);
 	}
 
 	void manageMouvementsAndSounds(Vector3[] currentPos, Vector3[] pastPos)
 	{
-		//Play next note   
-		//Calculer la droite entre hip_center et main gauche
-		//Regarder les intersection entre cette droite et la main droite (dans le plan du joueur?)
-		//if(intersects)
-		//GuitarPlayer.PlayNextRandomNote();
+		Vector3 hipPos = current_positions[(int)Skeleton.Joint.HipCenter];
+		Vector3 lHandPos = current_positions[(int)Skeleton.Joint.HandLeft];
 
-		//http://answers.unity3d.com/questions/336755/line-renderer-collision-detection.html
-		Ray ray = new Ray(current_positions[(int)Skeleton.Joint.HandLeft], 
-		                 current_positions[(int)Skeleton.Joint.HipCenter] - current_positions[(int)Skeleton.Joint.HandLeft]);
-		RaycastHit hit;
-		if (Physics.Raycast (ray, out hit)) {
-			if(hit.transform.gameObject.tag == "PlayHand")
-			{
-				GuitPlayer.PlayNextRandomNote();
-			}
-		}
+		//Guit position
+		GuitarContainer.position = hipPos;
+
+		//Guit rotation
+
+		Vector3 hipPosXZ = new Vector3(hipPos.x, 0, hipPos.z);
+		Vector3 lHandPosXZ = new Vector3(lHandPos.x, 0, lHandPos.z);
+		float AngleRotY = Vector3.Angle(new Vector3(0,0,1), lHandPosXZ-hipPosXZ);
+
+		Vector3 hipPosXY = new Vector3(hipPos.x, hipPos.y, 0);
+		Vector3 lHandPosXY = new Vector3(lHandPos.x, lHandPos.y, 0);
+		float AngleRotZ = Vector3.Angle(new Vector3(0,1,0), hipPosXY-lHandPosXY);
+
+		Quaternion GuitarRotation = Quaternion.Euler (0, -AngleRotY-90, AngleRotZ);
+		GuitarContainer.rotation = GuitarRotation;
+
 	}
 
 }
