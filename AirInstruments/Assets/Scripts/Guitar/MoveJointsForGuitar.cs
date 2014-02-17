@@ -147,21 +147,21 @@ public class MoveJointsForGuitar : MonoBehaviour {
 		GuitarContainer.position = hipPos;
 
 		//Guit rotation
-		/*
-		Vector3 hipPosY = new Vector3(hipPos.x, 0, hipPos.z);
-		Vector3 hipPosZ = new Vector3(hipPos.x, hipPos.y, 0);
-		Vector3 lHandPosY = new Vector3(lHandPos.x, 0, lHandPos.z);
-		Vector3 lHandPosZ =new Vector3(lHandPos.x, lHandPos.y, 0);
-		float AngleRotY = Vector3.Angle(new Vector3(0,1,0), lHandPosZ-hipPosZ);
-		float AngleRotZ = Vector3.Angle(new Vector3(0,0,1), lHandPosY-hipPosY);
 
-		Debug.Log ("lHand : "+ lHandPosY);
-		Debug.Log ("Hip : "+ hipPosY);
-		Debug.Log ("Angle Y : "+ AngleRotY);
+		Vector3 hipPosXZ = new Vector3(hipPos.x, 0, hipPos.z);
+		Vector3 lHandPosXZ = new Vector3(lHandPos.x, 0, lHandPos.z);
+		float AngleRotY = Vector3.Angle(new Vector3(0,0,1), lHandPosXZ-hipPosXZ);
 
-		Quaternion GuitarRotation = Quaternion.Euler (0, AngleRotZ+180, AngleRotY+90);
+		Vector3 hipPosXY = new Vector3(hipPos.x, hipPos.y, 0);
+		Vector3 lHandPosXY = new Vector3(lHandPos.x, lHandPos.y, 0);
+		float AngleRotZ = Vector3.Angle(new Vector3(0,1,0), hipPosXY-lHandPosXY);
+		//Debug.Log ("lHand : "+ lHandPosY);
+		//Debug.Log ("Hip : "+ hipPosY);
+		//Debug.Log ("Angle Y : "+ AngleRotY);
+		//WTF
+		Quaternion GuitarRotation = Quaternion.Euler (0, -AngleRotY-90, AngleRotZ);
 		GuitarContainer.rotation = GuitarRotation;
-*/
+
 	}
 
 }
