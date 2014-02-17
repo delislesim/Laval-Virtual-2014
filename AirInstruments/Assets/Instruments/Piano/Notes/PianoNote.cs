@@ -6,6 +6,9 @@ public class PianoNote : MonoBehaviour {
 	// Objet affichant réellement la note.
 	public GameObject noteObject;
 
+	// Ecart demi-ton.
+	public float ecartDemiTon;
+
 	void Start () {
 		// Calculer la position du point de rotation de la note.
 		pointRotationLocal = new Vector3 (0, 0.5f, -0.5f);
@@ -17,6 +20,18 @@ public class PianoNote : MonoBehaviour {
 		noteObject.transform.localRotation = Quaternion.identity;
 		noteObject.transform.localPosition = Vector3.zero;
 		noteObject.transform.RotateAround (pointRotationWorld, Vector3.left, noteAngleMax);
+
+		// Si l'angle n'est pas nul, on est en train de jouer la note.
+		// TODO(fdoray): Le son de la note pourrait dépendre de la vitesse de changement de l'angle.
+		if (noteAngleMax != 0) {
+			if (!isPlaying) {
+				PlaySound();
+			}
+		} else {
+			if (isPlaying) {
+				StopSound();
+			}
+		}
 
 		// Réinitialiser l'angle de la note.
 		noteAngleMax = 0;
@@ -33,6 +48,17 @@ public class PianoNote : MonoBehaviour {
 		} else if (noteAngle > noteAngleMax) {
 			noteAngleMax = noteAngle;
 		}
+	}
+
+	private void PlaySound() {
+		audio.pitch = Mathf.Pow (2.0f, ecartDemiTon/12);
+		audio.Play ();
+		isPlaying = true;
+	}
+
+	private void StopSound() {
+		audio.Stop ();
+		isPlaying = false;
 	}
 
 	// Calcule l'angle que doit avoir la note pour ne pas toucher
@@ -59,5 +85,8 @@ public class PianoNote : MonoBehaviour {
 
 	// Angle maximal permis.
 	float noteAngleMaxAllowed = 6.0f;
+
+	// Indique si on est en train de jouer la note.
+	bool isPlaying = false;
 
 }
