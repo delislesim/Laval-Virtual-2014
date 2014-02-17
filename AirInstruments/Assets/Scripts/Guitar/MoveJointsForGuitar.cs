@@ -140,25 +140,28 @@ public class MoveJointsForGuitar : MonoBehaviour {
 
 	void manageMouvementsAndSounds(Vector3[] currentPos, Vector3[] pastPos)
 	{
-		//Play next note   
-		//Calculer la droite entre hip_center et main gauche
-		//Regarder les intersection entre cette droite et la main droite (dans le plan du joueur?)
-		//if(intersects)
-		//GuitarPlayer.PlayNextRandomNote();
+		Vector3 hipPos = current_positions[(int)Skeleton.Joint.HipCenter];
+		Vector3 lHandPos = current_positions[(int)Skeleton.Joint.HandLeft];
 
-		//http://answers.unity3d.com/questions/336755/line-renderer-collision-detection.html
-		/*Ray ray = new Ray(current_positions[(int)Skeleton.Joint.HandLeft], 
-		                 current_positions[(int)Skeleton.Joint.HipCenter] - current_positions[(int)Skeleton.Joint.HandLeft]);
-		RaycastHit hit;
-		if (Physics.Raycast (ray, out hit)) {
-			if(hit.transform.gameObject.tag == "PlayHand")
-			{
-				GuitPlayer.PlayNextRandomNote();
-			}
-		}
-		*/
-		GuitarContainer.position = current_positions[(int)Skeleton.Joint.HipCenter];
+		//Guit position
+		GuitarContainer.position = hipPos;
 
+		//Guit rotation
+		/*
+		Vector3 hipPosY = new Vector3(hipPos.x, 0, hipPos.z);
+		Vector3 hipPosZ = new Vector3(hipPos.x, hipPos.y, 0);
+		Vector3 lHandPosY = new Vector3(lHandPos.x, 0, lHandPos.z);
+		Vector3 lHandPosZ =new Vector3(lHandPos.x, lHandPos.y, 0);
+		float AngleRotY = Vector3.Angle(new Vector3(0,1,0), lHandPosZ-hipPosZ);
+		float AngleRotZ = Vector3.Angle(new Vector3(0,0,1), lHandPosY-hipPosY);
+
+		Debug.Log ("lHand : "+ lHandPosY);
+		Debug.Log ("Hip : "+ hipPosY);
+		Debug.Log ("Angle Y : "+ AngleRotY);
+
+		Quaternion GuitarRotation = Quaternion.Euler (0, AngleRotZ+180, AngleRotY+90);
+		GuitarContainer.rotation = GuitarRotation;
+*/
 	}
 
 }
