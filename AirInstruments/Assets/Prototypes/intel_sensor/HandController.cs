@@ -30,6 +30,7 @@ public class HandController : MonoBehaviour {
 	void Update () {
 		float[] positions = new float[17 * 2 * 3];
 		float[] error = new float[17 * 2];
+		/*
 		KinectPowerInterop.GetHandsSkeletons (positions, error);
 
 		SetJointPosition (positions, 0, joint1);
@@ -49,6 +50,7 @@ public class HandController : MonoBehaviour {
 		SetJointPosition (positions, 14, joint15);
 		SetJointPosition (positions, 15, joint16);
 		SetJointPosition (positions, 16, joint17);
+		*/
 	}
 
 	void SetJointPosition(float[] positions, int index, Transform joint) {

@@ -183,12 +183,40 @@ public class KinectPowerInterop
   public static uint NuiHandPointerStatePressed = 0x08;
   public static uint NuiHandPointerStatePrimaryForUser = 0x10;
 
+  public struct HandJointInfo {
+	public float x;
+	public float y;
+	public float z;
+	public float error;
+  }
+
+  public enum HandJointIndex {
+	FOREARM = 0,
+	PALM,
+	PINKY_BASE,
+	PINKY_MID,
+	PINKY_TIP,
+	RING_BASE,
+	RING_MID,
+	RING_TIP,
+	MIDDLE_BASE,
+	MIDDLE_MID,
+	MIDDLE_TIP,
+	INDEX_BASE,
+	INDEX_MID,
+	INDEX_TIP,
+	THUMB_BASE,
+	THUMB_MID,
+	THUMB_TIP,
+	NUM_JOINTS
+  }
+
   // Hand tracker.
   [DllImport(@"kinect_lib.dll", EntryPoint = "InitializeHandTracker", CallingConvention = CallingConvention.Cdecl)]
   public static extern bool InitializeHandTracker();
   
   [DllImport(@"kinect_lib.dll", EntryPoint = "GetHandsSkeletons", CallingConvention = CallingConvention.Cdecl)]
-  public static extern bool GetHandsSkeletons(float[] positions, float[] tracking_error);
+  public static extern bool GetHandsSkeletons(HandJointInfo[] hand_joints);
 
   // Piano experimentations.
   [DllImport(@"kinect_lib.dll", EntryPoint = "GetPianoDepth", CallingConvention = CallingConvention.Cdecl)]

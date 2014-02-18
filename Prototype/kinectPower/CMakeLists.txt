@@ -196,6 +196,7 @@ add_library(kinect_lib SHARED
 target_link_libraries(kinect_lib
   algos
   base
+  creative
   bitmap_graph
   finger_finder
   finger_finder_thinning

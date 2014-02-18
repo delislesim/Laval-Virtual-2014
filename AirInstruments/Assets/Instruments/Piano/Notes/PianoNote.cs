@@ -9,6 +9,9 @@ public class PianoNote : MonoBehaviour {
 	// Ecart demi-ton.
 	public float ecartDemiTon;
 
+	// Indique si c'est une note noire.
+	public bool noire;
+
 	void Start () {
 		// Calculer la position du point de rotation de la note.
 		pointRotationLocal = new Vector3 (0, 0.5f, -0.5f);
@@ -19,7 +22,9 @@ public class PianoNote : MonoBehaviour {
 		// Appliquer la rotation a la note visible.
 		noteObject.transform.localRotation = Quaternion.identity;
 		noteObject.transform.localPosition = Vector3.zero;
-		noteObject.transform.RotateAround (pointRotationWorld, Vector3.left, noteAngleMax);
+		if (noteAngleMax != 0) {
+			noteObject.transform.RotateAround (pointRotationWorld, Vector3.left, noteAngleMax);
+		}
 
 		// Si l'angle n'est pas nul, on est en train de jouer la note.
 		// TODO(fdoray): Le son de la note pourrait dépendre de la vitesse de changement de l'angle.
@@ -38,8 +43,14 @@ public class PianoNote : MonoBehaviour {
 	}
 
 	public void TouchWithSphere(FingerSphere sphere) {
-		// Calculer la position de la boule rouge selon nos coordonnées.
+		// Calculer la position du bas de la boule rouge.
 		Vector3 spherePositionWorld = sphere.transform.position + Vector3.forward * sphere.transform.localScale.y * 0.5f;
+		Vector3 spherePositionLocal = transform.InverseTransformPoint (spherePositionWorld);
+
+		// Accepter la note seulement si le centre de la boule rouge est au-dessus de la note.
+		if (spherePositionLocal.x > 0.5 || spherePositionLocal.x < -0.5) {
+			return;
+		}
 
 		// Calculer l'angle que la note doit avoir pour ne pas toucher au doigt.
 		float noteAngle = AngleWithFingerAt (spherePositionWorld);

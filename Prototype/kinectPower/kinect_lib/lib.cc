@@ -4,7 +4,7 @@
 #include <opencv2/core/core.hpp>
 
 #include "base/logging.h"
-#include "intel_hand_tracker/intel_hand_tracker.h"
+#include "creative/creative_wrapper.h"
 #include "kinect_interaction/interaction_client_menu.h"
 #include "kinect_interaction/interaction_frame.h"
 #include "kinect_face_tracker/face_tracker.h"
@@ -216,15 +216,16 @@ bool GetFaceRotation(float* face_rotation) {
 
 #ifdef USE_INTEL_CAMERA
 
+creative::CreativeWrapper creative_wrapper;
+
 bool InitializeHandTracker() {
-  return intel_hand_tracker::IntelHandTracker::instance()->Initialize();
+  creative_wrapper.Initialize();
+  return true;
 }
 
-bool GetHandsSkeletons(hskl::float3* positions,
-                       float* tracking_error) {
-  intel_hand_tracker::IntelHandTracker::instance()->GetFrame(
-      positions, tracking_error
-  );
+bool GetHandsSkeletons(creative::JointInfo* joints) {
+  creative_wrapper.UpdateJoints();
+  creative_wrapper.QueryJoints(joints);
   return true;
 }
 
