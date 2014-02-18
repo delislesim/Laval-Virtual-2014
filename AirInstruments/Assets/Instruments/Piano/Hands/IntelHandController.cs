@@ -28,15 +28,16 @@ public class IntelHandController : MonoBehaviour {
 		KinectPowerInterop.GetHandsSkeletons (hand_joints);
 
 		for (int i = 0; i < hand_joints.Length; ++i) {
-			fingerSpheres[i].transform.position = new Vector3(-hand_joints[i].x * 45, -hand_joints[i].y * 45 - 10, -hand_joints[i].z * 45 + 20);
+			fingerSpheres[i].transform.position = new Vector3(-hand_joints[i].x * 45, -hand_joints[i].y * 45 - 10, -hand_joints[i].z * 60 + 20);
 
+			/*
 			const float errorMax = 5.0f;
 			float error = hand_joints[i].error;
 			if (error > errorMax)
 				error = errorMax;
 
 			fingerSpheres[i].renderer.material.SetColor("_Color", new Color32(255, 0, 0, (byte)(255*(errorMax - error) / errorMax)));
-			
+			*/
 		}
 	}
 
