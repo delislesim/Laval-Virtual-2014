@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef USE_INTEL_CAMERA
-
+/*
 #include "hsklu.h"
 
 #include <cstdlib>
@@ -39,5 +39,5 @@ class IntelHandTracker {
 };
 
 }  // namespace intel_hand_tracker
-
+*/
 #endif

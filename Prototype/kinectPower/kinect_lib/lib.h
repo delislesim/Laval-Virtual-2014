@@ -2,6 +2,7 @@
 #include "hsklu.h"
 #endif
 
+#include "creative/joint_info.h"
 #include "kinect_wrapper/kinect_include.h"
 
 extern "C" bool __declspec(dllexport)
@@ -49,7 +50,7 @@ extern "C" bool __declspec(dllexport)
 InitializeHandTracker();
 
 extern "C" bool __declspec(dllexport)
-GetHandsSkeletons(hskl::float3* joint_positions, float* tracking_error);
+GetHandsSkeletons(creative::JointInfo* joints);
 
 #endif
 
