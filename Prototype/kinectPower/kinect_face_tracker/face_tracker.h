@@ -21,6 +21,8 @@ namespace kinect_face_tracker {
 		//		roll (incliner la tête sur le coté)
 		cv::Vec3f FaceRotation();
 
+		void initializeTracker();
+
 		bool isTracking() { return is_tracking_; }
 
 	private:

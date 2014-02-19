@@ -90,6 +90,7 @@ class KinectSensor {
   NUI_IMAGE_TYPE depth_stream_type() const { return depth_stream_type_; }
   void depth_stream_type(NUI_IMAGE_TYPE val) { depth_stream_type_ = val; }
 
+
  private:
   INuiSensor* native_sensor_;
 

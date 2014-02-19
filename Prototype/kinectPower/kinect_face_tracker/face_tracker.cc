@@ -1,15 +1,12 @@
 #include "face_tracker.h"
 #include "kinect_wrapper/constants.h"
 #include "kinect_wrapper/kinect_sensor_data.h"
+#include "kinect_wrapper/kinect_wrapper.h"
+#include "kinect_wrapper/kinect_skeleton.h"
 
 namespace kinect_face_tracker {
 	FaceTracker::FaceTracker(){
 		is_tracking_ = false;
-		face_tracker_ = FTCreateFaceTracker();
-		color_image_ = FTCreateImage();
-		depth_image_ = FTCreateImage();
-		HRESULT result_result;
-		result_result = face_tracker_->CreateFTResult(&face_tracker_result_);
 	}
 
 	FaceTracker::~FaceTracker(){
@@ -29,6 +26,22 @@ namespace kinect_face_tracker {
 		rotation[2] = rotationXYZ[2];
 
 		return rotation;
+	}
+
+	void FaceTracker::initializeTracker(){
+		face_tracker_ = FTCreateFaceTracker();
+		color_image_ = FTCreateImage();
+		depth_image_ = FTCreateImage();
+		FT_CAMERA_CONFIG video_config;
+		video_config.FocalLength = NUI_CAMERA_COLOR_NOMINAL_FOCAL_LENGTH_IN_PIXELS;
+		video_config.Width = kinect_wrapper::kKinectColorWidth;
+		video_config.Height = kinect_wrapper::kKinectColorHeight;
+		FT_CAMERA_CONFIG depth_config;
+		depth_config.FocalLength = NUI_CAMERA_DEPTH_NOMINAL_FOCAL_LENGTH_IN_PIXELS * 2;
+		depth_config.Width = kinect_wrapper::kKinectDepthWidth;
+		depth_config.Height = kinect_wrapper::kKinectDepthHeight;
+		face_tracker_->Initialize(&video_config, &depth_config, NULL, NULL);
+		face_tracker_->CreateFTResult(&face_tracker_result_);
 	}
 
 	void FaceTracker::ObserveDepth(const cv::Mat& depth_mat, const kinect_wrapper::KinectSensorData& sensor_data){
@@ -55,7 +68,20 @@ namespace kinect_face_tracker {
 		HRESULT result;
 
 		if (!is_tracking_){
-			result = face_tracker_->StartTracking(&ft_sensor_data, NULL, NULL, face_tracker_result_);
+			FT_VECTOR3D* head_point_pointer = NULL;
+			FT_VECTOR3D head_point;
+			kinect_wrapper::KinectSkeleton skeleton;
+			if (sensor_data.GetSkeletonFrame()->GetTrackedSkeleton(0, &skeleton)){
+				cv::Vec3f position;
+				kinect_wrapper::KinectSkeleton::JointStatus status;
+				skeleton.GetJointPosition(kinect_wrapper::KinectSkeleton::Head, &position, &status);
+				head_point.x = position[0];
+				head_point.y = position[1];
+				head_point.z = position[2];
+				head_point_pointer = &head_point;
+			}
+
+			result = face_tracker_->StartTracking(&ft_sensor_data, NULL, head_point_pointer, face_tracker_result_);
 
 			if (SUCCEEDED(result) && SUCCEEDED(face_tracker_result_->GetStatus()))
 			{
