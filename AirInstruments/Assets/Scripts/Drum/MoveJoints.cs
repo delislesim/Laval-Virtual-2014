@@ -45,7 +45,7 @@ public class MoveJoints : MonoBehaviour {
 	private const float PLAYER_HIGHT = 5.0f;
 	private const float DELTA_CHECK_TIME = 5.0f;
 	//private float accumulated_time;
-	private const float DIST_MAX_KINECT = 10.0f; //2m
+	private const float DIST_MAX_KINECT = 12.0f; //2m
 	private const float DIST_MIN_KINECT = 2.0f; //dist min...
 
 	//Hand freeze info
