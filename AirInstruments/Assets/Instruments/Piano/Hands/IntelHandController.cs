@@ -7,6 +7,9 @@ public class IntelHandController : MonoBehaviour {
 	// Prefab de boule rouge représentant un doigt.
 	public GameObject fingerSpherePrefab;
 
+	// Prefab de boule transparent repréesentant un joint de la main.
+	public GameObject handJointSpherePrefab;
+
 	// Liste des boules rouges affichées dans la scene.
 	private List<GameObject> fingerSpheres = new List<GameObject>();
 
@@ -19,7 +22,17 @@ public class IntelHandController : MonoBehaviour {
 
 		// Créer les boules rouges de doigts.
 		for (int i = 0; i < numFingerSpheres; ++i) {
-			createFingerSphere(new Vector3(i * 1.5f, -5, -5));
+			KinectPowerInterop.HandJointIndex joint_index = (KinectPowerInterop.HandJointIndex)(i % (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS);
+
+			if (joint_index == KinectPowerInterop.HandJointIndex.PINKY_TIP ||
+			    joint_index == KinectPowerInterop.HandJointIndex.RING_TIP ||
+			    joint_index == KinectPowerInterop.HandJointIndex.MIDDLE_TIP ||
+			    joint_index == KinectPowerInterop.HandJointIndex.INDEX_TIP ||
+			    joint_index == KinectPowerInterop.HandJointIndex.THUMB_TIP) {
+				createFingerSphere(new Vector3(i * 1.5f, -5, -5));
+			} else {
+				createHandJointSphere(new Vector3(i * 1.5f, -5, -5));
+			}
 		}
 	}
 
@@ -49,6 +62,14 @@ public class IntelHandController : MonoBehaviour {
 		                                                   Quaternion.identity);
 		fingerSpheres.Add (fingerSphere);
 		return fingerSphere;
+	}
+
+	private GameObject createHandJointSphere(Vector3 position) {
+		GameObject handJointSphere = (GameObject)Instantiate (handJointSpherePrefab,
+		                                                      position,
+		                                                      Quaternion.identity);
+		fingerSpheres.Add (handJointSphere);
+		return handJointSphere;
 	}
 
 	// Buffer pour récupérer les positions des boules rouges.

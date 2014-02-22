@@ -28,11 +28,25 @@ public class PianoNote : MonoBehaviour {
 
 		// Si l'angle n'est pas nul, on est en train de jouer la note.
 		// TODO(fdoray): Le son de la note pourrait dépendre de la vitesse de changement de l'angle.
-		if (noteAngleMax != 0) {
+		if (noteAngleMax >= noteAngleStart) {
 			if (!isPlaying) {
-				PlaySound();
+				// Calculer le volume.
+				float volume = Time.time - lastTimeNotPressed;
+				if (volume > timeToPlay) {
+					volume = timeToPlay;
+				}
+				volume -= timeToMaxSound;
+				if (volume < 0) {
+					volume = 0;
+				}
+				volume = (timeToPlay - timeToMaxSound) - volume;
+				volume /= (timeToPlay - timeToMaxSound);
+
+				PlaySound(volume);
 			}
-		} else {
+		} else if (noteAngleMax == 0) {
+			lastTimeNotPressed = Time.time;
+
 			if (isPlaying) {
 				StopSound();
 			}
@@ -52,6 +66,10 @@ public class PianoNote : MonoBehaviour {
 			return;
 		}
 
+		if (!noire && spherePositionLocal.y > 0.5f - whiteNoteNotPlayable) {
+			return;
+		}
+
 		// Calculer l'angle que la note doit avoir pour ne pas toucher au doigt.
 		float noteAngle = AngleWithFingerAt (spherePositionWorld);
 		if (noteAngle > noteAngleMaxAllowed) {
@@ -61,8 +79,9 @@ public class PianoNote : MonoBehaviour {
 		}
 	}
 
-	private void PlaySound() {
+	private void PlaySound(float volume) {
 		audio.pitch = Mathf.Pow (2.0f, ecartDemiTon/12);
+		audio.volume = volume;
 		audio.Play ();
 		isPlaying = true;
 	}
@@ -91,13 +110,28 @@ public class PianoNote : MonoBehaviour {
 	// Coordonnées du point autour duquel la note tourne, en coordonnées du monde.
 	Vector3 pointRotationWorld;
 
-	// Angle que la note doit avoir pour ne pas toucher aux doigts.
+	// Angle que la note doit avoir pour ne pas toucher aux doigts a cette frame.
 	float noteAngleMax = 0;
+
+	// Temps permis pour enfoncer une note.
+	float timeToPlay = 0.5f;
+
+	// Temps a partir duquel on a le son maximal.
+	float timeToMaxSound = 0.2f;
+
+	// Angle pour commencer a jouer la note.
+	float noteAngleStart = 4.0f;
 
 	// Angle maximal permis.
 	float noteAngleMaxAllowed = 6.0f;
 
+	// Dernier instant auquel la note n'était pas enfoncée.
+	float lastTimeNotPressed = 0.0f;
+
 	// Indique si on est en train de jouer la note.
 	bool isPlaying = false;
+
+	// Proportion des notes blanches sur lesquelles on ne peut pas jouer (réservé aux notes noires)
+	float whiteNoteNotPlayable = 0.7f;
 
 }
