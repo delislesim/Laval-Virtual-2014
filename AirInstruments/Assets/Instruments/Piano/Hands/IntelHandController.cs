@@ -41,7 +41,7 @@ public class IntelHandController : MonoBehaviour {
 		KinectPowerInterop.GetHandsSkeletons (hand_joints);
 
 		for (int i = 0; i < hand_joints.Length; ++i) {
-			fingerSpheres[i].transform.position = new Vector3(-hand_joints[i].x * 45, -hand_joints[i].y * 45 - 10, -hand_joints[i].z * 60 + 20);
+			fingerSpheres[i].transform.position = new Vector3(-hand_joints[i].x * 45, -hand_joints[i].y * 45 - 10, -hand_joints[i].z * 52 + 20);
 
 			/*
 			const float errorMax = 5.0f;

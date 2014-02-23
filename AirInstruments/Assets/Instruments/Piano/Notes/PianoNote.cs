@@ -30,28 +30,37 @@ public class PianoNote : MonoBehaviour {
 		// TODO(fdoray): Le son de la note pourrait dépendre de la vitesse de changement de l'angle.
 		if (noteAngleMax >= noteAngleStart) {
 			if (!isPlaying) {
-				// Calculer le volume.
-				float volume = Time.time - lastTimeNotPressed;
-				if (volume > timeToPlay) {
-					volume = timeToPlay;
-				}
-				volume -= timeToMaxSound;
-				if (volume < 0) {
-					volume = 0;
-				}
-				volume = (timeToPlay - timeToMaxSound) - volume;
-				volume /= (timeToPlay - timeToMaxSound);
+				// Calculer le volume selon le déplacement dans les dernieres images.
+				float dernierAngle = derniersAngles[indexDerniersAngles];
+				float vitesse = noteAngleMax - dernierAngle / (float)derniersAngles.Length;
+
+				vitesse -= vitesseNoSound;
+				if (vitesse < 0)
+					vitesse = 0;
+
+				float volume = vitesse / 2.2f;
+				if (volume > 1.0f)
+					volume = 1.0f;
+
+				/*
+				if (vitesse > vitesseNoSound)
+					vitesse = vitesseNoSound;
+				if (vitesse < 0)
+					vitesse = 0;
+*/
 
 				PlaySound(volume);
 			}
 		} else if (noteAngleMax == 0) {
-			lastTimeNotPressed = Time.time;
-
 			if (isPlaying) {
 				StopSound();
 			}
 		}
 
+		// Toujours enregister les angles.
+		derniersAngles [indexDerniersAngles] = noteAngleMax;
+		indexDerniersAngles = (indexDerniersAngles + 1) % derniersAngles.Length;
+		
 		// Réinitialiser l'angle de la note.
 		noteAngleMax = 0;
 	}
@@ -125,13 +134,19 @@ public class PianoNote : MonoBehaviour {
 	// Angle maximal permis.
 	float noteAngleMaxAllowed = 6.0f;
 
-	// Dernier instant auquel la note n'était pas enfoncée.
-	float lastTimeNotPressed = 0.0f;
+	// Index du prochain angle a mettre dans le tableau dernierAngles (tableau circulaire).
+	int indexDerniersAngles = 0;
+
+	// Angles aux dernieres images.
+	float[] derniersAngles = new float[2];
+
+	// Vitesse a laquelle il faut appuyer la note pour faire un son (degres par seconde).
+	float vitesseNoSound = 2.0f;
+
+	// Proportion des notes blanches qui ne peuvent pas etre jourées (réservées aux notes noire)
+	const float whiteNoteNotPlayable = 0.45f;
 
 	// Indique si on est en train de jouer la note.
 	bool isPlaying = false;
-
-	// Proportion des notes blanches sur lesquelles on ne peut pas jouer (réservé aux notes noires)
-	float whiteNoteNotPlayable = 0.7f;
 
 }

@@ -4,8 +4,8 @@ namespace creative {
 
 namespace {
 
-const float	kHandWidth = 0.08f;
-const float	kHandLength = 0.19f;
+const float	kHandWidth = /*0.08f*/ 0.0816f;
+const float	kHandLength = /*0.19f*/ 0.1559f;
 
 const hskl_model kHandModelType = HSKL_MODEL_TWO_HAND;
 
