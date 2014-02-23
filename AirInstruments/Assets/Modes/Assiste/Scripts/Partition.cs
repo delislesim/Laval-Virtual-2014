@@ -72,7 +72,7 @@ public class Partition {
 
 	public void JouerTemps(float temps, Instrument instrument) {
 		int indexTemps = (int)(temps * 1.75f / resolution);
-		if (indexTemps > dureePartition)
+		if (indexTemps >= dureePartition)
 			return;
 
 		for (int i = 0; i < noteToIndex.Count; ++i) {
@@ -208,7 +208,7 @@ public class Partition {
 	private const int dureePartition = 50 * 10;
 
 	// Duree des notes pour lesquelles aucune duree n'est specifiee.
-	private const float dureeParDefaut = 0.9f;
+	private const float dureeParDefaut = 1.0f;
 
 	// Table qui fait le lien entre les notes et leur index.
 	private Dictionary<String, int> noteToIndex = new Dictionary<String, int>();

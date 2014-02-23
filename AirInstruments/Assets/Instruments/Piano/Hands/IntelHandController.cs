@@ -41,7 +41,17 @@ public class IntelHandController : MonoBehaviour {
 		KinectPowerInterop.GetHandsSkeletons (hand_joints);
 
 		for (int i = 0; i < hand_joints.Length; ++i) {
-			fingerSpheres[i].transform.position = new Vector3(-hand_joints[i].x * 45, -hand_joints[i].y * 45 - 10, -hand_joints[i].z * 52 + 20);
+			Vector3 targetPosition = new Vector3(-hand_joints[i].x * 45,
+			                                     -hand_joints[i].y * 45 - 10,
+			                                     -hand_joints[i].z * 52 + 20);
+
+			HandJointSphere handJointSphereScript = (HandJointSphere)fingerSpheres[i].GetComponent(typeof(HandJointSphere));
+			if (handJointSphereScript != null) {
+				handJointSphereScript.SetTargetPosition(targetPosition);
+			} else {
+				FingerSphere fingerSphereScript = (FingerSphere)fingerSpheres[i].GetComponent(typeof(FingerSphere));
+				fingerSphereScript.SetTargetPosition(targetPosition);
+			}
 
 			/*
 			const float errorMax = 5.0f;
