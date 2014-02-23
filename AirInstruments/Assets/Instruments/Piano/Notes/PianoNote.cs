@@ -99,6 +99,11 @@ public class PianoNote : MonoBehaviour {
 		}
 	}
 
+	public void GetInfo(out float positionHorizontale, out float largeur) {
+		positionHorizontale = transform.localPosition.x;
+		largeur = transform.localScale.x;
+	}
+
 	// Calcule l'angle que doit avoir la note pour ne pas toucher
 	// au doigt dont la position est spécifiée en parametre
 	// (en coordonnées du monde).

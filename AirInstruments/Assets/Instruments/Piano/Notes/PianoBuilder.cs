@@ -83,6 +83,7 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 		                                            blanchePrefab.transform.position.y,
 		                                            blanchePrefab.transform.position.z);
 		note.transform.localScale = blanchePrefab.transform.localScale;
+		note.transform.localRotation = Quaternion.identity;
 
 		AudioSource audioSource = (AudioSource)note.GetComponent (typeof(AudioSource));
 		audioSource.clip = clip;
@@ -91,6 +92,13 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 		pianoNote.ecartDemiTon = ecartDemiTon;
 
 		notes.Add (pianoNote);
+
+		if (position < 0) {
+			// Rendre la note invisible.
+			note.transform.localPosition = new Vector3(note.transform.localPosition.x,
+			                                           note.transform.localPosition.y, 
+			                                           100.0f);
+		}
 	}
 
 	void CreerNoire(int position, AudioClip clip, float ecartDemiTon) {
@@ -100,6 +108,7 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 		                                            noirePrefab.transform.position.y,
 		                                            noirePrefab.transform.position.z);
 		note.transform.localScale = noirePrefab.transform.localScale;
+		note.transform.localRotation = Quaternion.identity;
 		
 		AudioSource audioSource = (AudioSource)note.GetComponent (typeof(AudioSource));
 		audioSource.clip = clip;
@@ -108,6 +117,13 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 		pianoNote.ecartDemiTon = ecartDemiTon;
 		
 		notes.Add (pianoNote);
+
+		if (position < 0) {
+			// Rendre la note invisible.
+			note.transform.localPosition = new Vector3(note.transform.localPosition.x,
+			                                           note.transform.localPosition.y, 
+			                                           100.0f);
+		}
 	}
 
 	public void PlayNote(int index) {
@@ -116,6 +132,10 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 
 	public void StopNote(int index) {
 		notes [index].StopSound (true);
+	}
+
+	public void GetNoteInfo(int index, out float positionHorizontale, out float largeur) {
+		notes [index].GetInfo (out positionHorizontale, out largeur);
 	}
 
 	// Espace horizontal entre le centre de 2 notes blanches.

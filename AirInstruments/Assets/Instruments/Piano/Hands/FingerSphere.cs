@@ -21,6 +21,10 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 		}
 	}
 
+	public void Reset() {
+		initialized = false;
+	}
+
 	public void SetTargetPosition(Vector3 targetPosition) {
 		if (!initialized) {
 			kalman.SetInitialObservation(new Vector4(targetPosition.x,

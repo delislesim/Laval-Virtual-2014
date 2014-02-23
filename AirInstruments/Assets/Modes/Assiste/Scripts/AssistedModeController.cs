@@ -6,6 +6,8 @@ public class AssistedModeController : MonoBehaviour {
 	// GameObject de l'instrument controle par ce mode.
 	public GameObject instrument;
 
+	// GameObject de cubes tombants.
+	public GameObject cubesTombants;
 
 	void Start () {
 		partition = new Partition ();
@@ -14,6 +16,9 @@ public class AssistedModeController : MonoBehaviour {
 		tempsDebut = Time.time;
 
 		instrumentScript = (Instrument)(instrument.GetComponent (typeof(PianoBuilder)));
+		cubesTombantsScript = (CubesTombants)(cubesTombants.GetComponent (typeof(CubesTombants)));
+		cubesTombantsScript.AssignerTempsAvantDebutMusique (tempsAttendreDebutMusique * resolution * speed);
+		cubesTombantsScript.AssignerInstrument (instrumentScript);
 
 		// Remplir tout le tableau de prochaines notes avec des notes muettes.
 		for (int i = 0; i < nombreEchantillons; ++i) {
@@ -24,38 +29,47 @@ public class AssistedModeController : MonoBehaviour {
 	}
 
 	void Update () {
+		// Temps actuel, en secondes.
+		float tempsActuel = Time.time - tempsDebut * speed;
+
 		// Temps actuel, en echantillons --> temps de remplissage.
-		int tempsActuel = (int)(((Time.time - tempsDebut) / resolution) * speed);
+		int tempsActuelEchantillons = (int)(tempsActuel / resolution);
 
 		// Temps a jouer, en echantillons.
-		int tempsAJouer = tempsActuel - (int)(tempsAttendreDebutMusique * speed);
+		int tempsAJouerEchantillons = tempsActuelEchantillons - (int)(tempsAttendreDebutMusique * speed);
 
 		// Remplir des notes jusqu'au temps actuel.
-		partition.RemplirProchainesNotes((Time.time - tempsDebut) * speed, prochainesNotes,
-		                                 nombreEchantillons, resolution);
+		partition.RemplirProchainesNotes(tempsActuel,
+		                                 prochainesNotes,
+		                                 nombreEchantillons,
+		                                 resolutionInverse,
+		                                 cubesTombantsScript);
+
+		// Faire avancer les cubes.
+		cubesTombantsScript.AssignerTempsCourant (tempsActuel);
 
 		// Jouer le temps actuel.
-		if (tempsAJouer < 0)
+		if (tempsAJouerEchantillons < 0)
 			return;
 
-		for (int i = dernierTempsJoue; i < tempsAJouer; ++i) {
-			int tempsAJouerModulo = i % nombreEchantillons;
+		for (int i = dernierTempsJoue; i < tempsAJouerEchantillons; ++i) {
+			int tempsAJouerEchantillonsModulo = i % nombreEchantillons;
 
 			// Passer toutes les notes.
 			for (int j = 0; j < nombreNotes; ++j) {
 				// Jouer la note si necessaire.
-				if (prochainesNotes[tempsAJouerModulo, j] != Partition.StatutNote.Muette) {
+				if (prochainesNotes[tempsAJouerEchantillonsModulo, j] != Partition.StatutNote.Muette) {
 					instrumentScript.PlayNote(j);
 				} else {
 					instrumentScript.StopNote(j);
 				}
 
 				// Nettoyer le tableau.
-				prochainesNotes[tempsAJouerModulo, j] = Partition.StatutNote.Muette;
+				prochainesNotes[tempsAJouerEchantillonsModulo, j] = Partition.StatutNote.Muette;
 			}
 		}
 
-		dernierTempsJoue = tempsAJouer;
+		dernierTempsJoue = tempsAJouerEchantillons;
 	}
 
 	// Facteur pour jouer plus rapidement.
@@ -74,6 +88,9 @@ public class AssistedModeController : MonoBehaviour {
 	// Resolution du tableau de prochaines notes a jouer.
 	private const float resolution = 0.1f;
 
+	// Resolution inverse du tableau de prochaines notes a jouer.
+	private const float resolutionInverse = 10.0f;
+
 	// Nombre d'echantillons presents dans le tableau de prochaines notes a jouer.
 	private const int nombreEchantillons = 120;
 
@@ -82,6 +99,9 @@ public class AssistedModeController : MonoBehaviour {
 
 	// Interface Instrument de l'instrument controle par ce mode.
 	private Instrument instrumentScript;
+
+	// Script du GameObject de cubes tombants.
+	private CubesTombants cubesTombantsScript;
 
 	// Temps auquel la musique a commence a jouer.
 	private float tempsDebut;

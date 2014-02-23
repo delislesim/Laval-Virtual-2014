@@ -45,6 +45,10 @@ public class IntelHandController : MonoBehaviour {
 			                                     -hand_joints[i].y * 45 - 10,
 			                                     -hand_joints[i].z * 52 + 20);
 
+			if (hand_joints[i].error > 5.0f) {
+				targetPosition = new Vector3(0.0f, 0.0f, 50.0f);
+			}
+
 			HandJointSphere handJointSphereScript = (HandJointSphere)fingerSpheres[i].GetComponent(typeof(HandJointSphere));
 			if (handJointSphereScript != null) {
 				handJointSphereScript.SetTargetPosition(targetPosition);

@@ -69,7 +69,8 @@ public class Partition {
 	public bool RemplirProchainesNotes(float jusquaTemps,
 	                                   Partition.StatutNote[,] prochainesNotes,
 	                                   int nombreEchantillons,
-	                                   float resolution) {
+	                                   float resolutionInverse,
+	                                   CubesTombants cubesTombants) {
 		if (jusquaTemps < tempsDerniereNote)
 			return true;
 
@@ -85,7 +86,8 @@ public class Partition {
 			while (ReadNoteDePartition(tempsDebut, ligne, ref pos,
 			                           prochainesNotes,
 			                           nombreEchantillons,
-			                           resolution)) {
+			                           resolutionInverse,
+			                           cubesTombants)) {
 			}
 
 			tempsDerniereNote = tempsDebut;
@@ -123,7 +125,8 @@ public class Partition {
 	private bool ReadNoteDePartition(float tempsDebut, string ligne, ref int pos,
 	                                 Partition.StatutNote[,] prochainesNotes,
 	                                 int nombreEchantillons,
-	                                 float resolution) {
+	                                 float resolutionInverse,
+	                                 CubesTombants cubesTombants) {
 		// Lire la note.
 		string val = "";
 		bool hasSeenNoteBeginning = false;
@@ -189,6 +192,9 @@ public class Partition {
 			prochainesNotes[i % nombreEchantillons, noteIndex] = statut;
 		}
 
+		// Ajouter aux cubes tombants.
+		cubesTombants.AjouterCube (noteIndex, tempsDebut, duree);
+
 		return true;
 	}
 
@@ -202,9 +208,6 @@ public class Partition {
 
 	// Stream du fichier de partition.
 	private StreamReader streamReader;
-
-	// Resolution inverse.
-	private const float resolutionInverse = 10;
 
 	// Temps de la derniere note chargee du fichier.
 	private float tempsDerniereNote = -1.0f;
