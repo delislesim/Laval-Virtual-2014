@@ -42,19 +42,10 @@ public class PianoNote : MonoBehaviour {
 				if (volume > 1.0f)
 					volume = 1.0f;
 
-				/*
-				if (vitesse > vitesseNoSound)
-					vitesse = vitesseNoSound;
-				if (vitesse < 0)
-					vitesse = 0;
-*/
-
-				PlaySound(volume);
+				PlaySound(volume, false);
 			}
 		} else if (noteAngleMax == 0) {
-			if (isPlaying) {
-				StopSound();
-			}
+			StopSound(false);
 		}
 
 		// Toujours enregister les angles.
@@ -88,16 +79,24 @@ public class PianoNote : MonoBehaviour {
 		}
 	}
 
-	private void PlaySound(float volume) {
-		audio.pitch = Mathf.Pow (2.0f, ecartDemiTon/12);
-		audio.volume = volume;
-		audio.Play ();
-		isPlaying = true;
+	public void PlaySound(float volume, bool with_override) {
+		if (!isPlaying) {
+			audio.pitch = Mathf.Pow (2.0f, ecartDemiTon / 12);
+			audio.volume = volume;
+			audio.Play ();
+			isPlaying = true;
+
+			if (with_override)
+				isOverride = true;
+		}
 	}
 
-	private void StopSound() {
-		audio.Stop ();
-		isPlaying = false;
+	public void StopSound(bool with_override) {
+		if (isPlaying && (with_override || !isOverride)) {
+			audio.Stop ();
+			isPlaying = false;
+			isOverride = false;
+		}
 	}
 
 	// Calcule l'angle que doit avoir la note pour ne pas toucher
@@ -121,13 +120,7 @@ public class PianoNote : MonoBehaviour {
 
 	// Angle que la note doit avoir pour ne pas toucher aux doigts a cette frame.
 	float noteAngleMax = 0;
-
-	// Temps permis pour enfoncer une note.
-	float timeToPlay = 0.5f;
-
-	// Temps a partir duquel on a le son maximal.
-	float timeToMaxSound = 0.2f;
-
+	
 	// Angle pour commencer a jouer la note.
 	float noteAngleStart = 4.0f;
 
@@ -148,5 +141,8 @@ public class PianoNote : MonoBehaviour {
 
 	// Indique si on est en train de jouer la note.
 	bool isPlaying = false;
+
+	// Indique si la note est en train d'etre joue par un systeme automatique.
+	bool isOverride = false;
 
 }
