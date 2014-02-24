@@ -36,19 +36,45 @@ public class IntelHandController : MonoBehaviour {
 		}
 	}
 
+	public Vector3 TransformerPositionDoigt(KinectPowerInterop.HandJointInfo handJointInfo) {
+		return new Vector3(-handJointInfo.x * 45,
+		                   -handJointInfo.y * 45 - 10,
+		                   -handJointInfo.z * 52 + 20);
+	}
+
 	void Update () {
 		// Mettre a jour la position des boules rouge en fonction des donnees de la caméra Creative.
 		KinectPowerInterop.GetHandsSkeletons (hand_joints);
 
 		for (int i = 0; i < hand_joints.Length; ++i) {
-			Vector3 targetPosition = new Vector3(-hand_joints[i].x * 45,
-			                                     -hand_joints[i].y * 45 - 10,
-			                                     -hand_joints[i].z * 52 + 20);
+			KinectPowerInterop.HandJointIndex jointIndex =
+				(KinectPowerInterop.HandJointIndex)(i % (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS);
+
+			Vector3 targetPosition = TransformerPositionDoigt(hand_joints[i]);
 
 			if (hand_joints[i].error > 5.0f) {
 				targetPosition = new Vector3(0.0f, 0.0f, 50.0f);
 			}
 
+			// Allonger le pouce.
+			if (jointIndex == KinectPowerInterop.HandJointIndex.THUMB_TIP) {
+				// Trouver l'index de la base du pouce.
+				int diffBoutExtremite = (int)KinectPowerInterop.HandJointIndex.THUMB_TIP -
+										(int)KinectPowerInterop.HandJointIndex.THUMB_BASE;
+				int indexBase = i - diffBoutExtremite;
+				Vector3 positionBasePouce = TransformerPositionDoigt(hand_joints[indexBase]);
+
+				Vector2 baseVersExtremitePouce = new Vector2(targetPosition.x - positionBasePouce.x,
+				                                             targetPosition.y - positionBasePouce.y);
+
+				// Allonger la distance de la base du pouce a l'extremite.
+				baseVersExtremitePouce = baseVersExtremitePouce * 1.5f;
+
+				//targetPosition.x = positionBasePouce.x + baseVersExtremitePouce.x;
+				targetPosition.y = positionBasePouce.y + baseVersExtremitePouce.y;
+			}
+
+			// Appliquer les positions aux boules.
 			HandJointSphere handJointSphereScript = (HandJointSphere)fingerSpheres[i].GetComponent(typeof(HandJointSphere));
 			if (handJointSphereScript != null) {
 				handJointSphereScript.SetTargetPosition(targetPosition);
@@ -56,15 +82,6 @@ public class IntelHandController : MonoBehaviour {
 				FingerSphere fingerSphereScript = (FingerSphere)fingerSpheres[i].GetComponent(typeof(FingerSphere));
 				fingerSphereScript.SetTargetPosition(targetPosition);
 			}
-
-			/*
-			const float errorMax = 5.0f;
-			float error = hand_joints[i].error;
-			if (error > errorMax)
-				error = errorMax;
-
-			fingerSpheres[i].renderer.material.SetColor("_Color", new Color32(255, 0, 0, (byte)(255*(errorMax - error) / errorMax)));
-			*/
 		}
 	}
 
