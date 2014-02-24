@@ -29,6 +29,7 @@ public class AssistedModeController : MonoBehaviour {
 
 	void Update () {
 		return;
+
 		// Temps actuel, en secondes. Utilise pour remplir le tableau de prochaines notes.
 		float tempsActuel = (Time.time - tempsDebut) * speed;
 

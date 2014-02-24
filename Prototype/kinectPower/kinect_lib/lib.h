@@ -53,12 +53,3 @@ extern "C" bool __declspec(dllexport)
 GetHandsSkeletons(creative::JointInfo* joints);
 
 #endif
-
-// Piano experiments.
-extern "C" bool __declspec(dllexport)
-GetPianoImage(unsigned char* pixels, unsigned int pixels_size);
-
-extern "C" bool __declspec(dllexport)
-GetPianoFingers(unsigned int* values, unsigned char* known);
-
-

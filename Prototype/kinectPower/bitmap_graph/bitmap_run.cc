@@ -35,10 +35,6 @@ int BuildBitmapGraphInternal(int index, unsigned char* bitmap_ptr,
   int best_neighbour_index = -1;
   int best_neighbour_size = 0;
 
-  if (index == 7) {
-    int tt = 2;
-  }
-
   for (int i = 0; i < kNumNeighbours; ++i) {
     cv::Point neighbour(position.x + kNeighboursOffset[i][0],
                         position.y + kNeighboursOffset[i][1]);

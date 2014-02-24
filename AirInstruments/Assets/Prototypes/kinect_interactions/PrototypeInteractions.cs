@@ -17,6 +17,7 @@ public class PrototypeInteractions : MonoBehaviour {
 			if ((hands[0].State & KinectPowerInterop.NuiHandpointerStateNotTracked) == 0) {
 				left_hand_position.x = hands[0].X;
 				left_hand_position.y = hands[0].Y;
+				Debug.Log(left_hand_position);
 				left_hand_visible = true;
 			} else {
 				left_hand_visible = false;
