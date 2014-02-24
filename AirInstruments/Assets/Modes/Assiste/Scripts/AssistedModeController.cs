@@ -58,10 +58,14 @@ public class AssistedModeController : MonoBehaviour {
 			// Passer toutes les notes.
 			for (int j = 0; j < nombreNotes; ++j) {
 				// Jouer la note si necessaire.
-				if (prochainesNotes[tempsAJouerEchantillonsModulo, j] != Partition.StatutNote.Muette) {
-					instrumentScript.PlayNote(j);
+				Partition.StatutNote statutNote = prochainesNotes[tempsAJouerEchantillonsModulo, j];
+				if (statutNote == Partition.StatutNote.Muette) {
+					instrumentScript.DontPlayNotePlayer(j);
+				} else if (statutNote == Partition.StatutNote.Accompagnement) {
+					instrumentScript.PlayNoteOverride(j);
 				} else {
-					instrumentScript.StopNote(j);
+					//instrumentScript.PlayNotePlayer(j);
+					instrumentScript.PlayNoteOverride(j);
 				}
 
 				// Nettoyer le tableau.

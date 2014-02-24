@@ -126,12 +126,19 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 		}
 	}
 
-	public void PlayNote(int index) {
-		notes [index].PlaySound (1.0f, true);
+	// Joue la note de force (accompagnement).
+	public void PlayNoteOverride(int index) {
+		notes [index].PlayNoteOverride ();
 	}
-
-	public void StopNote(int index) {
-		notes [index].StopSound (true);
+	
+	// Indique que le joueur doit jouer la note specifiee.
+	public void PlayNotePlayer(int index) {
+		notes [index].PlayNotePlayer ();
+	}
+	
+	// Indique que le joueur ne doit pas jouer la note specifiee.
+	public void DontPlayNotePlayer(int index) {
+		notes [index].DontPlayNotePlayer ();
 	}
 
 	public void GetNoteInfo(int index, out float positionHorizontale, out float largeur) {

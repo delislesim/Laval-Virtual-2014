@@ -12,13 +12,24 @@ public class PianoNote : MonoBehaviour {
 	// Indique si c'est une note noire.
 	public bool noire;
 
+	// Materiel pour indiquer que la note doit etre jouee.
+	public Material doitJouerMaterial;
+
 	void Start () {
 		// Calculer la position du point de rotation de la note.
 		pointRotationLocal = new Vector3 (0, 0.5f, -0.5f);
 		pointRotationWorld = transform.TransformPoint (pointRotationLocal);
+
+		// Se souvenir du materiel par defaut.
+		normalMaterial = noteObject.renderer.material;
 	}
 
 	void Update () {
+		// Si la note est jouee automatiquement (accompagnement du mode assiste), mettre l'angle au max.
+		if (isOverride) {
+			noteAngleMax = noteAngleMaxAllowed;
+		}
+
 		// Appliquer la rotation a la note visible.
 		noteObject.transform.localRotation = Quaternion.identity;
 		noteObject.transform.localPosition = Vector3.zero;
@@ -42,10 +53,10 @@ public class PianoNote : MonoBehaviour {
 				if (volume > 1.0f)
 					volume = 1.0f;
 
-				PlaySound(volume, false);
+				PlaySound(volume);
 			}
 		} else if (noteAngleMax == 0) {
-			StopSound(false);
+			StopSound();
 		}
 
 		// Toujours enregister les angles.
@@ -79,24 +90,38 @@ public class PianoNote : MonoBehaviour {
 		}
 	}
 
-	public void PlaySound(float volume, bool with_override) {
+	public void PlaySound(float volume) {
 		if (!isPlaying) {
 			audio.pitch = Mathf.Pow (2.0f, ecartDemiTon / 12);
 			audio.volume = volume;
 			audio.Play ();
 			isPlaying = true;
-
-			if (with_override)
-				isOverride = true;
 		}
 	}
 
-	public void StopSound(bool with_override) {
-		if (isPlaying && (with_override || !isOverride)) {
+	public void StopSound() {
+		if (isPlaying) {
 			audio.Stop ();
 			isPlaying = false;
-			isOverride = false;
 		}
+	}
+
+	// Joue la note de force (accompagnement).
+	public void PlayNoteOverride() {
+		isOverride = true;
+		noteObject.renderer.material = normalMaterial;
+	}
+	
+	// Indique que le joueur doit jouer la note specifiee.
+	public void PlayNotePlayer() {
+		isOverride = false;
+		noteObject.renderer.material = doitJouerMaterial;
+	}
+	
+	// Indique que le joueur ne doit pas jouer la note specifiee.
+	public void DontPlayNotePlayer() {
+		isOverride = false;
+		noteObject.renderer.material = normalMaterial;
 	}
 
 	public void GetInfo(out float positionHorizontale, out float largeur) {
@@ -150,4 +175,6 @@ public class PianoNote : MonoBehaviour {
 	// Indique si la note est en train d'etre joue par un systeme automatique.
 	bool isOverride = false;
 
+	// Materiel par defaut.
+	Material normalMaterial;
 }

@@ -79,8 +79,9 @@ public class Partition {
 		while ((ligne = streamReader.ReadLine()) != null) {
 			int pos = 0;
 
-			// Lire le temps.
-			float tempsDebut = ReadNumber(ligne, ref pos);
+			// Lire la duree de cet ensemble de notes.
+			float dureeEnsemble = ReadNumber(ligne, ref pos);
+			float tempsDebut = tempsDerniereNote;
 
 			// Lire les notes.
 			while (ReadNoteDePartition(tempsDebut, ligne, ref pos,
@@ -90,9 +91,9 @@ public class Partition {
 			                           cubesTombants)) {
 			}
 
-			tempsDerniereNote = tempsDebut;
+			tempsDerniereNote = tempsDebut + dureeEnsemble;
 
-			if (tempsDebut >= jusquaTemps) {
+			if (tempsDerniereNote >= jusquaTemps) {
 				return true;
 			}
 		}
@@ -193,7 +194,9 @@ public class Partition {
 		}
 
 		// Ajouter aux cubes tombants.
-		cubesTombants.AjouterCube (noteIndex, tempsDebut, duree);
+		if (statut == StatutNote.Joueur) {
+			cubesTombants.AjouterCube (noteIndex, tempsDebut, duree);
+		}
 
 		return true;
 	}
@@ -210,7 +213,7 @@ public class Partition {
 	private StreamReader streamReader;
 
 	// Temps de la derniere note chargee du fichier.
-	private float tempsDerniereNote = -1.0f;
+	private float tempsDerniereNote = 0.0f;
 
 	// Duree des notes pour lesquelles aucune duree n'est specifiee.
 	private const float dureeParDefaut = 1.0f;
