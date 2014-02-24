@@ -4,12 +4,13 @@ using UnityEngine;
 namespace KinectHelpers
 {
 
-  public class Skeleton
-  {
+	public class Skeleton
+	{
 
     public Skeleton(int skeleton_id)
     {
       this.skeleton_id = skeleton_id;
+			is_face_tracking = false;
     }
 
     public enum Joint : int
@@ -120,10 +121,14 @@ namespace KinectHelpers
 	public Quaternion GetFaceRotation()
 	{
 			float[] faceRotationXYZ = new float[3];
-			bool isTracking;
-			isTracking = KinectPowerInterop.GetFaceRotation (faceRotationXYZ);
+			is_face_tracking = KinectPowerInterop.GetFaceRotation (faceRotationXYZ);
 			Quaternion rotation = Quaternion.Euler (faceRotationXYZ [0], faceRotationXYZ [1], faceRotationXYZ [2]);
 			return rotation;
+	}
+
+	public bool GetFaceTrackingStatus()
+	{
+		return is_face_tracking;
 	}
 
 	public Quaternion GetBoneOrientation(Joint joint)
@@ -172,5 +177,6 @@ namespace KinectHelpers
 	private KinectPowerInterop.NuiSkeletonBoneOrientation[] bone_orientations;
     private int[] joint_positions_depth;
     private JointStatus[] joint_status;
+		private bool is_face_tracking;
   }
 }

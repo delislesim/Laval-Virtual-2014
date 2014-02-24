@@ -39,6 +39,8 @@ bool Initialize(bool near_mode, bool with_sensor_thread) {
     if (wrapper->GetSensorCount() != 1)
       return false;
 
+	the_face_tracker.initializeTracker();
+
     // Initialize sensor 0.
     wrapper->GetSensorByIndex(0)->SetNearModeEnabled(near_mode);
     wrapper->GetSensorByIndex(0)->OpenDepthStream();
@@ -47,7 +49,6 @@ bool Initialize(bool near_mode, bool with_sensor_thread) {
     wrapper->GetSensorByIndex(0)->OpenInteractionStream(
         kinect_interaction::InteractionClientMenu::instance());
     wrapper->StartSensorThread(0);
-	the_face_tracker.initializeTracker();
   }
   return true;
 }
