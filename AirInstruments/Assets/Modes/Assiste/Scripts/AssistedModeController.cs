@@ -17,7 +17,6 @@ public class AssistedModeController : MonoBehaviour {
 
 		instrumentScript = (Instrument)(instrument.GetComponent (typeof(PianoBuilder)));
 		cubesTombantsScript = (CubesTombants)(cubesTombants.GetComponent (typeof(CubesTombants)));
-		cubesTombantsScript.AssignerTempsAvantDebutMusique (tempsAttendreDebutMusique * resolution * speed);
 		cubesTombantsScript.AssignerInstrument (instrumentScript);
 
 		// Remplir tout le tableau de prochaines notes avec des notes muettes.
@@ -29,14 +28,15 @@ public class AssistedModeController : MonoBehaviour {
 	}
 
 	void Update () {
-		// Temps actuel, en secondes.
-		float tempsActuel = Time.time - tempsDebut * speed;
+		return;
+		// Temps actuel, en secondes. Utilise pour remplir le tableau de prochaines notes.
+		float tempsActuel = (Time.time - tempsDebut) * speed;
 
-		// Temps actuel, en echantillons --> temps de remplissage.
-		int tempsActuelEchantillons = (int)(tempsActuel / resolution);
+		// Temps de la note qu'on entend, en secondes.
+		float tempsAJouer = tempsActuel - (tempsAttendreDebutMusique * speed);
 
 		// Temps a jouer, en echantillons.
-		int tempsAJouerEchantillons = tempsActuelEchantillons - (int)(tempsAttendreDebutMusique * speed);
+		int tempsAJouerEchantillons = (int) (tempsAJouer * resolutionInverse);
 
 		// Remplir des notes jusqu'au temps actuel.
 		partition.RemplirProchainesNotes(tempsActuel,
@@ -46,11 +46,10 @@ public class AssistedModeController : MonoBehaviour {
 		                                 cubesTombantsScript);
 
 		// Faire avancer les cubes.
-		cubesTombantsScript.AssignerTempsCourant (tempsActuel);
+		cubesTombantsScript.AssignerTempsCourant (tempsAJouer);
 
 		// Jouer le temps actuel.
 		if (tempsAJouerEchantillons >= 0) {
-
 			for (int i = dernierTempsJoue; i < tempsAJouerEchantillons; ++i) {
 				int tempsAJouerEchantillonsModulo = i % nombreEchantillons;
 
@@ -68,7 +67,7 @@ public class AssistedModeController : MonoBehaviour {
 			dernierTempsJoue = tempsAJouerEchantillons;
 		}
 		
-		// Aimanter les doigts vers les notes qui doivent etre jouees.
+		// Gerer les notes qui doivent etre jouees.
 		for (int indexNote = 0; indexNote < nombreNotes; ++indexNote) {
 			// TODO
 		}
@@ -87,11 +86,11 @@ public class AssistedModeController : MonoBehaviour {
 	}
 
 	// Facteur pour jouer plus rapidement.
-	private const float speed = 1.5f;
+	private const float speed = 1.0f;
 
-	// Temps a attendre avant de commencer a jouer la musique, en nombre d'echantillons.
+	// Temps a attendre avant de commencer a jouer la musique, en secondes.
 	// Ceci correspond au decalage entre le remplissage et le jouage.
-	private const int tempsAttendreDebutMusique = 40;
+	private const float tempsAttendreDebutMusique = 4.0f;
 
 	// Dernier temps qu'on a joue (non inclusivement), en nombre d'echantillons.
 	private int dernierTempsJoue = 0;
@@ -106,7 +105,7 @@ public class AssistedModeController : MonoBehaviour {
 	private const float resolutionInverse = 10.0f;
 
 	// Nombre d'echantillons presents dans le tableau de prochaines notes a jouer.
-	private const int nombreEchantillons = 120;
+	private const int nombreEchantillons = (int)(120 * speed);
 
 	// Nombre de notes de l'instrument controle par ce mode.
 	private const int nombreNotes = 48;

@@ -8,17 +8,13 @@ public class CubesTombants : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		positionDepart = new Vector3 (transform.localPosition.x,
+		                              transform.localPosition.y,
+		                              transform.localPosition.z);
 	}
 	
 	// Update is called once per frame
 	void Update () {
-	}
-
-	public void AssignerTempsAvantDebutMusique(float tempsAvantDebutMusique) {
-		positionDepart = new Vector3 (transform.localPosition.x,
-		                              transform.localPosition.y + tempsAvantDebutMusique,
-		                              transform.localPosition.z);
-		this.tempsAvantDebutMusique = tempsAvantDebutMusique;
 	}
 
 	public void AssignerTempsCourant(float tempsCourant) {
@@ -30,7 +26,7 @@ public class CubesTombants : MonoBehaviour {
 		while (cubes.Count != 0) {
 			GameObject cube = cubes.Peek();
 			float maxY = cube.transform.localPosition.y + cube.transform.localScale.y / 2.0f;
-			if (maxY < tempsCourant - tempsAvantDebutMusique) {
+			if (maxY < tempsCourant) {
 				cubes.Dequeue();
 				Destroy(cube);
 			} else {
@@ -71,7 +67,4 @@ public class CubesTombants : MonoBehaviour {
 
 	// Queue contenant les cubes de la partition.
 	private Queue<GameObject> cubes = new Queue<GameObject>();
-
-	// Temps avant que la musique commence, en secondes.
-	private float tempsAvantDebutMusique;
 }

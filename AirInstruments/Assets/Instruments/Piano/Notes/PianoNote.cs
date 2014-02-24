@@ -233,7 +233,7 @@ public class PianoNote : MonoBehaviour {
 	Vector3 pointRotationWorld;
 
 	// Indique si on est dans le mode libre <------------------------
-	bool estModeLibre = false;
+	bool estModeLibre = true;
 	
 	// Materiel par defaut.
 	Material materialNormal;
