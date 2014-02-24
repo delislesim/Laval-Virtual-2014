@@ -10,7 +10,7 @@ namespace kinect_face_tracker {
 		FaceTracker();
 		~FaceTracker();
 
-		virtual void ObserveDepth(const cv::Mat& depth_mat,
+		virtual void ObserveColor(const cv::Mat& color_mat,
 			const kinect_wrapper::KinectSensorData& sensor_data);
 
 		IFTResult* FaceTrackerResult() { return face_tracker_result_; }

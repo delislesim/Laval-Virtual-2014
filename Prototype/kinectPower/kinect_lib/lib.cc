@@ -35,7 +35,7 @@ bool Initialize(bool near_mode, bool with_sensor_thread) {
     if (wrapper->GetSensorCount() != 1)
       return false;
 
-    the_face_tracker.initializeTracker();
+	the_face_tracker.initializeTracker();
 
     // Initialize sensor 0.
     wrapper->GetSensorByIndex(0)->SetNearModeEnabled(near_mode);
