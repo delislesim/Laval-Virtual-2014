@@ -136,6 +136,13 @@ add_library(intel_hand_tracker
   intel_hand_tracker/hsklu.h
   intel_hand_tracker/hsklu.cc
   )
+  
+add_library(kinect_gesture_recognition
+  kinect_gesture_recognition/gesture_controller.h
+  kinect_gesture_recognition/gesture_controller.cc
+  kinect_gesture_recognition/gesture.h
+  kinect_gesture_recognition/gesture.cc
+  )
 
 add_library(kinect_interaction
   kinect_interaction/interaction_client_base.h
@@ -201,6 +208,7 @@ target_link_libraries(kinect_lib
   finger_finder
   finger_finder_thinning
   image
+  kinect_gesture_recognition
   kinect_interaction
   kinect_face_tracker
   kinect_replay
