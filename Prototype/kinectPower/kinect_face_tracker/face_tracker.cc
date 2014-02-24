@@ -93,7 +93,6 @@ namespace kinect_face_tracker {
 			}*/
 
 			result = face_tracker_->StartTracking(&ft_sensor_data, NULL, head_point_pointer, face_tracker_result_);
-
 			HRESULT resultatFaceTracker = face_tracker_result_->GetStatus();
 			if (SUCCEEDED(result) && SUCCEEDED(resultatFaceTracker))
 			{
