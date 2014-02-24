@@ -122,9 +122,12 @@ bool KinectSensor::PollNextDepthFrame(KinectSensorData* data) {
 
   if (interaction_stream_opened_) {
     // Provide the data to the interaction stream.
-    interaction_stream_->ProcessDepth(locked_rect.size,
+    HRESULT res = interaction_stream_->ProcessDepth(locked_rect.size,
                                       locked_rect.pBits,
                                       image_frame.liTimeStamp);
+    if (FAILED(res)) {
+      int boubou = 4;
+    }
   }
 
   image_frame.pFrameTexture->UnlockRect(0);
@@ -278,8 +281,12 @@ bool KinectSensor::PollNextSkeletonFrame(KinectSensorData* data) {
     // Provide the data to the interaction stream.
     Vector4 gravity = { 0 };
     native_sensor_->NuiAccelerometerGetCurrentReading(&gravity);
-    interaction_stream_->ProcessSkeleton(kNumSkeletons, frame->SkeletonData,
-                                         &gravity, frame->liTimeStamp);
+    HRESULT res = interaction_stream_->ProcessSkeleton(kNumSkeletons, frame->SkeletonData,
+                                                       &gravity, frame->liTimeStamp);
+    if (FAILED(res)) {
+      int boubou = 4;
+    }
+
     data->GetInteractionFrame()->SetTrackedSkeletons(track_ids[0],
                                                      track_ids[1]);
   }
@@ -320,6 +327,7 @@ bool KinectSensor::PollNextInteractionFrame(KinectSensorData* data) {
     return false;
 
   NUI_INTERACTION_FRAME interaction_frame;
+  ::ZeroMemory(&interaction_frame, sizeof(interaction_frame));
   HRESULT hr = interaction_stream_->GetNextFrame(0, &interaction_frame);
   if (FAILED(hr))
     return false;

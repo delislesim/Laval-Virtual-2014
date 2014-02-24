@@ -42,13 +42,13 @@ Piano::~Piano() {
 void Piano::ObserveDepth(
       const cv::Mat& /*depth_mat*/,
       const kinect_wrapper::KinectSensorData& data) {
-  
+
   // Extraire les données de profondeur et de couleur.
   cv::Mat depth_mat;
   cv::Mat color_mat;
   if (!data.QueryDepth(&depth_mat) || !data.QueryColor(&color_mat))
     return;
-
+  /*
   // Find the fingers.
   cv::Mat image;
   finger_finder_.ObserveData(depth_mat, color_mat, &image);
@@ -61,8 +61,8 @@ void Piano::ObserveDepth(
   for (size_t i = 0; i < fingers.size(); ++i) {
     cv::circle(image, fingers[i].position(), 2, image::kBlue, 2);
   }
-
-  nice_image_.SetNext(image);
+  */
+  nice_image_.SetNext(color_mat);
 
   // Donner la permission de faire des requêtes.
   started_ = true;

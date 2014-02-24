@@ -42,21 +42,32 @@ namespace kinect_face_tracker {
 		depth_config.Height = kinect_wrapper::kKinectDepthHeight;
 		face_tracker_->Initialize(&video_config, &depth_config, NULL, NULL);
 		face_tracker_->CreateFTResult(&face_tracker_result_);
+
+		HRESULT hr = color_image_->Allocate(kinect_wrapper::kKinectColorWidth, kinect_wrapper::kKinectColorHeight, FTIMAGEFORMAT_UINT8_B8G8R8X8);
+		if (FAILED(hr)) {
+			int le_demon_est_arrive = true;
+		}
+
+		hr = depth_image_->Allocate(kinect_wrapper::kKinectDepthWidth, kinect_wrapper::kKinectDepthHeight, FTIMAGEFORMAT_UINT16_D13P3);
+		if (FAILED(hr)) {
+			int le_demon_est_arrive = true;
+		}
 	}
 
-	void FaceTracker::ObserveDepth(const cv::Mat& depth_mat, const kinect_wrapper::KinectSensorData& sensor_data){
-		cv::Mat color_mat;
-		if (!sensor_data.QueryColor(&color_mat))
+	void FaceTracker::ObserveColor(const cv::Mat& color_mat, const kinect_wrapper::KinectSensorData& sensor_data){
+		cv::Mat depth_mat;
+		if (!sensor_data.QueryDepth(&depth_mat))
 			return;
 
-		cv::Mat depth_mat_not_const = depth_mat;
-		if (!sensor_data.QueryDepth(&depth_mat_not_const))
-			return;
+		cv::Mat color_mat_not_const = color_mat;
 
-		color_image_->Attach(kinect_wrapper::kKinectColorWidth, kinect_wrapper::kKinectColorHeight,
-			color_mat.ptr(), FTIMAGEFORMAT_UINT8_B8G8R8X8, kinect_wrapper::kKinectColorWidth * 4);
+		memcpy_s(color_image_->GetBuffer(), color_image_->GetBufferSize(), color_mat_not_const.ptr(), color_image_->GetBufferSize());
+		memcpy_s(depth_image_->GetBuffer(), depth_image_->GetBufferSize(), depth_mat.ptr(), depth_image_->GetBufferSize());
+
+		/*color_image_->Attach(kinect_wrapper::kKinectColorWidth, kinect_wrapper::kKinectColorHeight,
+			color_mat_not_const.ptr(), FTIMAGEFORMAT_UINT8_B8G8R8X8, kinect_wrapper::kKinectColorWidth * 4);
 		depth_image_->Attach(kinect_wrapper::kKinectDepthWidth, kinect_wrapper::kKinectDepthHeight,
-			depth_mat_not_const.ptr(), FTIMAGEFORMAT_UINT16_D16, kinect_wrapper::kKinectDepthWidth * 2);
+			depth_mat.ptr(), FTIMAGEFORMAT_UINT16_D13P3, kinect_wrapper::kKinectDepthWidth * 2);*/
 
 		FT_SENSOR_DATA ft_sensor_data;
 		ft_sensor_data.pDepthFrame = depth_image_;
@@ -71,7 +82,7 @@ namespace kinect_face_tracker {
 			FT_VECTOR3D* head_point_pointer = NULL;
 			FT_VECTOR3D head_point;
 			kinect_wrapper::KinectSkeleton skeleton;
-			if (sensor_data.GetSkeletonFrame()->GetTrackedSkeleton(0, &skeleton)){
+			/*if (sensor_data.GetSkeletonFrame()->GetTrackedSkeleton(0, &skeleton)){
 				cv::Vec3f position;
 				kinect_wrapper::KinectSkeleton::JointStatus status;
 				skeleton.GetJointPosition(kinect_wrapper::KinectSkeleton::Head, &position, &status);
@@ -79,17 +90,19 @@ namespace kinect_face_tracker {
 				head_point.y = position[1];
 				head_point.z = position[2];
 				head_point_pointer = &head_point;
-			}
+			}*/
 
 			result = face_tracker_->StartTracking(&ft_sensor_data, NULL, head_point_pointer, face_tracker_result_);
 
-			if (SUCCEEDED(result) && SUCCEEDED(face_tracker_result_->GetStatus()))
+			HRESULT resultatFaceTracker = face_tracker_result_->GetStatus();
+			if (SUCCEEDED(result) && SUCCEEDED(resultatFaceTracker))
 			{
 				is_tracking_ = true;
 			}
 			else
 			{
 				// No faces found
+				face_tracker_result_->Reset();
 				is_tracking_ = false;
 			}
 		}
@@ -103,6 +116,5 @@ namespace kinect_face_tracker {
 			}
 		}
 	}
-
 
 } // namespace kinect_face_tracker

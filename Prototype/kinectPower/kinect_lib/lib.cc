@@ -14,13 +14,10 @@
 #include "kinect_wrapper/kinect_skeleton_frame.h"
 #include "kinect_wrapper/kinect_wrapper.h"
 #include "kinect_wrapper/utility.h"
-#include "piano/piano.h"
 
 using namespace kinect_wrapper;
 
 namespace {
-// TODO(fdoray)
-static piano::Piano the_piano;
 
 static kinect_face_tracker::FaceTracker the_face_tracker;
 
@@ -31,13 +28,14 @@ bool Initialize(bool near_mode, bool with_sensor_thread) {
 
   KinectWrapper* wrapper = KinectWrapper::instance();
   wrapper->Initialize();
-  wrapper->AddObserver(0, &the_piano);
   wrapper->AddObserver(0, &the_face_tracker);
 
   if (with_sensor_thread) {
     // Check that the expected sensors are connected.
     if (wrapper->GetSensorCount() != 1)
       return false;
+
+	the_face_tracker.initializeTracker();
 
     // Initialize sensor 0.
     wrapper->GetSensorByIndex(0)->SetNearModeEnabled(near_mode);
@@ -47,7 +45,6 @@ bool Initialize(bool near_mode, bool with_sensor_thread) {
     wrapper->GetSensorByIndex(0)->OpenInteractionStream(
         kinect_interaction::InteractionClientMenu::instance());
     wrapper->StartSensorThread(0);
-	the_face_tracker.initializeTracker();
   }
   return true;
 }
@@ -202,7 +199,7 @@ bool GetHandsInteraction(int skeleton_id, NUI_HANDPOINTER_INFO* hands) {
 
 bool GetFaceRotation(float* face_rotation) {
 	assert(face_rotation);
-
+ 
 	if (the_face_tracker.isTracking()) {
 		cv::Vec3f rotation = the_face_tracker.FaceRotation();
 		face_rotation[0] = rotation[0];
@@ -213,6 +210,8 @@ bool GetFaceRotation(float* face_rotation) {
 	else {
 		return false;
 	}
+
+  return false;
 }
 
 #ifdef USE_INTEL_CAMERA
@@ -231,30 +230,3 @@ bool GetHandsSkeletons(creative::JointInfo* joints) {
 }
 
 #endif
-
-bool GetPianoImage(unsigned char* pixels, unsigned int pixels_size) {
-  the_piano.QueryNiceImage(pixels, pixels_size);
-  return true;
-}
-
-bool GetPianoFingers(unsigned int* values, unsigned char* known) {
-  const int kNumFingers = 25;
-
-  finger_finder::FingerInfoVector fingers;
-  the_piano.QueryFingers(&fingers);
-
-  int i = 0;
-  for (; i < kNumFingers && i < static_cast<int>(fingers.size()); ++i) {
-    finger_finder::FingerInfo finger_info = fingers[i];
-    values[i*3 + 0] = finger_info.position().x;
-    values[i*3 + 1] = finger_info.position().y;
-    values[i*3 + 2] = finger_info.depth();
-    known[i] = 1;
-  }
-
-  for (; i < kNumFingers; ++i) {
-    known[i] = 0;
-  }
-
-  return true;
-}
