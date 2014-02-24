@@ -8,6 +8,7 @@
 *.csproj
 *.unityproj
 *.sln
+*.suo
 *.userprefs
 
 Thumbs.db
@@ -31,3 +32,4 @@ kinect_power.sdf
 kinect_power.v12.suo
 Prototype/kinectPower/sample/bin/
 Prototype/kinectPower/Debug/
+Prototype/kinectPower/Release
