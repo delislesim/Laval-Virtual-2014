@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class FingerSphere : MonoBehaviour {
+public class FingerSphere : MonoBehaviour, HandJointSphereI {
 
 	// Use this for initialization
 	void Start () {
@@ -16,8 +16,36 @@ public class FingerSphere : MonoBehaviour {
 			Collider collider = hitColliders[i];
 			PianoNote note = collider.GetComponent<PianoNote>();
 			if (note != null) {
-				note.TouchWithSphere(this);
+				note.ToucherAvecSphere(this);
 			}
 		}
 	}
+
+	public void Reset() {
+		initialized = false;
+	}
+
+	public void SetTargetPosition(Vector3 targetPosition) {
+		if (!initialized) {
+			kalman.SetInitialObservation(new Vector4(targetPosition.x,
+			                                         targetPosition.y,
+			                                         targetPosition.z));
+			initialized = true;
+		} else {
+			kalman.Update(new Vector4(targetPosition.x,
+			                          targetPosition.y,
+			                          targetPosition.z));
+		}
+
+		// Bouger selon le filtre de Kalman.
+		Vector4 kalmanPosition = kalman.GetFilteredVector ();
+		transform.position = new Vector3 (kalmanPosition.x,
+		                                  kalmanPosition.y,
+		                                  kalmanPosition.z);
+	}
+	
+	
+	private bool initialized = false;
+	
+	private Kalman kalman = new Kalman();
 }

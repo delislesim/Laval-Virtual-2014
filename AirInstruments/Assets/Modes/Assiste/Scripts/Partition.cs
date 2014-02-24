@@ -59,45 +59,46 @@ public class Partition {
 		noteToIndex.Add ("La4", 45);
 		noteToIndex.Add ("La#4", 46);
 		noteToIndex.Add ("Si4", 47);
-
-		// Initialiser la mémoire pour la partition.
-		for (int i = 0; i < dureePartition; ++i) {
-			List<StatutNote> echantillon = new List<StatutNote>();
-			for (int j = 0; j < noteToIndex.Count; ++j) {
-				echantillon.Add(StatutNote.Muette);
-			}
-			partition.Add(echantillon);
-		}
-	}
-
-	public void JouerTemps(float temps, Instrument instrument) {
-		int indexTemps = (int)(temps * 1.75f / resolution);
-		if (indexTemps > dureePartition)
-			return;
-
-		for (int i = 0; i < noteToIndex.Count; ++i) {
-			if (partition[indexTemps][i] == StatutNote.Muette) {
-				instrument.StopNote(i);
-			} else {
-				instrument.PlayNote(i);
-			}
-		}
 	}
 
 	public void ChargerFichier(string nomFichier) {
-		StreamReader streamReader = new StreamReader (nomFichier);
+		streamReader = new StreamReader (nomFichier);
+	}
+
+	// Retourne vrai quand il reste des notes, faux quand la musique est finie.
+	public bool RemplirProchainesNotes(float jusquaTemps,
+	                                   Partition.StatutNote[,] prochainesNotes,
+	                                   int nombreEchantillons,
+	                                   float resolutionInverse,
+	                                   CubesTombants cubesTombants) {
+		if (jusquaTemps < tempsDerniereNote)
+			return true;
+
 		string ligne;
 
 		while ((ligne = streamReader.ReadLine()) != null) {
 			int pos = 0;
 
-			// Lire le temps.
-			float tempsDebut = ReadNumber(ligne, ref pos);
+			// Lire la duree de cet ensemble de notes.
+			float dureeEnsemble = ReadNumber(ligne, ref pos);
+			float tempsDebut = tempsDerniereNote;
 
 			// Lire les notes.
-			while (ReadNoteDePartition(tempsDebut, ligne, ref pos)) {
+			while (ReadNoteDePartition(tempsDebut, ligne, ref pos,
+			                           prochainesNotes,
+			                           nombreEchantillons,
+			                           resolutionInverse,
+			                           cubesTombants)) {
+			}
+
+			tempsDerniereNote = tempsDebut + dureeEnsemble;
+
+			if (tempsDerniereNote >= jusquaTemps) {
+				return true;
 			}
 		}
+
+		return false;
 	}
 
 	private float ReadNumber(string ligne, ref int pos) {
@@ -122,7 +123,11 @@ public class Partition {
 		}
 	}
 
-	private bool ReadNoteDePartition(float tempsDebut, string ligne, ref int pos) {
+	private bool ReadNoteDePartition(float tempsDebut, string ligne, ref int pos,
+	                                 Partition.StatutNote[,] prochainesNotes,
+	                                 int nombreEchantillons,
+	                                 float resolutionInverse,
+	                                 CubesTombants cubesTombants) {
 		// Lire la note.
 		string val = "";
 		bool hasSeenNoteBeginning = false;
@@ -180,35 +185,38 @@ public class Partition {
 			}
 		}
 
-		// Ajouter la note a la partition.
-		int debut = (int)(tempsDebut / resolution);
-		int fin = (int)((tempsDebut + duree) / resolution);
+		// Ajouter au tableau de prochaines notes.
+		int debut = (int)(tempsDebut * resolutionInverse);
+		int fin = (int)((tempsDebut + duree) * resolutionInverse);
 
 		for (int i = debut; i < fin; ++i) {
-			partition[i][noteIndex] = statut;
+			prochainesNotes[i % nombreEchantillons, noteIndex] = statut;
+		}
+
+		// Ajouter aux cubes tombants.
+		if (statut == StatutNote.Joueur) {
+			cubesTombants.AjouterCube (noteIndex, tempsDebut, duree);
 		}
 
 		return true;
 	}
 
-	// Represente une note de la paritition, dans un echantillon de temps.
-	enum StatutNote {
+	// Statut d'une note a un instant donne.
+	public enum StatutNote {
 		Accompagnement,
 		Joueur,
+		JoueurFacultatif,
 		Muette
 	}
 
-	// Tableau qui contient toute la musique.
-	private List<List<StatutNote> > partition = new List<List<StatutNote> > ();
+	// Stream du fichier de partition.
+	private StreamReader streamReader;
 
-	// Resolution de la parititon.
-	private const float resolution = 0.1f;
-
-	// Duree de la partition (en nombre d'elements de resolution |resolution|).
-	private const int dureePartition = 50 * 10;
+	// Temps de la derniere note chargee du fichier.
+	private float tempsDerniereNote = 0.0f;
 
 	// Duree des notes pour lesquelles aucune duree n'est specifiee.
-	private const float dureeParDefaut = 0.9f;
+	private const float dureeParDefaut = 1.0f;
 
 	// Table qui fait le lien entre les notes et leur index.
 	private Dictionary<String, int> noteToIndex = new Dictionary<String, int>();

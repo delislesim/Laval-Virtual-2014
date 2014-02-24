@@ -3,7 +3,9 @@ using System.Collections;
 
 public interface Instrument {
 
-	void PlayNote(int index);
-	void StopNote(int index);
+	void DefinirStatutNote(int indexNote, Partition.StatutNote statut);
 
+	void ObtenirInfoNotePourCubesTombants(int index, out float positionHorizontale, out float largeur);
+
+	PianoNote ObtenirNote(int index);
 }
