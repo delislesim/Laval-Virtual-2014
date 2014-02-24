@@ -16,7 +16,7 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 			Collider collider = hitColliders[i];
 			PianoNote note = collider.GetComponent<PianoNote>();
 			if (note != null) {
-				note.TouchWithSphere(this);
+				note.ToucherAvecSphere(this);
 			}
 		}
 	}

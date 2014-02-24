@@ -93,7 +93,7 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 
 		notes.Add (pianoNote);
 
-		if (position < 0) {
+		if (position < 7) {
 			// Rendre la note invisible.
 			note.transform.localPosition = new Vector3(note.transform.localPosition.x,
 			                                           note.transform.localPosition.y, 
@@ -118,7 +118,7 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 		
 		notes.Add (pianoNote);
 
-		if (position < 0) {
+		if (position < 7) {
 			// Rendre la note invisible.
 			note.transform.localPosition = new Vector3(note.transform.localPosition.x,
 			                                           note.transform.localPosition.y, 
@@ -126,23 +126,16 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 		}
 	}
 
-	// Joue la note de force (accompagnement).
-	public void PlayNoteOverride(int index) {
-		notes [index].PlayNoteOverride ();
-	}
-	
-	// Indique que le joueur doit jouer la note specifiee.
-	public void PlayNotePlayer(int index) {
-		notes [index].PlayNotePlayer ();
-	}
-	
-	// Indique que le joueur ne doit pas jouer la note specifiee.
-	public void DontPlayNotePlayer(int index) {
-		notes [index].DontPlayNotePlayer ();
+	public void DefinirStatutNote(int index, Partition.StatutNote statut) {
+		notes [index].DefinirStatut (statut);
 	}
 
-	public void GetNoteInfo(int index, out float positionHorizontale, out float largeur) {
-		notes [index].GetInfo (out positionHorizontale, out largeur);
+	public void ObtenirInfoNotePourCubesTombants(int index, out float positionHorizontale, out float largeur) {
+		notes [index].ObtenirInfoPourCubesTombants (out positionHorizontale, out largeur);
+	}
+
+	public PianoNote ObtenirNote(int index) {
+		return notes [index];
 	}
 
 	// Espace horizontal entre le centre de 2 notes blanches.

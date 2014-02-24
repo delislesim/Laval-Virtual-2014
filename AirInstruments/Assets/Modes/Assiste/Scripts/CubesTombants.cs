@@ -51,7 +51,7 @@ public class CubesTombants : MonoBehaviour {
 		// Obtenir la position et la taille de la note a jouer.
 		float positionHorizontale;
 		float largeur;
-		instrument.GetNoteInfo (indexNote, out positionHorizontale, out largeur);
+		instrument.ObtenirInfoNotePourCubesTombants (indexNote, out positionHorizontale, out largeur);
 
 		// Placer le cube tombant au bon endroit et a la bonne taille.
 		cubeTombant.transform.localPosition = new Vector3 (positionHorizontale,

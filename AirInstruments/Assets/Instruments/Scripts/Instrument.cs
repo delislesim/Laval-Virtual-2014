@@ -3,14 +3,9 @@ using System.Collections;
 
 public interface Instrument {
 
-	// Joue la note de force (accompagnement).
-	void PlayNoteOverride(int index);
+	void DefinirStatutNote(int indexNote, Partition.StatutNote statut);
 
-	// Indique que le joueur doit jouer la note specifiee.
-	void PlayNotePlayer(int index);
+	void ObtenirInfoNotePourCubesTombants(int index, out float positionHorizontale, out float largeur);
 
-	// Indique que le joueur ne doit pas jouer la note specifiee.
-	void DontPlayNotePlayer(int index);
-
-	void GetNoteInfo(int index, out float positionHorizontale, out float largeur);
+	PianoNote ObtenirNote(int index);
 }

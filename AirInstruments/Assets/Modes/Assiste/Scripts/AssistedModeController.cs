@@ -49,35 +49,45 @@ public class AssistedModeController : MonoBehaviour {
 		cubesTombantsScript.AssignerTempsCourant (tempsActuel);
 
 		// Jouer le temps actuel.
-		if (tempsAJouerEchantillons < 0)
-			return;
+		if (tempsAJouerEchantillons >= 0) {
 
-		for (int i = dernierTempsJoue; i < tempsAJouerEchantillons; ++i) {
-			int tempsAJouerEchantillonsModulo = i % nombreEchantillons;
+			for (int i = dernierTempsJoue; i < tempsAJouerEchantillons; ++i) {
+				int tempsAJouerEchantillonsModulo = i % nombreEchantillons;
 
-			// Passer toutes les notes.
-			for (int j = 0; j < nombreNotes; ++j) {
-				// Jouer la note si necessaire.
-				Partition.StatutNote statutNote = prochainesNotes[tempsAJouerEchantillonsModulo, j];
-				if (statutNote == Partition.StatutNote.Muette) {
-					instrumentScript.DontPlayNotePlayer(j);
-				} else if (statutNote == Partition.StatutNote.Accompagnement) {
-					instrumentScript.PlayNoteOverride(j);
-				} else {
-					//instrumentScript.PlayNotePlayer(j);
-					instrumentScript.PlayNoteOverride(j);
+				// Passer toutes les notes.
+				for (int j = 0; j < nombreNotes; ++j) {
+					// Jouer la note si necessaire.
+					Partition.StatutNote statutNote = prochainesNotes [tempsAJouerEchantillonsModulo, j];
+					instrumentScript.DefinirStatutNote (j, statutNote);
+
+					// Nettoyer le tableau.
+					prochainesNotes [tempsAJouerEchantillonsModulo, j] = Partition.StatutNote.Muette;
 				}
-
-				// Nettoyer le tableau.
-				prochainesNotes[tempsAJouerEchantillonsModulo, j] = Partition.StatutNote.Muette;
 			}
+
+			dernierTempsJoue = tempsAJouerEchantillons;
+		}
+		
+		// Aimanter les doigts vers les notes qui doivent etre jouees.
+		for (int indexNote = 0; indexNote < nombreNotes; ++indexNote) {
+			// TODO
 		}
 
-		dernierTempsJoue = tempsAJouerEchantillons;
+		// Mettre les timers des notes enfoncees par erreur et jouer les notes au besoin.
+		for (int indexNote = 0; indexNote < nombreNotes; ++indexNote) {
+			PianoNote note = instrumentScript.ObtenirNote(indexNote);
+			note.MettreAJourTimerEnfonceeParErreur();
+		}
+
+		// Remettre tous les angles a zero.
+		for (int indexNote = 0; indexNote < nombreNotes; ++indexNote) {
+			PianoNote note = instrumentScript.ObtenirNote(indexNote);
+			note.DefinirAngle(0);
+		}
 	}
 
 	// Facteur pour jouer plus rapidement.
-	private const float speed = 2.0f;
+	private const float speed = 1.5f;
 
 	// Temps a attendre avant de commencer a jouer la musique, en nombre d'echantillons.
 	// Ceci correspond au decalage entre le remplissage et le jouage.
