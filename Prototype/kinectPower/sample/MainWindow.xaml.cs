@@ -44,6 +44,7 @@ namespace sample
 
       KinectPowerInterop.PlayNextFrame(0);
 
+      /*
       KinectPowerInterop.GetPianoImage(buffer, (uint)buffer.Length);
 
       int stride = kImageWidth * kPixelSize;
@@ -60,6 +61,7 @@ namespace sample
       {
         Console.WriteLine("Exception dans aTime_Elapsed: " + exception.Message);
       }
+       */
     }
 
     private const int kImageWidth = 640;

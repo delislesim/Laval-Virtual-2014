@@ -92,7 +92,7 @@ public class MoveJoints : MonoBehaviour {
 	{
 		float distHipHead = Vector3.Distance(current_positions[(int)Skeleton.Joint.HipCenter], current_positions[(int)Skeleton.Joint.Head]);
 		//Debug.Log ("Hip pos : z" + current_positions[(int)Skeleton.Joint.HipCenter].z);
-		Debug.Log ("Dist Hip-Head : " + distHipHead);
+		//Debug.Log ("Dist Hip-Head : " + distHipHead);
 
 		//Check if hip joint is at reasonable distance from kinect (drum)
 		//Check if dist hip to head is reasonable (no mini ghost) skeleton
@@ -166,7 +166,11 @@ public class MoveJoints : MonoBehaviour {
 					// // ROTATIONS
 					//Apply head rotation
 					if(i == (int)Skeleton.Joint.Head)
-						joints[i].transform.localRotation = player.GetFaceRotation();
+						if(player.GetFaceTrackingStatus())
+						{
+							Debug.Log("Head rotation" + player.GetFaceRotation());
+							joints[i].transform.localRotation = player.GetFaceRotation();
+						}
 
 					//Apply hand rotation if needed
 					if(i == (int)Skeleton.Joint.HandRight)

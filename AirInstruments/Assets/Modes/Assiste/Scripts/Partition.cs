@@ -158,6 +158,8 @@ public class Partition {
 			}
 		}
 
+		statut = StatutNote.Accompagnement;
+
 		if (!hasSeenNoteBeginning)
 			return false;
 
@@ -194,7 +196,7 @@ public class Partition {
 		}
 
 		// Ajouter aux cubes tombants.
-		if (statut == StatutNote.Joueur) {
+		if (statut == StatutNote.Accompagnement) {
 			cubesTombants.AjouterCube (noteIndex, tempsDebut, duree);
 		}
 

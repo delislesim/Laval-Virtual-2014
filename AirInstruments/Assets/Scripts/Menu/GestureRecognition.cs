@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PrototypeInteractions : MonoBehaviour {
-
-	public Texture handTexture;
-
+public class GestureRecognition : MonoBehaviour {
+	
 	// Use this for initialization
 	void Start () {
 	
@@ -17,7 +15,8 @@ public class PrototypeInteractions : MonoBehaviour {
 			if ((hands[0].State & KinectPowerInterop.NuiHandpointerStateNotTracked) == 0) {
 				left_hand_position.x = hands[0].X;
 				left_hand_position.y = hands[0].Y;
-				Debug.Log(left_hand_position);
+				print(left_hand_position.x);
+				print(left_hand_position.y);
 				left_hand_visible = true;
 			} else {
 				left_hand_visible = false;
@@ -40,9 +39,11 @@ public class PrototypeInteractions : MonoBehaviour {
 			GUI.DrawTexture (new Rect (left_hand_position.x * 200 + 300, left_hand_position.y * 200 + 300, 50, 50), handTexture);
 	}
 
+	public Texture handTexture;
+
 	bool left_hand_visible = false;
 	//bool right_hand_visible = false;
-
+	
 	Vector2 left_hand_position = new Vector2 ();
 	Vector2 right_hand_position = new Vector2 ();
 }
