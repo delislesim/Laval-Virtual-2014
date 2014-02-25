@@ -142,6 +142,12 @@ add_library(kinect_gesture_recognition
   kinect_gesture_recognition/gesture_controller.cc
   kinect_gesture_recognition/gesture.h
   kinect_gesture_recognition/gesture.cc
+  kinect_gesture_recognition/gesture_piano.h
+  kinect_gesture_recognition/gesture_piano.cc
+  kinect_gesture_recognition/gesture_guitar.cc
+  kinect_gesture_recognition/gesture_guitar.h
+  kinect_gesture_recognition/gesture_drum.h
+  kinect_gesture_recognition/gesture_drum.cc
   )
 
 add_library(kinect_interaction

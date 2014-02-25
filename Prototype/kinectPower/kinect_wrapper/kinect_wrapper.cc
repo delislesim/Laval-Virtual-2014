@@ -42,6 +42,7 @@ void KinectWrapper::Release() {
 }
 
 KinectWrapper::KinectWrapper() {
+  gestureContInst_ = new GestureController();
 }
 
 KinectWrapper::~KinectWrapper() {
