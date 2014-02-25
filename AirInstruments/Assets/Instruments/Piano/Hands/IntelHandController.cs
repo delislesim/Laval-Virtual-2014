@@ -22,7 +22,8 @@ public class IntelHandController : MonoBehaviour {
 
 		// Créer les boules rouges de doigts.
 		for (int i = 0; i < numFingerSpheres; ++i) {
-			KinectPowerInterop.HandJointIndex joint_index = (KinectPowerInterop.HandJointIndex)(i % (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS);
+			KinectPowerInterop.HandJointIndex joint_index =
+				(KinectPowerInterop.HandJointIndex)(i % (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS);
 
 			if (joint_index == KinectPowerInterop.HandJointIndex.PINKY_TIP ||
 			    joint_index == KinectPowerInterop.HandJointIndex.RING_TIP ||
@@ -42,15 +43,52 @@ public class IntelHandController : MonoBehaviour {
 		                   -handJointInfo.z * 52 + 20);
 	}
 
+	private const float hauteurCibleMain = 0.43f;
+	private const float differenceHauteurCarreMaxPourAjustement = 0.030f;
+
 	void Update () {
 		// Mettre a jour la position des boules rouge en fonction des donnees de la caméra Creative.
 		KinectPowerInterop.GetHandsSkeletons (hand_joints);
 
+		// Calculer les ajustements de hauteur.
+		float[] ajustementsHauteur = new float[2];
+		for (int i = 0; i < 2; ++i) {
+			// Calculer la hauteur moyenne des bases de doigts.
+			float sommeHauteurs = 0.0f;
+			for (int j = (int)KinectPowerInterop.HandJointIndex.PINKY_BASE;
+			     j <= (int)KinectPowerInterop.HandJointIndex.INDEX_BASE;
+			     j += 3) {
+				int indexDeBase = (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS*i + j;
+				sommeHauteurs += hand_joints[indexDeBase].z;
+			}
+			float hauteurMoyenne = sommeHauteurs / 4.0f;
+
+			// Calculer l'ajustement nécessaire pour cette main.
+			float difference = hauteurCibleMain - hauteurMoyenne;
+			float differenceCarre = difference * difference;
+			if (differenceCarre > differenceHauteurCarreMaxPourAjustement) {
+				differenceCarre = differenceHauteurCarreMaxPourAjustement;
+			}
+
+			ajustementsHauteur[i] = difference;
+			if (differenceHauteurCarreMaxPourAjustement != 0) {
+				difference *= (differenceHauteurCarreMaxPourAjustement - differenceCarre) /
+					differenceHauteurCarreMaxPourAjustement;
+			}
+		}
+
+		// Placer toutes les boules de doigts.
 		for (int i = 0; i < hand_joints.Length; ++i) {
 			KinectPowerInterop.HandJointIndex jointIndex =
 				(KinectPowerInterop.HandJointIndex)(i % (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS);
+			int indexMain = i / (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS;
 
+			// Ajuster la hauteur (idee de Vanier).
+			hand_joints[i].z += ajustementsHauteur[indexMain];
+
+			// Appliquer de belles multiplications.
 			Vector3 targetPosition = TransformerPositionDoigt(hand_joints[i]);
+
 
 			if (hand_joints[i].error > 5.0f) {
 				targetPosition = new Vector3(0.0f, 0.0f, 50.0f);
@@ -58,6 +96,7 @@ public class IntelHandController : MonoBehaviour {
 
 			// Allonger le pouce.
 			if (jointIndex == KinectPowerInterop.HandJointIndex.THUMB_TIP) {
+				/*
 				// Trouver l'index de la base du pouce.
 				int diffBoutExtremite = (int)KinectPowerInterop.HandJointIndex.THUMB_TIP -
 										(int)KinectPowerInterop.HandJointIndex.THUMB_BASE;
@@ -66,12 +105,9 @@ public class IntelHandController : MonoBehaviour {
 
 				Vector2 baseVersExtremitePouce = new Vector2(targetPosition.x - positionBasePouce.x,
 				                                             targetPosition.y - positionBasePouce.y);
+				*/
 
-				// Allonger la distance de la base du pouce a l'extremite.
-				baseVersExtremitePouce = baseVersExtremitePouce * 1.5f;
-
-				//targetPosition.x = positionBasePouce.x + baseVersExtremitePouce.x;
-				targetPosition.y = positionBasePouce.y + baseVersExtremitePouce.y;
+				targetPosition.y = targetPosition.y + 2.0f;
 			}
 
 			// Appliquer les positions aux boules.
