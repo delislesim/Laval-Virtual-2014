@@ -125,13 +125,13 @@ public class GuitarPlayer : MonoBehaviour {
 
 		if (dist > LONGUEUR_MANCHE)
 			niveauAigue = 0;
-		else if(LONGUEUR_MANCHE > dist && dist >= 3*LONGUEUR_MANCHE/4)
+		else if(LONGUEUR_MANCHE > dist && dist >= 4*LONGUEUR_MANCHE/5)
 			niveauAigue = 1;
-		else if(3*LONGUEUR_MANCHE/4 > dist && dist >= 2*LONGUEUR_MANCHE/4)
+		else if(4*LONGUEUR_MANCHE/5 > dist && dist >= 3*LONGUEUR_MANCHE/5)
 			niveauAigue = 2;
-		else if(2*LONGUEUR_MANCHE > dist && dist >= LONGUEUR_MANCHE/4)
+		else if(3*LONGUEUR_MANCHE > dist && dist >= LONGUEUR_MANCHE/10)
 			niveauAigue = 3;
-		//Debug.Log ("Pitch Level : " + niveauAigue );
+		Debug.Log ("Pitch Level : " + niveauAigue );
 		return niveauAigue;
 	}
 
