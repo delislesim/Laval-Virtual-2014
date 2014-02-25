@@ -13,12 +13,13 @@ enum GestureID {
 
 class GestureController:public kinect_wrapper::KinectObserver {
 public:
-  void AddGesture(Gesture gesture);
+  GestureController();
+  void AddGesture(Gesture* gesture);
   void ObserveSkeleton(const kinect_wrapper::KinectSkeletonFrame& frame, const kinect_wrapper::KinectSensorData& data);
   GestureID GetGestureStatus();
   
 private:
 
-  std::vector<Gesture> gestureList_;
+  std::vector<Gesture*> gestureList_;
   GestureID detectedGesture_;
 };

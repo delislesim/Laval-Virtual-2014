@@ -10,6 +10,7 @@ public class GestureRecognition : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		// Verify if hand is pointing towards an instrument
 		KinectPowerInterop.NuiHandPointerInfo[] hands = new KinectPowerInterop.NuiHandPointerInfo[2];
 		if (KinectPowerInterop.GetHandsInteraction (0, hands)) {
 			if ((hands[0].State & KinectPowerInterop.NuiHandpointerStateNotTracked) == 0) {
@@ -32,6 +33,10 @@ public class GestureRecognition : MonoBehaviour {
 			left_hand_visible = false;
 			//right_hand_visible = false;
 		}
+
+		// Poll gesture controller to see if a gesture has been detected
+		int[] gestureId = {-1};
+		KinectPowerInterop.GetGestureStatus(gestureId);
 	}
 
 	void OnGUI () {

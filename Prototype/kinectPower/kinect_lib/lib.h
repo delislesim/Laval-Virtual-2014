@@ -43,6 +43,9 @@ GetHandsInteraction(int skeleton_id, NUI_HANDPOINTER_INFO* hands);
 extern "C" bool __declspec(dllexport)
 GetFaceRotation(float* face_rotation);
 
+extern "C" bool __declspec(dllexport)
+GetGestureStatus(int* gestureID);
+
 // Hand tracker.
 #ifdef USE_INTEL_CAMERA
 
