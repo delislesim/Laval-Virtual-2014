@@ -32,12 +32,12 @@ STDMETHODIMP InteractionClientMenu::GetInteractionInfoAtLocation(
 
   if (NUI_HAND_TYPE_RIGHT == handType)
   {
-    pInteractionInfo->IsGripTarget = true;
+    pInteractionInfo->IsGripTarget = false;
     pInteractionInfo->PressTargetControlId = 1;
   }
   else if (NUI_HAND_TYPE_LEFT == handType)
   {
-    pInteractionInfo->IsGripTarget = true;
+    pInteractionInfo->IsGripTarget = false;
     pInteractionInfo->PressTargetControlId = 2;
   }
   else if (NUI_HAND_TYPE_NONE == handType)
