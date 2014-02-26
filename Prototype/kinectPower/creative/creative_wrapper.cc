@@ -1,3 +1,5 @@
+#ifdef USE_INTEL_CAMERA
+
 #include "creative/creative_wrapper.h"
 
 namespace creative {
@@ -44,3 +46,5 @@ void CreativeWrapper::UpdateJoints() {
 }
 
 }  // namespace creative
+
+#endif

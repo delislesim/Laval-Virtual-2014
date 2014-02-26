@@ -229,10 +229,11 @@ bool GetHandsSkeletons(creative::JointInfo* joints) {
   return true;
 }
 
+#endif
+
 bool GetGestureStatus(int* gestureID)
 {
   gestureID[0] = kinect_wrapper::KinectWrapper::instance()->GetGestureControllerInstance()->GetGestureStatus();
   return true;
 }
 
-#endif
