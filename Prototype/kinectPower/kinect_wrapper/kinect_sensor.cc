@@ -34,7 +34,8 @@ KinectSensor::KinectSensor(INuiSensor* native_sensor, NUI_IMAGE_TYPE color_strea
       color_stream_type_(color_stream_type),
       angle_thread_(INVALID_HANDLE_VALUE),
       angle_event_(INVALID_HANDLE_VALUE),
-      target_angle_(0) {
+      target_angle_(0),
+      num_skeletons_to_avoid_(0) {
   depth_frame_ready_event_ = ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
   color_frame_ready_event_ = ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
   skeleton_frame_ready_event_ = ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
@@ -44,13 +45,17 @@ KinectSensor::KinectSensor(INuiSensor* native_sensor, NUI_IMAGE_TYPE color_strea
   skeleton_sticky_ids_[0] = 0;
   skeleton_sticky_ids_[1] = 0;
 
+  for (int i = 0; i < NUI_SKELETON_COUNT; ++i) {
+    skeletons_to_avoid_[i] = 0;
+  }
+
   native_sensor_->NuiGetCoordinateMapper(&coordinate_mapper_);
 
   // Creer le thread et l'event pour definir l'angle de la Kinect.
-  angle_event_ = ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
-  angle_thread_ = ::CreateThread(
+  angle_event_.Set(::CreateEventW(nullptr, TRUE, FALSE, nullptr));
+  angle_thread_.Set(::CreateThread(
       nullptr, 0, (LPTHREAD_START_ROUTINE)KinectSensor::AngleThread, this,
-      0, nullptr);
+      0, nullptr));
 }
 
 void KinectSensor::SetNearModeEnabled(bool near_mode_enabled) {
@@ -64,7 +69,7 @@ void KinectSensor::SetAngle(int angle) {
     angle = -27;
 
   target_angle_ = angle;
-  ::SetEvent(angle_event_);
+  ::SetEvent(angle_event_.get());
 }
 
 int KinectSensor::GetAngle() {
@@ -277,18 +282,11 @@ bool KinectSensor::PollNextSkeletonFrame(KinectSensorData* data) {
     }
   }
 
-  for (int i = 0; i < NUI_SKELETON_COUNT; i++) {
-    if (track_ids[0] && track_ids[1])
-      break;
-
-    if (frame->SkeletonData[i].eTrackingState != NUI_SKELETON_NOT_TRACKED) {
-      DWORD track_id = frame->SkeletonData[i].dwTrackingID;
-
-      if (!track_ids[0] && track_id != track_ids[1])
-        track_ids[0] = track_id;
-      else if (!track_ids[1] && track_id != track_ids[0])
-        track_ids[1] = track_id;
-    }
+  // Find new skeletons.
+  FindNewSkeletons(track_ids, frame);
+  if (!track_ids[0] && !track_ids[1] && num_skeletons_to_avoid_ != 0) {
+    num_skeletons_to_avoid_ = 0;
+    FindNewSkeletons(track_ids, frame);
   }
 
   skeleton_sticky_ids_[0] = track_ids[0];
@@ -305,15 +303,55 @@ bool KinectSensor::PollNextSkeletonFrame(KinectSensorData* data) {
     native_sensor_->NuiAccelerometerGetCurrentReading(&gravity);
     HRESULT res = interaction_stream_->ProcessSkeleton(kNumSkeletons, frame->SkeletonData,
                                                        &gravity, frame->liTimeStamp);
-    if (FAILED(res)) {
-      int boubou = 4;
-    }
 
     data->GetInteractionFrame()->SetTrackedSkeletons(track_ids[0],
                                                      track_ids[1]);
   }
 
   return true;
+}
+
+void KinectSensor::AvoidCurrentSkeleton() {
+  if (skeleton_sticky_ids_[0] == 0) {
+    return;
+  }
+
+  if (num_skeletons_to_avoid_ == NUI_SKELETON_COUNT) {
+    num_skeletons_to_avoid_ = 0;
+  }
+
+  skeletons_to_avoid_[num_skeletons_to_avoid_] = skeleton_sticky_ids_[0];
+  ++num_skeletons_to_avoid_;
+
+  skeleton_sticky_ids_[0] = 0;
+  skeleton_sticky_ids_[1] = 0;
+}
+
+void KinectSensor::FindNewSkeletons(DWORD* track_ids, NUI_SKELETON_FRAME* frame) {
+  for (int i = 0; i < NUI_SKELETON_COUNT; i++) {
+    if (track_ids[0] && track_ids[1])
+      break;
+
+    if (frame->SkeletonData[i].eTrackingState != NUI_SKELETON_NOT_TRACKED &&
+        frame->SkeletonData[i].Position.z < kDistanceMaxToTrackSkeleton) {
+      DWORD track_id = frame->SkeletonData[i].dwTrackingID;
+
+      // Ne pas selectionner le squelette s'il fait partie de ceux a eviter.
+      bool ok = true;
+      for (int j = 0; j < num_skeletons_to_avoid_; ++j) {
+        if (track_id == skeletons_to_avoid_[j]) {
+          ok = false;
+        }
+      }
+      if (!ok)
+        continue;
+
+      if (!track_ids[0] && track_id != track_ids[1])
+        track_ids[0] = track_id;
+      else if (!track_ids[1] && track_id != track_ids[0])
+        track_ids[1] = track_id;
+    }
+  }
 }
 
 bool KinectSensor::OpenInteractionStream(
@@ -412,13 +450,29 @@ KinectSensor::~KinectSensor() {
   ::CloseHandle(color_frame_ready_event_);
   ::CloseHandle(skeleton_frame_ready_event_);
   ::CloseHandle(interaction_frame_ready_event_);
+
+  assert(angle_event_.get() == INVALID_HANDLE_VALUE);
+  assert(angle_thread_.get() == INVALID_HANDLE_VALUE);
+}
+
+void KinectSensor::Shutdown() {
+  // Fermer le thread servant a definir l'angle.
+  target_angle_ = -999;
+  ::SetEvent(angle_event_.get());
+  ::WaitForSingleObject(angle_thread_.get(), INFINITE);
+
+  angle_event_.Close();
+  angle_thread_.Close();
 }
 
 DWORD KinectSensor::AngleThread(KinectSensor* sensor) {
   for (;;) {
-    DWORD ret = ::WaitForSingleObject(sensor->angle_event_, INFINITE);
+    DWORD ret = ::WaitForSingleObject(sensor->angle_event_.get(), INFINITE);
 
     if (ret != WAIT_OBJECT_0)  // Thread close event.
+      break;
+    
+    if (sensor->target_angle_ == -999)
       break;
 
     // Definir l'angle de la Kinect.

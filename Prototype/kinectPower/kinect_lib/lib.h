@@ -38,6 +38,9 @@ extern "C" bool __declspec(dllexport)
 GetJointsPositionDepth(int skeleton_id, int* joint_positions);
 
 extern "C" bool __declspec(dllexport)
+AvoidCurrentSkeleton();
+
+extern "C" bool __declspec(dllexport)
 GetHandsInteraction(int skeleton_id, NUI_HANDPOINTER_INFO* hands);
 
 extern "C" bool __declspec(dllexport)

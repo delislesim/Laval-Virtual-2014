@@ -32,10 +32,7 @@ class KinectWrapper {
   }
   int GetSensorCount();
 
-  // Initialization.
-  bool isInitialized() const {
-    return initialized_;
-  }
+  // Initialisation.
   void Initialize();
   void StartSensorThread(int sensor_index);
   void Shutdown();

@@ -24,9 +24,7 @@ static kinect_face_tracker::FaceTracker the_face_tracker;
 }  // namespace
 
 bool Initialize(bool near_mode, bool with_sensor_thread) {
-  if (KinectWrapper::instance()->isInitialized()) {
-    return true;
-  }
+  KinectWrapper::Release();
 
   KinectWrapper* wrapper = KinectWrapper::instance();
   wrapper->Initialize();
@@ -184,6 +182,12 @@ bool GetJointsPositionDepth(int skeleton_id, int* joint_positions) {
     joint_positions[joint_index * 3 + 2] = depth;
   }
 
+  return true;
+}
+
+bool AvoidCurrentSkeleton() {
+  KinectWrapper* wrapper = KinectWrapper::instance();
+  wrapper->GetSensorByIndex(0)->AvoidCurrentSkeleton();
   return true;
 }
 

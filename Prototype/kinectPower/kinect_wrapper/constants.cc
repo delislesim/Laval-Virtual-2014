@@ -14,6 +14,8 @@ const size_t kKinectDepthHeight = 480;
 const size_t kKinectColorWidth = 640;
 const size_t kKinectColorHeight = 480;
 
-extern const unsigned int kNumSkeletons = 6;
+const unsigned int kNumSkeletons = 6;
+
+const float kDistanceMaxToTrackSkeleton = 2.25f;
 
 }  // namespace kinect_wrapper

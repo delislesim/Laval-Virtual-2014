@@ -47,8 +47,9 @@ namespace sample
         return;
       //pause_ = true;
 
-      if (counter == 0) {
-          KinectPowerInterop.SetKinectAngle(20);
+      if (counter == 10) {
+          KinectPowerInterop.Shutdown();
+          KinectPowerInterop.Initialize(false, true);
       }
       ++counter;
 

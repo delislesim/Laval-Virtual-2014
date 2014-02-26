@@ -37,6 +37,9 @@ public class KinectPowerInterop
 	[DllImport(@"kinect_lib.dll", EntryPoint = "SetKinectAngle", CallingConvention = CallingConvention.Cdecl)]
 	public static extern void SetKinectAngle(int angle);
 
+	[DllImport(@"kinect_lib.dll", EntryPoint = "AvoidCurrentSkeleton", CallingConvention = CallingConvention.Cdecl)]
+	public static extern bool AvoidCurrentSkeleton();
+
 	// Kinect SDK constants.
 	public const int NUI_SKELETON_POSITION_COUNT = 20;
 

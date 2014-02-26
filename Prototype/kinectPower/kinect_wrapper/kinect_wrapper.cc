@@ -50,9 +50,6 @@ KinectWrapper::~KinectWrapper() {
 }
 
 void KinectWrapper::Initialize() {
-  if (initialized_)
-    return;
-
   // Register a callback to be notified when the status of a sensor changes.
   NuiSetDeviceStatusCallback(StatusChangeCallback,
                              reinterpret_cast<void*>(this));
@@ -64,8 +61,6 @@ void KinectWrapper::Initialize() {
   for (int i = 0; i < num_sensors; ++i) {
     CreateSensorByIndex(i);
   }
-
-  initialized_ = true;
 }
 
 void KinectWrapper::StartSensorThread(int sensor_index) {
@@ -89,6 +84,10 @@ void KinectWrapper::Shutdown() {
   for (int i = 0; i < kMaxNumSensors; ++i) {
     sensor_state_[i].WaitThreadCloseAndDelete();
     sensor_state_[i].StopRecording();
+
+    KinectSensor* sensor = sensor_state_[i].GetSensor();
+    if (sensor != NULL)
+      sensor->Shutdown();
   }
 }
 
