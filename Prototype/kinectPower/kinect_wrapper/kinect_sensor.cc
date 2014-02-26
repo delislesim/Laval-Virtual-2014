@@ -31,7 +31,10 @@ KinectSensor::KinectSensor(INuiSensor* native_sensor, NUI_IMAGE_TYPE color_strea
       interaction_stream_(NULL),
       interaction_frame_ready_event_(INVALID_HANDLE_VALUE),
       depth_stream_type_(depth_stream_type),
-      color_stream_type_(color_stream_type) {
+      color_stream_type_(color_stream_type),
+      angle_thread_(INVALID_HANDLE_VALUE),
+      angle_event_(INVALID_HANDLE_VALUE),
+      target_angle_(0) {
   depth_frame_ready_event_ = ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
   color_frame_ready_event_ = ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
   skeleton_frame_ready_event_ = ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
@@ -42,10 +45,32 @@ KinectSensor::KinectSensor(INuiSensor* native_sensor, NUI_IMAGE_TYPE color_strea
   skeleton_sticky_ids_[1] = 0;
 
   native_sensor_->NuiGetCoordinateMapper(&coordinate_mapper_);
+
+  // Creer le thread et l'event pour definir l'angle de la Kinect.
+  angle_event_ = ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
+  angle_thread_ = ::CreateThread(
+      nullptr, 0, (LPTHREAD_START_ROUTINE)KinectSensor::AngleThread, this,
+      0, nullptr);
 }
 
 void KinectSensor::SetNearModeEnabled(bool near_mode_enabled) {
   near_mode_enabled_ = near_mode_enabled;
+}
+
+void KinectSensor::SetAngle(int angle) {
+  if (angle > 27)
+    angle = 27;
+  else if (angle < -27)
+    angle = -27;
+
+  target_angle_ = angle;
+  ::SetEvent(angle_event_);
+}
+
+int KinectSensor::GetAngle() {
+  LONG angle = 0;
+  native_sensor_->NuiCameraElevationGetAngle(&angle);
+  return angle;
 }
 
 bool KinectSensor::OpenDepthStream() {
@@ -125,9 +150,6 @@ bool KinectSensor::PollNextDepthFrame(KinectSensorData* data) {
     HRESULT res = interaction_stream_->ProcessDepth(locked_rect.size,
                                       locked_rect.pBits,
                                       image_frame.liTimeStamp);
-    if (FAILED(res)) {
-      int boubou = 4;
-    }
   }
 
   image_frame.pFrameTexture->UnlockRect(0);
@@ -390,6 +412,20 @@ KinectSensor::~KinectSensor() {
   ::CloseHandle(color_frame_ready_event_);
   ::CloseHandle(skeleton_frame_ready_event_);
   ::CloseHandle(interaction_frame_ready_event_);
+}
+
+DWORD KinectSensor::AngleThread(KinectSensor* sensor) {
+  for (;;) {
+    DWORD ret = ::WaitForSingleObject(sensor->angle_event_, INFINITE);
+
+    if (ret != WAIT_OBJECT_0)  // Thread close event.
+      break;
+
+    // Definir l'angle de la Kinect.
+    sensor->native_sensor_->NuiCameraElevationSetAngle(sensor->target_angle_);
+  }
+
+  return 1;
 }
 
 }  // namespace kinect_wrapper

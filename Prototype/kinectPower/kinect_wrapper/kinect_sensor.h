@@ -26,10 +26,16 @@ class KinectSensorData;
 
 class KinectSensor {
  public:
-  KinectSensor(INuiSensor* native_sensor, NUI_IMAGE_TYPE color_stream_type = kColorImageType, NUI_IMAGE_TYPE depth_stream_type = kDepthImageType);
+  KinectSensor(INuiSensor* native_sensor,
+               NUI_IMAGE_TYPE color_stream_type = kColorImageType,
+               NUI_IMAGE_TYPE depth_stream_type = kDepthImageType);
   ~KinectSensor();
 
   void SetNearModeEnabled(bool near_mode_enabled);
+
+  // Angle de la Kinect.
+  void SetAngle(int angle);
+  int GetAngle();
 
   // Depth stream.
   bool OpenDepthStream();
@@ -96,6 +102,8 @@ class KinectSensor {
 
   bool near_mode_enabled_;
 
+  static DWORD AngleThread(KinectSensor* sensor);
+
   // Depth stream.
   bool depth_stream_opened_;
   HANDLE depth_frame_ready_event_;
@@ -123,6 +131,11 @@ class KinectSensor {
   bool interaction_stream_opened_;
   INuiInteractionStream* interaction_stream_;
   HANDLE interaction_frame_ready_event_;
+
+  // Thread et event pour definir l'angle de la Kinect.
+  HANDLE angle_thread_;
+  HANDLE angle_event_;
+  int target_angle_;
 
   // Coordinate mapper.
   INuiCoordinateMapper* coordinate_mapper_;

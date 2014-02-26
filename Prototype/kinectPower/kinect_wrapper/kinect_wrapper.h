@@ -33,6 +33,9 @@ class KinectWrapper {
   int GetSensorCount();
 
   // Initialization.
+  bool isInitialized() const {
+    return initialized_;
+  }
   void Initialize();
   void StartSensorThread(int sensor_index);
   void Shutdown();
@@ -63,6 +66,8 @@ class KinectWrapper {
   KinectSensor* CreateSensorByIndex(int index);
 
   static KinectWrapper* instance_;
+
+  bool initialized_;
 
   KinectSensorState sensor_state_[kMaxNumSensors];
 

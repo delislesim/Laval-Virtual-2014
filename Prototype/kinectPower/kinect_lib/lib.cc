@@ -24,7 +24,9 @@ static kinect_face_tracker::FaceTracker the_face_tracker;
 }  // namespace
 
 bool Initialize(bool near_mode, bool with_sensor_thread) {
-  KinectWrapper::Release();
+  if (KinectWrapper::instance()->isInitialized()) {
+    return true;
+  }
 
   KinectWrapper* wrapper = KinectWrapper::instance();
   wrapper->Initialize();
@@ -35,7 +37,7 @@ bool Initialize(bool near_mode, bool with_sensor_thread) {
     if (wrapper->GetSensorCount() != 1)
       return false;
 
-	the_face_tracker.initializeTracker();
+    the_face_tracker.initializeTracker();
 
     // Initialize sensor 0.
     wrapper->GetSensorByIndex(0)->SetNearModeEnabled(near_mode);
@@ -237,3 +239,13 @@ bool GetGestureStatus(int* gestureID)
   return true;
 }
 
+int GetKinectAngle() {
+  KinectWrapper* wrapper = KinectWrapper::instance();
+  return wrapper->GetSensorByIndex(0)->GetAngle();
+}
+
+bool SetKinectAngle(int angle) {
+  KinectWrapper* wrapper = KinectWrapper::instance();
+  wrapper->GetSensorByIndex(0)->SetAngle(angle);
+  return true;
+}

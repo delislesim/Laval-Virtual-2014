@@ -31,6 +31,12 @@ public class KinectPowerInterop
 	[DllImport(@"kinect_lib.dll", EntryPoint = "GetFaceRotation")]
 	public static extern bool GetFaceRotation (float[] face_rotation);
 
+	[DllImport(@"kinect_lib.dll", EntryPoint = "GetKinectAngle", CallingConvention = CallingConvention.Cdecl)]
+	public static extern int GetKinectAngle();
+
+	[DllImport(@"kinect_lib.dll", EntryPoint = "SetKinectAngle", CallingConvention = CallingConvention.Cdecl)]
+	public static extern void SetKinectAngle(int angle);
+
 	// Kinect SDK constants.
 	public const int NUI_SKELETON_POSITION_COUNT = 20;
 

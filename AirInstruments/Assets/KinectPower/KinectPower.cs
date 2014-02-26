@@ -40,9 +40,8 @@ public class KinectPower : MonoBehaviour {
 			KinectPowerInterop.StartPlaySensor(0, replayFilename);
 		}
 	}
-	
-	void Update () {
 
+	void Update () {
 		if (replay == ReplayMode.REPLAY) {
 			KinectPowerInterop.PlayNextFrame(0);
 		}

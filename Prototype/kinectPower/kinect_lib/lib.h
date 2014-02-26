@@ -46,6 +46,12 @@ GetFaceRotation(float* face_rotation);
 extern "C" bool __declspec(dllexport)
 GetGestureStatus(int* gestureID);
 
+extern "C" int __declspec(dllexport)
+GetKinectAngle();
+
+extern "C" bool __declspec(dllexport)
+SetKinectAngle(int angle);
+
 // Hand tracker.
 #ifdef USE_INTEL_CAMERA
 

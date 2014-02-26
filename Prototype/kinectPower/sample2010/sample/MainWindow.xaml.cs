@@ -38,6 +38,8 @@ namespace sample
 
     bool pause_ = false;
 
+    int counter = 0;
+
     [MethodImpl(MethodImplOptions.Synchronized)]
     void aTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
     {
@@ -45,8 +47,14 @@ namespace sample
         return;
       //pause_ = true;
 
+      if (counter == 0) {
+          KinectPowerInterop.SetKinectAngle(20);
+      }
+      ++counter;
+
       KinectPowerInterop.PlayNextFrame(0);
 
+        /*
       KinectPowerInterop.GetPianoImage(buffer, (uint)buffer.Length);
 
       int stride = kImageWidth * kPixelSize;
@@ -63,6 +71,7 @@ namespace sample
       {
         Console.WriteLine("Exception dans aTime_Elapsed: " + exception.Message);
       }
+         */
     }
 
     private const int kImageWidth = 640;
