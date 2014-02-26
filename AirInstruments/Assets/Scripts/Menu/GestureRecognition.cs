@@ -16,8 +16,7 @@ public class GestureRecognition : MonoBehaviour {
 			if ((hands[0].State & KinectPowerInterop.NuiHandpointerStateNotTracked) == 0) {
 				left_hand_position.x = hands[0].X;
 				left_hand_position.y = hands[0].Y;
-				print(left_hand_position.x);
-				print(left_hand_position.y);
+				Debug.Log(left_hand_position);
 				left_hand_visible = true;
 			} else {
 				left_hand_visible = false;
@@ -37,6 +36,7 @@ public class GestureRecognition : MonoBehaviour {
 		// Poll gesture controller to see if a gesture has been detected
 		int[] gestureId = {-1};
 		KinectPowerInterop.GetGestureStatus(gestureId);
+		print(gestureId[0]);
 	}
 
 	void OnGUI () {

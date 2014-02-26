@@ -1,8 +1,11 @@
 #include "gesture_controller.h"
+#include "gesture_piano.h"
+#include <iostream>
 
 GestureController::GestureController():detectedGesture_(GestureID::NONE)
 {
-
+  PianoGesture* pianoGesture = new PianoGesture();
+  AddGesture(pianoGesture);
 }
 
 void GestureController::AddGesture(Gesture* gesture)
@@ -18,6 +21,7 @@ void GestureController::ObserveSkeleton( const kinect_wrapper::KinectSkeletonFra
      if((gestureList_[i])->trackGesture(frame, data))
      {
         detectedGesture_ = (GestureID) i;
+        std::cout << i;
      }
   }
 }
