@@ -44,7 +44,8 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 			if (tempsEcoule > partition[currentPartitionIndex+1].time)
 			{
 				tempsNotes = tempsNotes + partition[currentPartitionIndex+1].time;
-				currentPartitionIndex ++;
+				if(currentPartitionIndex < partition.Count-1)
+					currentPartitionIndex ++;
 			}
 			currentTone = partition[currentPartitionIndex].note;
 			currentStyle = partition[currentPartitionIndex].style;
