@@ -1,91 +1,65 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class AssistedModeControllerGuitar : MonoBehaviour {
 
+	public GuitarPlayer.Tone getCurrentTone(){
+		return currentTone;
+	}
+
+	public GuitarPlayer.Style getCurrentStyle(){
+		return currentStyle;
+	}
+
+	public void StartSong()
+	{
+		HasStarted = true;
+		audio.Play();
+	}
 
 	void Start () {
-		partition = new PartitionGuitar ();
-		partition.ChargerFichier(".\\Assets\\Modes\\Assiste\\Chanons\\01 Lonely Boy.txt");
-
-		tempsDebut = Time.time;
-
-		// Remplir tout le tableau de prochaines notes avec des notes muettes.
-		for (int i = 0; i < nombreEchantillons; ++i) {
-			for (int j = 0; j < nombreNotes; ++j) {
-				prochainesNotes[i, j] = PartitionGuitar.StatutNoteGuitar.Muette;
-			}
-		}
+		tempsEcoule = 0.0f;
+		tempsNotes = 0.0f;
+		partitionMaker = new PartitionGuitar ();
+		partitionMaker.ChargerFichier(".\\Assets\\Modes\\Assiste\\Chansons\\LonelyBoy.txt");
+		partition = new List<PartitionGuitar.Playable>();
+		// Remplir des notes jusqu'au temps actuel.
+		partitionMaker.RemplirPartition( partition );
+		currentPartitionIndex = 0;
+		currentTone = partition[currentPartitionIndex].note;
+		currentStyle = partition[currentPartitionIndex].style;
+		HasStarted = false;
+		//audio.source = ... toune de fond
+		//audio.play
 	}
 
 	void Update () {
-		return;
-		// Temps actuel, en secondes. Utilise pour remplir le tableau de prochaines notes.
-		float tempsActuel = (Time.time - tempsDebut) * speed;
+		if(HasStarted)
+		{
+			// Temps actuel, en secondes.
+			//Set le tone et style de la note a jouer
+			tempsEcoule = tempsEcoule + Time.deltaTime;
 
-		// Temps de la note qu'on entend, en secondes.
-		float tempsAJouer = tempsActuel - (tempsAttendreDebutMusique * speed);
-
-		// Temps a jouer, en echantillons.
-		int tempsAJouerEchantillons = (int) (tempsAJouer * resolutionInverse);
-
-		// Remplir des notes jusqu'au temps actuel.
-		partition.RemplirProchainesNotes(tempsActuel,
-		                                 prochainesNotes,
-		                                 nombreEchantillons,
-		                                 resolutionInverse);
-		// Jouer le temps actuel.
-		if (tempsAJouerEchantillons >= 0) {
-			for (int i = dernierTempsJoue; i < tempsAJouerEchantillons; ++i) {
-				int tempsAJouerEchantillonsModulo = i % nombreEchantillons;
-
-				// Passer toutes les notes.
-				for (int j = 0; j < nombreNotes; ++j) {
-					// Jouer la note si necessaire.
-					PartitionGuitar.StatutNoteGuitar statutNote = prochainesNotes [tempsAJouerEchantillonsModulo, j];
-
-					// Nettoyer le tableau.
-					prochainesNotes [tempsAJouerEchantillonsModulo, j] = PartitionGuitar.StatutNoteGuitar.Muette;
-				}
+			if (tempsEcoule > partition[currentPartitionIndex+1].time)
+			{
+				tempsNotes = tempsNotes + partition[currentPartitionIndex+1].time;
+				currentPartitionIndex ++;
 			}
-
-			dernierTempsJoue = tempsAJouerEchantillons;
-		}
-		
-		// Gerer les notes qui doivent etre jouees.
-		for (int indexNote = 0; indexNote < nombreNotes; ++indexNote) {
-			// TODO
+			currentTone = partition[currentPartitionIndex].note;
+			currentStyle = partition[currentPartitionIndex].style;
 		}
 	}
-
-	// Facteur pour jouer plus rapidement.
-	private const float speed = 1.0f;
-
-	// Temps a attendre avant de commencer a jouer la musique, en secondes.
-	// Ceci correspond au decalage entre le remplissage et le jouage.
-	private const float tempsAttendreDebutMusique = 4.0f;
-
-	// Dernier temps qu'on a joue (non inclusivement), en nombre d'echantillons.
-	private int dernierTempsJoue = 0;
-
-	// Tableau qui contient les prochaines notes a jouer.
-	private PartitionGuitar.StatutNoteGuitar[,] prochainesNotes = new PartitionGuitar.StatutNoteGuitar[nombreEchantillons, nombreNotes];
 	
-	// Resolution du tableau de prochaines notes a jouer.
-	private const float resolution = 0.1f;
-
-	// Resolution inverse du tableau de prochaines notes a jouer.
-	private const float resolutionInverse = 10.0f;
-
-	// Nombre d'echantillons presents dans le tableau de prochaines notes a jouer.
-	private const int nombreEchantillons = (int)(120 * speed);
-
-	// Nombre de notes de l'instrument controle par ce mode.
-	private const int nombreNotes = 48;
-
-	// Temps auquel la musique a commence a jouer.
-	private float tempsDebut;
-
+	private PartitionGuitar partitionMaker;
 	// Partition a jouer.
-	private PartitionGuitar partition;
+	private List<PartitionGuitar.Playable> partition;
+
+	private float tempsEcoule;
+	private float tempsNotes; // Temps qui augmente avec les duree des notes. (par step)
+	private int currentPartitionIndex;
+
+	private GuitarPlayer.Tone currentTone;
+	private GuitarPlayer.Style currentStyle; 
+	private bool HasStarted;
 }

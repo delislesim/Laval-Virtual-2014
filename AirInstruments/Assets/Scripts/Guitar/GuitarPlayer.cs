@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -7,12 +7,20 @@ public class GuitarPlayer : MonoBehaviour {
 	public AudioClip[] HighVelocityNotes;
 	public AudioClip[] LowVelocityNotes;
 	public AudioClip[] MedVelocityNotes;
+	public AudioClip[] PowerChords;
 	public Transform HipTransform;
 	public Transform LeftHandTransform;
+	public AssistedModeControllerGuitar AssistedCtrl;
 
 	public enum Tone : int
 	{
-		E = 0, F, Gb, G, Ab, A, Bb, B, C, Db, D
+		E = 0, F, Gb, G, Ab, A, Bb, B, C, Db, D, Eb
+	}
+
+	public enum Style : int
+	{
+		NOTE = 0,
+		CHORD
 	}
 
 	public enum Mode : int
@@ -23,12 +31,16 @@ public class GuitarPlayer : MonoBehaviour {
 		PENT
 	}
 
+	public bool isAssisted;
 
 	private int dummy_counter;
 	//List of audio lists.
 	//The different lists for different pitch level (left hand position)
 	private List<List<AudioClip>> HighVelocityPlayableNotes;
 	private const float LONGUEUR_MANCHE = 3.0f;
+	private float StartDelay = 5.0f;
+	private bool HasStarted;
+	private float elapsedTime;
 
 /*********************************************************/
 	public void SetScaleModeAndTone(Mode mode, Tone tone)
@@ -81,29 +93,68 @@ public class GuitarPlayer : MonoBehaviour {
 		if (level == -1)
 			return;
 
-		int maxIndex = HighVelocityPlayableNotes[level].Count;
-		//Debug.Log("Count : " + maxIndex);
+		if(isAssisted)
+		{
+			///get the note 
+			Style style = AssistedCtrl.getCurrentStyle();
+			int note = (int)AssistedCtrl.getCurrentTone();
 
-		int idx = (int)Random.Range (0, maxIndex);
-		//Debug.Log("Index : " + idx);
+			int idx = 0;
 
-		audio.clip = HighVelocityPlayableNotes[level][idx];
-		//Debug.Log ("Note name : " + audio.clip.name);
+			if(style == Style.NOTE){
+				idx = note + (12*level);
+				if(idx > 44)//be safe
+					idx = idx-12;
+				audio.clip = HighVelocityNotes[idx];
+			}
+			else if(style == Style.CHORD){
+				if(level == 0)
+					idx = note;
+				else
+					idx = note+12;
+				idx = idx%18;
+				audio.clip = PowerChords[idx];
+			}
+
+		}
+		else //random
+		{
+			int maxIndex = HighVelocityPlayableNotes[level].Count;
+			//Debug.Log("Count : " + maxIndex);
+			
+			int idx = (int)Random.Range (0, maxIndex);
+			//int idx =  (dummy_counter % maxIndex);
+			//dummy_counter ++;
+			//Debug.Log("Index : " + idx);
+			
+			audio.clip = HighVelocityPlayableNotes[level][idx];
+			//Debug.Log ("Note name : " + audio.clip.name);
+
+		}
+
 		audio.Play();
-		dummy_counter ++;
 	}
 
 	// Use this for initialization
 	void Start () {
 		dummy_counter = 0;
 		HighVelocityPlayableNotes = new List<List<AudioClip>>();
-
+		//isAssisted = true;
 		SetScaleModeAndTone(Mode.BLUES, Tone.E);
+		HasStarted = false;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
+		if(!HasStarted)
+		{
+			elapsedTime = elapsedTime + Time.deltaTime;
+			if(elapsedTime >= StartDelay)
+			{
+				AssistedCtrl.StartSong();
+				HasStarted = true;
+			}
+		}
 	}
 	
 	void OnTriggerEnter(Collider col)
@@ -131,7 +182,7 @@ public class GuitarPlayer : MonoBehaviour {
 			niveauAigue = 2;
 		else if(3*LONGUEUR_MANCHE > dist && dist >= LONGUEUR_MANCHE/10)
 			niveauAigue = 3;
-		Debug.Log ("Pitch Level : " + niveauAigue );
+		//Debug.Log ("Pitch Level : " + niveauAigue );
 		return niveauAigue;
 	}
 

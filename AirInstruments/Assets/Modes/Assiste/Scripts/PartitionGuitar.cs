@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.IO;
 using System;
@@ -7,58 +7,19 @@ using System.Collections.Generic;
 public class PartitionGuitar {
 
 	public PartitionGuitar() {
-		// Remplir la table faisant le lien entre les notes et leur index.
-		noteToIndex.Add ("Do1", 0);
-		noteToIndex.Add ("Do#1", 1);
-		noteToIndex.Add ("Re1", 2);
-		noteToIndex.Add ("Re#1", 3);
-		noteToIndex.Add ("Mi1", 4);
-		noteToIndex.Add ("Fa1", 5);
-		noteToIndex.Add ("Fa#1", 6);
-		noteToIndex.Add ("Sol1", 7);
-		noteToIndex.Add ("Sol#1", 8);
-		noteToIndex.Add ("La1", 9);
-		noteToIndex.Add ("La#1", 10);
-		noteToIndex.Add ("Si1", 11);
-
-		noteToIndex.Add ("Do2", 12);
-		noteToIndex.Add ("Do#2", 13);
-		noteToIndex.Add ("Re2", 14);
-		noteToIndex.Add ("Re#2", 15);
-		noteToIndex.Add ("Mi2", 16);
-		noteToIndex.Add ("Fa2", 17);
-		noteToIndex.Add ("Fa#2", 18);
-		noteToIndex.Add ("Sol2", 19);
-		noteToIndex.Add ("Sol#2", 20);
-		noteToIndex.Add ("La2", 21);
-		noteToIndex.Add ("La#2", 22);
-		noteToIndex.Add ("Si2", 23);
-
-		noteToIndex.Add ("Do3", 24);
-		noteToIndex.Add ("Do#3", 25);
-		noteToIndex.Add ("Re3", 26);
-		noteToIndex.Add ("Re#3", 27);
-		noteToIndex.Add ("Mi3", 28);
-		noteToIndex.Add ("Fa3", 29);
-		noteToIndex.Add ("Fa#3", 30);
-		noteToIndex.Add ("Sol3", 31);
-		noteToIndex.Add ("Sol#3", 32);
-		noteToIndex.Add ("La3", 33);
-		noteToIndex.Add ("La#3", 34);
-		noteToIndex.Add ("Si3", 35);
-
-		noteToIndex.Add ("Do4", 36);
-		noteToIndex.Add ("Do#4", 37);
-		noteToIndex.Add ("Re4", 38);
-		noteToIndex.Add ("Re#4", 39);
-		noteToIndex.Add ("Mi4", 40);
-		noteToIndex.Add ("Fa4", 41);
-		noteToIndex.Add ("Fa#4", 42);
-		noteToIndex.Add ("Sol4", 43);
-		noteToIndex.Add ("Sol#4", 44);
-		noteToIndex.Add ("La4", 45);
-		noteToIndex.Add ("La#4", 46);
-		noteToIndex.Add ("Si4", 47);
+		// Remplir la table faisant le lien entre les notes et le tone.
+		notToTone.Add ("E", GuitarPlayer.Tone.E);
+		notToTone.Add ("F", GuitarPlayer.Tone.F);
+		notToTone.Add ("F#", GuitarPlayer.Tone.Gb);
+		notToTone.Add ("G", GuitarPlayer.Tone.G);
+		notToTone.Add ("G#", GuitarPlayer.Tone.Ab);
+		notToTone.Add ("A", GuitarPlayer.Tone.A);
+		notToTone.Add ("A#", GuitarPlayer.Tone.Bb);
+		notToTone.Add ("B", GuitarPlayer.Tone.B);
+		notToTone.Add ("C", GuitarPlayer.Tone.C);
+		notToTone.Add ("C#", GuitarPlayer.Tone.Db);
+		notToTone.Add ("D", GuitarPlayer.Tone.D);
+		notToTone.Add ("D#", GuitarPlayer.Tone.Eb);
 	}
 
 	public void ChargerFichier(string nomFichier) {
@@ -66,37 +27,16 @@ public class PartitionGuitar {
 	}
 
 	// Retourne vrai quand il reste des notes, faux quand la musique est finie.
-	public bool RemplirProchainesNotes(float jusquaTemps,
-	                                   PartitionGuitar.StatutNoteGuitar[,] prochainesNotes,
-	                                   int nombreEchantillons,
-	                                   float resolutionInverse) {
-		if (jusquaTemps < tempsDerniereNote)
-			return true;
+	public void RemplirPartition(List<Playable> partition) {
 
 		string ligne;
-
 		while ((ligne = streamReader.ReadLine()) != null) {
 			int pos = 0;
 
-			// Lire la duree de cet ensemble de notes.
-			float dureeEnsemble = ReadNumber(ligne, ref pos);
-			float tempsDebut = tempsDerniereNote;
-
 			// Lire les notes.
-			while (ReadNoteDePartition(tempsDebut, ligne, ref pos,
-			                           prochainesNotes,
-			                           nombreEchantillons,
-			                           resolutionInverse)) {
-			}
+			while (ReadNoteDePartition(ligne, ref pos, partition)) {}
 
-			tempsDerniereNote = tempsDebut + dureeEnsemble;
-
-			if (tempsDerniereNote >= jusquaTemps) {
-				return true;
-			}
 		}
-
-		return false;
 	}
 
 	private float ReadNumber(string ligne, ref int pos) {
@@ -121,15 +61,16 @@ public class PartitionGuitar {
 		}
 	}
 
-	private bool ReadNoteDePartition(float tempsDebut, string ligne, ref int pos,
-	                                 PartitionGuitar.StatutNoteGuitar[,] prochainesNotes,
-	                                 int nombreEchantillons,
-	                                 float resolutionInverse ) {
-		// Lire la note.
+	private bool ReadNoteDePartition(string ligne, ref int pos, List<Playable> partition) {
+		// Lire la duree.
+		float duree = ReadNumber (ligne, ref pos);
+		if (duree < 0)
+			duree = dureeParDefaut;
+
+		// Lire la note. val = Tone {} ou [] = Style
 		string val = "";
 		bool hasSeenNoteBeginning = false;
-		StatutNoteGuitar statut = StatutNoteGuitar.Muette;
-
+		GuitarPlayer.Style style = GuitarPlayer.Style.NOTE;
 		for (int i = pos; i < ligne.Length; ++i) {
 			Char caractere = ligne[i];
 
@@ -144,11 +85,11 @@ public class PartitionGuitar {
 				pos = i + 1;
 			} else if (caractere == '{') {
 				hasSeenNoteBeginning = true;
-				statut = StatutNoteGuitar.Joueur;
+				style = GuitarPlayer.Style.NOTE;
 				pos = i + 1;
 			} else if (caractere == '[') {
 				hasSeenNoteBeginning = true;
-				statut = StatutNoteGuitar.Accompagnement;
+				style = GuitarPlayer.Style.CHORD;
 				pos = i + 1;
 			} else {
 				break;
@@ -157,19 +98,6 @@ public class PartitionGuitar {
 
 		if (!hasSeenNoteBeginning)
 			return false;
-
-		int noteIndex = 0;
-		try {
-			noteIndex = noteToIndex [val];
-		} catch (Exception e) {
-			Debug.Log("Une note invalide a ete trouvee: " + val + "  " + e.Message);
-			return false;
-		}
-
-		// Lire la duree.
-		float duree = ReadNumber (ligne, ref pos);
-		if (duree < 0)
-			duree = dureeParDefaut;
 
 		// Lire le caractere de fin.
 		for (int i = pos; i < ligne.Length; ++i) {
@@ -183,34 +111,32 @@ public class PartitionGuitar {
 		}
 
 		// Ajouter au tableau de prochaines notes.
-		int debut = (int)(tempsDebut * resolutionInverse);
-		int fin = (int)((tempsDebut + duree) * resolutionInverse);
-
-		for (int i = debut; i < fin; ++i) {
-			prochainesNotes[i % nombreEchantillons, noteIndex] = statut;
-		}
-
+		partition.Add (new Playable(duree, notToTone[val], style));
+		                
 		return true;
 	}
 
-	// Statut d'une note a un instant donne.
-	public enum StatutNoteGuitar {
-		Accompagnement,
-		Joueur,
-		JoueurFacultatif,
-		Muette
+	public struct Playable{
+		public float time;
+		public GuitarPlayer.Tone note;
+		public GuitarPlayer.Style style;
+
+		// Constructor:
+		public Playable(float duree, GuitarPlayer.Tone tone, GuitarPlayer.Style style) 
+		{
+			this.time = duree;
+			this.note = tone;
+			this.style = style;
+		}
 	}
 
 	// Stream du fichier de partition.
 	private StreamReader streamReader;
 
-	// Temps de la derniere note chargee du fichier.
-	private float tempsDerniereNote = 0.0f;
-
 	// Duree des notes pour lesquelles aucune duree n'est specifiee.
 	private const float dureeParDefaut = 1.0f;
 
 	// Table qui fait le lien entre les notes et leur index.
-	private Dictionary<String, int> noteToIndex = new Dictionary<String, int>();
+	private Dictionary<String, GuitarPlayer.Tone> notToTone = new Dictionary<String, GuitarPlayer.Tone>();
 
 }
