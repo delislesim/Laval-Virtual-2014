@@ -60,60 +60,86 @@ public class PartitionGuitar {
 			return -1.0f;
 		}
 	}
-
-	private bool ReadNoteDePartition(string ligne, ref int pos, List<Playable> partition) {
-		// Lire la duree.
-		float duree = ReadNumber (ligne, ref pos);
-		if (duree < 0)
-			duree = dureeParDefaut;
-
-		// Lire la note. val = Tone {} ou [] = Style
+	private bool FindLabel(string ligne, ref int pos)
+	{
 		string val = "";
-		bool hasSeenNoteBeginning = false;
-		GuitarPlayer.Style style = GuitarPlayer.Style.NOTE;
 		for (int i = pos; i < ligne.Length; ++i) {
 			Char caractere = ligne[i];
-
-			if (caractere == ' ') {
-				if (hasSeenNoteBeginning) {
-					break;
-				} else {
-					pos = i + 1;
-				}
-			} else if (Char.IsLetterOrDigit(caractere) || caractere == '#') {
+			if (Char.IsLetter(caractere) || caractere == '<') {
 				val += caractere;
 				pos = i + 1;
-			} else if (caractere == '{') {
-				hasSeenNoteBeginning = true;
-				style = GuitarPlayer.Style.NOTE;
+			} else if (caractere == '\t') {
 				pos = i + 1;
-			} else if (caractere == '[') {
-				hasSeenNoteBeginning = true;
-				style = GuitarPlayer.Style.CHORD;
-				pos = i + 1;
-			} else {
+			} else if (caractere == ' '){
 				break;
 			}
 		}
 
-		if (!hasSeenNoteBeginning)
-			return false;
-
-		// Lire le caractere de fin.
-		for (int i = pos; i < ligne.Length; ++i) {
-			Char caractere = ligne[i];
-
-			if (caractere == ' ' || caractere == '}' || caractere == ']') {
-				pos = i + 1;
-			} else {
-				break;
-			}
+		if(val == "<label"){
+			//Debug.Log ("Label trouvé!!");
+			return true;
 		}
+		return false;
+	}
 
-		// Ajouter au tableau de prochaines notes.
-		partition.Add (new Playable(duree, notToTone[val], style));
-		                
-		return true;
+	private bool ReadNoteDePartition(string ligne, ref int pos, List<Playable> partition) {
+
+		if(FindLabel(ligne, ref pos ))
+		{
+			// Lire la duree.
+			float duree = ReadNumber (ligne, ref pos);
+			if (duree < 0)
+				duree = dureeParDefaut;
+
+			// Lire la note. val = Tone {} ou [] = Style
+			string val = "";
+			bool hasSeenNoteBeginning = false;
+			GuitarPlayer.Style style = GuitarPlayer.Style.NOTE;
+			for (int i = pos; i < ligne.Length; ++i) {
+				Char caractere = ligne[i];
+
+				if (caractere == ' ') {
+					if (hasSeenNoteBeginning) {
+						break;
+					} else {
+						pos = i + 1;
+					}
+				} else if (Char.IsLetterOrDigit(caractere) || caractere == '#') {
+					val += caractere;
+					pos = i + 1;
+				} else if (caractere == '{') {
+					hasSeenNoteBeginning = true;
+					style = GuitarPlayer.Style.NOTE;
+					pos = i + 1;
+				} else if (caractere == '[') {
+					hasSeenNoteBeginning = true;
+					style = GuitarPlayer.Style.CHORD;
+					pos = i + 1;
+				} else {
+					break;
+				}
+			}
+
+			if (!hasSeenNoteBeginning)
+				return false;
+
+			// Lire le caractere de fin.
+			for (int i = pos; i < ligne.Length; ++i) {
+				Char caractere = ligne[i];
+
+				if (caractere == ' ' || caractere == '}' || caractere == ']') {
+					pos = i + 1;
+				} else {
+					break;
+				}
+			}
+
+			// Ajouter au tableau de prochaines notes.
+			partition.Add (new Playable(duree, notToTone[val], style));
+			                
+			return true;
+		}
+		return false;
 	}
 
 	public struct Playable{

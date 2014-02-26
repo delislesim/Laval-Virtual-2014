@@ -22,7 +22,7 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 		tempsEcoule = 0.0f;
 		tempsNotes = 0.0f;
 		partitionMaker = new PartitionGuitar ();
-		partitionMaker.ChargerFichier(".\\Assets\\Modes\\Assiste\\Chansons\\LonelyBoy.txt");
+		partitionMaker.ChargerFichier(".\\Assets\\Modes\\Assiste\\Chansons\\Lonely Boy Audacity.aup");
 		partition = new List<PartitionGuitar.Playable>();
 		// Remplir des notes jusqu'au temps actuel.
 		partitionMaker.RemplirPartition( partition );
