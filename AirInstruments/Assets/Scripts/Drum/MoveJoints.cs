@@ -120,6 +120,7 @@ public class MoveJoints : MonoBehaviour {
 				Skeleton.JointStatus jointStatus = player.GetJointPosition((Skeleton.Joint)i, out posJoint);
 				if(jointStatus != Skeleton.JointStatus.NotTracked)
 				{
+					joints[i].renderer.enabled = true;
 					// // POSITIONS
 					//*****************************Freeze hands! *************************************************\\\
 					if ( i == (int)Skeleton.Joint.HandRight && tip_right.IsCollided() )
@@ -192,7 +193,8 @@ public class MoveJoints : MonoBehaviour {
 				}
 				//If not tracked, hide!
 				else
-					joints[i].transform.position = HIDING_POS;
+					joints[i].renderer.enabled = true;
+					//joints[i].transform.position = HIDING_POS;
 
 				//Store new current position/rotation
 				current_positions[i] = joints[i].transform.position;
