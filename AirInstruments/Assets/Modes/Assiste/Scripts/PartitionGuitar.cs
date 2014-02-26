@@ -47,19 +47,40 @@ public class PartitionGuitar {
 				val += caractere;
 				pos = i + 1;
 			} else if (caractere == ' ') {
-				pos = i + 1;
-			} else {
 				break;
+			} else {
+				pos = i + 1;
 			}
 		}
 
 		float numeric_val;
 		if (float.TryParse (val, out numeric_val)) {
+			//Debug.Log ("Time : " + numeric_val + " at line : " + ligne);
 			return numeric_val;
 		} else {
 			return -1.0f;
 		}
 	}
+
+	private bool SkipFirstTime(string ligne, ref int pos) {
+		bool tFound = false;
+		for (int i = pos; i < ligne.Length; ++i) {
+			Char caractere = ligne[i];
+			if (caractere == 't') {
+				tFound = true;
+				pos = i + 1;
+			} else if (caractere == '1' && tFound) {
+				//Debug.Log ("Found good time");
+				pos = i + 1;
+				return true;
+			} else if (caractere != '1' && tFound){
+				tFound = false;
+				pos = i + 1;
+			}
+		}
+		return false;
+	}
+
 	private bool FindLabel(string ligne, ref int pos)
 	{
 		string val = "";
@@ -82,62 +103,58 @@ public class PartitionGuitar {
 		return false;
 	}
 
+	/// <summary>
+	/// Lit une ligne d'un fichier audicity (aup) et trouve un label avec un temps et une note.
+	/// </summary>
+	/// <returns><c>true</c>, if note de partition was  read, <c>false</c> otherwise.</returns>
+	/// <param name="ligne">Ligne.</param>
+	/// <param name="pos">Position.</param>
+	/// <param name="partition">Partition.</param>
 	private bool ReadNoteDePartition(string ligne, ref int pos, List<Playable> partition) {
 
-		if(FindLabel(ligne, ref pos ))
+		if(FindLabel(ligne, ref pos))
 		{
-			// Lire la duree.
-			float duree = ReadNumber (ligne, ref pos);
-			if (duree < 0)
-				duree = dureeParDefaut;
+			if(SkipFirstTime(ligne, ref pos))
+			{
+				// Lire la duree.
+				float duree = ReadNumber (ligne, ref pos);
+				if (duree < 0)
+					duree = dureeParDefaut;
 
-			// Lire la note. val = Tone {} ou [] = Style
-			string val = "";
-			bool hasSeenNoteBeginning = false;
-			GuitarPlayer.Style style = GuitarPlayer.Style.NOTE;
-			for (int i = pos; i < ligne.Length; ++i) {
-				Char caractere = ligne[i];
+				// Lire la note. val = Tone {} ou [] = Style
+				string val = "";
+				bool hasSeenNoteBeginning = false;
+				GuitarPlayer.Style style = GuitarPlayer.Style.NOTE;
+				for (int i = pos; i < ligne.Length; ++i) {
+					Char caractere = ligne[i];
 
-				if (caractere == ' ') {
-					if (hasSeenNoteBeginning) {
+					if (caractere == '>') {
 						break;
-					} else {
+					} else if ((caractere=='A' || caractere=='B' ||caractere=='C' ||caractere=='D' ||caractere=='E' ||
+					            caractere=='F' ||caractere=='G'  || caractere == '#') && hasSeenNoteBeginning ) {
+						val += caractere;
 						pos = i + 1;
+					} else if (caractere == '-') {
+						hasSeenNoteBeginning = true;
+						style = GuitarPlayer.Style.NOTE;
+						pos = i + 1;
+					} else if (caractere == '+') {
+						hasSeenNoteBeginning = true;
+						style = GuitarPlayer.Style.CHORD;
+						pos = i + 1;
+					} else {
+						pos= i+1;
 					}
-				} else if (Char.IsLetterOrDigit(caractere) || caractere == '#') {
-					val += caractere;
-					pos = i + 1;
-				} else if (caractere == '{') {
-					hasSeenNoteBeginning = true;
-					style = GuitarPlayer.Style.NOTE;
-					pos = i + 1;
-				} else if (caractere == '[') {
-					hasSeenNoteBeginning = true;
-					style = GuitarPlayer.Style.CHORD;
-					pos = i + 1;
-				} else {
-					break;
 				}
+
+				if (!hasSeenNoteBeginning)
+					return false;
+
+				// Ajouter au tableau de prochaines notes.
+				partition.Add (new Playable(duree, notToTone[val], style));
+				//Debug.Log ("Found note : " + val);               
+				return true;
 			}
-
-			if (!hasSeenNoteBeginning)
-				return false;
-
-			// Lire le caractere de fin.
-			for (int i = pos; i < ligne.Length; ++i) {
-				Char caractere = ligne[i];
-
-				if (caractere == ' ' || caractere == '}' || caractere == ']') {
-					pos = i + 1;
-				} else {
-					break;
-				}
-			}
-
-			// Ajouter au tableau de prochaines notes.
-			partition.Add (new Playable(duree, notToTone[val], style));
-			                
-			return true;
 		}
 		return false;
 	}
