@@ -28,6 +28,12 @@ public class KinectPowerInterop
   [DllImport(@"kinect_lib.dll", EntryPoint = "GetHandsInteraction")]
   public static extern bool GetHandsInteraction(int skeleton_id, NuiHandPointerInfo[] hands);
 
+  [DllImport(@"kinect_lib.dll", EntryPoint = "GetKinectAngle", CallingConvention = CallingConvention.Cdecl)]
+  public static extern int GetKinectAngle();
+
+  [DllImport(@"kinect_lib.dll", EntryPoint = "SetKinectAngle", CallingConvention = CallingConvention.Cdecl)]
+  public static extern void SetKinectAngle(int angle);
+
   // Kinect SDK constants.
   public const int NUI_SKELETON_POSITION_COUNT = 20;
 

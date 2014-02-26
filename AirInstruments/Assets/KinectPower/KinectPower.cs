@@ -39,12 +39,17 @@ public class KinectPower : MonoBehaviour {
 		} else if (replay == ReplayMode.REPLAY) {
 			KinectPowerInterop.StartPlaySensor(0, replayFilename);
 		}
+		initialized = true;
 	}
-	
-	void Update () {
 
+	void Update () {
 		if (replay == ReplayMode.REPLAY) {
 			KinectPowerInterop.PlayNextFrame(0);
+		}
+
+		if (Input.GetButtonDown("SwitchSkeleton")) {
+			KinectPowerInterop.AvoidCurrentSkeleton();
+			UnityEngine.Debug.Log("avoid current skeleton");
 		}
 
 		if (showDepthImage) {
@@ -107,11 +112,17 @@ public class KinectPower : MonoBehaviour {
 	}
 
 	void OnDestroy () {
- 		KinectPowerInterop.Shutdown();
+		if (initialized) {
+			KinectPowerInterop.Shutdown ();
+			initialized = false;
+		}
 	}
 
 	void OnApplicationQuit() {
-		KinectPowerInterop.Shutdown();
+		if (initialized) {
+			KinectPowerInterop.Shutdown ();
+			initialized = false;
+		}
 	}
 
 	// draws the skeleton in the given texture
@@ -120,6 +131,8 @@ public class KinectPower : MonoBehaviour {
 		int jointsCount = (int)Skeleton.Joint.Count;
 		int width = aTexture.width;
 		int height = aTexture.height;
+
+		Color color = skeleton.GetID () == 0 ? Color.yellow : Color.red;
 
 		for(int i = 0; i < jointsCount; i++)
 		{
@@ -140,7 +153,7 @@ public class KinectPower : MonoBehaviour {
 				DrawLine(aTexture,
 				         (int)parent_joint_position.x, (int)parent_joint_position.y,
 				         (int)joint_position.x, (int)joint_position.y,
-				         Color.yellow);
+				         color);
 			}
 		}
 		
@@ -222,6 +235,8 @@ public class KinectPower : MonoBehaviour {
 		}
 		
 	}
+
+	private bool initialized = false;
 	
 	// Depth and color stream.
 	private Rect streamRect;

@@ -35,7 +35,7 @@ bool Initialize(bool near_mode, bool with_sensor_thread) {
     if (wrapper->GetSensorCount() != 1)
       return false;
 
-	the_face_tracker.initializeTracker();
+    the_face_tracker.initializeTracker();
 
     // Initialize sensor 0.
     wrapper->GetSensorByIndex(0)->SetNearModeEnabled(near_mode);
@@ -185,6 +185,12 @@ bool GetJointsPositionDepth(int skeleton_id, int* joint_positions) {
   return true;
 }
 
+bool AvoidCurrentSkeleton() {
+  KinectWrapper* wrapper = KinectWrapper::instance();
+  wrapper->GetSensorByIndex(0)->AvoidCurrentSkeleton();
+  return true;
+}
+
 bool GetHandsInteraction(int skeleton_id, NUI_HANDPOINTER_INFO* hands) {
   assert(hands);
 
@@ -237,3 +243,13 @@ bool GetGestureStatus(int* gestureID)
   return true;
 }
 
+int GetKinectAngle() {
+  KinectWrapper* wrapper = KinectWrapper::instance();
+  return wrapper->GetSensorByIndex(0)->GetAngle();
+}
+
+bool SetKinectAngle(int angle) {
+  KinectWrapper* wrapper = KinectWrapper::instance();
+  wrapper->GetSensorByIndex(0)->SetAngle(angle);
+  return true;
+}
