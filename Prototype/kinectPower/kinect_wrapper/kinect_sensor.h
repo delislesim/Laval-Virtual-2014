@@ -4,6 +4,7 @@
 
 #include "base/base.h"
 #include "base/scoped_ptr.h"
+#include "base/scoped_handle.h"
 #include "kinect_wrapper/constants.h"
 #include "kinect_wrapper/kinect_include.h"
 
@@ -26,10 +27,18 @@ class KinectSensorData;
 
 class KinectSensor {
  public:
-  KinectSensor(INuiSensor* native_sensor, NUI_IMAGE_TYPE color_stream_type = kColorImageType, NUI_IMAGE_TYPE depth_stream_type = kDepthImageType);
+  KinectSensor(INuiSensor* native_sensor,
+               NUI_IMAGE_TYPE color_stream_type = kColorImageType,
+               NUI_IMAGE_TYPE depth_stream_type = kDepthImageType);
   ~KinectSensor();
 
+  void Shutdown();
+
   void SetNearModeEnabled(bool near_mode_enabled);
+
+  // Angle de la Kinect.
+  void SetAngle(int angle);
+  int GetAngle();
 
   // Depth stream.
   bool OpenDepthStream();
@@ -64,6 +73,8 @@ class KinectSensor {
     return skeleton_frame_ready_event_;
   }
 
+  void AvoidCurrentSkeleton();
+
   // Interaction stream.
   bool OpenInteractionStream(
       kinect_interaction::InteractionClientBase* interaction_client);
@@ -96,6 +107,11 @@ class KinectSensor {
 
   bool near_mode_enabled_;
 
+  static DWORD AngleThread(KinectSensor* sensor);
+
+  // Skeleton stream.
+  void FindNewSkeletons(DWORD* track_ids, NUI_SKELETON_FRAME* frame);
+
   // Depth stream.
   bool depth_stream_opened_;
   HANDLE depth_frame_ready_event_;
@@ -118,11 +134,18 @@ class KinectSensor {
   bool skeleton_stream_opened_;
   HANDLE skeleton_frame_ready_event_;
   DWORD skeleton_sticky_ids_[kNumTrackedSkeletons];
+  int skeletons_to_avoid_[NUI_SKELETON_COUNT];
+  int num_skeletons_to_avoid_;
 
   // Interaction stream.
   bool interaction_stream_opened_;
   INuiInteractionStream* interaction_stream_;
   HANDLE interaction_frame_ready_event_;
+
+  // Thread et event pour definir l'angle de la Kinect.
+  base::ScopedHandle angle_thread_;
+  base::ScopedHandle angle_event_;
+  int target_angle_;
 
   // Coordinate mapper.
   INuiCoordinateMapper* coordinate_mapper_;

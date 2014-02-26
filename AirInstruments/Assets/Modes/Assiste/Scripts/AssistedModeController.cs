@@ -13,8 +13,6 @@ public class AssistedModeController : MonoBehaviour {
 		partition = new Partition ();
 		partition.ChargerFichier ("C:\\piano\\scientist.txt");
 
-		tempsDebut = Time.time;
-
 		instrumentScript = (Instrument)(instrument.GetComponent (typeof(PianoBuilder)));
 		cubesTombantsScript = (CubesTombants)(cubesTombants.GetComponent (typeof(CubesTombants)));
 		cubesTombantsScript.AssignerInstrument (instrumentScript);
@@ -28,49 +26,55 @@ public class AssistedModeController : MonoBehaviour {
 	}
 
 	void Update () {
-		return;
+		if (peutContinuer) {
+			// Temps actuel, en secondes. Utilise pour remplir le tableau de prochaines notes.
+			tempsActuel += Time.deltaTime * speed;
 
-		// Temps actuel, en secondes. Utilise pour remplir le tableau de prochaines notes.
-		float tempsActuel = (Time.time - tempsDebut) * speed;
+			// Temps de la note qu'on entend, en secondes.
+			float tempsAJouer = tempsActuel - (tempsAttendreDebutMusique * speed);
 
-		// Temps de la note qu'on entend, en secondes.
-		float tempsAJouer = tempsActuel - (tempsAttendreDebutMusique * speed);
+			// Temps a jouer, en echantillons.
+			int tempsAJouerEchantillons = (int) (tempsAJouer * resolutionInverse);
 
-		// Temps a jouer, en echantillons.
-		int tempsAJouerEchantillons = (int) (tempsAJouer * resolutionInverse);
+			// Remplir des notes jusqu'au temps actuel.
+			partition.RemplirProchainesNotes(tempsActuel,
+			                                 prochainesNotes,
+			                                 nombreEchantillons,
+			                                 resolutionInverse,
+			                                 cubesTombantsScript);
 
-		// Remplir des notes jusqu'au temps actuel.
-		partition.RemplirProchainesNotes(tempsActuel,
-		                                 prochainesNotes,
-		                                 nombreEchantillons,
-		                                 resolutionInverse,
-		                                 cubesTombantsScript);
+			// Faire avancer les cubes.
+			cubesTombantsScript.AssignerTempsCourant (tempsAJouer);
 
-		// Faire avancer les cubes.
-		cubesTombantsScript.AssignerTempsCourant (tempsAJouer);
+			// Jouer le temps actuel.
+			if (tempsAJouerEchantillons >= 0) {
+				for (int i = dernierTempsJoue; i < tempsAJouerEchantillons; ++i) {
+					int tempsAJouerEchantillonsModulo = i % nombreEchantillons;
 
-		// Jouer le temps actuel.
-		if (tempsAJouerEchantillons >= 0) {
-			for (int i = dernierTempsJoue; i < tempsAJouerEchantillons; ++i) {
-				int tempsAJouerEchantillonsModulo = i % nombreEchantillons;
+					// Passer toutes les notes.
+					for (int j = 0; j < nombreNotes; ++j) {
+						// Jouer la note si necessaire.
+						Partition.StatutNote statutNote = prochainesNotes [tempsAJouerEchantillonsModulo, j];
+						instrumentScript.DefinirStatutNote (j, statutNote);
 
-				// Passer toutes les notes.
-				for (int j = 0; j < nombreNotes; ++j) {
-					// Jouer la note si necessaire.
-					Partition.StatutNote statutNote = prochainesNotes [tempsAJouerEchantillonsModulo, j];
-					instrumentScript.DefinirStatutNote (j, statutNote);
-
-					// Nettoyer le tableau.
-					prochainesNotes [tempsAJouerEchantillonsModulo, j] = Partition.StatutNote.Muette;
+						// Nettoyer le tableau.
+						prochainesNotes [tempsAJouerEchantillonsModulo, j] = Partition.StatutNote.Muette;
+					}
 				}
-			}
 
-			dernierTempsJoue = tempsAJouerEchantillons;
+				dernierTempsJoue = tempsAJouerEchantillons;
+			}
 		}
-		
+
 		// Gerer les notes qui doivent etre jouees.
+		peutContinuer = true;
 		for (int indexNote = 0; indexNote < nombreNotes; ++indexNote) {
-			// TODO
+			// TODO(aimantation)
+
+			PianoNote note = instrumentScript.ObtenirNote(indexNote);
+			bool ok = note.GererNoteQuiDoitEtreJouee();
+			if (!ok)
+				peutContinuer = false;
 		}
 
 		// Mettre les timers des notes enfoncees par erreur et jouer les notes au besoin.
@@ -91,7 +95,7 @@ public class AssistedModeController : MonoBehaviour {
 
 	// Temps a attendre avant de commencer a jouer la musique, en secondes.
 	// Ceci correspond au decalage entre le remplissage et le jouage.
-	private const float tempsAttendreDebutMusique = 4.0f;
+	private const float tempsAttendreDebutMusique = 6.0f;
 
 	// Dernier temps qu'on a joue (non inclusivement), en nombre d'echantillons.
 	private int dernierTempsJoue = 0;
@@ -118,7 +122,10 @@ public class AssistedModeController : MonoBehaviour {
 	private CubesTombants cubesTombantsScript;
 
 	// Temps auquel la musique a commence a jouer.
-	private float tempsDebut;
+	private float tempsActuel = 0.0f;
+
+	// Indique si la musique peut continuer a avancer au temps suivant.
+	private bool peutContinuer = true;
 
 	// Partition a jouer.
 	private Partition partition;

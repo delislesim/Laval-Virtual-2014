@@ -3,6 +3,7 @@ using System;
 
 public interface HandJointSphereI
 {
-	void SetTargetPosition (Vector3 targetPosition);
+	void SetTargetPosition (Vector3 targetPosition, bool valid);
+	bool IsValid();
 }
 

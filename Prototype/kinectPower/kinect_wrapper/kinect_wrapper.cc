@@ -41,10 +41,13 @@ void KinectWrapper::Release() {
   instance_ = NULL;
 }
 
-KinectWrapper::KinectWrapper() {
+KinectWrapper::KinectWrapper() : initialized_(false) {
+  gestureContInst_ = new GestureController();
+  AddObserver(0,gestureContInst_);
 }
 
 KinectWrapper::~KinectWrapper() {
+  delete gestureContInst_;
 }
 
 void KinectWrapper::Initialize() {
@@ -82,6 +85,10 @@ void KinectWrapper::Shutdown() {
   for (int i = 0; i < kMaxNumSensors; ++i) {
     sensor_state_[i].WaitThreadCloseAndDelete();
     sensor_state_[i].StopRecording();
+
+    KinectSensor* sensor = sensor_state_[i].GetSensor();
+    if (sensor != NULL)
+      sensor->Shutdown();
   }
 }
 

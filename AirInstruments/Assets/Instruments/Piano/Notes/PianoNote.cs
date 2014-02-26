@@ -76,7 +76,8 @@ public class PianoNote : MonoBehaviour {
 		Vector3 spherePositionLocal = transform.InverseTransformPoint (spherePositionWorld);
 
 		// Accepter la note seulement si le centre de la boule rouge est au-dessus de la note.
-		if (spherePositionLocal.x > 0.5 || spherePositionLocal.x < -0.5) {
+		float scaleXCollider = ((BoxCollider)collider).size.x;
+		if (spherePositionLocal.x > 0.5f * scaleXCollider || spherePositionLocal.x < -0.5 * scaleXCollider) {
 			return;
 		}
 
@@ -152,6 +153,17 @@ public class PianoNote : MonoBehaviour {
 		Partition.StatutNote dernierStatut = this.statut;
 		this.statut = statut;
 
+		// Arreter le son quand la note d'accompagnement cesse.
+		if (dernierStatut == Partition.StatutNote.Accompagnement) {
+			ArreterSon();
+		}
+
+		if (dernierStatut == Partition.StatutNote.Joueur) {
+			// Mettre le timer au maximum pour permettre a la note de continuer a jouer.
+			tempsEnfonceeParErreur = kTempsEnfonceeParErreurMax;
+		}
+
+		// Preparer le nouvel etat!
 		if (statut == Partition.StatutNote.Accompagnement) {
 
 			// La note est jouee automatiquement par le mode assiste.
@@ -165,6 +177,8 @@ public class PianoNote : MonoBehaviour {
 			// La note doit etre jouee par le joueur.
 			noteObject.renderer.material = doitJouerMaterial;
 
+			aEteJouee = false;
+
 		} else if (statut == Partition.StatutNote.Muette) {
 
 			// La note ne doit pas etre jouee.
@@ -172,11 +186,27 @@ public class PianoNote : MonoBehaviour {
 			tempsEnfonceeParErreur = 0;
 
 		}
+	}
 
-		// Arreter le son quand la note d'accompagnement cesse.
-		if (dernierStatut == Partition.StatutNote.Accompagnement) {
-			ArreterSon();
+	// Retourne vrai si la note est dans un etat qui permet a la partie de continuer.
+	public bool GererNoteQuiDoitEtreJouee() {
+		if (statut != Partition.StatutNote.Joueur)
+			return true;
+
+		AppliquerRotation(angleCourant);
+
+		if (aEteJouee) {
+			// Une fois que la note a ete jouee, elle joue automatiquement pour le reste de la duree requise.
+			return true;
 		}
+
+		if (angleCourant >= kAngleCommencerSon) {
+			JouerSon(1.0f);
+			aEteJouee = true;
+			return true;
+		}
+
+		return false;
 	}
 
 	// Met a jour le timer qui avance quand la note est enfoncee alors qu'elle ne
@@ -187,10 +217,10 @@ public class PianoNote : MonoBehaviour {
 
 		if (angleCourant >= kAngleCommencerSon) {
 			tempsEnfonceeParErreur += Time.deltaTime;
-			if (tempsEnfonceeParErreur > kTempsEnfonceeParErreurMax) {
+			if (tempsEnfonceeParErreur >= kTempsEnfonceeParErreurMax) {
 				// Appliquer l'angle et jouer la note.
 				AppliquerRotation(angleCourant);
-				JouerSon(0.6f);  // on ne joue pas le son trop fort.
+				JouerSon(0.8f);  // on ne joue pas le son trop fort.
 
 			} else {
 				angleCourant = 0.0f;
@@ -219,7 +249,7 @@ public class PianoNote : MonoBehaviour {
 	private const float kVitesseMinPourSon = 2.0f;
 	
 	// Proportion des notes blanches qui ne peuvent pas etre jourées (réservées aux notes noire)
-	private const float kProportionNoteBlancheNonJouable = 0.45f;
+	private const float kProportionNoteBlancheNonJouable = 0.62f;
 
 	// Temps que la note doit etre enfoncee par erreur avant qu'on entende un son.
 	private const float kTempsEnfonceeParErreurMax = 0.3f;
@@ -233,7 +263,7 @@ public class PianoNote : MonoBehaviour {
 	Vector3 pointRotationWorld;
 
 	// Indique si on est dans le mode libre <------------------------
-	bool estModeLibre = true;
+	bool estModeLibre = false;
 	
 	// Materiel par defaut.
 	Material materialNormal;
@@ -261,4 +291,7 @@ public class PianoNote : MonoBehaviour {
 
 	// Temps pendant lequel la note a ete enfoncee alors qu'elle ne devrait pas l'etre.
 	float tempsEnfonceeParErreur = 0.0f;
+
+	// Indique si la note a ete jouee par le joueur depuis l'instant ou il doit la jouer.
+	bool aEteJouee = false;
 }

@@ -17,4 +17,6 @@ extern const size_t kKinectColorHeight;
 extern const unsigned int kNumSkeletons;
 #define kNumTrackedSkeletons (2)
 
+extern const float kDistanceMaxToTrackSkeleton;
+
 }  // namespace kinect_wrapper

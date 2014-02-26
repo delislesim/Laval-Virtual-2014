@@ -5,7 +5,7 @@ set (OpenCV_DIR $ENV{OPENCV_DIR})
 FIND_PACKAGE(OpenCV REQUIRED)
 #FIND_PACKAGE(OpenCL REQUIRED)
 
-set(USE_INTEL_CAMERA 1)
+#set(USE_INTEL_CAMERA 1)
 
 set(GMOCK_ROOT "../gmock/")
 
@@ -17,17 +17,6 @@ if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
   string(REGEX REPLACE "/W[0-4]" "/W4 /wd4481" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
-endif()
-
-if(USE_INTEL_CAMERA)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D USE_INTEL_CAMERA")
-  set(INTEL_HAND_TRACKER_DEPENDENCY
-        intel_hand_tracker
-        hskl/lib/Win32/hskl
-        $ENV{PCSDK_DIR}/lib/Win32/libpxc.lib
-  )
-else()
-  set(INTEL_HAND_TRACKER_DEPENDENCY "")  
 endif()
 
 # Force a unicode project
@@ -129,19 +118,17 @@ add_library(image
   image/image_utility.h
   )
   
-add_library(intel_hand_tracker
-  intel_hand_tracker/intel_hand_tracker.cc
-  intel_hand_tracker/intel_hand_tracker.h
-  intel_hand_tracker/hskl.h
-  intel_hand_tracker/hsklu.h
-  intel_hand_tracker/hsklu.cc
-  )
-  
 add_library(kinect_gesture_recognition
   kinect_gesture_recognition/gesture_controller.h
   kinect_gesture_recognition/gesture_controller.cc
   kinect_gesture_recognition/gesture.h
   kinect_gesture_recognition/gesture.cc
+  kinect_gesture_recognition/gesture_piano.h
+  kinect_gesture_recognition/gesture_piano.cc
+  kinect_gesture_recognition/gesture_guitar.cc
+  kinect_gesture_recognition/gesture_guitar.h
+  kinect_gesture_recognition/gesture_drum.h
+  kinect_gesture_recognition/gesture_drum.cc
   )
 
 add_library(kinect_interaction
@@ -218,7 +205,6 @@ target_link_libraries(kinect_lib
   $ENV{KINECTSDK10_DIR}/lib/x86/Kinect10.lib
   $ENV{KINECT_TOOLKIT_DIR}/Lib/x86/KinectInteraction180_32.lib
   $ENV{KINECT_TOOLKIT_DIR}/Lib/x86/FaceTrackLib.lib
-  ${INTEL_HAND_TRACKER_DEPENDENCY}
   )
 	
 ####################

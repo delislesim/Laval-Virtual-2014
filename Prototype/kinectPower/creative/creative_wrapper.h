@@ -1,3 +1,5 @@
+#ifdef USE_INTEL_CAMERA
+
 #pragma once
 
 #include "creative/hand_info.h"
@@ -32,3 +34,5 @@ class CreativeWrapper {
 };
 
 }  // namespace creative
+
+#endif

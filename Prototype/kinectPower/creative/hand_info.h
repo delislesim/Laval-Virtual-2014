@@ -1,3 +1,5 @@
+#ifdef USE_INTEL_CAMERA
+
 #pragma once
 
 #include <opencv2/core/core.hpp>
@@ -46,3 +48,5 @@ class HandInfo {
 };
 
 }  // namespace creative
+
+#endif

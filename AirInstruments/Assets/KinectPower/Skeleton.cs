@@ -169,6 +169,10 @@ namespace KinectHelpers
       }
     }
 
+	public int GetID() {
+		return skeleton_id;
+	}
+
     private int skeleton_id;
 
     private bool skeleton_loaded;

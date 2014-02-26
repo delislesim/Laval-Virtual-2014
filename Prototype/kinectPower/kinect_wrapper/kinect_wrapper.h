@@ -10,6 +10,7 @@
 #include "kinect_wrapper/constants.h"
 #include "kinect_wrapper/kinect_include.h"
 #include "kinect_wrapper/kinect_sensor_state.h"
+#include "kinect_gesture_recognition/gesture_controller.h"
 
 namespace kinect_wrapper {
 
@@ -31,7 +32,7 @@ class KinectWrapper {
   }
   int GetSensorCount();
 
-  // Initialization.
+  // Initialisation.
   void Initialize();
   void StartSensorThread(int sensor_index);
   void Shutdown();
@@ -47,6 +48,8 @@ class KinectWrapper {
   }
   void AddObserver(int sensor_index, KinectObserver* observer);
 
+  GestureController* GetGestureControllerInstance() {return gestureContInst_;}
+
  private:
   KinectWrapper();
 	~KinectWrapper();
@@ -61,7 +64,11 @@ class KinectWrapper {
 
   static KinectWrapper* instance_;
 
+  bool initialized_;
+
   KinectSensorState sensor_state_[kMaxNumSensors];
+
+  GestureController* gestureContInst_;
 
   DISALLOW_COPY_AND_ASSIGN(KinectWrapper);
 };

@@ -38,10 +38,22 @@ extern "C" bool __declspec(dllexport)
 GetJointsPositionDepth(int skeleton_id, int* joint_positions);
 
 extern "C" bool __declspec(dllexport)
+AvoidCurrentSkeleton();
+
+extern "C" bool __declspec(dllexport)
 GetHandsInteraction(int skeleton_id, NUI_HANDPOINTER_INFO* hands);
 
 extern "C" bool __declspec(dllexport)
 GetFaceRotation(float* face_rotation);
+
+extern "C" bool __declspec(dllexport)
+GetGestureStatus(int* gestureID);
+
+extern "C" int __declspec(dllexport)
+GetKinectAngle();
+
+extern "C" bool __declspec(dllexport)
+SetKinectAngle(int angle);
 
 // Hand tracker.
 #ifdef USE_INTEL_CAMERA

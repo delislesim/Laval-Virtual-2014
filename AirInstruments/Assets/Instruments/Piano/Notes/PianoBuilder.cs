@@ -13,8 +13,11 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 	// Prefab de note noire.
 	public GameObject noirePrefab;
 
-	// Notes blanches du piano.
+	// Notes du piano.
 	private List<PianoNote> notes = new List<PianoNote>();
+
+	// Game objects des notes du piano.
+	private List<GameObject> notesGameObject = new List<GameObject>();
 
 
 	void Start () {
@@ -72,8 +75,16 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 		CreerBlanche (20, clips [11], 3);  // Si
 	}
 
+	private int countUpdate = 0;
+
 	void Update () {
-	
+		// Hack pour eviter d'avoir des notes deformees.
+		++countUpdate;
+		if (countUpdate == 2) {
+			for (int i = 0; i < notesGameObject.Count; ++i) {
+				notesGameObject[i].SetActive(true);
+			}
+		}
 	}
 
 	void CreerBlanche(int position, AudioClip clip, float ecartDemiTon) {
@@ -84,6 +95,8 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 		                                            blanchePrefab.transform.position.z);
 		note.transform.localScale = blanchePrefab.transform.localScale;
 		note.transform.localRotation = Quaternion.identity;
+		note.SetActive (false);
+		notesGameObject.Add (note);
 
 		AudioSource audioSource = (AudioSource)note.GetComponent (typeof(AudioSource));
 		audioSource.clip = clip;
@@ -109,6 +122,8 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 		                                            noirePrefab.transform.position.z);
 		note.transform.localScale = noirePrefab.transform.localScale;
 		note.transform.localRotation = Quaternion.identity;
+		note.SetActive (false);
+		notesGameObject.Add (note);
 		
 		AudioSource audioSource = (AudioSource)note.GetComponent (typeof(AudioSource));
 		audioSource.clip = clip;
