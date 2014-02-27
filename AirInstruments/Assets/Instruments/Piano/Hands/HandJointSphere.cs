@@ -30,9 +30,9 @@ public class HandJointSphere : MonoBehaviour, HandJointSphereI
 
 		// Bouger selon le filtre de Kalman.
 		Vector4 kalmanPosition = kalman.GetFilteredVector ();
-		transform.position = new Vector3 (kalmanPosition.x,
-		                                  kalmanPosition.y,
-		                                  kalmanPosition.z);
+		transform.localPosition = new Vector3 (kalmanPosition.x,
+		                                       kalmanPosition.y,
+		                                       kalmanPosition.z);
 	}
 
 	public bool IsValid() {

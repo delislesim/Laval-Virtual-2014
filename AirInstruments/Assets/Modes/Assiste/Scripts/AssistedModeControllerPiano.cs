@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class AssistedModeController : MonoBehaviour {
+public class AssistedModeControllerPiano : MonoBehaviour {
 
 	// GameObject de l'instrument controle par ce mode.
 	public GameObject instrument;
@@ -9,23 +9,18 @@ public class AssistedModeController : MonoBehaviour {
 	// GameObject de cubes tombants.
 	public GameObject cubesTombants;
 
+	public static bool EstActive () {
+		return estActive;
+	}
+
 	void Start () {
-		partition = new Partition ();
-		partition.ChargerFichier ("C:\\piano\\scientist.txt");
-
-		instrumentScript = (Instrument)(instrument.GetComponent (typeof(PianoBuilder)));
-		cubesTombantsScript = (CubesTombants)(cubesTombants.GetComponent (typeof(CubesTombants)));
-		cubesTombantsScript.AssignerInstrument (instrumentScript);
-
-		// Remplir tout le tableau de prochaines notes avec des notes muettes.
-		for (int i = 0; i < nombreEchantillons; ++i) {
-			for (int j = 0; j < nombreNotes; ++j) {
-				prochainesNotes[i, j] = Partition.StatutNote.Muette;
-			}
-		}
+		//ChargerPartition ("C:\\piano\\scientist.txt");
 	}
 
 	void Update () {
+		if (!EstActive())
+			return;
+
 		if (peutContinuer) {
 			// Temps actuel, en secondes. Utilise pour remplir le tableau de prochaines notes.
 			tempsActuel += Time.deltaTime * speed;
@@ -54,11 +49,11 @@ public class AssistedModeController : MonoBehaviour {
 					// Passer toutes les notes.
 					for (int j = 0; j < nombreNotes; ++j) {
 						// Jouer la note si necessaire.
-						Partition.StatutNote statutNote = prochainesNotes [tempsAJouerEchantillonsModulo, j];
+						PartitionPiano.StatutNote statutNote = prochainesNotes [tempsAJouerEchantillonsModulo, j];
 						instrumentScript.DefinirStatutNote (j, statutNote);
 
 						// Nettoyer le tableau.
-						prochainesNotes [tempsAJouerEchantillonsModulo, j] = Partition.StatutNote.Muette;
+						prochainesNotes [tempsAJouerEchantillonsModulo, j] = PartitionPiano.StatutNote.Muette;
 					}
 				}
 
@@ -90,6 +85,28 @@ public class AssistedModeController : MonoBehaviour {
 		}
 	}
 
+	// Charge un fichier de partition et demarre le mode assiste.
+	private void ChargerPartition(string fichierPartition) {
+		partition = new PartitionPiano ();
+		partition.ChargerFichier (fichierPartition);
+		
+		instrumentScript = (Instrument)(instrument.GetComponent (typeof(PianoBuilder)));
+		cubesTombantsScript = (CubesTombants)(cubesTombants.GetComponent (typeof(CubesTombants)));
+		cubesTombantsScript.AssignerInstrument (instrumentScript);
+		
+		// Remplir tout le tableau de prochaines notes avec des notes muettes.
+		for (int i = 0; i < nombreEchantillons; ++i) {
+			for (int j = 0; j < nombreNotes; ++j) {
+				prochainesNotes[i, j] = PartitionPiano.StatutNote.Muette;
+			}
+		}
+
+		estActive = true;
+	}
+
+	// Indique si le mode assiste est active.
+	private static bool estActive = false;
+
 	// Facteur pour jouer plus rapidement.
 	private const float speed = 1.0f;
 
@@ -101,7 +118,7 @@ public class AssistedModeController : MonoBehaviour {
 	private int dernierTempsJoue = 0;
 
 	// Tableau qui contient les prochaines notes a jouer.
-	private Partition.StatutNote[,] prochainesNotes = new Partition.StatutNote[nombreEchantillons, nombreNotes];
+	private PartitionPiano.StatutNote[,] prochainesNotes = new PartitionPiano.StatutNote[nombreEchantillons, nombreNotes];
 	
 	// Resolution du tableau de prochaines notes a jouer.
 	private const float resolution = 0.1f;
@@ -128,5 +145,5 @@ public class AssistedModeController : MonoBehaviour {
 	private bool peutContinuer = true;
 
 	// Partition a jouer.
-	private Partition partition;
+	private PartitionPiano partition;
 }

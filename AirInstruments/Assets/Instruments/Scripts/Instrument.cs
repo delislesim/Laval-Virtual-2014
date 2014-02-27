@@ -3,7 +3,7 @@ using System.Collections;
 
 public interface Instrument {
 
-	void DefinirStatutNote(int indexNote, Partition.StatutNote statut);
+	void DefinirStatutNote(int indexNote, PartitionPiano.StatutNote statut);
 
 	void ObtenirInfoNotePourCubesTombants(int index, out float positionHorizontale, out float largeur);
 

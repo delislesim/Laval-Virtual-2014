@@ -4,9 +4,9 @@ using System.IO;
 using System;
 using System.Collections.Generic;
 
-public class Partition {
+public class PartitionPiano {
 
-	public Partition() {
+	public PartitionPiano() {
 		// Remplir la table faisant le lien entre les notes et leur index.
 		noteToIndex.Add ("Do1", 0);
 		noteToIndex.Add ("Do#1", 1);
@@ -67,7 +67,7 @@ public class Partition {
 
 	// Retourne vrai quand il reste des notes, faux quand la musique est finie.
 	public bool RemplirProchainesNotes(float jusquaTemps,
-	                                   Partition.StatutNote[,] prochainesNotes,
+	                                   PartitionPiano.StatutNote[,] prochainesNotes,
 	                                   int nombreEchantillons,
 	                                   float resolutionInverse,
 	                                   CubesTombants cubesTombants) {
@@ -124,7 +124,7 @@ public class Partition {
 	}
 
 	private bool ReadNoteDePartition(float tempsDebut, string ligne, ref int pos,
-	                                 Partition.StatutNote[,] prochainesNotes,
+	                                 PartitionPiano.StatutNote[,] prochainesNotes,
 	                                 int nombreEchantillons,
 	                                 float resolutionInverse,
 	                                 CubesTombants cubesTombants) {

@@ -94,7 +94,7 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 		                                            blanchePrefab.transform.position.y,
 		                                            blanchePrefab.transform.position.z);
 		note.transform.localScale = blanchePrefab.transform.localScale;
-		note.transform.localRotation = Quaternion.identity;
+		note.transform.localRotation = blanchePrefab.transform.localRotation;
 		note.SetActive (false);
 		notesGameObject.Add (note);
 
@@ -108,9 +108,7 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 
 		if (position < 7) {
 			// Rendre la note invisible.
-			note.transform.localPosition = new Vector3(note.transform.localPosition.x,
-			                                           note.transform.localPosition.y, 
-			                                           100.0f);
+			note.transform.localPosition = kPositionInvalide;
 		}
 	}
 
@@ -121,7 +119,7 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 		                                            noirePrefab.transform.position.y,
 		                                            noirePrefab.transform.position.z);
 		note.transform.localScale = noirePrefab.transform.localScale;
-		note.transform.localRotation = Quaternion.identity;
+		note.transform.localRotation = noirePrefab.transform.localRotation;
 		note.SetActive (false);
 		notesGameObject.Add (note);
 		
@@ -135,13 +133,11 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 
 		if (position < 7) {
 			// Rendre la note invisible.
-			note.transform.localPosition = new Vector3(note.transform.localPosition.x,
-			                                           note.transform.localPosition.y, 
-			                                           100.0f);
+			note.transform.localPosition = kPositionInvalide;
 		}
 	}
 
-	public void DefinirStatutNote(int index, Partition.StatutNote statut) {
+	public void DefinirStatutNote(int index, PartitionPiano.StatutNote statut) {
 		notes [index].DefinirStatut (statut);
 	}
 
@@ -158,4 +154,7 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 
 	// Espace horizontal entre le centre de 2 notes noires.
 	private const float spaceBetweenBlackNotes = 0.575f;
+
+	// Position invalide.
+	private Vector3 kPositionInvalide = new Vector3(0, 100.0f, 0);
 }

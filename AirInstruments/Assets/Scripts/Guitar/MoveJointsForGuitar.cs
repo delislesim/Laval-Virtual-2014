@@ -101,7 +101,9 @@ public class MoveJointsForGuitar : MonoBehaviour {
 				if(jointStatus != Skeleton.JointStatus.NotTracked)
 				{
 					//POSITIONS
-					joints[i].transform.position = new Vector3(posJoint.x*PLAYER_HIGHT, posJoint.y*PLAYER_HIGHT, -posJoint.z*PLAYER_HIGHT);
+					joints[i].transform.position = 
+						new Vector3(posJoint.x*PLAYER_HIGHT, posJoint.y*PLAYER_HIGHT, -posJoint.z*PLAYER_HIGHT)
+							+ kDeplacementJoueur;
 
 					// // ROTATIONS
 					//Apply head rotation
@@ -144,5 +146,12 @@ public class MoveJointsForGuitar : MonoBehaviour {
 		GuitarContainer.rotation = GuitarRotation;
 
 	}
+
+	// --- Constantes ---
+
+	// Deplacement du joueur par rapport au centre de la scene.
+	// Sert a ne pas etre au meme endroit que le drummer.
+	private Vector3 kDeplacementJoueur = new Vector3(13.25f, 0, 0);
+
 
 }

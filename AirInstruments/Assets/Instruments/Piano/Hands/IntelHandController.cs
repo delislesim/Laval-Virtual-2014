@@ -51,14 +51,16 @@ public class IntelHandController : MonoBehaviour {
 		// Creer les cylindres.
 		for (int i = 0; i < nombreCylindres; ++i) {
 			GameObject cylindre = (GameObject)Instantiate (cylindrePrefab);
+			cylindre.transform.parent = this.transform;
+			cylindre.transform.localScale = cylindrePrefab.transform.localScale;
 			cylindres.Add (cylindre);
 		}
 	}
 
 	public Vector3 TransformerPositionDoigt(KinectPowerInterop.HandJointInfo handJointInfo) {
 		return new Vector3(-handJointInfo.x * 45,
-		                   -handJointInfo.y * 45 - 10,
-		                   -handJointInfo.z * 52 + 20);
+		                   -(-handJointInfo.z * 52 + 20),
+		                   -handJointInfo.y * 45 - 5);
 	}
 
 	void Update () {
@@ -88,15 +90,16 @@ public class IntelHandController : MonoBehaviour {
 		
 		// Ajuster la hauteur du joint selon le snap (idee de Vanier).
 		jointInfo.z += ajustementsHauteur[indexMain];
-		
-		// Appliquer de belles multiplications.
-		Vector3 targetPosition = TransformerPositionDoigt(jointInfo);
-		
+
 		// Allonger le pouce.
 		if (jointIndex == KinectPowerInterop.HandJointIndex.THUMB_TIP) {
-			targetPosition.y = targetPosition.y + 2.0f;
+			jointInfo.y -= 2.0f / 45.0f;
+			// TODO(fdoray): Verifier cette donnee.
 		}
-		
+
+		// Appliquer de belles multiplications.
+		Vector3 targetPosition = TransformerPositionDoigt(jointInfo);
+
 		// Appliquer les positions aux boules.
 		HandJointSphereI jointureSphereScript = ObtenirHandJointSphereScript (index);
 		jointureSphereScript.SetTargetPosition (targetPosition, jointInfo.error < kErreurMaxPermise);
@@ -268,6 +271,8 @@ public class IntelHandController : MonoBehaviour {
 		                                                   position,
 		                                                   Quaternion.identity);
 		spheres.Add (fingerSphere);
+		fingerSphere.transform.parent = this.transform;
+		fingerSphere.transform.localScale = fingerSpherePrefab.transform.localScale;
 		return fingerSphere;
 	}
 
@@ -276,6 +281,8 @@ public class IntelHandController : MonoBehaviour {
 		                                                      position,
 		                                                      Quaternion.identity);
 		spheres.Add (handJointSphere);
+		handJointSphere.transform.parent = this.transform;
+		handJointSphere.transform.localScale = handJointSpherePrefab.transform.localScale;
 		return handJointSphere;
 	}
 
