@@ -188,6 +188,7 @@ public class iTweenEvent : MonoBehaviour{
 		
 		stopped = false;
 		StartCoroutine(StartEvent());
+
 	}
 	
 	/// <summary>
