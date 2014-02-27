@@ -160,9 +160,8 @@ public class MoveJoints : MonoBehaviour {
 					}*/
 					//*********************************************************************************\\\
 				
-					joints[i].transform.Translate(posJoint.x*PLAYER_HIGHT, posJoint.y*PLAYER_HIGHT, -posJoint.z*PLAYER_HIGHT);
 					//else {
-						//joints[i].transform.position = new Vector3(posJoint.x*PLAYER_HIGHT, posJoint.y*PLAYER_HIGHT, -posJoint.z*PLAYER_HIGHT);
+						joints[i].transform.position = new Vector3(posJoint.x*PLAYER_HIGHT, posJoint.y*PLAYER_HIGHT, -posJoint.z*PLAYER_HIGHT);
 					//}
 
 					// // ROTATIONS

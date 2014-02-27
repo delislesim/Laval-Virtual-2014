@@ -16,6 +16,7 @@ public class moveDrumstick : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (Input.GetKeyDown (KeyCode.Space)) {
+			//capsule.rigidbody.AddRelativeForce(capsule.transform.up * 100, ForceMode.Acceleration);
 			if(compteur%2 == 0){
 				mainDroite.transform.Translate(0,1,0);
 			} else {
