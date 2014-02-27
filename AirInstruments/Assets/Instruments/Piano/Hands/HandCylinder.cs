@@ -26,6 +26,10 @@ public class HandCylinder : MonoBehaviour {
 		Vector3 scale = new Vector3(transform.localScale.x,
 		                            direction.magnitude / (2.0f * worldScale),
 		                            transform.localScale.z);
+		if (scale.y == float.PositiveInfinity || scale.y == float.NegativeInfinity) {
+			// Eviter division par zero.
+			scale.y = 0.0f;
+		}
 
 		// Appliquer les transformations.
 		transform.position = centre;
