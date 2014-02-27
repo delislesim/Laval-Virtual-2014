@@ -23,6 +23,16 @@ public class GameState : MonoBehaviour {
 		DefinirInstrument (Instrument.None);
 	}
 
+	void Update() {
+		if (Input.GetButtonDown("Piano")) {
+			DefinirInstrument (Instrument.Piano);
+		} else if (Input.GetButtonDown("Drum")) {
+			DefinirInstrument (Instrument.Drum);
+		} else if (Input.GetButtonDown("Guitare")) {
+			DefinirInstrument (Instrument.Guitar);
+		}
+	}
+
 	// Definir l'instrument presentement actif.
 	public void DefinirInstrument(Instrument instrument) {
 		// Arreter la composante presentement active.
@@ -34,10 +44,13 @@ public class GameState : MonoBehaviour {
 		currentInstrument = instrument;
 		if (currentInstrument == Instrument.Piano) {
 			pianoController.gameObject.SetActive (true);
+			Debug.Log("Piano choisi.");
 		} else if (currentInstrument == Instrument.Drum) {
 			drumController.gameObject.SetActive (true);
+			Debug.Log("Drum choisi.");
 		} else if (currentInstrument == Instrument.Guitar) {
 			guitareController.gameObject.SetActive (true);
+			Debug.Log("Guitare choisie.");
 		}
 	}
 
