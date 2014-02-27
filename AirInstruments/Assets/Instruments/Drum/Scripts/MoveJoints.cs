@@ -123,7 +123,7 @@ public class MoveJoints : MonoBehaviour {
 					joints[i].renderer.enabled = true;
 					// // POSITIONS
 					//*****************************Freeze hands! *************************************************\\\
-					if ( i == (int)Skeleton.Joint.HandRight && tip_right.IsCollided() )
+					/*if ( i == (int)Skeleton.Joint.HandRight && tip_right.IsCollided() )
 					{
 						if(!right_hand_is_frozen)
 						{
@@ -157,12 +157,13 @@ public class MoveJoints : MonoBehaviour {
 								joints[i].transform.position = new Vector3(posJoint.x*PLAYER_HIGHT, posJoint.y*PLAYER_HIGHT, -posJoint.z*PLAYER_HIGHT);
 							}
 						}
-					}
+					}*/
 					//*********************************************************************************\\\
 				
-					else {
-						joints[i].transform.position = new Vector3(posJoint.x*PLAYER_HIGHT, posJoint.y*PLAYER_HIGHT, -posJoint.z*PLAYER_HIGHT);
-					}
+					joints[i].transform.Translate(posJoint.x*PLAYER_HIGHT, posJoint.y*PLAYER_HIGHT, -posJoint.z*PLAYER_HIGHT);
+					//else {
+						//joints[i].transform.position = new Vector3(posJoint.x*PLAYER_HIGHT, posJoint.y*PLAYER_HIGHT, -posJoint.z*PLAYER_HIGHT);
+					//}
 
 					// // ROTATIONS
 					//Apply head rotation
@@ -176,7 +177,7 @@ public class MoveJoints : MonoBehaviour {
 						}
 					}
 					//Apply hand rotation if needed
-					if(i == (int)Skeleton.Joint.HandRight)
+					/*if(i == (int)Skeleton.Joint.HandRight)
 					{
 						if(tip_right.IsCollided())
 							joints[i].transform.localRotation = last_rotations[i];
@@ -189,11 +190,11 @@ public class MoveJoints : MonoBehaviour {
 							joints[i].transform.localRotation = last_rotations[i];
 						else
 							joints[i].transform.localRotation = player.GetBoneOrientation(Skeleton.Joint.HandLeft);
-					}
+					}*/
 				}
 				//If not tracked, hide!
 				else
-					joints[i].renderer.enabled = true;
+					joints[i].renderer.enabled = false;
 					//joints[i].transform.position = HIDING_POS;
 
 				//Store new current position/rotation

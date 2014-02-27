@@ -20,7 +20,7 @@ public class MoveDrumsticks : MonoBehaviour
     {
 		//Create valid skeleton with joints positions/rotations
 		Skeleton playerOne = new Skeleton(0);
-		moveDrumsticks (playerOne);
+		//moveDrumsticks (playerOne);
     }
 
 	void moveDrumsticks(Skeleton player)
