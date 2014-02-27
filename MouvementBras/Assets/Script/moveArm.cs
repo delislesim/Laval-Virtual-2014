@@ -15,8 +15,8 @@ public class moveArm : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if(Input.GetKeyDown(KeyCode.Space)){
-			Debug.Log("Application de la force");
-		    main.rigidbody.AddForce (main.transform.up * 1000, ForceMode.Acceleration);
+			//Debug.Log("Application de la force");
+		    //main.rigidbody.AddForce (main.transform.up * 1000, ForceMode.Acceleration);
 		}
 	}
 }
