@@ -19,8 +19,6 @@ public class PianoNote : MonoBehaviour {
 		// Calculer la position du point de rotation de la note.
 		pointRotationLocal = new Vector3 (0, 0.5f, -0.5f);
 		pointRotationWorld = transform.TransformPoint (pointRotationLocal);
-		GameObject newSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-		newSphere.transform.position = pointRotationWorld;
 
 		// Se souvenir du materiel par defaut.
 		materialNormal = noteObject.renderer.material;
@@ -84,7 +82,6 @@ public class PianoNote : MonoBehaviour {
 		}
 
 		if (!noire && spherePositionLocal.y > 0.5f - kProportionNoteBlancheNonJouable) {
-			Debug.Log("boubou blanche noire");
 			return;
 		}
 
@@ -104,8 +101,9 @@ public class PianoNote : MonoBehaviour {
 		Vector3 direction = new Vector3 (0,
 		                                 pointRotationWorld.y - fingerPositionWorld.y,
 		                                 pointRotationWorld.z - fingerPositionWorld.z);
-		if (direction.y < 0)
+		if (direction.y < 0) {
 			return 0;
+		}
 		
 		return Vector3.Angle (Vector3.forward, direction);
 	}

@@ -5,16 +5,18 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 
 	// Use this for initialization
 	void Start () {
-	
+		Vector3 worldScale = VectorConversions.CalculerWorldScale (transform);
+		rayon = worldScale.x / 2.0f;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if (!IsValid ())
+		if (!IsValid ()) {
 			return;
+		}
 
 		// Trouver des objets en collision avec cette boule.
-		Collider[] hitColliders = Physics.OverlapSphere (transform.localPosition, 0.5f);
+		Collider[] hitColliders = Physics.OverlapSphere (transform.position, rayon);
 		for (int i = 0; i < hitColliders.Length; ++i) {
 			Collider collider = hitColliders[i];
 			PianoNote note = collider.GetComponent<PianoNote>();
@@ -55,9 +57,9 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 
 		// Bouger selon le filtre de Kalman.
 		Vector4 kalmanPosition = kalman.GetFilteredVector ();
-		transform.position = new Vector3 (kalmanPosition.x,
-		                                  kalmanPosition.y,
-		                                  kalmanPosition.z);
+		transform.localPosition = new Vector3 (kalmanPosition.x,
+		                       		           kalmanPosition.y,
+		                            	       kalmanPosition.z);
 	}
 
 	public bool IsValid() {
@@ -67,6 +69,9 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 	private bool initialized = false;
 	
 	private Kalman kalman = new Kalman();
+
+	// Rayon de la sphere en coordonnes du monde.
+	private float rayon;
 
 	// Gerer les donnees invalides.
 	private bool valid = false;

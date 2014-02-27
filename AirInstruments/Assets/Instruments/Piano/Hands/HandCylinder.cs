@@ -5,7 +5,8 @@ public class HandCylinder : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	
+		Vector3 worldScaleVector = VectorConversions.CalculerWorldScale (transform.parent);
+		worldScale = worldScaleVector.x;
 	}
 	
 	// Update is called once per frame
@@ -23,7 +24,7 @@ public class HandCylinder : MonoBehaviour {
 
 		Quaternion rotation = Quaternion.FromToRotation (Vector3.up, direction);
 		Vector3 scale = new Vector3(transform.localScale.x,
-		                            direction.magnitude / 2.0f,
+		                            direction.magnitude / (2.0f * worldScale),
 		                            transform.localScale.z);
 
 		// Appliquer les transformations.
@@ -31,4 +32,7 @@ public class HandCylinder : MonoBehaviour {
 		transform.rotation = rotation;
 		transform.localScale = scale;
 	}
+
+	// Facteur de multiplication de notre scale par rapport au monde, au repos.
+	private float worldScale;
 }
