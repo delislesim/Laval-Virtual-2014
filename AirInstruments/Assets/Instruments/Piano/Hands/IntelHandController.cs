@@ -51,14 +51,15 @@ public class IntelHandController : MonoBehaviour {
 		// Creer les cylindres.
 		for (int i = 0; i < nombreCylindres; ++i) {
 			GameObject cylindre = (GameObject)Instantiate (cylindrePrefab);
+			cylindre.transform.parent = this.transform;
 			cylindres.Add (cylindre);
 		}
 	}
 
 	public Vector3 TransformerPositionDoigt(KinectPowerInterop.HandJointInfo handJointInfo) {
 		return new Vector3(-handJointInfo.x * 45,
-		                   -handJointInfo.y * 45 - 10,
-		                   -handJointInfo.z * 52 + 20);
+		                   -(-handJointInfo.z * 52 + 20),
+		                   -handJointInfo.y * 45 - 10);
 	}
 
 	void Update () {
@@ -93,10 +94,13 @@ public class IntelHandController : MonoBehaviour {
 		Vector3 targetPosition = TransformerPositionDoigt(jointInfo);
 		
 		// Allonger le pouce.
+		// TODO(fdoray): Faire c
+		/*
 		if (jointIndex == KinectPowerInterop.HandJointIndex.THUMB_TIP) {
-			targetPosition.y = targetPosition.y + 2.0f;
+			targetPosition.z = targetPosition.z + 2.0f;
 		}
-		
+		*/
+
 		// Appliquer les positions aux boules.
 		HandJointSphereI jointureSphereScript = ObtenirHandJointSphereScript (index);
 		jointureSphereScript.SetTargetPosition (targetPosition, jointInfo.error < kErreurMaxPermise);
@@ -268,6 +272,7 @@ public class IntelHandController : MonoBehaviour {
 		                                                   position,
 		                                                   Quaternion.identity);
 		spheres.Add (fingerSphere);
+		fingerSphere.transform.parent = this.transform;
 		return fingerSphere;
 	}
 
@@ -276,6 +281,7 @@ public class IntelHandController : MonoBehaviour {
 		                                                      position,
 		                                                      Quaternion.identity);
 		spheres.Add (handJointSphere);
+		handJointSphere.transform.parent = this.transform;
 		return handJointSphere;
 	}
 

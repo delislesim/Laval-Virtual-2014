@@ -19,13 +19,15 @@ public class PianoNote : MonoBehaviour {
 		// Calculer la position du point de rotation de la note.
 		pointRotationLocal = new Vector3 (0, 0.5f, -0.5f);
 		pointRotationWorld = transform.TransformPoint (pointRotationLocal);
+		GameObject newSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+		newSphere.transform.position = pointRotationWorld;
 
 		// Se souvenir du materiel par defaut.
 		materialNormal = noteObject.renderer.material;
 	}
 
 	void Update () {
-		if (estModeLibre) {
+		if (!AssistedModeControllerPiano.EstActive()) {
 			// --------- Mode libre ---------
 
 			// Appliquer la rotation a la note visible.
@@ -72,7 +74,7 @@ public class PianoNote : MonoBehaviour {
 
 	public void ToucherAvecSphere(FingerSphere sphere) {
 		// Calculer la position du bas de la boule rouge.
-		Vector3 spherePositionWorld = sphere.transform.position + Vector3.forward * sphere.transform.localScale.y * 0.5f;
+		Vector3 spherePositionWorld = sphere.transform.position + Vector3.down * sphere.transform.localScale.y * 0.5f;
 		Vector3 spherePositionLocal = transform.InverseTransformPoint (spherePositionWorld);
 
 		// Accepter la note seulement si le centre de la boule rouge est au-dessus de la note.
@@ -82,6 +84,7 @@ public class PianoNote : MonoBehaviour {
 		}
 
 		if (!noire && spherePositionLocal.y > 0.5f - kProportionNoteBlancheNonJouable) {
+			Debug.Log("boubou blanche noire");
 			return;
 		}
 
@@ -101,10 +104,10 @@ public class PianoNote : MonoBehaviour {
 		Vector3 direction = new Vector3 (0,
 		                                 pointRotationWorld.y - fingerPositionWorld.y,
 		                                 pointRotationWorld.z - fingerPositionWorld.z);
-		if (direction.z > 0)
+		if (direction.y < 0)
 			return 0;
 		
-		return Vector3.Angle (Vector3.up, direction);
+		return Vector3.Angle (Vector3.forward, direction);
 	}
 
 	// ===========================================
@@ -140,31 +143,31 @@ public class PianoNote : MonoBehaviour {
 		angleCourant = angle;
 	}
 
-	public Partition.StatutNote ObtenirStatut() {
+	public PartitionPiano.StatutNote ObtenirStatut() {
 		return statut;
 	}
 
 	// Joue la note de force (accompagnement).
-	public void DefinirStatut(Partition.StatutNote statut) {
+	public void DefinirStatut(PartitionPiano.StatutNote statut) {
 		if (statut == this.statut) {
 			// Le statut n'a pas change.
 			return;
 		}
-		Partition.StatutNote dernierStatut = this.statut;
+		PartitionPiano.StatutNote dernierStatut = this.statut;
 		this.statut = statut;
 
 		// Arreter le son quand la note d'accompagnement cesse.
-		if (dernierStatut == Partition.StatutNote.Accompagnement) {
+		if (dernierStatut == PartitionPiano.StatutNote.Accompagnement) {
 			ArreterSon();
 		}
 
-		if (dernierStatut == Partition.StatutNote.Joueur) {
+		if (dernierStatut == PartitionPiano.StatutNote.Joueur) {
 			// Mettre le timer au maximum pour permettre a la note de continuer a jouer.
 			tempsEnfonceeParErreur = kTempsEnfonceeParErreurMax;
 		}
 
 		// Preparer le nouvel etat!
-		if (statut == Partition.StatutNote.Accompagnement) {
+		if (statut == PartitionPiano.StatutNote.Accompagnement) {
 
 			// La note est jouee automatiquement par le mode assiste.
 			noteObject.renderer.material = materialNormal;
@@ -172,14 +175,14 @@ public class PianoNote : MonoBehaviour {
 
 			JouerSon(1.0f);
 
-		} else if (statut == Partition.StatutNote.Joueur) {
+		} else if (statut == PartitionPiano.StatutNote.Joueur) {
 
 			// La note doit etre jouee par le joueur.
 			noteObject.renderer.material = doitJouerMaterial;
 
 			aEteJouee = false;
 
-		} else if (statut == Partition.StatutNote.Muette) {
+		} else if (statut == PartitionPiano.StatutNote.Muette) {
 
 			// La note ne doit pas etre jouee.
 			noteObject.renderer.material = materialNormal;
@@ -190,7 +193,7 @@ public class PianoNote : MonoBehaviour {
 
 	// Retourne vrai si la note est dans un etat qui permet a la partie de continuer.
 	public bool GererNoteQuiDoitEtreJouee() {
-		if (statut != Partition.StatutNote.Joueur)
+		if (statut != PartitionPiano.StatutNote.Joueur)
 			return true;
 
 		AppliquerRotation(angleCourant);
@@ -212,7 +215,7 @@ public class PianoNote : MonoBehaviour {
 	// Met a jour le timer qui avance quand la note est enfoncee alors qu'elle ne
 	// devrait pas l'etre.
 	public void MettreAJourTimerEnfonceeParErreur() {
-		if (statut != Partition.StatutNote.Muette)
+		if (statut != PartitionPiano.StatutNote.Muette)
 			return;
 
 		if (angleCourant >= kAngleCommencerSon) {
@@ -261,9 +264,6 @@ public class PianoNote : MonoBehaviour {
 
 	// Coordonnées du point autour duquel la note tourne, en coordonnées du monde.
 	Vector3 pointRotationWorld;
-
-	// Indique si on est dans le mode libre <------------------------
-	bool estModeLibre = false;
 	
 	// Materiel par defaut.
 	Material materialNormal;
@@ -287,7 +287,7 @@ public class PianoNote : MonoBehaviour {
 	// --- Parametres pour le mode assiste ---
 
 	// Statut de la note.
-	Partition.StatutNote statut = Partition.StatutNote.Muette;
+	PartitionPiano.StatutNote statut = PartitionPiano.StatutNote.Muette;
 
 	// Temps pendant lequel la note a ete enfoncee alors qu'elle ne devrait pas l'etre.
 	float tempsEnfonceeParErreur = 0.0f;

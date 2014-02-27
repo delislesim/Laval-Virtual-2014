@@ -10,6 +10,9 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 	
 	// Update is called once per frame
 	void Update () {
+		if (!IsValid ())
+			return;
+
 		// Trouver des objets en collision avec cette boule.
 		Collider[] hitColliders = Physics.OverlapSphere (transform.localPosition, 0.5f);
 		for (int i = 0; i < hitColliders.Length; ++i) {
