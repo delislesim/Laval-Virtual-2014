@@ -28,9 +28,6 @@ public class IntelHandController : MonoBehaviour {
 	// Nombre de cylindres a créer.
 	private const int nombreCylindres = nombreCylindresParDoigt * 2;
 
-	// Indique si le hand tracker de Intel a été initialisé.
-	private bool handTrackerInitialized = false;
-
 	void Start () {
 		// Initialiser la caméra Creative.
 		KinectPowerInterop.InitializeHandTracker ();
