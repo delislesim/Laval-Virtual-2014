@@ -14,7 +14,7 @@ public class CameraController : MonoBehaviour {
 	void Start () {
 		// Toujours commencer a la position initiale (choix d'instrument).
 		mainCamera.transform.position = pointDepart.transform.position;
-		mainCamera.transform.LookAt (Vector3.zero);
+		//mainCamera.transform.LookAt (Vector3.zero);
 	}
 
 	// Update is called once per frame.
@@ -24,6 +24,9 @@ public class CameraController : MonoBehaviour {
 
 	// Deplace la camera entre les etats specifies.
 	public void AccederEtat (GameState.State from, GameState.State to) {
+		// Remettre la caméra dans le monde global.
+		mainCamera.transform.parent = null;
+		
 		// Aller de unknown (au debut) vers le menu de choix d'instrument.
 		if (from == GameState.State.Unknown &&
 		    to == GameState.State.ChooseInstrument) {

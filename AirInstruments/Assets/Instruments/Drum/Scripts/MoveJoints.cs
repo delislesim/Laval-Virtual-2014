@@ -44,18 +44,24 @@ public class MoveJoints : MonoBehaviour {
 	private bool hit_hat_ready;
 	private const float PLAYER_HIGHT = 5.0f;
 	private const float DELTA_CHECK_TIME = 5.0f;
-	//private float accumulated_time;
 	private const float DIST_MAX_KINECT = 12.0f; //2m
 	private const float DIST_MIN_KINECT = 2.0f; //dist min...
 
+	// Position par défaut de la tete, lorsqu'aucun squelette n'est visible.
+	private Vector3 kPositionTeteDefaut = new Vector3(0, 1.88f, -10.88f);
+
+	// Deplacement maximum de la tete par deltaTime.
+	private float kDeplacementMaxTete = 10.0f;
+
+	// Vitesse de rotation maximale de la caméra, en degres par deltaTime.
+	private float kRotationMaxTete = 10.0f;
+
+	// Camera principale du jeu.
+	private Camera mainCamera;
+
 	//Hand freeze info
-	private float right_hand_freez_posy;
-	private float left_hand_freez_posy;
 	private bool right_hand_freez_speedY_positive;
 	private bool left_hand_freez_speedY_positive;
-	private bool left_hand_is_frozen;
-	private bool right_hand_is_frozen;
-
 
 	// Use this for initialization
 	void Start () {
@@ -74,149 +80,119 @@ public class MoveJoints : MonoBehaviour {
 		current_rotations = new Quaternion[(int)Skeleton.Joint.Count];
 		kick_ready = true;
 
-		right_hand_freez_posy = 0;
-	    left_hand_freez_posy= 0;
-		left_hand_is_frozen = false;
-		right_hand_is_frozen = false;
+		// Mettre la tete a la position par defaut, afin d'eviter les mouvements
+		// brusques de camera quand on entre dans le mode drum.
+		Head.transform.position = kPositionTeteDefaut;
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		//Create valid skeleton with joints positions/rotations
 		m_player_one = new Skeleton(0);
-		//if (SkeletonIsTrackedAndValid(m_player_one))
-			moveJoints (m_player_one);
+		moveJoints (m_player_one);
+	}
+
+	public void AssignerCamera(Camera mainCamera) {
+		this.mainCamera = mainCamera;
 	}
 
 	bool SkeletonIsTrackedAndValid()
 	{
 		float distHipHead = Vector3.Distance(current_positions[(int)Skeleton.Joint.HipCenter], current_positions[(int)Skeleton.Joint.Head]);
-		//Debug.Log ("Hip pos : z" + current_positions[(int)Skeleton.Joint.HipCenter].z);
-		//Debug.Log ("Dist Hip-Head : " + distHipHead);
 
 		//Check if hip joint is at reasonable distance from kinect (drum)
 		//Check if dist hip to head is reasonable (no mini ghost) skeleton
-			return current_positions[(int)Skeleton.Joint.HipCenter].z < -7
-				&& current_positions[(int)Skeleton.Joint.HipCenter].z > -11
-				&& distHipHead > 1.8
-				&& distHipHead < 5;
-			
+		return current_positions[(int)Skeleton.Joint.HipCenter].z < -7
+			&& current_positions[(int)Skeleton.Joint.HipCenter].z > -11
+			&& distHipHead > 1.8
+			&& distHipHead < 5;
 	}
 
 	void moveJoints(Skeleton player)
 	{
-		// update the local positions of the bones
-		int jointsCount = (int)Skeleton.Joint.Count;
+		const int jointsCount = (int)Skeleton.Joint.Count;
 
-		for(int i = 0; i < jointsCount; i++) 
-		{
-			//Store last positions/rotations
+		// Obtenir toutes les positions courantes.
+		for (int i = 0; i < jointsCount; ++i) {
+			// Store last positions/rotations
 			last_positions[i] = current_positions[i];
 			last_rotations[i] = current_rotations[i];
 
-			if(joints[i] != null)
-			{
-				Vector3 posJoint = Vector3.zero;
-				Skeleton.JointStatus jointStatus = player.GetJointPosition((Skeleton.Joint)i, out posJoint);
-				if(jointStatus != Skeleton.JointStatus.NotTracked)
-				{
-					joints[i].renderer.enabled = true;
-					// // POSITIONS
-					//*****************************Freeze hands! *************************************************\\\
-					/*if ( i == (int)Skeleton.Joint.HandRight && tip_right.IsCollided() )
-					{
-						if(!right_hand_is_frozen)
-						{
-							right_hand_is_frozen = true;
-							right_hand_freez_posy = last_positions[i].y;
-							joints[i].transform.position = last_positions[i];
-						}//Frozen
-						else
-						{
-							float posY = posJoint.y*PLAYER_HIGHT;
-							if((posY > right_hand_freez_posy)){
-								right_hand_is_frozen = false;
-								joints[i].transform.position = new Vector3(posJoint.x*PLAYER_HIGHT, posJoint.y*PLAYER_HIGHT, -posJoint.z*PLAYER_HIGHT);
-							}
-						}//Not frozen
-					}//if collided
+			// Obtenir la nouvelle position de la Kinect.
+			Vector3 posJoint;
+			Skeleton.JointStatus jointStatus = player.GetJointPosition((Skeleton.Joint)i, out posJoint);
 
-					else if ( i == (int)Skeleton.Joint.HandLeft && tip_left.IsCollided() )
-					{
-						if(!left_hand_is_frozen)
-						{
-							left_hand_is_frozen = true;
-							left_hand_freez_posy = last_positions[i].y;
-							joints[i].transform.position = last_positions[i];
-						}
-						else
-						{
-							float posY = posJoint.y*PLAYER_HIGHT;
-							if((posY > left_hand_freez_posy)){
-								left_hand_is_frozen = false;
-								joints[i].transform.position = new Vector3(posJoint.x*PLAYER_HIGHT, posJoint.y*PLAYER_HIGHT, -posJoint.z*PLAYER_HIGHT);
-							}
-						}
-					}*/
-					//*********************************************************************************\\\
-				
-					//else {
-						joints[i].transform.position = new Vector3(posJoint.x*PLAYER_HIGHT, posJoint.y*PLAYER_HIGHT, -posJoint.z*PLAYER_HIGHT);
-					//}
+			if(jointStatus != Skeleton.JointStatus.NotTracked && player.Exists()) {
+				current_positions[i] = WorldPositionFromKinectPosition(posJoint);
+			} else {
+				current_positions[i] = HIDING_POS;
+			}
+		}
 
-					// // ROTATIONS
-					//Apply head rotation
-					if(i == (int)Skeleton.Joint.Head)
-					{
-						Quaternion faceRotation = player.GetFaceRotation();
-						if(player.GetFaceTrackingStatus())
-						{
-							Debug.Log("Head rotation" + player.GetFaceRotation());
-							joints[i].transform.localRotation = faceRotation;
-						}
-					}
-					//Apply hand rotation if needed
-					/*if(i == (int)Skeleton.Joint.HandRight)
-					{
-						if(tip_right.IsCollided())
-							joints[i].transform.localRotation = last_rotations[i];
-						else
-							joints[i].transform.localRotation = player.GetBoneOrientation(Skeleton.Joint.HandRight);
-					}
-					if(i == (int)Skeleton.Joint.HandLeft)
-					{
-						if(tip_left.IsCollided())
-							joints[i].transform.localRotation = last_rotations[i];
-						else
-							joints[i].transform.localRotation = player.GetBoneOrientation(Skeleton.Joint.HandLeft);
-					}*/
+		// Determiner si le squelette est valide.
+		bool skeletonValid = SkeletonIsTrackedAndValid ();
+
+		// Appliquer les positions aux articulations.
+		for(int i = 0; i < jointsCount; i++) {
+
+			if (joints[i] == null)  // TODO: Pourquoi ca arriverait?
+				continue;
+
+			if(i == (int)Skeleton.Joint.Head) {
+
+				// Cas spécial de la tete.
+				Vector3 targetPosition;
+				if (skeletonValid && current_positions[i] != HIDING_POS) {
+					targetPosition = current_positions[i];
+				} else {
+					targetPosition = kPositionTeteDefaut;
 				}
-				//If not tracked, hide!
-				else
+
+				// Bouger la tete progressivement vers la position cible, afin d'eviter les
+				// mouvements brusques de camera.
+				joints[i].transform.position = Vector3.MoveTowards(joints[i].transform.position,
+				                                                   targetPosition,
+				                                                   kDeplacementMaxTete * Time.deltaTime);
+
+				// Si on a une camera, faire la rotation.
+				if (mainCamera != null) {
+					Quaternion rotationCamera = mainCamera.transform.rotation;
+					Quaternion targetRotationCamera = Quaternion.identity;
+					mainCamera.transform.rotation = Quaternion.RotateTowards(rotationCamera,
+					                                                         targetRotationCamera,
+					                                                         kRotationMaxTete * Time.deltaTime);
+				}
+
+				/* TODO: Face tracker.
+				Quaternion faceRotation = player.GetFaceRotation();
+				if(player.GetFaceTrackingStatus())
+				{
+					Debug.Log("Head rotation" + player.GetFaceRotation());
+					joints[i].transform.localRotation = faceRotation;
+				}
+				*/
+			} else {
+				joints[i].transform.position = current_positions[i];
+				if (skeletonValid && current_positions[i] != HIDING_POS) {
+					joints[i].renderer.enabled = true;
+				} else {
 					joints[i].renderer.enabled = false;
-					//joints[i].transform.position = HIDING_POS;
-
-				//Store new current position/rotation
-				current_positions[i] = joints[i].transform.position;
-				current_rotations[i] = joints[i].transform.localRotation;
+				}
 			}
+
+			//Store new current position/rotation
+			current_positions[i] = joints[i].transform.position;
+			current_rotations[i] = joints[i].transform.localRotation;
 		}
 
-		//Check if these positions are worth rendering -> Valid Skeleton
-		//accumulated_time += Time.deltaTime;
-		//if(accumulated_time > DELTA_CHECK_TIME)
-		//{
-		if(!SkeletonIsTrackedAndValid()){
-			//Hide everything
-			for(int i = 0; i < jointsCount; i++) 
-			{
-				joints[i].transform.position = HIDING_POS;
-			}
-			//TODO place camera so we don't see shit
-		}
-		//}
-		//Predict sounds
+		// Predict sounds
 		manageMouvementsAndSounds(current_positions, last_positions);
+	}
+
+	Vector3 WorldPositionFromKinectPosition(Vector3 kinectPosition) {
+		return new Vector3(kinectPosition.x*PLAYER_HIGHT,
+		                   kinectPosition.y*PLAYER_HIGHT,
+		                   -kinectPosition.z*PLAYER_HIGHT);
 	}
 
 	void manageMouvementsAndSounds(Vector3[] currentPos, Vector3[] pastPos)
