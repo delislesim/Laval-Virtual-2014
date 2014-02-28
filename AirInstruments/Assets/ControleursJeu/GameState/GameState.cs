@@ -89,7 +89,9 @@ public class GameState : MonoBehaviour {
 		Debug.Log ("transition terminee");
 
 		if (currentState == State.ChooseInstrument) {
-			// TODO
+
+			cameraController.RegarderPositionDefaut();
+
 		} else if (currentState == State.Piano) {
 
 			pianoController.gameObject.SetActive (true);
