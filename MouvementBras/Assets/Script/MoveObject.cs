@@ -19,7 +19,8 @@ public class MoveObject : MonoBehaviour {
 			objet.transform.position = objet.transform.forward + objet.transform.position;
 		}
 		if (Input.GetKey (KeyCode.Space)) {
-			objet.rigidbody.AddRelativeForce (-objet.transform.forward * 100, ForceMode.Acceleration);
+			objet.transform.Rotate(new Vector3(0,10,0));
+			//objet.rigidbody.AddRelativeForce (-objet.transform.forward * 100, ForceMode.Acceleration);
 		}
 	}
 }
