@@ -146,9 +146,11 @@ bool KinectSensor::PollNextDepthFrame(KinectSensorData* data) {
     goto ReleaseFrame;
   }
 
+  /*
   const NUI_DEPTH_IMAGE_PIXEL* start =
       reinterpret_cast<const NUI_DEPTH_IMAGE_PIXEL*>(locked_rect.pBits);
   data->InsertDepthFrame(start, depth_stream_width_ * depth_stream_height_);
+  */
 
   if (interaction_stream_opened_) {
     // Provide the data to the interaction stream.

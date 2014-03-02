@@ -19,7 +19,7 @@ using namespace kinect_wrapper;
 
 namespace {
 
-static kinect_face_tracker::FaceTracker the_face_tracker;
+//static kinect_face_tracker::FaceTracker the_face_tracker;
 
 }  // namespace
 
@@ -28,14 +28,14 @@ bool Initialize(bool near_mode, bool with_sensor_thread) {
 
   KinectWrapper* wrapper = KinectWrapper::instance();
   wrapper->Initialize();
-  wrapper->AddObserver(0, &the_face_tracker);
+  //wrapper->AddObserver(0, &the_face_tracker);
 
   if (with_sensor_thread) {
     // Check that the expected sensors are connected.
     if (wrapper->GetSensorCount() != 1)
       return false;
 
-    the_face_tracker.initializeTracker();
+    //the_face_tracker.initializeTracker();
 
     // Initialize sensor 0.
     wrapper->GetSensorByIndex(0)->SetNearModeEnabled(near_mode);
@@ -205,7 +205,7 @@ bool GetHandsInteraction(int skeleton_id, NUI_HANDPOINTER_INFO* hands) {
 
 bool GetFaceRotation(float* face_rotation) {
 	assert(face_rotation);
- 
+ /*
 	if (the_face_tracker.isTracking()) {
 		cv::Vec3f rotation = the_face_tracker.FaceRotation();
 		face_rotation[0] = rotation[0];
@@ -216,7 +216,7 @@ bool GetFaceRotation(float* face_rotation) {
 	else {
 		return false;
 	}
-
+  */
   return false;
 }
 
