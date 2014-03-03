@@ -88,7 +88,7 @@ public class MoveJoints : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
 		//Create valid skeleton with joints positions/rotations
 		m_player_one = new Skeleton(0);
 		moveJoints (m_player_one);
