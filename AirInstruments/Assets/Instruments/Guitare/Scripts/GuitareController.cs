@@ -12,8 +12,17 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 	// Joueur de guitare.
 	public GuitarPlayer guitarPlayer;
 
+	// joints unity
+	public Joints jointsObject;
+
 	public void Prepare() {
 		KinectPowerInterop.SetKinectAngle (15);
+	}
+
+	//Show/Hide joints
+	public void ShowJoints(bool show)
+	{
+		jointsObject.gameObject.SetActive(show);
 	}
 
 	// Methode appelee quand l'instrument "guitare" est choisi.

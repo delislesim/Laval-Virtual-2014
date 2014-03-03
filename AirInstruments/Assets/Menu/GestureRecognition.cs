@@ -14,12 +14,12 @@ public class GestureRecognition : MonoBehaviour {
 		// Poll gesture controller to see if a gesture has been detected
 		int[] gestureId = {-1};
 		KinectPowerInterop.GetGestureStatus(gestureId);
-		print(gestureId[0]);
+		//print(gestureId[0]);
 	}
 
 	void OnGUI () {
 		if (left_hand_visible)
-			GUI.DrawTexture (new Rect (left_hand_position.x * 200 + 300, left_hand_position.y * 200 + 300, 50, 50), handTexture);
+			;//GUI.DrawTexture (new Rect (left_hand_position.x * 200 + 300, left_hand_position.y * 200 + 300, 50, 50), handTexture);
 	}
 
 	public Texture handTexture;
