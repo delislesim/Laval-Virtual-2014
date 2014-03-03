@@ -16,7 +16,7 @@ public class GestureRecognition : MonoBehaviour {
 			if ((hands[0].State & KinectPowerInterop.NuiHandpointerStateNotTracked) == 0) {
 				left_hand_position.x = hands[0].X;
 				left_hand_position.y = hands[0].Y;
-				Debug.Log(left_hand_position);
+				//Debug.Log(left_hand_position);
 				left_hand_visible = true;
 			} else {
 				left_hand_visible = false;
@@ -41,7 +41,7 @@ public class GestureRecognition : MonoBehaviour {
 
 	void OnGUI () {
 		if (left_hand_visible)
-			GUI.DrawTexture (new Rect (left_hand_position.x * 200 + 300, left_hand_position.y * 200 + 300, 50, 50), handTexture);
+			;//GUI.DrawTexture (new Rect (left_hand_position.x * 200 + 300, left_hand_position.y * 200 + 300, 50, 50), handTexture);
 	}
 
 	public Texture handTexture;
