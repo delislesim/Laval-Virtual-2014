@@ -175,6 +175,11 @@ public class MoveJoints : MonoBehaviour {
 				*/
 			} else {
 				joints[i].transform.position = current_positions[i];
+
+				if (i == (int)Skeleton.Joint.HandRight || i == (int)Skeleton.Joint.HandLeft) {
+					moveHand(player, (Skeleton.Joint)i);
+				}
+
 				if (skeletonValid && current_positions[i] != HIDING_POS) {
 					joints[i].renderer.enabled = true;
 				} else {
@@ -230,6 +235,9 @@ public class MoveJoints : MonoBehaviour {
 		           
 	}
 
-	private Quaternion targetRotationCamera = Quaternion.identity;
+	private void moveHand(Skeleton player, Skeleton.Joint joint){
+		joints[(int)joint].transform.localRotation = player.GetBoneOrientation(joint);
+	}
 
+	private Quaternion targetRotationCamera = Quaternion.identity;
 }
