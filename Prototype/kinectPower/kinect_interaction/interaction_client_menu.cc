@@ -30,6 +30,7 @@ STDMETHODIMP InteractionClientMenu::GetInteractionInfoAtLocation(
   if (!pInteractionInfo)
     return E_POINTER;
 
+  /*
   if (NUI_HAND_TYPE_RIGHT == handType)
   {
     pInteractionInfo->IsGripTarget = false;
@@ -44,6 +45,8 @@ STDMETHODIMP InteractionClientMenu::GetInteractionInfoAtLocation(
   {
     pInteractionInfo->PressTargetControlId = 0;
   }
+  */
+  pInteractionInfo->IsGripTarget = true;
 
   pInteractionInfo->PressAttractionPointX = 0.f;
   pInteractionInfo->PressAttractionPointY = 0.f;

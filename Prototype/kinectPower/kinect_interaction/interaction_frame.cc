@@ -26,7 +26,7 @@ bool InteractionFrame::GetHands(int skeleton_id,
       continue;
 
     *left_hand = frame_.UserInfos[i].HandPointerInfos[0];
-    *right_hand = frame_.UserInfos[i].HandPointerInfos[0];
+    *right_hand = frame_.UserInfos[i].HandPointerInfos[1];
 
     return true;
   }
