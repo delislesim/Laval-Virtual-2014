@@ -36,7 +36,7 @@ public class GestureRecognition : MonoBehaviour {
 		// Poll gesture controller to see if a gesture has been detected
 		int[] gestureId = {-1};
 		KinectPowerInterop.GetGestureStatus(gestureId);
-		print(gestureId[0]);
+		//print(gestureId[0]);
 	}
 
 	void OnGUI () {
