@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GuitareController : MonoBehaviour {
+public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 
 	// Controleur du mode assiste de la guitare.
 	public AssistedModeControllerGuitar assistedModeController;
@@ -11,6 +11,10 @@ public class GuitareController : MonoBehaviour {
 
 	// Joueur de guitare.
 	public GuitarPlayer guitarPlayer;
+
+	public void Prepare() {
+		KinectPowerInterop.SetKinectAngle (15);
+	}
 
 	// Methode appelee quand l'instrument "guitare" est choisi.
 	void OnEnable() {

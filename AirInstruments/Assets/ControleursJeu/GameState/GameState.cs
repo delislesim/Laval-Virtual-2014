@@ -13,6 +13,9 @@ public class GameState : MonoBehaviour {
 	// Controleur du drum.
 	public DrumController drumController;
 
+	// Controleur du menu de choix d'instrument.
+	public ChoixInstrumentController choixInstrumentControleur;
+
 	// Controleur de la camera.
 	public CameraController cameraController;
 
@@ -52,6 +55,7 @@ public class GameState : MonoBehaviour {
 		GameState.State previousState = currentState;
 
 		// Arreter l'etat presentement actif.
+		choixInstrumentControleur.gameObject.SetActive (false);
 		pianoController.gameObject.SetActive (false);
 		drumController.gameObject.SetActive (false);
 		guitareController.gameObject.SetActive (false);
@@ -63,21 +67,25 @@ public class GameState : MonoBehaviour {
 		if (currentState == State.ChooseInstrument) {
 
 			cameraController.AccederEtat(previousState, State.ChooseInstrument);
+			choixInstrumentControleur.Prepare();
 			Debug.Log("Aller au choix d'instrument.");
 
 		} else if (currentState == State.Piano) {
 
 			cameraController.AccederEtat(previousState, State.Piano);
+			pianoController.Prepare();
 			Debug.Log("Piano choisi.");
 
 		} else if (currentState == State.Drum) {
 
 			cameraController.AccederEtat(previousState, State.Drum);
+			drumController.Prepare();
 			Debug.Log("Drum choisi.");
 
 		} else if (currentState == State.Guitar) {
 
 			cameraController.AccederEtat(previousState, State.Guitar);
+			guitareController.Prepare();
 			Debug.Log("Guitare choisie.");
 
 		}
@@ -90,7 +98,7 @@ public class GameState : MonoBehaviour {
 
 		if (currentState == State.ChooseInstrument) {
 
-			cameraController.RegarderPositionDefaut();
+			choixInstrumentControleur.gameObject.SetActive (true);
 
 		} else if (currentState == State.Piano) {
 

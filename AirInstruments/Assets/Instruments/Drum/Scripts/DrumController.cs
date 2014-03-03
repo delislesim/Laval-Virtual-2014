@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class DrumController : MonoBehaviour {
+public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 
 	// Controleur du squelette du joueur de drum.
 	public MoveJoints jointsController;
@@ -11,6 +11,10 @@ public class DrumController : MonoBehaviour {
 
 	// Camera principale du jeu.
 	public Camera mainCamera;
+
+	public void Prepare() {
+		KinectPowerInterop.SetKinectAngle (4);
+	}
 
 	// Methode appelee quand l'instrument "drum" est choisi.
 	void OnEnable() {

@@ -1,10 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PianoController : MonoBehaviour {
+public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 
 	// Controleur des mains du squelette a partir des donnees de la camera d'Intel.
 	public IntelHandController intelHandController;
+
+	public void Prepare() {
+		KinectPowerInterop.SetKinectAngle (15);
+	}
 
 	// Methode appelee quand l'instrument "piano" est choisi.
 	void OnEnable() {
