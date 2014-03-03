@@ -65,6 +65,8 @@ public class MoveJoints : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		targetRotationCamera.eulerAngles = new Vector3 (-10.0f, 0, 0);
+
 		joints = new GameObject[(int)Skeleton.Joint.Count] {
 			Hip_Center, Spine, Shoulder_Center, Head,
 			Shoulder_Left, Elbow_Left, Wrist_Left, Hand_Left,
@@ -157,10 +159,10 @@ public class MoveJoints : MonoBehaviour {
 				// Si on a une camera, faire la rotation.
 				if (mainCamera != null) {
 					Quaternion rotationCamera = mainCamera.transform.rotation;
-					Quaternion targetRotationCamera = Quaternion.identity;
+					/*
 					mainCamera.transform.rotation = Quaternion.RotateTowards(rotationCamera,
 					                                                         targetRotationCamera,
-					                                                         kRotationMaxTete * Time.deltaTime);
+					                                                         kRotationMaxTete * Time.deltaTime);*/
 				}
 
 				/* TODO: Face tracker.
@@ -227,5 +229,7 @@ public class MoveJoints : MonoBehaviour {
 		}
 		           
 	}
+
+	private Quaternion targetRotationCamera = Quaternion.identity;
 
 }
