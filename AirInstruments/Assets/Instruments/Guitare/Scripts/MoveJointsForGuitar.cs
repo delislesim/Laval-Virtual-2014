@@ -102,7 +102,7 @@ public class MoveJointsForGuitar : MonoBehaviour {
 				{
 					//POSITIONS
 					joints[i].transform.position = 
-						new Vector3(posJoint.x*PLAYER_HIGHT, posJoint.y*PLAYER_HIGHT, -posJoint.z*PLAYER_HIGHT)
+						new Vector3(posJoint.x*PLAYER_HIGHT, posJoint.y*PLAYER_HIGHT+2.5f, -posJoint.z*PLAYER_HIGHT)
 							+ kDeplacementJoueur;
 
 					// // ROTATIONS

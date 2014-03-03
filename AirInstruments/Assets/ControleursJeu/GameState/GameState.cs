@@ -57,7 +57,11 @@ public class GameState : MonoBehaviour {
 		// Arreter l'etat presentement actif.
 		choixInstrumentControleur.gameObject.SetActive (false);
 		pianoController.gameObject.SetActive (false);
+
+		drumController.ShowJoints (false);
 		drumController.gameObject.SetActive (false);
+
+		guitareController.ShowJoints(false);
 		guitareController.gameObject.SetActive (false);
 
 		transitionTerminee = false;
@@ -107,10 +111,12 @@ public class GameState : MonoBehaviour {
 		} else if (currentState == State.Drum) {
 
 			drumController.gameObject.SetActive (true);
+			drumController.ShowJoints(true);
 			
 		} else if (currentState == State.Guitar) {
 
 			guitareController.gameObject.SetActive (true);
+			guitareController.ShowJoints(true);
 			
 		}
 
