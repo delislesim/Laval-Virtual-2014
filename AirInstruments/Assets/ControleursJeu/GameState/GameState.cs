@@ -47,7 +47,7 @@ public class GameState : MonoBehaviour {
 	}
 
 	// Acceder a un nouvel etat.
-	private void AccederEtat(State state) {
+	public void AccederEtat(State state) {
 		if (state == currentState || !transitionTerminee) {
 			return;
 		}

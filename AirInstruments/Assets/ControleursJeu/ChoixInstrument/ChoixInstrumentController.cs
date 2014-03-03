@@ -18,7 +18,25 @@ public class ChoixInstrumentController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+		// Verifier s'il y a un choix d'instrument actif.
+		Pointeur pointeur = Pointeur.obtenirInstance ();
+		int targetid = pointeur.GetCurrentTargetId ();
+		if (targetid != -1) {
+			switch (targetid) {
+				case kDrumTargetId : {
+					GameState.ObtenirInstance().AccederEtat(GameState.State.Drum);
+					break;
+				}
+				case kGuitarTargetId : {
+					GameState.ObtenirInstance().AccederEtat(GameState.State.Guitar);
+					break;
+				}
+				case kPianoTargetId : {
+					GameState.ObtenirInstance().AccederEtat(GameState.State.Piano);
+					break;
+				}
+			}
+		}
 	}
 
 	void OnEnable () {
@@ -37,6 +55,13 @@ public class ChoixInstrumentController : MonoBehaviour {
 		pointeur.AddTarget (kPianoTargetId,
 		                    new Vector2 (1.8f, -0.3f),
 		                    new Vector2 (0.4f, 1.0f));
+
+		// Activer le pointeur.
+		pointeur.gameObject.SetActive (true);
+	}
+
+	void OnDisable () {
+		Pointeur.obtenirInstance ().gameObject.SetActive (false);
 	}
 
 	private const int kDrumTargetId = 0;
