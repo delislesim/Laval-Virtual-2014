@@ -105,6 +105,11 @@ public class Pointeur : MonoBehaviour {
 	
 	void OnGUI () {
 		if (handIsActive) {
+			// S'assurer qu'on est en avant de tout.
+			// (Petite valeur = plus vers l'avant)
+			GUI.depth = 0; 
+
+			// Dessiner la main.
 			GUI.DrawTexture (new Rect ((handPosition.x * 250 + 300) * Screen.width / 1080,
 			                           (handPosition.y * 350 + 300) * Screen.height / 768,
 			                           70 * Screen.width / 1080,

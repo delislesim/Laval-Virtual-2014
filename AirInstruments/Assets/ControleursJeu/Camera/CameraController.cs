@@ -44,7 +44,6 @@ public class CameraController : MonoBehaviour {
 			                                             targetRotation,
 			                                             rotationSpeed);
 			mainCamera.transform.rotation = newRot;
-
 			if (newRot == targetRotation) {
 				targetRotation = Quaternion.identity;
 			}
