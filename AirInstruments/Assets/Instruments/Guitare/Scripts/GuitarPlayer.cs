@@ -149,7 +149,7 @@ public class GuitarPlayer : MonoBehaviour {
 		if(!HasStarted)
 		{
 			elapsedTime = elapsedTime + Time.deltaTime;
-			if(elapsedTime >= StartDelay)
+			if(elapsedTime >= StartDelay && isAssisted)
 			{
 				AssistedCtrl.StartSong();
 				HasStarted = true;
