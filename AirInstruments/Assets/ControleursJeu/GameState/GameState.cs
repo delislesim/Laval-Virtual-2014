@@ -98,8 +98,6 @@ public class GameState : MonoBehaviour {
 	// Appele lorsque l'animation de camera permettant de se rendre a l'etat
 	// suivant est terminee.
 	public void OnCompleteTransition() {
-		Debug.Log ("transition terminee");
-
 		if (currentState == State.ChooseInstrument) {
 
 			choixInstrumentControleur.gameObject.SetActive (true);

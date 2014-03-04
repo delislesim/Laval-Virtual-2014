@@ -31,7 +31,6 @@ public class Pointeur : MonoBehaviour {
 		target.center = targetCenter;
 		target.size = targetSize;
 		targets.Add (target);
-		Debug.Log ("ajout");
 	}
 
 	public int GetCurrentTargetId() {

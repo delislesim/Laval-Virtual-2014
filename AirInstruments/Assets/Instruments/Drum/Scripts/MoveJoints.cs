@@ -93,6 +93,9 @@ public class MoveJoints : MonoBehaviour {
 			kalmanMains[i] = new Kalman(20.0f);
 			kalmanMains[i].SetInitialObservation(Vector4.zero);
 		}
+
+		// Layer des colliders de drum components.
+		drumComponentLayer = 1 << LayerMask.NameToLayer ("DrumComponent");
 	}
 	
 	// Update is called once per frame
@@ -135,8 +138,9 @@ public class MoveJoints : MonoBehaviour {
 		}
 
 		// Abandonner si les positions sont les memes que la derniere fois.
-		if (ArraysEqual (temp_positions, current_positions))
+		if (ArraysEqual (temp_positions, current_positions)) {
 			return;
+		}
 
 		// Mettre les positions dans le tableau de positions a traiter.
 		for (int i = 0; i < jointsCount; ++i) {
@@ -301,11 +305,36 @@ public class MoveJoints : MonoBehaviour {
 		kalmanMains [index].SetInitialObservation (smoothedRotation);
 
 		// S'assurer que le joint ne rentre pas dans un tambour.
-
+		RaycastHit hitInfo;
+		Vector3 direction = joints [(int)joint].transform.position - last_positions [(int)joint];
+		float distance = direction.magnitude;
+		if (Physics.SphereCast(joints [(int)joint].transform.position,
+		                       kRayonSphereMain,
+		                       direction.normalized,
+		                       out hitInfo,
+		                       distance + kRayonSphereMain, // distance a parcourir
+		                       drumComponentLayer)) {
+			// La main touche un collider quelconque de la scene.
+			// Bouger la main pour ne plus qu'elle touche a ce collider :)
+			Vector3 handPosition = joints[(int)joint].transform.position;
+			float distanceVersCollision = (handPosition - hitInfo.point).magnitude;
+			float distanceEnTrop = Mathf.Abs(kRayonSphereMain - distanceVersCollision);
+			handPosition += -hitInfo.normal * distanceEnTrop;	
+			Debug.Log("touche");
+		} else {
+			Debug.Log("pas");
+		}
 	}
 
 	private Quaternion targetRotationCamera = Quaternion.identity;
 
 	// Filtres de Kalman pour la rotation des mains.
 	private Kalman[] kalmanMains = new Kalman[2];
+
+	// Rayon d'une sphere de main.
+	private const float kRayonSphereMain = 0.6f;
+
+	// Layer des colliders de drum components.
+	private int drumComponentLayer;
 }
+
