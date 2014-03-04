@@ -80,8 +80,8 @@ public class TipFollower : MonoBehaviour {
 	const float kDistancePourRejouer = 0.1f;
 
 	// Distance pour le raycast.
-	const float kDistanceRaycast = 7.0f * 0.118f;
+	const float kDistanceRaycast = 7.0f * 0.1f;
 
 	// Distance pour jouer un instrument du drum.
-	const float kDistancePourJouer = 4.0f * 0.118f;
+	const float kDistancePourJouer = 4.0f * 0.1f;
 }

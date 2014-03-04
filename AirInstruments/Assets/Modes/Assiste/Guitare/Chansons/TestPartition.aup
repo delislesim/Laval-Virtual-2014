@@ -226,14 +226,7 @@
 	</wavetrack>
 	<labeltrack name="Label Track" numlabels="124" height="73" minimized="0" isSelected="0">
 		<label t="0.00000000" t1="0.00000000" title="-E0"/>
-		<label t="0.00000000" t1="5.00000000" title="-E1"/>
-		<label t="0.00000000" t1="10.00000000" title="-E2"/>
-		<label t="0.00000000" t1="15.00000000" title="-E0"/>
-		<label t="0.00000000" t1="20.00000000" title="-E1"/>
-		<label t="0.00000000" t1="25.00000000" title="-E2"/>
-		<label t="0.00000000" t1="30.00000000" title="-E0"/>
-		<label t="0.00000000" t1="35.00000000" title="-E1"/>
-		<label t="0.00000000" t1="40.00000000" title="-E2"/>
-		<label t="0.00000000" t1="60.00000000" title="-A0"/>
+		<label t="0.00000000" t1="2.00000000" title="-A1"/>
+		<label t="0.00000000" t1="4.00000000" title="-E1"/>
 	</labeltrack>
 </project>

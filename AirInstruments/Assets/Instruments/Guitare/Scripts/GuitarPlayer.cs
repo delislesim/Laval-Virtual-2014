@@ -150,7 +150,6 @@ public class GuitarPlayer : MonoBehaviour {
 	void Start () {
 		dummy_counter = 0;
 		HighVelocityPlayableNotes = new List<List<AudioClip>>();
-		//isAssisted = true;
 		SetScaleModeAndTone(Mode.BLUES, Tone.E);
 		HasStarted = false;
 	}
@@ -170,9 +169,11 @@ public class GuitarPlayer : MonoBehaviour {
 	
 	void OnTriggerEnter(Collider col)
 	{
+		/*
 		//Debug.Log ("Trigger with guitar player! : " + col.gameObject.tag);
 		if(col.gameObject.tag == "PlayHand")
 			PlayNextNote();
+			*/
 	}
 
 	/// <summary>
