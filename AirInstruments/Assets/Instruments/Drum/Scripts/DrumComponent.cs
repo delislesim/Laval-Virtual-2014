@@ -6,13 +6,23 @@ public class DrumComponent : MonoBehaviour, ComponentInterface {
 	// Plan situe sur la surface du composant a jouer.
 	public GameObject plane;
 
+	// Spotlight qui eclaire ce composant.
+	public DrumSpot spot;
+
 	public void PlaySound()
 	{
 		audio.Play();
+		if (spot != null) {
+			spot.Play ();
+		}
 	}
 
 	public float DistanceToPoint (Vector3 point) {
 		return planeMath.GetDistanceToPoint (point);
+	}
+
+	public void DefinirLuminosite(float luminosite) {
+		spot.DefinirLuminosite (luminosite);
 	}
 
 	// Use this for initialization

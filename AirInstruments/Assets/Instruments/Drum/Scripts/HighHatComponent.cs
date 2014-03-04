@@ -9,6 +9,9 @@ public class HighHatComponent : MonoBehaviour, ComponentInterface {
 	// Plan situe sur la surface du composant a jouer.
 	public GameObject plane;
 
+	// Spotlight qui eclaire ce composant.
+	public DrumSpot spot;
+
 	public void PlaySound()
 	{
 		if(opened){
@@ -19,10 +22,15 @@ public class HighHatComponent : MonoBehaviour, ComponentInterface {
 			audio.clip = soundClosed;
 			audio.Play();
 		}
+		spot.Play ();
 	}
 
 	public float DistanceToPoint (Vector3 point) {
 		return planeMath.GetDistanceToPoint (point);
+	}
+
+	public void DefinirLuminosite(float luminosite) {
+		spot.DefinirLuminosite (luminosite);
 	}
 	
 	// Use this for initialization
