@@ -133,7 +133,6 @@ public class MoveJointsForGuitar : MonoBehaviour {
 		GuitarContainer.position = hipPos;
 
 		//Guit rotation
-
 		Vector3 hipPosXZ = new Vector3(hipPos.x, 0, hipPos.z);
 		Vector3 lHandPosXZ = new Vector3(lHandPos.x, 0, lHandPos.z);
 		float AngleRotY = Vector3.Angle(new Vector3(0,0,1), lHandPosXZ-hipPosXZ);
@@ -144,7 +143,6 @@ public class MoveJointsForGuitar : MonoBehaviour {
 
 		Quaternion GuitarRotation = Quaternion.Euler (0, -AngleRotY-90, AngleRotZ);
 		GuitarContainer.rotation = GuitarRotation;
-
 	}
 
 	// --- Constantes ---
