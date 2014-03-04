@@ -7,9 +7,7 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 	public MoveJoints jointsController;
 
 	//Dude 
-	public Joints joints;
-	public Joints DrumStickR;
-	public Joints DrumStickL;
+	public GameObject dude;
 
 	// Tete du joueur de drum, utilise pour controler la camera.
 	public GameObject teteDrummer;
@@ -21,17 +19,9 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 		KinectPowerInterop.SetKinectAngle (4);
 	}
 
-	//Show/Hide joints
-	public void ShowJoints(bool show)
-	{
-		joints.gameObject.SetActive(show);
-		DrumStickR.gameObject.SetActive(show);
-		DrumStickL.gameObject.SetActive(show);
-	}
-
 	// Methode appelee quand l'instrument "drum" est choisi.
 	void OnEnable() {
-		jointsController.gameObject.SetActive (true);
+		dude.gameObject.SetActive (true);
 
 		// Prendre le controle de la camera.
 		mainCamera.transform.parent = teteDrummer.transform;
@@ -43,7 +33,7 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 	
 	// Methode appelee quand l'instrument "drum" n'est plus choisi.
 	void OnDisable () {
-		jointsController.gameObject.SetActive (false);
+		dude.gameObject.SetActive (false);
 	}
 	
 	// Methode appelee a chaque frame quand le drum est l'instrument courant.

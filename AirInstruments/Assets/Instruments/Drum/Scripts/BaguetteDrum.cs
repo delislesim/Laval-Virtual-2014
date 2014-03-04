@@ -1,0 +1,24 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class BaguetteDrum : MonoBehaviour {
+
+	// Main dans laquelle se trouve la baguette.
+	public GameObject main;
+
+	// Bout de la baguette suppose etre dans la main.
+	public GameObject boutBaguetteMain;
+
+	// Update is called once per frame
+	void FixedUpdate () {
+		// Bouger la baguette pour que son bout soit au centre de la main.
+		/*
+		Vector3 nouvellePositionBoutBaguette = Vector3.MoveTowards (boutBaguetteMain.transform.position,
+		                                                           main.transform.position,
+		                                                           kVitesseBaguette * Time.deltaTime);*/
+		Vector3 deplacement = main.transform.position - boutBaguetteMain.transform.position;
+		transform.position = transform.position + deplacement;
+	}
+
+	private const float kVitesseBaguette = 0.25f;
+}
