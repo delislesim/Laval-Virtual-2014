@@ -33,6 +33,7 @@ public class MoveJoints : MonoBehaviour {
 	//Private
 	private Skeleton m_player_one;
 	private GameObject[] joints;
+	private Vector3[] temp_positions;
 	private Vector3[] current_positions;
 	private Vector3[] last_positions;
 	private Quaternion[] current_rotations;
@@ -77,6 +78,7 @@ public class MoveJoints : MonoBehaviour {
 
 		last_positions = new Vector3[(int)Skeleton.Joint.Count];
 		current_positions = new Vector3[(int)Skeleton.Joint.Count];
+		temp_positions = new Vector3[(int)Skeleton.Joint.Count];
 
 		last_rotations = new Quaternion[(int)Skeleton.Joint.Count];
 		current_rotations = new Quaternion[(int)Skeleton.Joint.Count];
@@ -122,19 +124,28 @@ public class MoveJoints : MonoBehaviour {
 
 		// Obtenir toutes les positions courantes.
 		for (int i = 0; i < jointsCount; ++i) {
-			// Store last positions/rotations
-			last_positions[i] = current_positions[i];
-			last_rotations[i] = current_rotations[i];
-
-			// Obtenir la nouvelle position de la Kinect.
 			Vector3 posJoint;
 			Skeleton.JointStatus jointStatus = player.GetJointPosition((Skeleton.Joint)i, out posJoint);
 
 			if(jointStatus != Skeleton.JointStatus.NotTracked && player.Exists()) {
-				current_positions[i] = WorldPositionFromKinectPosition(posJoint);
+				temp_positions[i] = WorldPositionFromKinectPosition(posJoint);
 			} else {
-				current_positions[i] = HIDING_POS;
+				temp_positions[i] = HIDING_POS;
 			}
+		}
+
+		// Abandonner si les positions sont les memes que la derniere fois.
+		if (ArraysEqual (temp_positions, current_positions))
+			return;
+
+		// Mettre les positions dans le tableau de positions a traiter.
+		for (int i = 0; i < jointsCount; ++i) {
+			// Store last positions/rotations
+			last_positions[i] = current_positions[i];
+			last_rotations[i] = current_rotations[i];
+
+			// Store current position.
+			current_positions[i] = temp_positions[i];
 		}
 
 		// Determiner si le squelette est valide.
@@ -202,6 +213,24 @@ public class MoveJoints : MonoBehaviour {
 		manageMouvementsAndSounds(current_positions, last_positions);
 	}
 
+	// Indique si 2 tableaux sont égaux.
+	static bool ArraysEqual (Vector3[] a1, Vector3[] a2)
+	{
+		if (ReferenceEquals(a1,a2))
+			return true;
+		
+		if (a1 == null || a2 == null)
+			return false;
+		
+		if (a1.Length != a2.Length)
+			return false;
+
+		for (int i = 0; i < a1.Length; i++) {
+			if (a1[i] != a2[i]) return false;
+		}
+		return true;
+	}
+	
 	Vector3 WorldPositionFromKinectPosition(Vector3 kinectPosition) {
 		return new Vector3(kinectPosition.x*PLAYER_HIGHT,
 		                   kinectPosition.y*PLAYER_HIGHT,
@@ -270,6 +299,9 @@ public class MoveJoints : MonoBehaviour {
 			}
 		}
 		kalmanMains [index].SetInitialObservation (smoothedRotation);
+
+		// S'assurer que le joint ne rentre pas dans un tambour.
+
 	}
 
 	private Quaternion targetRotationCamera = Quaternion.identity;
