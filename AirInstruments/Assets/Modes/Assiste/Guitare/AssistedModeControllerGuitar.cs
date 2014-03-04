@@ -12,6 +12,10 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 		return currentStyle;
 	}
 
+	public int getCurrentOctave(){
+		return currentOctave;
+	}
+
 	public void StartSong()
 	{
 		HasStarted = true;
@@ -29,6 +33,7 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 		currentPartitionIndex = 0;
 		currentTone = partition[currentPartitionIndex].note;
 		currentStyle = partition[currentPartitionIndex].style;
+		currentOctave = partition[currentPartitionIndex].octave;
 		HasStarted = false;
 		//audio.source = ... toune de fond
 		//audio.play
@@ -49,6 +54,7 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 			}
 			currentTone = partition[currentPartitionIndex].note;
 			currentStyle = partition[currentPartitionIndex].style;
+			currentOctave = partition[currentPartitionIndex].octave;
 		}
 	}
 	
@@ -59,6 +65,7 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 	private float tempsEcoule;
 	private float tempsNotes; // Temps qui augmente avec les duree des notes. (par step)
 	private int currentPartitionIndex;
+	private int currentOctave;
 
 	private GuitarPlayer.Tone currentTone;
 	private GuitarPlayer.Style currentStyle; 
