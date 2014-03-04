@@ -2,18 +2,11 @@
 using KinectHelpers;
 using UnityEngine;
 
-enum PianoMove
-{
-	NO_MOVE_DETECTED, HANDS_PLACED, FIRST_LATERAL_MOVE, SUBSEQUENT_LATERAL_MOVES
-}
-
 public class GesturePiano : Gesture {
 	
 	public GesturePiano()
 	{
-		elapsedTimeSinceLastMove_ = 0;
-		currentMove_ = PianoMove.NO_MOVE_DETECTED;
-		nbLateralMoves_ = 0;
+		elapsedTime_ = 0;
 		nbSteps_ = 30;
 		lastMoveHandXPosition_ = new float[2];
 		lastMoveHandXPosition_[0] = 0;
@@ -53,7 +46,8 @@ public class GesturePiano : Gesture {
 		
 		// Verify every joint is currently tracked
 		if(leftHandStatus == Skeleton.JointStatus.NotTracked || rightHandStatus == Skeleton.JointStatus.NotTracked || rightHipStatus == Skeleton.JointStatus.NotTracked
-		   || centerHipStatus == Skeleton.JointStatus.NotTracked || leftHipStatus == Skeleton.JointStatus.NotTracked){
+		   || centerHipStatus == Skeleton.JointStatus.NotTracked || leftHipStatus == Skeleton.JointStatus.NotTracked
+		   || rightKneeStatus == Skeleton.JointStatus.NotTracked || leftKneeStatus == Skeleton.JointStatus.NotTracked) {
 			return false;
 		}
 		
@@ -75,61 +69,28 @@ public class GesturePiano : Gesture {
 		//Debug.Log ("Left hand : " + leftHandPos [0] + " " + leftHandPos [1] + "\n");
 		//Debug.Log ("Right hand : " + rightHandPos [0] + " " + rightHandPos [1] + "\n");
 
-		switch(currentMove_)
-		{
-		case PianoMove.NO_MOVE_DETECTED:
-			if(isInLimits)
-			{
-				currentMove_ = PianoMove.HANDS_PLACED;
-				updateHandPositionX(rightHandPos[0], leftHandPos[0]);
+		//Debug.Log ("Hands depth : " + leftHandPos [2] + " right : " + rightHandPos [2] + "\n");
 
-				//Debug.Log("Move {0} detected\n" + (int)currentMove_);
-			}
-			break;
-		case PianoMove.HANDS_PLACED:
-			if((Mathf.Abs(rightHandPos[0] - lastMoveHandXPosition_[0]) >= LATERAL_MOVEMENT || Mathf.Abs(leftHandPos[0] - lastMoveHandXPosition_[1]) >= LATERAL_MOVEMENT) && isInLimits)
-			{
-				elapsedTimeSinceLastMove_ = 0;
-				currentMove_ = PianoMove.FIRST_LATERAL_MOVE;
-				updateHandPositionX(rightHandPos[0], leftHandPos[0]);
-				nbLateralMoves_++;
-				//Debug.Log("Move {0} detected\n" + (int)currentMove_);
-			}
-			else
-			{
-				elapsedTimeSinceLastMove_ += 1.0f/Time.deltaTime;
-			}
-			break;
-		case PianoMove.FIRST_LATERAL_MOVE:
-			if(nbLateralMoves_ + 1 == MOVES_NUMBER)
-			{
-				elapsedTimeSinceLastMove_ = 0;
-				currentMove_ = PianoMove.NO_MOVE_DETECTED;
-				//Debug.Log("Final Move {0} detected\n" +  (int)currentMove_);
-				return true;
-			}
-			bool hasMovedLaterally = (Mathf.Abs(rightHandPos[0] - lastMoveHandXPosition_[0]) >= LATERAL_MOVEMENT || Mathf.Abs(leftHandPos[0] - lastMoveHandXPosition_[1]) >= LATERAL_MOVEMENT);
-			if(hasMovedLaterally && isInLimits)
-			{
-				nbLateralMoves_++;
-				updateHandPositionX(rightHandPos[0], leftHandPos[0]);
-				elapsedTimeSinceLastMove_ = 0;
-				//Debug.Log("Move {0} detected\n" + (int)currentMove_);
-			}
-			else
-			{
-				elapsedTimeSinceLastMove_ += 1.0f/Time.deltaTime;
-			}
-			break;
+		// Verify that current hand depth is within bounds
+		bool handsFarEnough = (centerHipPos [2] - leftHandPos[2]) >= minHandDepth_ && (centerHipPos [2] - rightHandPos[2]) >= minHandDepth_;
+
+		if(handsFarEnough && isInLimits)
+		{
+			elapsedTime_ += Time.deltaTime;
+		}
+		else
+		{
+			elapsedTime_ = 0;
+			return false;
 		}
 
-		
-		if(elapsedTimeSinceLastMove_ > GESTURE_TIMEOUT)
+		if(elapsedTime_ >= gestureTime_)
 		{
-			currentMove_ = PianoMove.NO_MOVE_DETECTED;
-			elapsedTimeSinceLastMove_ = 0;
+			elapsedTime_ = 0;
+			return true;
 		}
-		return false;
+		else
+			return false;
 	}
 	
 	private void updateHandPositionX(float rightHandPos, float leftHandPos )
@@ -138,20 +99,15 @@ public class GesturePiano : Gesture {
 		lastMoveHandXPosition_[1] = leftHandPos;
 	}
 	
-	private float elapsedTimeSinceLastMove_;
-	
-	// Id of last detected move in the sequence
-	private PianoMove currentMove_;
-	
-	// Number of lateral moves to activate the piano
-	private uint nbLateralMoves_;
+	private float elapsedTime_;
 	
 	// Registered position of each hand for the last move
 	private float[] lastMoveHandXPosition_;
 
 	// Constants
 	private const float LATERAL_MOVEMENT = 0.3f;
-	private const float GESTURE_TIMEOUT = 3.0f;
+	private const float gestureTime_ = 2.0f;
 	private const uint MOVES_NUMBER = 3;
+	private const float minHandDepth_ = 0.18f;
 
 }

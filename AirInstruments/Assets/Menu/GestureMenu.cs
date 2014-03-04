@@ -4,10 +4,10 @@ using KinectHelpers;
 
 public class GestureMenu : Gesture {
 
-	const float distanceBetweenHands_ = 0.18f;
-	const float handsToHead_ = 0.10f;
-	const float gestureTime_ = 1.2f;
-	float elapsedTime_ = 0;
+	private const float distanceBetweenHands_ = 0.18f;
+	private const float handsToHead_ = 0.10f;
+	private const float gestureTime_ = 1.2f;
+	private float elapsedTime_ = 0;
 
 	public GestureMenu()
 	{

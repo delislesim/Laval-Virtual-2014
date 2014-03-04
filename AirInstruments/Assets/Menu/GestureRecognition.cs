@@ -7,7 +7,8 @@ public enum GestureId
 {
 	NO_GESTURE = -1, 
 	GESTURE_PIANO = 0,
-	GESTURE_MENU = 1
+	GESTURE_MENU = 1,
+	GESTURE_DRUM = 2
 }
 
 public class GestureRecognition : MonoBehaviour {
@@ -16,6 +17,7 @@ public class GestureRecognition : MonoBehaviour {
 	void Start () {
 		AddGesture (new GesturePiano ());
 		AddGesture (new GestureMenu ());
+		AddGesture (new GestureDrum ());
 	}
 	
 	// Update is called once per frame
