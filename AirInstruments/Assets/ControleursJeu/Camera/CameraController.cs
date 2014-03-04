@@ -50,10 +50,15 @@ public class CameraController : MonoBehaviour {
 		}
 	}
 
+	// Mettre la camera a la racine du projet.
+	public void ReprendreCamera() {
+		mainCamera.transform.parent = null;
+	}
+
 	// Deplace la camera entre les etats specifies.
 	public void AccederEtat (GameState.State from, GameState.State to) {
 		// Remettre la caméra dans le monde global.
-		mainCamera.transform.parent = null;
+		ReprendreCamera ();
 
 		// Par défaut, on met le zoom par défaut.
 		targetFieldOfView = defaultFieldOfView;

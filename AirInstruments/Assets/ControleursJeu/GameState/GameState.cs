@@ -54,11 +54,13 @@ public class GameState : MonoBehaviour {
 
 		GameState.State previousState = currentState;
 
+		// Voler la camera.
+		cameraController.ReprendreCamera ();
+
 		// Arreter l'etat presentement actif.
 		choixInstrumentControleur.gameObject.SetActive (false);
 		pianoController.gameObject.SetActive (false);
-
-		drumController.ShowJoints (false);
+		
 		drumController.gameObject.SetActive (false);
 
 		guitareController.ShowJoints(false);
@@ -109,7 +111,6 @@ public class GameState : MonoBehaviour {
 		} else if (currentState == State.Drum) {
 
 			drumController.gameObject.SetActive (true);
-			drumController.ShowJoints(true);
 			
 		} else if (currentState == State.Guitar) {
 

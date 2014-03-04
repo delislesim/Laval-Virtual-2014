@@ -55,8 +55,19 @@ public class DrumHand : MonoBehaviour {
 
 		CharacterController characterController = GetComponent<CharacterController> ();
 		characterController.Move (motion);
+
+		// Si la main est trop loin de sa position actuelle selon Kinect, faire
+		// une teleportation.
+		if ((transform.position - position).magnitude > kDistanceTeleportation) {
+			if (!Physics.CheckSphere(position, 0.8f)) {
+				transform.position = position;
+			}
+		}
 	}
 
 	// Filtre de Kalman pour smoother la rotation des mains.
 	private Kalman kalman = new Kalman(20.0f);
+
+	// Distance maximale pour une teleportation.
+	private const float kDistanceTeleportation = 2.0f;
 }
