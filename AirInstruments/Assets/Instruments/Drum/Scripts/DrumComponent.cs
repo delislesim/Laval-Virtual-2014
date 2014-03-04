@@ -24,7 +24,7 @@ public class DrumComponent : MonoBehaviour {
 	
 	void OnCollisionEnter(Collision col)
 	{
-		if(col.gameObject.tag == "Tip")
-			PlaySound();
+		/*if(col.gameObject.tag == "Tip")
+			PlaySound();*/
 	}
 }
