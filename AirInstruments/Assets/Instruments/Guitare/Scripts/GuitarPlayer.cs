@@ -98,14 +98,25 @@ public class GuitarPlayer : MonoBehaviour {
 			///get the note 
 			Style style = AssistedCtrl.getCurrentStyle();
 			int note = (int)AssistedCtrl.getCurrentTone();
-
+			int octave = AssistedCtrl.getCurrentOctave();
 			int idx = 0;
+			level = level / 2; //Max level = 2, should be 0 or 1
 
 			if(style == Style.NOTE){
-				idx = note + (12*level);
-				if(idx > 44)//be safe
-					idx = idx-12;
+				switch(level){
+				case 0:
+					idx = note + (12*octave);
+					if(idx > 44)//be safe
+						idx = idx-12;
+					break;
+				default :
+					idx = note + (12*(octave + 1));
+					if(idx > 44)//be safe
+						idx = idx-12;
+					break;
+				}
 				audio.clip = HighVelocityNotes[idx];
+
 			}
 			else if(style == Style.CHORD){
 				if(level == 0)

@@ -116,6 +116,7 @@ public class PartitionGuitar {
 		{
 			if(SkipFirstTime(ligne, ref pos))
 			{
+
 				// Lire la duree.
 				float duree = ReadNumber (ligne, ref pos);
 				if (duree < 0)
@@ -123,6 +124,7 @@ public class PartitionGuitar {
 
 				// Lire la note. val = Tone {} ou [] = Style
 				string val = "";
+				int octave = 0;
 				bool hasSeenNoteBeginning = false;
 				GuitarPlayer.Style style = GuitarPlayer.Style.NOTE;
 				for (int i = pos; i < ligne.Length; ++i) {
@@ -133,6 +135,11 @@ public class PartitionGuitar {
 					} else if ((caractere=='A' || caractere=='B' ||caractere=='C' ||caractere=='D' ||caractere=='E' ||
 					            caractere=='F' ||caractere=='G'  || caractere == '#') && hasSeenNoteBeginning ) {
 						val += caractere;
+						pos = i + 1;
+					}else if ((caractere=='0' || caractere=='1' ||caractere=='2') && hasSeenNoteBeginning ) {
+						float numeric_val;
+						float.TryParse (val, out numeric_val);
+						octave = (int)(numeric_val+0.1);
 						pos = i + 1;
 					} else if (caractere == '-') {
 						hasSeenNoteBeginning = true;
@@ -151,7 +158,7 @@ public class PartitionGuitar {
 					return false;
 
 				// Ajouter au tableau de prochaines notes.
-				partition.Add (new Playable(duree, notToTone[val], style));
+				partition.Add (new Playable(duree, notToTone[val], style, octave));
 				//Debug.Log ("Found note : " + val);               
 				return true;
 			}
@@ -163,13 +170,15 @@ public class PartitionGuitar {
 		public float time;
 		public GuitarPlayer.Tone note;
 		public GuitarPlayer.Style style;
+		public int octave;
 
 		// Constructor:
-		public Playable(float duree, GuitarPlayer.Tone tone, GuitarPlayer.Style style) 
+		public Playable(float duree, GuitarPlayer.Tone tone, GuitarPlayer.Style style, int octave) 
 		{
 			this.time = duree;
 			this.note = tone;
 			this.style = style;
+			this.octave = octave;
 		}
 	}
 

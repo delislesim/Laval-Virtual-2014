@@ -80,7 +80,7 @@ public class GesturePiano : Gesture {
 				currentMove_ = PianoMove.HANDS_PLACED;
 				updateHandPositionX(rightHandPos[0], leftHandPos[0]);
 
-				Debug.Log("Move {0} detected\n" + (int)currentMove_);
+				//Debug.Log("Move {0} detected\n" + (int)currentMove_);
 			}
 			break;
 		case PianoMove.HANDS_PLACED:
@@ -90,7 +90,7 @@ public class GesturePiano : Gesture {
 				currentMove_ = PianoMove.FIRST_LATERAL_MOVE;
 				updateHandPositionX(rightHandPos[0], leftHandPos[0]);
 				nbLateralMoves_++;
-				Debug.Log("Move {0} detected\n" + (int)currentMove_);
+				//Debug.Log("Move {0} detected\n" + (int)currentMove_);
 			}
 			else
 			{
@@ -102,7 +102,7 @@ public class GesturePiano : Gesture {
 			{
 				elapsedTimeSinceLastMove_ = 0;
 				currentMove_ = PianoMove.NO_MOVE_DETECTED;
-				Debug.Log("Final Move {0} detected\n" +  (int)currentMove_);
+				//Debug.Log("Final Move {0} detected\n" +  (int)currentMove_);
 				return true;
 			}
 			bool hasMovedLaterally = (Mathf.Abs(rightHandPos[0] - lastMoveHandXPosition_[0]) >= LATERAL_MOVEMENT || Mathf.Abs(leftHandPos[0] - lastMoveHandXPosition_[1]) >= LATERAL_MOVEMENT);
@@ -111,7 +111,7 @@ public class GesturePiano : Gesture {
 				nbLateralMoves_++;
 				updateHandPositionX(rightHandPos[0], leftHandPos[0]);
 				elapsedTimeSinceLastMove_ = 0;
-				Debug.Log("Move {0} detected\n" + (int)currentMove_);
+				//Debug.Log("Move {0} detected\n" + (int)currentMove_);
 			}
 			else
 			{
