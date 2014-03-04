@@ -41,7 +41,7 @@ public class HandJointSphere : MonoBehaviour, HandJointSphereI
 	
 	private bool initialized = false;
 
-	private Kalman kalman = new Kalman();
+	private Kalman kalman = new Kalman(1.0f);
 
 	// Gerer les donnees invalides.
 	private bool valid = false;

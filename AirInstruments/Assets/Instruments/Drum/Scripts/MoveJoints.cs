@@ -85,6 +85,12 @@ public class MoveJoints : MonoBehaviour {
 		// Mettre la tete a la position par defaut, afin d'eviter les mouvements
 		// brusques de camera quand on entre dans le mode drum.
 		Head.transform.position = kPositionTeteDefaut;
+
+		// Initialiser les filtres de Kalman.
+		for (int i = 0; i < kalmanMains.Length; ++i) {
+			kalmanMains[i] = new Kalman(20.0f);
+			kalmanMains[i].SetInitialObservation(Vector4.zero);
+		}
 	}
 	
 	// Update is called once per frame
@@ -236,8 +242,38 @@ public class MoveJoints : MonoBehaviour {
 	}
 
 	private void moveHand(Skeleton player, Skeleton.Joint joint){
-		joints[(int)joint].transform.localRotation = player.GetBoneOrientation(joint);
+		// Gerer la rotation des mains.
+		int index = joint == Skeleton.Joint.HandLeft ? 0 : 1;
+
+		Vector3 rotation = player.GetBoneOrientation (joint).eulerAngles;
+		Vector4 previousRotation = kalmanMains [index].GetFilteredVector ();
+		for (int i = 0; i < 3; ++i) {
+			if (rotation[i] > 300 && previousRotation[i] < 60) {
+				rotation[i] -= 360;
+			} else if (rotation[i] < 60 && previousRotation[i] > 300) {
+				rotation[i] += 360;
+			}
+		}
+
+		Vector4 smoothedRotation = kalmanMains [index].Update (new Vector4(rotation.x, rotation.y, rotation.z, 0));
+		Quaternion smoothedRotationQuaternion = Quaternion.Euler (new Vector3 (smoothedRotation.x,
+		                                                                       smoothedRotation.y,
+		                                                                       smoothedRotation.z));
+		joints [(int)joint].transform.localRotation = smoothedRotationQuaternion;
+
+		for (int i = 0; i < 3; ++i) {
+			while (smoothedRotation[i] > 360) {
+				smoothedRotation[i] -= 360;
+			}
+			while (smoothedRotation[i] < 0) {
+				smoothedRotation[i] += 360;
+			}
+		}
+		kalmanMains [index].SetInitialObservation (smoothedRotation);
 	}
 
 	private Quaternion targetRotationCamera = Quaternion.identity;
+
+	// Filtres de Kalman pour la rotation des mains.
+	private Kalman[] kalmanMains = new Kalman[2];
 }

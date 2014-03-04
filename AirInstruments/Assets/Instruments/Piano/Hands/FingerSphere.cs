@@ -68,7 +68,7 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 	
 	private bool initialized = false;
 	
-	private Kalman kalman = new Kalman();
+	private Kalman kalman = new Kalman(1.0f);
 
 	// Rayon de la sphere en coordonnes du monde.
 	private float rayon;

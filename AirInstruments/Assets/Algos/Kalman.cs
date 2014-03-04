@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Kalman  {
 
-	public Kalman() {
+	public Kalman(float force) {
 		// q
 		// Matrice de covariance du bruit sur l'état
 		// Plus c'est gros, plus ça bouge (moins on fait confiance à l'hypothèse que ça ne bouge pas).
@@ -15,10 +15,10 @@ public class Kalman  {
 		// r
 		// Matrice de covariance de l'erreur sur l'observation.
 		// Si l'observation shake beaucoup, le mettre gros.
-		r.SetRow (0, new Vector4 (1.0f, 0,    0,    0));
-		r.SetRow (1, new Vector4 (0,    1.0f, 0,    0));
-		r.SetRow (2, new Vector4 (0,    0,    2.0f, 0));
-		r.SetRow (3, new Vector4 (0,    0,    0,    1.0f));
+		r.SetRow (0, new Vector4 (force, 0,     0,     0));
+		r.SetRow (1, new Vector4 (0,     force, 0,     0));
+		r.SetRow (2, new Vector4 (0,     0,     force, 0));
+		r.SetRow (3, new Vector4 (0,     0,     0,     1.0f));
 
 		// p est initialement la matrice identité
 		p = Matrix4x4.identity;
