@@ -27,8 +27,6 @@ public class MoveJoints : MonoBehaviour {
 
 	public DrumComponent Bass_Kick; 
 	public HighHatComponent High_Hat;
-	public TipCollider tip_left;
-	public TipCollider tip_right;
 
 	//Private
 	private Skeleton m_player_one;
@@ -87,12 +85,6 @@ public class MoveJoints : MonoBehaviour {
 		// Mettre la tete a la position par defaut, afin d'eviter les mouvements
 		// brusques de camera quand on entre dans le mode drum.
 		Head.transform.position = kPositionTeteDefaut;
-
-		// Initialiser les filtres de Kalman.
-		for (int i = 0; i < kalmanMains.Length; ++i) {
-			kalmanMains[i] = new Kalman(20.0f);
-			kalmanMains[i].SetInitialObservation(Vector4.zero);
-		}
 
 		// Layer des colliders de drum components.
 		drumComponentLayer = 1 << LayerMask.NameToLayer ("DrumComponent");
@@ -195,10 +187,12 @@ public class MoveJoints : MonoBehaviour {
 				}
 				*/
 			} else {
-				joints[i].transform.position = current_positions[i];
-
 				if (i == (int)Skeleton.Joint.HandRight || i == (int)Skeleton.Joint.HandLeft) {
-					moveHand(player, (Skeleton.Joint)i);
+					DrumHand drumHand = joints [i].GetComponent<DrumHand>();
+					drumHand.MettreAJour(current_positions[i],
+					                     player.GetBoneOrientation ((Skeleton.Joint)i).eulerAngles);
+				} else {
+					joints[i].transform.position = current_positions[i];
 				}
 
 				if (skeletonValid && current_positions[i] != HIDING_POS) {
@@ -274,65 +268,8 @@ public class MoveJoints : MonoBehaviour {
 		           
 	}
 
-	private void moveHand(Skeleton player, Skeleton.Joint joint){
-		// Gerer la rotation des mains.
-		int index = joint == Skeleton.Joint.HandLeft ? 0 : 1;
-
-		Vector3 rotation = player.GetBoneOrientation (joint).eulerAngles;
-		Vector4 previousRotation = kalmanMains [index].GetFilteredVector ();
-		for (int i = 0; i < 3; ++i) {
-			if (rotation[i] > 300 && previousRotation[i] < 60) {
-				rotation[i] -= 360;
-			} else if (rotation[i] < 60 && previousRotation[i] > 300) {
-				rotation[i] += 360;
-			}
-		}
-
-		Vector4 smoothedRotation = kalmanMains [index].Update (new Vector4(rotation.x, rotation.y, rotation.z, 0));
-		Quaternion smoothedRotationQuaternion = Quaternion.Euler (new Vector3 (smoothedRotation.x,
-		                                                                       smoothedRotation.y,
-		                                                                       smoothedRotation.z));
-		joints [(int)joint].transform.localRotation = smoothedRotationQuaternion;
-
-		for (int i = 0; i < 3; ++i) {
-			while (smoothedRotation[i] > 360) {
-				smoothedRotation[i] -= 360;
-			}
-			while (smoothedRotation[i] < 0) {
-				smoothedRotation[i] += 360;
-			}
-		}
-		kalmanMains [index].SetInitialObservation (smoothedRotation);
-
-		// S'assurer que le joint ne rentre pas dans un tambour.
-		RaycastHit hitInfo;
-		Vector3 direction = joints [(int)joint].transform.position - last_positions [(int)joint];
-		float distance = direction.magnitude;
-		if (Physics.SphereCast(joints [(int)joint].transform.position,
-		                       kRayonSphereMain,
-		                       direction.normalized,
-		                       out hitInfo,
-		                       distance + kRayonSphereMain, // distance a parcourir
-		                       drumComponentLayer)) {
-			// La main touche un collider quelconque de la scene.
-			// Bouger la main pour ne plus qu'elle touche a ce collider :)
-			Vector3 handPosition = joints[(int)joint].transform.position;
-			float distanceVersCollision = (handPosition - hitInfo.point).magnitude;
-			float distanceEnTrop = Mathf.Abs(kRayonSphereMain - distanceVersCollision);
-			handPosition += -hitInfo.normal * distanceEnTrop;	
-			Debug.Log("touche");
-		} else {
-			Debug.Log("pas");
-		}
-	}
-
+	// Cible de rotation de la camera.
 	private Quaternion targetRotationCamera = Quaternion.identity;
-
-	// Filtres de Kalman pour la rotation des mains.
-	private Kalman[] kalmanMains = new Kalman[2];
-
-	// Rayon d'une sphere de main.
-	private const float kRayonSphereMain = 0.6f;
 
 	// Layer des colliders de drum components.
 	private int drumComponentLayer;

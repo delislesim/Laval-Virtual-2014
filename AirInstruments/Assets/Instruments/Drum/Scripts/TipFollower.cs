@@ -26,7 +26,6 @@ public class TipFollower : MonoBehaviour {
 		// Si on a joue un drum component recemment, s'assurer qu'on s'en eloigne avant de le rejouer.
 		if (dernierDrumComponent != null) {
 			float distance = dernierDrumComponent.DistanceToPoint(transform.position);
-			//Debug.Log(distance);
 
 			if (distance > distanceDernierDrumComponent + kDistancePourRejouer) {
 				dernierDrumComponent = null;
@@ -39,15 +38,19 @@ public class TipFollower : MonoBehaviour {
 		// Verifier si on a fait une collision depuis la derniere fois.
 		Vector3 direction = transform.position - lastPosition;
 		RaycastHit hitInfo;
-		if (Physics.Raycast (lastPosition, direction, out hitInfo, direction.magnitude + rayon * kMultiplicateurRayon, drumComponentLayer)) {
+		if (Physics.Raycast (lastPosition, direction, out hitInfo, direction.magnitude + kDistanceRaycast, drumComponentLayer)) {
 
 			GameObject drumComponentGameObject = hitInfo.collider.gameObject;
-			ComponentInterface componentInterface = (DrumComponent)drumComponentGameObject.GetComponent(typeof(DrumComponent));
+			ComponentInterface componentInterface = drumComponentGameObject.GetComponent<DrumComponent>();
 			if (componentInterface == null) {
-				componentInterface = (HighHatComponent)drumComponentGameObject.GetComponent(typeof(HighHatComponent));
+				componentInterface = drumComponentGameObject.GetComponent<HighHatComponent>();
 			}
-			
-			if (componentInterface != dernierDrumComponent) {
+
+			float distanceReelle = hitInfo.distance - direction.magnitude;
+			if (distanceReelle < 0)
+				distanceReelle = 0;
+
+			if (componentInterface != dernierDrumComponent && distanceReelle < kDistancePourJouer) {
 				// Jouer le son.
 				componentInterface.PlaySound();
 
@@ -64,18 +67,21 @@ public class TipFollower : MonoBehaviour {
 	// Rayon du tip.
 	float rayon;
 
-	// Multiplicateur du rayon pour produire un son.
-	const float kMultiplicateurRayon = 4.0f;
-
 	// Dernier drum component a avoir ete joue.
 	ComponentInterface dernierDrumComponent;
 
 	// Distance entre le bout de la baguette et le drum component lors de l'impact.
 	float distanceDernierDrumComponent;
 
+	// Layer des colliders de drum components.
+	int drumComponentLayer;
+
 	// Distance dont il faut s'eloigner du drum component pour le rejouer.
 	const float kDistancePourRejouer = 0.1f;
 
-	// Layer des colliders de drum components.
-	int drumComponentLayer;
+	// Distance pour le raycast.
+	const float kDistanceRaycast = 7.0f * 0.118f;
+
+	// Distance pour jouer un instrument du drum.
+	const float kDistancePourJouer = 4.0f * 0.118f;
 }
