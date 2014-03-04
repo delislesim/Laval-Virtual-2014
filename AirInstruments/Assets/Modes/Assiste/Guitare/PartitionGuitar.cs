@@ -138,7 +138,9 @@ public class PartitionGuitar {
 						pos = i + 1;
 					}else if ((caractere=='0' || caractere=='1' ||caractere=='2') && hasSeenNoteBeginning ) {
 						float numeric_val;
-						float.TryParse (val, out numeric_val);
+						string oc = "";
+						oc += caractere;
+						float.TryParse (oc, out numeric_val);
 						octave = (int)(numeric_val+0.1);
 						pos = i + 1;
 					} else if (caractere == '-') {
