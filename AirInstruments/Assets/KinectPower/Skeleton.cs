@@ -133,16 +133,21 @@ namespace KinectHelpers
 
 	public Quaternion GetBoneOrientation(Joint joint)
 	{
-			LoadSkeleton ();
-			Quaternion rotation = bone_orientations [(int)joint].absoluteRotation.rotationQuaternion;
-			Vector3 eulerAngles = rotation.eulerAngles;
-			Quaternion fixedRot = Quaternion.Euler (eulerAngles.x, -eulerAngles.y + 180, -eulerAngles.z);
-			return fixedRot;
+		LoadSkeleton ();
+		Quaternion rotation = bone_orientations [(int)joint].absoluteRotation.rotationQuaternion;
+		Vector3 eulerAngles = rotation.eulerAngles;
+		Quaternion fixedRot = Quaternion.Euler (eulerAngles.x, -eulerAngles.y + 180, -eulerAngles.z);
+		return fixedRot;
 	}
 	
 	public void ReloadSkeleton() {
-			skeleton_loaded = false;
-			LoadSkeleton ();
+		skeleton_loaded = false;
+		joint_positions_depth = null;
+
+		// Se rappeler des dernieres positions pour voir s'il y a un changement.
+		previous_joint_positions = joint_positions;
+
+		LoadSkeleton ();
 	}
 
 	private void LoadSkeleton() {
@@ -162,6 +167,23 @@ namespace KinectHelpers
 			KinectPowerInterop.GetBonesOrientation(skeleton_id, bone_orientations);
 		
 		skeleton_loaded = true;
+
+		// Determiner si le squelette est different de la derniere fois.
+		is_different = false;
+		if (previous_joint_positions == null) {
+			is_different = true;
+		} else {
+			for (int i = 0; i < joint_positions.Length; ++i) {
+				if (joint_positions[i] != previous_joint_positions[i]) {
+					is_different = true;
+					break;
+				}
+			}
+		}
+	}
+
+	public bool IsDifferent() {
+		return is_different;
 	}
 
     public void LoadSkeletonDepth()
@@ -186,6 +208,10 @@ namespace KinectHelpers
 	private KinectPowerInterop.NuiSkeletonBoneOrientation[] bone_orientations;
     private int[] joint_positions_depth;
     private JointStatus[] joint_status;
-		private bool is_face_tracking;
+	private bool is_face_tracking;
+
+	private float[] previous_joint_positions;
+
+	private bool is_different = false;
   }
 }

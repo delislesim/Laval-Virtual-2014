@@ -31,7 +31,6 @@ public class MoveJoints : MonoBehaviour {
 	//Private
 	private Skeleton m_player_one;
 	private GameObject[] joints;
-	private Vector3[] temp_positions;
 	private Vector3[] current_positions;
 	private Vector3[] last_positions;
 	private Quaternion[] current_rotations;
@@ -53,7 +52,7 @@ public class MoveJoints : MonoBehaviour {
 	private float kDeplacementMaxTete = 10.0f;
 
 	// Vitesse de rotation maximale de la caméra, en degres par deltaTime.
-	private float kRotationMaxTete = 10.0f;
+	//private float kRotationMaxTete = 10.0f;
 
 	// Camera principale du jeu.
 	private Camera mainCamera;
@@ -76,7 +75,6 @@ public class MoveJoints : MonoBehaviour {
 
 		last_positions = new Vector3[(int)Skeleton.Joint.Count];
 		current_positions = new Vector3[(int)Skeleton.Joint.Count];
-		temp_positions = new Vector3[(int)Skeleton.Joint.Count];
 
 		last_rotations = new Quaternion[(int)Skeleton.Joint.Count];
 		current_rotations = new Quaternion[(int)Skeleton.Joint.Count];
@@ -88,13 +86,18 @@ public class MoveJoints : MonoBehaviour {
 
 		// Layer des colliders de drum components.
 		drumComponentLayer = 1 << LayerMask.NameToLayer ("DrumComponent");
+
+		// Charger le squelette.
+		m_player_one = new Skeleton(0);
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () {
 		//Create valid skeleton with joints positions/rotations
-		m_player_one = new Skeleton(0);
-		moveJoints (m_player_one);
+		m_player_one.ReloadSkeleton ();
+		if (m_player_one.IsDifferent()) {
+			moveJoints (m_player_one);
+		}
 	}
 
 	public void AssignerCamera(Camera mainCamera) {
@@ -103,7 +106,8 @@ public class MoveJoints : MonoBehaviour {
 
 	bool SkeletonIsTrackedAndValid()
 	{
-		float distHipHead = Vector3.Distance(current_positions[(int)Skeleton.Joint.HipCenter], current_positions[(int)Skeleton.Joint.Head]);
+		float distHipHead = Vector3.Distance(current_positions[(int)Skeleton.Joint.HipCenter],
+		                                     current_positions[(int)Skeleton.Joint.Head]);
 
 		//Check if hip joint is at reasonable distance from kinect (drum)
 		//Check if dist hip to head is reasonable (no mini ghost) skeleton
@@ -119,29 +123,19 @@ public class MoveJoints : MonoBehaviour {
 
 		// Obtenir toutes les positions courantes.
 		for (int i = 0; i < jointsCount; ++i) {
-			Vector3 posJoint;
-			Skeleton.JointStatus jointStatus = player.GetJointPosition((Skeleton.Joint)i, out posJoint);
-
-			if(jointStatus != Skeleton.JointStatus.NotTracked && player.Exists()) {
-				temp_positions[i] = WorldPositionFromKinectPosition(posJoint);
-			} else {
-				temp_positions[i] = HIDING_POS;
-			}
-		}
-
-		// Abandonner si les positions sont les memes que la derniere fois.
-		if (ArraysEqual (temp_positions, current_positions)) {
-			return;
-		}
-
-		// Mettre les positions dans le tableau de positions a traiter.
-		for (int i = 0; i < jointsCount; ++i) {
 			// Store last positions/rotations
 			last_positions[i] = current_positions[i];
 			last_rotations[i] = current_rotations[i];
 
-			// Store current position.
-			current_positions[i] = temp_positions[i];
+			// Get new position.
+			Vector3 posJoint;
+			Skeleton.JointStatus jointStatus = player.GetJointPosition((Skeleton.Joint)i, out posJoint);
+
+			if(jointStatus != Skeleton.JointStatus.NotTracked && player.Exists()) {
+				current_positions[i] = WorldPositionFromKinectPosition(posJoint);
+			} else {
+				current_positions[i] = HIDING_POS;
+			}
 		}
 
 		// Determiner si le squelette est valide.
