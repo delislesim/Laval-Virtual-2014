@@ -22,7 +22,7 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 	private Vector3 DEFAULT_GUIT_ROT;
 
 	public void Prepare() {
-		KinectPowerInterop.SetKinectAngle (15);
+		KinectPowerInterop.SetKinectAngle (10);
 	}
 
 	private void Start(){

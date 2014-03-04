@@ -101,7 +101,7 @@ public class GuitarPlayer : MonoBehaviour {
 			int octave = AssistedCtrl.getCurrentOctave();
 			int idx = 0;
 			level = level / 2; //Max level = 2, should be 0 or 1
-
+			//Debug.Log ("Octave : " + octave);
 			if(style == Style.NOTE){
 				switch(level){
 				case 0:

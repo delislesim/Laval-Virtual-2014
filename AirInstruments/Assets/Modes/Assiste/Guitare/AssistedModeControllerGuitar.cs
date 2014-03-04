@@ -19,6 +19,7 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 	public void StartSong()
 	{
 		HasStarted = true;
+		audio.volume = 0.4f;
 		audio.Play();
 	}
 
@@ -45,7 +46,7 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 			// Temps actuel, en secondes.
 			//Set le tone et style de la note a jouer
 			tempsEcoule = tempsEcoule + Time.deltaTime;
-
+			//Debug.Log("Temps ecoulé : " + tempsEcoule);
 			if (tempsEcoule > partition[currentPartitionIndex+1].time)
 			{
 				tempsNotes = tempsNotes + partition[currentPartitionIndex+1].time;

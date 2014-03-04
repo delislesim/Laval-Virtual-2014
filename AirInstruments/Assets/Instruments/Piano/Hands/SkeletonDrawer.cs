@@ -40,7 +40,7 @@ public class SkeletonDrawer : MonoBehaviour {
 		PlacerCylindres();
 	}
 
-
+	//TODO : avoir un tableau de listes pour avoir une seule boucle for double (imbriquée)
 	void PlacerCylindres()
 	{
 		int i = 0;
