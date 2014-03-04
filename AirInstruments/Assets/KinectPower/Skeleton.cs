@@ -140,6 +140,11 @@ namespace KinectHelpers
 			return fixedRot;
 	}
 	
+	public void ReloadSkeleton() {
+			skeleton_loaded = false;
+			LoadSkeleton ();
+	}
+
 	private void LoadSkeleton() {
 		if (skeleton_loaded)
 			return;

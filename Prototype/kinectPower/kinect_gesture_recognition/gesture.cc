@@ -6,7 +6,7 @@ Gesture::Gesture()
   achievedSteps_[1] = 0;
 }
 
-void Gesture::setNbSteps(unsigned int* nbSteps )
+void Gesture::setNbSteps(unsigned int nbSteps )
 {
   nbSteps_ = nbSteps;
 }

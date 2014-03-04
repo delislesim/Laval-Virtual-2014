@@ -1,32 +1,42 @@
 ﻿using UnityEngine;
 using System.Collections;
+using KinectHelpers;
+using System.Collections.Generic;
+
+public enum GestureId
+{
+	NO_GESTURE = -1, 
+	GESTURE_PIANO = 0
+}
 
 public class GestureRecognition : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-	
+		AddGesture (new GesturePiano ());
 	}
 	
 	// Update is called once per frame
 	void Update () {
-
+		skeleton_.ReloadSkeleton ();
+		GestureId currentId = GestureId.NO_GESTURE;
 		// Poll gesture controller to see if a gesture has been detected
-		int[] gestureId = {-1};
-		KinectPowerInterop.GetGestureStatus(gestureId);
+		foreach(Gesture gesture in gestureList)
+		{
+		   if(gesture.trackGesture(skeleton_))
+				currentId = gesture.GestureId_;
+		}
+		//print(currentId);
 		//print(gestureId[0]);
 	}
 
-	void OnGUI () {
-		if (left_hand_visible)
-			;//GUI.DrawTexture (new Rect (left_hand_position.x * 200 + 300, left_hand_position.y * 200 + 300, 50, 50), handTexture);
+	void AddGesture(Gesture gesture)
+	{
+		gestureList.Add(gesture);
 	}
 
-	public Texture handTexture;
+	Skeleton skeleton_ = new Skeleton(0);
 
-	bool left_hand_visible = false;
-	//bool right_hand_visible = false;
-	
-	Vector2 left_hand_position = new Vector2 ();
-	Vector2 right_hand_position = new Vector2 ();
+	List<Gesture> gestureList = new List<Gesture>();
+
 }

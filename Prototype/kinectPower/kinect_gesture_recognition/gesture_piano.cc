@@ -1,10 +1,13 @@
 #include "gesture_piano.h"
+#include <iostream>
 
-PianoGesture::PianoGesture()
+PianoGesture::PianoGesture() : elapsedTimeSinceLastMove_(0), currentMove_(NO_MOVE_DETECTED), nbLateralMoves_(0)
 {
   nbSteps_ = new unsigned int[2];
   nbSteps_[0] = 30;
   nbSteps_[1] = 30;
+  lastMoveHandXPosition_[0] = 0;
+  lastMoveHandXPosition_[1] = 0;
 }
 
 bool PianoGesture::trackGesture( const kinect_wrapper::KinectSkeletonFrame& frame, const kinect_wrapper::KinectSensorData& data )
@@ -62,19 +65,68 @@ bool PianoGesture::trackGesture( const kinect_wrapper::KinectSkeletonFrame& fram
     float upperLimit = headPos.val[1];//((avgShouldPos[1] - avgHipPos[1]) * (2.0f/3.0f)) + avgHipPos[1];
     float lowerLimit = ((avgHipPos.val[1] - avgKneePos.val[1]) * (2.0f/3.0f)) + avgKneePos.val[1];
 
-    // Verify that hands are within allowed bounds 
-    if(lowerLimit > leftHandPos.val[1] || lowerLimit > rightHandPos.val[1] || leftHandPos.val[1] > upperLimit || rightHandPos.val[1] > upperLimit)
+    bool isInLimits = lowerLimit < leftHandPos.val[1] && lowerLimit < rightHandPos.val[1] && leftHandPos.val[1] < upperLimit && rightHandPos.val[1] < upperLimit;
+
+    switch(currentMove_)
     {
-      achievedSteps_[i] = 0;
-      continue;
+    case NO_MOVE_DETECTED:
+      if(isInLimits)
+      {
+        currentMove_ = HANDS_PLACED;
+        updateHandPositionX(rightHandPos[0], leftHandPos[0]);
+
+        std::cout << "Move" << (int)currentMove_ << "detected"<< std::endl;
+      }
+      break;
+    case HANDS_PLACED:
+      if((abs(rightHandPos[0] - lastMoveHandXPosition_[0]) >= LATERAL_MOVEMENT || abs(leftHandPos[0] - lastMoveHandXPosition_[1]) >= LATERAL_MOVEMENT) && isInLimits)
+      {
+        elapsedTimeSinceLastMove_ = 0;
+        currentMove_ = FIRST_LATERAL_MOVE;
+        updateHandPositionX(rightHandPos[0], leftHandPos[0]);
+        nbLateralMoves_++;
+        std::cout << "Move" << (int)currentMove_ << "detected"<< std::endl;
+      }
+      else
+      {
+        elapsedTimeSinceLastMove_ += 1/FRAME_PER_SECONDS;
+      }
+      break;
+    case FIRST_LATERAL_MOVE:
+      if(nbLateralMoves_ + 1 == MOVES_NUMBER)
+      {
+        elapsedTimeSinceLastMove_ = 0;
+        currentMove_ = NO_MOVE_DETECTED;
+        std::cout << "Final Move" << "detected" << std::endl;
+        return true;
+      }
+      bool hasMovedLaterally = (abs(rightHandPos[0] - lastMoveHandXPosition_[0]) >= LATERAL_MOVEMENT || abs(leftHandPos[0] - lastMoveHandXPosition_[1]) >= LATERAL_MOVEMENT);
+      if(hasMovedLaterally && isInLimits)
+      {
+        nbLateralMoves_++;
+        updateHandPositionX(rightHandPos[0], leftHandPos[0]);
+        elapsedTimeSinceLastMove_ = 0;
+        std::cout << "Move" << (int)currentMove_ << "detected"<< std::endl;
+      }
+      else
+      {
+        elapsedTimeSinceLastMove_ += 1/FRAME_PER_SECONDS;
+      }
+      break;
     }
+  }
 
-    achievedSteps_[i]++;
-
-    if(achievedSteps_[i] == nbSteps_[i])
-      return true;
-    else
-      return false;
+  if(elapsedTimeSinceLastMove_ > GESTURE_TIMEOUT)
+  {
+    currentMove_ = NO_MOVE_DETECTED;
+    elapsedTimeSinceLastMove_ = 0;
   }
   return false;
 }
+
+void PianoGesture::updateHandPositionX( float rightHandPos, float leftHandPos )
+{
+  lastMoveHandXPosition_[0] = rightHandPos;
+  lastMoveHandXPosition_[1] = leftHandPos;
+}
+
