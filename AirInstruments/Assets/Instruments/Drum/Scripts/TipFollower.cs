@@ -25,38 +25,37 @@ public class TipFollower : MonoBehaviour {
 
 		// Si on a joue un drum component recemment, s'assurer qu'on s'en eloigne avant de le rejouer.
 		if (dernierDrumComponent != null) {
-			float distance = (pointCollision - transform.position).magnitude;
+			float distance = dernierDrumComponent.DistanceToPoint(transform.position);
+			//Debug.Log(distance);
 
 			if (distance > distanceDernierDrumComponent + kDistancePourRejouer) {
 				dernierDrumComponent = null;
-			} else if (distance < distanceDernierDrumComponent) {
+			} else if (distance < distanceDernierDrumComponent && distance >= 0) {
 				distance = distanceDernierDrumComponent;
 			}
 
-			//Debug.Log("dist: " + distance + "pos: " + transform.position + " plusPres: " + pointLePlusPres);
 		}
 
 		// Verifier si on a fait une collision depuis la derniere fois.
 		Vector3 direction = transform.position - lastPosition;
 		RaycastHit hitInfo;
 		if (Physics.Raycast (lastPosition, direction, out hitInfo, direction.magnitude + rayon * kMultiplicateurRayon, drumComponentLayer)) {
-			// Retrouver la game object et le script du drum component touché.
+
 			GameObject drumComponentGameObject = hitInfo.collider.gameObject;
-			DrumComponent drumComponent = (DrumComponent)drumComponentGameObject.GetComponent(typeof(DrumComponent));
-
-
-			if (drumComponent != dernierDrumComponent) {
-				drumComponent.PlaySound();
+			ComponentInterface componentInterface = (DrumComponent)drumComponentGameObject.GetComponent(typeof(DrumComponent));
+			if (componentInterface == null) {
+				componentInterface = (HighHatComponent)drumComponentGameObject.GetComponent(typeof(HighHatComponent));
+			}
+			
+			if (componentInterface != dernierDrumComponent) {
+				// Jouer le son.
+				componentInterface.PlaySound();
 
 				// Se rappeler que l'on a joue ce component.
-				dernierDrumComponent = drumComponent;
-				pointCollision = hitInfo.point;
-				distanceDernierDrumComponent = (pointCollision - transform.position).magnitude;
+				dernierDrumComponent = componentInterface;
+				distanceDernierDrumComponent = componentInterface.DistanceToPoint(transform.position);
 			}
 		}
-	}
-
-	void OnEnable () {
 	}
 
 	// Derniere position du tip.
@@ -69,16 +68,13 @@ public class TipFollower : MonoBehaviour {
 	const float kMultiplicateurRayon = 4.0f;
 
 	// Dernier drum component a avoir ete joue.
-	DrumComponent dernierDrumComponent;
+	ComponentInterface dernierDrumComponent;
 
-	// Point de collision avec le dernier drum component.
-	Vector3 pointCollision;
-
-	// Distance lorsque le dernier drum component a ete joue.
+	// Distance entre le bout de la baguette et le drum component lors de l'impact.
 	float distanceDernierDrumComponent;
 
 	// Distance dont il faut s'eloigner du drum component pour le rejouer.
-	const float kDistancePourRejouer = 0.05f;
+	const float kDistancePourRejouer = 0.1f;
 
 	// Layer des colliders de drum components.
 	int drumComponentLayer;
