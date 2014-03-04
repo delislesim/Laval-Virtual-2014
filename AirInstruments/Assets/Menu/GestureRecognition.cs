@@ -6,7 +6,8 @@ using System.Collections.Generic;
 public enum GestureId
 {
 	NO_GESTURE = -1, 
-	GESTURE_PIANO = 0
+	GESTURE_PIANO = 0,
+	GESTURE_MENU = 1
 }
 
 public class GestureRecognition : MonoBehaviour {
@@ -14,6 +15,7 @@ public class GestureRecognition : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		AddGesture (new GesturePiano ());
+		AddGesture (new GestureMenu ());
 	}
 	
 	// Update is called once per frame

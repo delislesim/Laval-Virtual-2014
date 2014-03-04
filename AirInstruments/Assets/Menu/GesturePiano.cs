@@ -71,7 +71,10 @@ public class GesturePiano : Gesture {
 		float lowerLimit = ((avgHipPos[1] - avgKneePos[1]) * (2.0f/3.0f)) + avgKneePos[1];
 		
 		bool isInLimits = lowerLimit < leftHandPos[1] && lowerLimit < rightHandPos[1] && leftHandPos[1] < upperLimit && rightHandPos[1] < upperLimit;
-		
+
+		//Debug.Log ("Left hand : " + leftHandPos [0] + " " + leftHandPos [1] + "\n");
+		//Debug.Log ("Right hand : " + rightHandPos [0] + " " + rightHandPos [1] + "\n");
+
 		switch(currentMove_)
 		{
 		case PianoMove.NO_MOVE_DETECTED:
