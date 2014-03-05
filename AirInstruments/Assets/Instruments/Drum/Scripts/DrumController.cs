@@ -23,12 +23,12 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 	void OnEnable() {
 		dude.gameObject.SetActive (true);
 
+		// Mettre la tete du drummer a la position de la camera.
+		teteDrummer.transform.position = mainCamera.transform.position;
+
 		// Prendre le controle de la camera.
 		mainCamera.transform.parent = teteDrummer.transform;
 		mainCamera.transform.localPosition = Vector3.zero;
-
-		// Fournir la camera au controleur du squelette.
-		jointsController.AssignerCamera (mainCamera);
 	}
 	
 	// Methode appelee quand l'instrument "drum" n'est plus choisi.

@@ -6,47 +6,40 @@ public class CameraController : MonoBehaviour {
 	// Camera du jeu.
 	public Camera mainCamera;
 
-	// Field of view par defaut.
-	public float defaultFieldOfView;
-
-	// Field of view du piano.
-	public float pianoFieldOfView;
-
-	// Vitesse de changement du field of view, en unités par deltaTime.
-	public float fieldOfViewSpeed;
-
 	// Vitesse de rotation, en degrés par deltaTime.
 	public float rotationSpeed;
-
-	void Start () {
-		// Zoom par défaut.
-		targetFieldOfView = defaultFieldOfView;
-
-		// Se rappeler de la rotation initiale.
-		chooseInstrumentRotation = mainCamera.transform.rotation;
-	}
 
 	// Update is called once per frame.
 	void Update () {
 		// Ajustements du zoom.
 		float mainCameraFieldOfView = mainCamera.fieldOfView;
 		if (mainCamera.fieldOfView != targetFieldOfView) {
+			// Accelerer la vitesse du zoom.
+			if (vitesseFovActuelle < kFieldOfViewSpeed) {
+				vitesseFovActuelle += kAccelerationFov * Time.deltaTime;
+				if (vitesseFovActuelle > kFieldOfViewSpeed)
+					vitesseFovActuelle = kFieldOfViewSpeed;
+			}
+
+			// Changer le zoom.
 			Vector2 fovActuel = new Vector2(mainCameraFieldOfView, 0);
 			Vector2 fovTarget = new Vector2(targetFieldOfView, 0);
-			Vector2 newFov = Vector2.MoveTowards(fovActuel, fovTarget, fieldOfViewSpeed * Time.deltaTime);
+			Vector2 newFov = Vector2.MoveTowards(fovActuel, fovTarget, vitesseFovActuelle * Time.deltaTime);
 			mainCamera.fieldOfView = newFov.x;
+
+			// Si on a atteint notre cible, la vitesse de changement du fov devient nulle.
+			if (mainCamera.fieldOfView == targetFieldOfView) {
+				vitesseFovActuelle = 0;
+			}
 		}
 
 		// Ajustements de la rotation.
-		if (targetRotation != Quaternion.identity) {
+		if (ajusterRotation) {
 			Quaternion rotActuel = mainCamera.transform.rotation;
 			Quaternion newRot = Quaternion.RotateTowards(rotActuel,
 			                                             targetRotation,
 			                                             rotationSpeed);
 			mainCamera.transform.rotation = newRot;
-			if (newRot == targetRotation) {
-				targetRotation = Quaternion.identity;
-			}
 		}
 	}
 
@@ -57,61 +50,108 @@ public class CameraController : MonoBehaviour {
 
 	// Deplace la camera entre les etats specifies.
 	public void AccederEtat (GameState.State from, GameState.State to) {
+		ajusterRotation = false;
+
 		// Remettre la caméra dans le monde global.
 		ReprendreCamera ();
-
-		// Par défaut, on met le zoom par défaut.
-		targetFieldOfView = defaultFieldOfView;
-
+		
 		// Aller de unknown (au debut) vers le menu de choix d'instrument.
 		if (from == GameState.State.Unknown &&
 		    to == GameState.State.ChooseInstrument) {
+			targetRotation = Quaternion.Euler(kAngleChooseInstrument);
+			targetFieldOfView = kFovChoixInstrument;
 			GameState.ObtenirInstance().OnCompleteTransition();
 		}
 		// Aller vers le drum.
 		else if (from == GameState.State.ChooseInstrument &&
 		    to == GameState.State.Drum) {
 			iTweenEvent.GetEvent(mainCamera.gameObject, "trajectoireVersDrum").Play();
+			targetRotation = Quaternion.Euler(kAngleDrum);
+			targetFieldOfView = kFovDrum;
 		}
 		// Aller vers le piano.
 		else if (from == GameState.State.ChooseInstrument &&
 		         to == GameState.State.Piano) {
 			iTweenEvent.GetEvent(mainCamera.gameObject, "trajectoireVersPiano").Play();
-			targetFieldOfView = pianoFieldOfView;
+			targetRotation = Quaternion.Euler(kAnglePiano);
+			targetFieldOfView = kFovPiano;
 		}
 		// Aller vers la guitare.
 		else if (from == GameState.State.ChooseInstrument &&
 		    	 to == GameState.State.Guitar) {
 			iTweenEvent.GetEvent(mainCamera.gameObject, "trajectoireVersGuitare").Play();
+			targetRotation = Quaternion.Euler(kAngleGuitare);
+			targetFieldOfView = kFovGuitare;
 		}
 		// Quitter le drum.
 		else if (to == GameState.State.ChooseInstrument &&
 		         from == GameState.State.Drum) {
 			iTweenEvent.GetEvent(mainCamera.gameObject, "trajectoireQuitterDrum").Play();
+			targetRotation = Quaternion.Euler(kAngleChooseInstrument);
+			targetFieldOfView = kFovChoixInstrument;
 		}
 		// Quitter le piano.
 		else if (to == GameState.State.ChooseInstrument &&
 		         from == GameState.State.Piano) {
 			iTweenEvent.GetEvent(mainCamera.gameObject, "trajectoireQuitterPiano").Play();
+			targetRotation = Quaternion.Euler(kAngleChooseInstrument);
+			targetFieldOfView = kFovChoixInstrument;
 		}
 		// Quitter la guitare.
 		else if (to == GameState.State.ChooseInstrument &&
 		         from == GameState.State.Guitar) {
 			iTweenEvent.GetEvent(mainCamera.gameObject, "trajectoireQuitterGuitare").Play();
+			targetRotation = Quaternion.Euler(kAngleChooseInstrument);
+			targetFieldOfView = kFovChoixInstrument;
 		}
 
 	}
 
-	public void RegarderPositionDefaut() {
-		targetRotation = chooseInstrumentRotation;
+	public void AjusterRotation() {
+		ajusterRotation = true;
 	}
+
+	// Indique si on doit ajuster la rotation de la caméra. On n'ajuste pas
+	// la rotation pendant les animations.
+	private bool ajusterRotation = false;
 
 	// Field of view que la caméra doit atteindre.
 	private float targetFieldOfView;
 
-	// Angle de la caméra lors du menu de sélection d'instrument.
-	private Quaternion chooseInstrumentRotation;
-
 	// Angle que la caméra doit atteindre.
 	private Quaternion targetRotation = Quaternion.identity;
+
+	// Vitesse actuelle de changement du FOV.
+	private float vitesseFovActuelle = 0;
+
+	// FOV du menu de choix d'instrument.
+	private const float kFovChoixInstrument = 35.3f;
+
+	// Angle de la caméra lors du menu de choix d'instrument.
+	private Vector3 kAngleChooseInstrument = new Vector3 (15f, 0, 0);
+
+	// FOV du drum.
+	private const float kFovDrum = 76.2f;
+
+	// Angle de la caméra lors du drum.
+	private Vector3 kAngleDrum = new Vector3(14.15093f, 0, 0);
+
+	// FOV du piano.
+	private const float kFovPiano = 44.9f;
+	
+	// Angle de la caméra lors du piano.
+	private Vector3 kAnglePiano = new Vector3(0, 0, 0);
+
+	// FOV de la guitare.
+	private const float kFovGuitare = 76.2f;
+
+	// Angle de la caméra lors de la guitare.
+	private Vector3 kAngleGuitare = new Vector3(0, 0, 0);
+
+	// Vitesse de changement du field of view, en unités par deltaTime.
+	public const float kFieldOfViewSpeed = 10.0f;
+
+	// Acceleration pour changer FOV.
+	public const float kAccelerationFov = 6.0f;
+
 }

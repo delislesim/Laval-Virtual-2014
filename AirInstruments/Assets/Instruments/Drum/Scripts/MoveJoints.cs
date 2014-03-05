@@ -51,20 +51,12 @@ public class MoveJoints : MonoBehaviour {
 	// Deplacement maximum de la tete par deltaTime.
 	private float kDeplacementMaxTete = 10.0f;
 
-	// Vitesse de rotation maximale de la caméra, en degres par deltaTime.
-	//private float kRotationMaxTete = 10.0f;
-
-	// Camera principale du jeu.
-	private Camera mainCamera;
-
 	//Hand freeze info
 	private bool right_hand_freez_speedY_positive;
 	private bool left_hand_freez_speedY_positive;
 
 	// Use this for initialization
 	void Start () {
-		targetRotationCamera.eulerAngles = new Vector3 (-10.0f, 0, 0);
-
 		joints = new GameObject[(int)Skeleton.Joint.Count] {
 			Hip_Center, Spine, Shoulder_Center, Head,
 			Shoulder_Left, Elbow_Left, Wrist_Left, Hand_Left,
@@ -98,10 +90,6 @@ public class MoveJoints : MonoBehaviour {
 		if (m_player_one.IsDifferent()) {
 			moveJoints (m_player_one);
 		}
-	}
-
-	public void AssignerCamera(Camera mainCamera) {
-		this.mainCamera = mainCamera;
 	}
 
 	bool SkeletonIsTrackedAndValid()
@@ -163,15 +151,6 @@ public class MoveJoints : MonoBehaviour {
 				                                                   targetPosition,
 				                                                   kDeplacementMaxTete * Time.deltaTime);
 
-				// Si on a une camera, faire la rotation.
-				if (mainCamera != null) {
-					Quaternion rotationCamera = mainCamera.transform.rotation;
-					/*
-					mainCamera.transform.rotation = Quaternion.RotateTowards(rotationCamera,
-					                                                         targetRotationCamera,
-					                                                         kRotationMaxTete * Time.deltaTime);*/
-				}
-
 				/* TODO: Face tracker.
 				Quaternion faceRotation = player.GetFaceRotation();
 				if(player.GetFaceTrackingStatus())
@@ -182,9 +161,11 @@ public class MoveJoints : MonoBehaviour {
 				*/
 			} else {
 				if (i == (int)Skeleton.Joint.HandRight || i == (int)Skeleton.Joint.HandLeft) {
-					DrumHand drumHand = joints [i].GetComponent<DrumHand>();
-					drumHand.MettreAJour(current_positions[i],
-					                     player.GetBoneOrientation ((Skeleton.Joint)i).eulerAngles);
+					if (current_positions[i] != HIDING_POS) {
+						DrumHand drumHand = joints [i].GetComponent<DrumHand>();
+						drumHand.MettreAJour(current_positions[i],
+						                     player.GetBoneOrientation ((Skeleton.Joint)i).eulerAngles);
+					}
 				} else {
 					joints[i].transform.position = current_positions[i];
 				}
@@ -261,9 +242,6 @@ public class MoveJoints : MonoBehaviour {
 		}
 		           
 	}
-
-	// Cible de rotation de la camera.
-	private Quaternion targetRotationCamera = Quaternion.identity;
 
 	// Layer des colliders de drum components.
 	private int drumComponentLayer;

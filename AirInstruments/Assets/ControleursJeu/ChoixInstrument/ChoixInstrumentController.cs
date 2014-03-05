@@ -40,9 +40,6 @@ public class ChoixInstrumentController : MonoBehaviour {
 	}
 
 	void OnEnable () {
-		// Ajuster l'angle de la camera Unity.
-		cameraController.RegarderPositionDefaut();
-
 		// Inserer les cibles possibles pour la main.
 		Pointeur pointeur = Pointeur.obtenirInstance ();
 		pointeur.RemoveAllTargets ();
