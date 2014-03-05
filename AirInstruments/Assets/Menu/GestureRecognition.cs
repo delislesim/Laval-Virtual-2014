@@ -12,7 +12,23 @@ public enum GestureId
 }
 
 public class GestureRecognition : MonoBehaviour {
-	
+
+	public GestureRecognition() {
+		// Conserver une reference a l'instance unique de reconnaisseur
+		// de gestes.
+		instance = this;
+	}
+
+	// Retourne l'instance unique du reconnaisseur de gestes.
+	public static GestureRecognition ObtenirInstance() {
+		return instance;
+	}
+
+	// Retourne le geste effectue a l'image courante.
+	public GestureId GetCurrentGesture() {
+		return currentId;
+	}
+
 	// Use this for initialization
 	void Start () {
 		AddGesture (new GesturePiano ());
@@ -23,12 +39,15 @@ public class GestureRecognition : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		skeleton_.ReloadSkeleton ();
-		GestureId currentId = GestureId.NO_GESTURE;
+
+		currentId = GestureId.NO_GESTURE;
 		// Poll gesture controller to see if a gesture has been detected
 		foreach(Gesture gesture in gestureList)
 		{
-		   if(gesture.trackGesture(skeleton_))
+		   if(gesture.trackGesture(skeleton_)) {
 				currentId = gesture.GestureId_;
+				Debug.Log ("Gesture: " + currentId);
+			}
 		}
 		//print(currentId);
 		//print(gestureId[0]);
@@ -39,8 +58,12 @@ public class GestureRecognition : MonoBehaviour {
 		gestureList.Add(gesture);
 	}
 
-	Skeleton skeleton_ = new Skeleton(0);
+	private Skeleton skeleton_ = new Skeleton(0);
 
-	List<Gesture> gestureList = new List<Gesture>();
+	private List<Gesture> gestureList = new List<Gesture>();
+
+	private GestureId currentId = GestureId.NO_GESTURE;
+
+	private static GestureRecognition instance;
 
 }

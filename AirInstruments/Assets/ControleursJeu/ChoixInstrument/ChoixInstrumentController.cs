@@ -11,6 +11,12 @@ public class ChoixInstrumentController : MonoBehaviour {
 		KinectPowerInterop.SetKinectAngle (15);
 	}
 
+	public void PrepareToStop() {
+		// Des que l'animation de camera pour aller vers un instrument
+		// commence, on se desactive.
+		gameObject.SetActive (false);
+	}
+
 	// Use this for initialization
 	void Start () {
 		
@@ -18,6 +24,7 @@ public class ChoixInstrumentController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+
 		// Verifier s'il y a un choix d'instrument actif.
 		Pointeur pointeur = Pointeur.obtenirInstance ();
 		int targetid = pointeur.GetCurrentTargetId ();
@@ -44,14 +51,14 @@ public class ChoixInstrumentController : MonoBehaviour {
 		Pointeur pointeur = Pointeur.obtenirInstance ();
 		pointeur.RemoveAllTargets ();
 		pointeur.AddTarget (kDrumTargetId,
-		                   new Vector2 (0.6f, -0.6f),
-		                   new Vector2 (0.4f, 1.0f));
+		                   new Vector2 (0.9f, 0.3f),
+		                   new Vector2 (0.4f, 0.4f));
 		pointeur.AddTarget (kGuitarTargetId,
-		                    new Vector2 (-0.3f, -0.4f),
-		                    new Vector2 (0.4f, 1.0f));
+		                    new Vector2 (2.1f, 0.4f),
+		                    new Vector2 (0.4f, 0.4f));
 		pointeur.AddTarget (kPianoTargetId,
-		                    new Vector2 (1.8f, -0.3f),
-		                    new Vector2 (0.4f, 1.0f));
+		                    new Vector2 (-0.5f, 0.5f),
+		                    new Vector2 (0.4f, 0.4f));
 
 		// Activer le pointeur.
 		pointeur.gameObject.SetActive (true);

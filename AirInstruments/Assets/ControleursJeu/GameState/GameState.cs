@@ -37,12 +37,22 @@ public class GameState : MonoBehaviour {
 		// Changements d'etat a l'aide du clavier.
 		if (Input.GetButtonDown("ChoixInstrument")) {
 			AccederEtat (State.ChooseInstrument);
+			return;
 		} else if (Input.GetButtonDown("Piano")) {
 			AccederEtat (State.Piano);
+			return;
 		} else if (Input.GetButtonDown("Drum")) {
 			AccederEtat (State.Drum);
+			return;
 		} else if (Input.GetButtonDown("Guitare")) {
 			AccederEtat (State.Guitar);
+			return;
+		}
+
+		// Retour au menu de choix d'instrument a l'aide d'un geste.
+		if (GestureRecognition.ObtenirInstance ().GetCurrentGesture () == GestureId.GESTURE_MENU) {
+			AccederEtat (State.ChooseInstrument);
+			return;
 		}
 
 		// La guitare a besoin de continuer a animer son spot apres la
@@ -58,9 +68,11 @@ public class GameState : MonoBehaviour {
 			return;
 		}
 
+		transitionTerminee = false;
+
 		previousState = currentState;
 
-		// Voler la camera et lui faire reprendre son angle.
+		// Voler la camera a la tete du drummer.
 		cameraController.ReprendreCamera ();
 
 		// Arreter l'etat presentement actif.
@@ -70,9 +82,9 @@ public class GameState : MonoBehaviour {
 			pianoController.PrepareToStop();
 		} else if (previousState == State.Guitar) {
 			guitareController.PrepareToStop();			
+		} else if (previousState == State.ChooseInstrument) {
+			choixInstrumentControleur.PrepareToStop();
 		}
-
-		transitionTerminee = false;
 
 		// Activer le nouvel etat.
 		currentState = state;
@@ -80,25 +92,21 @@ public class GameState : MonoBehaviour {
 
 			cameraController.AccederEtat(previousState, State.ChooseInstrument);
 			choixInstrumentControleur.Prepare();
-			Debug.Log("Aller au choix d'instrument.");
 
 		} else if (currentState == State.Piano) {
 
 			cameraController.AccederEtat(previousState, State.Piano);
 			pianoController.Prepare();
-			Debug.Log("Piano choisi.");
 
 		} else if (currentState == State.Drum) {
 
 			cameraController.AccederEtat(previousState, State.Drum);
 			drumController.Prepare();
-			Debug.Log("Drum choisi.");
 
 		} else if (currentState == State.Guitar) {
 
 			cameraController.AccederEtat(previousState, State.Guitar);
 			guitareController.Prepare();
-			Debug.Log("Guitare choisie.");
 
 		}
 	}
