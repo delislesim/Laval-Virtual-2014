@@ -11,11 +11,21 @@ public class DrumHand : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		positionInitiale = transform.position;
+		rotationInitiale = transform.rotation;
+
 		// Ignore les collisions entre les elements d'une meme main.
 		Physics.IgnoreCollision (collider, baguette);
 
 		// Initialiser Kalman.
 		kalman.SetInitialObservation (Vector4.zero);
+	}
+
+	void OnDisable () {
+		// Remettre les baguettes a leur position initiale pour que
+		// le joint soit bien connecte au redemarrage.
+		transform.position = positionInitiale;
+		transform.rotation = rotationInitiale;
 	}
 
 	public void MettreAJour(Vector3 position, Vector3 rotation) {
@@ -70,4 +80,10 @@ public class DrumHand : MonoBehaviour {
 
 	// Distance maximale pour une teleportation.
 	private const float kDistanceTeleportation = 2.0f;
+
+	// Position initiale.
+	private Vector3 positionInitiale;
+	
+	// Rotation initiale.
+	private Quaternion rotationInitiale;
 }

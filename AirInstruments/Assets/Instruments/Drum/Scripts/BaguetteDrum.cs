@@ -9,6 +9,19 @@ public class BaguetteDrum : MonoBehaviour {
 	// Bout de la baguette suppose etre dans la main.
 	public GameObject boutBaguetteMain;
 
+	void Start () {
+		Debug.Log ("start baguette");
+		positionInitiale = transform.position;
+		rotationInitiale = transform.rotation;
+	}
+
+	void OnDisable () {
+		// Remettre les baguettes a leur position initiale pour que
+		// le joint soit bien connecte au redemarrage.
+		transform.position = positionInitiale;
+		transform.rotation = rotationInitiale;
+	}
+
 	// Update is called once per frame
 	void FixedUpdate () {
 		// Bouger la baguette pour que son bout soit au centre de la main.
@@ -23,4 +36,10 @@ public class BaguetteDrum : MonoBehaviour {
 	}
 
 	private const float kVitesseBaguette = 0.25f;
+
+	// Position initiale.
+	private Vector3 positionInitiale;
+
+	// Rotation initiale.
+	private Quaternion rotationInitiale;
 }
