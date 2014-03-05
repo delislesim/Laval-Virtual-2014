@@ -60,6 +60,14 @@ public class PianoNote : MonoBehaviour {
 			angleCourant = 0;
 		}
 
+		// Si on est en train de faire le fade out du son.
+		if (estFadeout) {
+			audio.volume -= kVitesseDiminutionVolume * Time.deltaTime;
+			if (audio.volume <= 0) {
+				audio.volume = 0;
+				estFadeout = false;
+			}
+		}
 	}
 
 	public void AppliquerRotation(float angle) {
@@ -114,17 +122,20 @@ public class PianoNote : MonoBehaviour {
 
 	public void JouerSon(float volume) {
 		if (!estJouee) {
-			audio.pitch = Mathf.Pow (2.0f, ecartDemiTon / 12);
 			audio.volume = volume;
-			audio.Play ();
+			if (!estFadeout || audio.volume < 0.5f) {
+				audio.pitch = Mathf.Pow (2.0f, ecartDemiTon / 12);
+				audio.Play ();
+			}
 			estJouee = true;
+			estFadeout = false;
 		}
 	}
 
 	public void ArreterSon() {
 		if (estJouee) {
-			audio.Stop ();
 			estJouee = false;
+			estFadeout = true;
 		}
 	}
 
@@ -255,6 +266,9 @@ public class PianoNote : MonoBehaviour {
 	// Temps que la note doit etre enfoncee par erreur avant qu'on entende un son.
 	private const float kTempsEnfonceeParErreurMax = 0.3f;
 
+	// Vitesse de diminution du volume.
+	private const float kVitesseDiminutionVolume = 4.0f;
+
 	// --- Parametres qui sont definis lors de la creation de la note ---
 
 	// Coordonnées du point autour duquel la note tourne, en coordonnées locales.
@@ -281,6 +295,9 @@ public class PianoNote : MonoBehaviour {
 
 	// Indique si la note est en train de produire un son.
 	bool estJouee = false;
+
+	// Indique si on est en train de faire le fade out du son.
+	bool estFadeout = false;
 
 	// --- Parametres pour le mode assiste ---
 
