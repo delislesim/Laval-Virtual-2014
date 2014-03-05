@@ -1,7 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class MenuAssisteController : MonoBehaviour {
+
+	// Boutons.
+	public List<GameObject> boutons;
 
 	public MenuAssisteController() {
 		instance = this;
@@ -10,6 +14,16 @@ public class MenuAssisteController : MonoBehaviour {
 	// Retourne l'unique instance de cette classe.
 	public static MenuAssisteController ObtenirInstance() {
 		return instance;
+	}
+
+	// Assigne un texte a un bouton du menu.
+	public void AssignerTexte(int indexBouton, string texteHaut, string texteBas) {
+		boutons [indexBouton].GetComponent<BoutonMusique> ().AssignerTexte (texteHaut, texteBas);
+	}
+
+	// Obtient l'index du bouton presse. -1 si aucun bouton n'est presse.
+	public int ObtenirBoutonPresse() {
+		return Pointeur.obtenirInstance ().GetCurrentTargetId ();
 	}
 
 	// Use this for initialization
@@ -30,15 +44,20 @@ public class MenuAssisteController : MonoBehaviour {
 	void OnEnable () {
 		Pointeur pointeur = Pointeur.obtenirInstance ();
 
+		// Mettre les bonnes cibles pour le pointeur.
+		pointeur.RemoveAllTargets ();
+		pointeur.AddTarget (0, new Vector2 (0, 0.1f), new Vector2 (0.25f, 0.5f));
+		pointeur.AddTarget (1, new Vector2 (0.9f, -0.4f), new Vector2 (0.25f, 0.25f));
+		pointeur.AddTarget (2, new Vector2 (1.8f, -0.4f), new Vector2 (0.25f, 0.25f));
+		pointeur.AddTarget (3, new Vector2 (0.9f,  0.5f), new Vector2 (0.25f, 0.25f));
+		pointeur.AddTarget (4, new Vector2 (1.8f,  0.5f), new Vector2 (0.25f, 0.25f));
+
 		// Activer le pointeur.
 		pointeur.gameObject.SetActive (true);
 	}
-
-	void OnGUI () {
-		
-	}
 	
 	void OnDisable () {
+		// Desactive le pointeur.
 		Pointeur.obtenirInstance ().gameObject.SetActive (false);
 	}
 

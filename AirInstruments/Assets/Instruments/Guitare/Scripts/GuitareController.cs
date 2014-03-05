@@ -33,6 +33,12 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 	}
 
 	public void Update() {
+		// Retour au menu de choix d'instrument a l'aide d'un geste.
+		if (GestureRecognition.ObtenirInstance ().GetCurrentGesture () == GestureId.GESTURE_MENU) {
+			GameState.ObtenirInstance().AccederEtat (GameState.State.ChooseInstrument);
+			return;
+		}
+
 		// Faire l'animation du gigaspot qui permet de switcher la guitare subtilement.
 		tempsPreparation += Time.deltaTime;
 		if (tempsPreparation > 0) {

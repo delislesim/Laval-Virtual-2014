@@ -15,29 +15,79 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 
 	// Methode appelee quand l'instrument "piano" est choisi.
 	void OnEnable() {
-		Debug.Log ("start active");
 		pianoWrapper.SetActive (true);
-		Debug.Log ("stop active");
 	}
 	
 	// Methode appelee quand l'instrument "piano" n'est plus choisi.
 	void OnDisable () {
 		pianoWrapper.SetActive (false);
+
+		// Desactiver le menu du mode assiste.
+		MenuAssisteController.ObtenirInstance ().gameObject.SetActive (false);
+		menuModeAssisteActif = false;
 	}
 
 	// Methode appelee a chaque frame quand le piano est l'instrument courant.
 	void Update () {
+		MenuAssisteController menuAssiste = MenuAssisteController.ObtenirInstance();
+
+		// Si le menu du mode assiste est affiche, repondre aux choix de l'utilisateur.
+		if (menuModeAssisteActif) {
+			int boutonPresse = menuAssiste.ObtenirBoutonPresse();
+			switch (boutonPresse) {
+			case 0:
+				// Quitter le piano.
+				GameState.ObtenirInstance().AccederEtat(GameState.State.ChooseInstrument);
+				break;
+			case 1:
+				Debug.Log("Mode Libre");
+				break;
+			case 2:
+				Debug.Log("Fur Elise");
+				break;
+			case 3:
+				Debug.Log("Comptine d'ete");
+				break;
+			case 4:
+				Debug.Log("Boubou the Boubou");
+				break;
+			}
+
+			if (boutonPresse != -1) {
+				// Fermer le menu du mode assiste.
+				MenuAssisteController.ObtenirInstance ().gameObject.SetActive (false);
+				menuModeAssisteActif = false;
+				return;
+			}
+		}
+		
 		// Verifier si le mode assiste est demande.
-		if (Input.GetButtonDown ("MenuAssiste")) {
-			MenuAssisteController menuAssiste = MenuAssisteController.ObtenirInstance();
+		if (Input.GetButtonDown ("MenuAssiste") ||
+		    GestureRecognition.ObtenirInstance().GetCurrentGesture() == GestureId.GESTURE_MENU) {
+
+			// Mettre le texte dans les boutons du mode assiste.
+			menuAssiste.AssignerTexte(0, "Retour aux", "instruments");
+			menuAssiste.AssignerTexte(1, "Mode", "libre");
+			menuAssiste.AssignerTexte(2, "Für", "Elise");
+			menuAssiste.AssignerTexte(3, "Comptine", "d'été");
+			menuAssiste.AssignerTexte(4, "Boubou", "the Boubou");
 
 			// Positionner le menu du mode assiste.
-			menuAssiste.transform.position = new Vector3(-11.15239f, 1.369231f, -5.25142f);
-			menuAssiste.transform.eulerAngles = new Vector3(323.81f, 180f, 0);
-			menuAssiste.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
+			menuAssiste.transform.position = new Vector3(-13.40673f, 1.765814f, -13.54324f);
+			menuAssiste.transform.eulerAngles = new Vector3(324.1f, 180f, 0);
+			menuAssiste.transform.localScale = new Vector3(0.32f, 0.32f, 0.32f);
+
+			// Desactive le piano.
+			pianoWrapper.SetActive (false);
 
 			// Activer le menu du mode assiste.
 			menuAssiste.gameObject.SetActive (true);
-		}
+
+			// Se rappeler que le menu est active.
+			menuModeAssisteActif = true;
+		} 
 	}
+
+	// Indique si le menu du mode assiste est presentement affiche.
+	private bool menuModeAssisteActif = false;
 }

@@ -41,5 +41,10 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 	
 	// Methode appelee a chaque frame quand le drum est l'instrument courant.
 	void Update () {
+		// Retour au menu de choix d'instrument a l'aide d'un geste.
+		if (GestureRecognition.ObtenirInstance ().GetCurrentGesture () == GestureId.GESTURE_MENU) {
+			GameState.ObtenirInstance().AccederEtat (GameState.State.ChooseInstrument);
+			return;
+		}
 	}
 }

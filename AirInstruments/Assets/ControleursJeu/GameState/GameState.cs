@@ -49,12 +49,6 @@ public class GameState : MonoBehaviour {
 			return;
 		}
 
-		// Retour au menu de choix d'instrument a l'aide d'un geste.
-		if (GestureRecognition.ObtenirInstance ().GetCurrentGesture () == GestureId.GESTURE_MENU) {
-			AccederEtat (State.ChooseInstrument);
-			return;
-		}
-
 		// La guitare a besoin de continuer a animer son spot apres la
 		// fin de l'animation de camera.
 		if (transitionTerminee && previousState == State.Guitar) {
