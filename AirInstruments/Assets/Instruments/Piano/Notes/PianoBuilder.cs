@@ -73,6 +73,32 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 		CreerBlanche (19, clips [11], 1);  // La
 		CreerNoire   (19, clips [11], 2);  // La#
 		CreerBlanche (20, clips [11], 3);  // Si
+
+		CreerBlanche (21, clips [9], -1);  // Do
+		CreerNoire   (21, clips [9], 0);  // Do#
+		CreerBlanche (22, clips [9], 1);  // Re
+		CreerNoire   (22, clips [9], 2);  // Re#
+		CreerBlanche (23, clips [10], -1);  // Mi
+		CreerBlanche (24, clips [10], 0);  // Fa
+		CreerNoire   (24, clips [10], 1);  // Fa#
+		CreerBlanche (25, clips [11], -1);  // Sol
+		CreerNoire   (25, clips [11], 0);  // Sol#
+		CreerBlanche (26, clips [11], 1);  // La
+		CreerNoire   (26, clips [11], 2);  // La#
+		CreerBlanche (27, clips [11], 3);  // Si
+
+		CreerBlanche (28, clips [9], -1);  // Do
+		CreerNoire   (28, clips [9], 0);  // Do#
+		CreerBlanche (29, clips [9], 1);  // Re
+		CreerNoire   (29, clips [9], 2);  // Re#
+		CreerBlanche (30, clips [10], -1);  // Mi
+		CreerBlanche (31, clips [10], 0);  // Fa
+		CreerNoire   (31, clips [10], 1);  // Fa#
+		CreerBlanche (32, clips [11], -1);  // Sol
+		CreerNoire   (32, clips [11], 0);  // Sol#
+		CreerBlanche (33, clips [11], 1);  // La
+		CreerNoire   (33, clips [11], 2);  // La#
+		CreerBlanche (34, clips [11], 3);  // Si
 	}
 
 	private int countUpdate = 0;
@@ -105,11 +131,12 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 		pianoNote.ecartDemiTon = ecartDemiTon;
 
 		notes.Add (pianoNote);
-
+		/*
 		if (position < 7) {
 			// Rendre la note invisible.
 			note.transform.localPosition = kPositionInvalide;
 		}
+		*/
 	}
 
 	void CreerNoire(int position, AudioClip clip, float ecartDemiTon) {
@@ -131,10 +158,12 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 		
 		notes.Add (pianoNote);
 
+		/*
 		if (position < 7) {
 			// Rendre la note invisible.
 			note.transform.localPosition = kPositionInvalide;
 		}
+		*/
 	}
 
 	public void DefinirStatutNote(int index, PartitionPiano.StatutNote statut) {
@@ -150,10 +179,10 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 	}
 
 	// Espace horizontal entre le centre de 2 notes blanches.
-	private const float spaceBetweenWhiteNotes = 1.15f;
+	private const float spaceBetweenWhiteNotes = 1.1f;
 
 	// Espace horizontal entre le centre de 2 notes noires.
-	private const float spaceBetweenBlackNotes = 0.575f;
+	private const float spaceBetweenBlackNotes = spaceBetweenWhiteNotes / 2.0f;
 
 	// Position invalide.
 	private Vector3 kPositionInvalide = new Vector3(0, 100.0f, 0);

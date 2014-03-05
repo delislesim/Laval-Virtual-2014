@@ -3,8 +3,8 @@ using System.Collections;
 
 public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 
-	// Controleur des mains du squelette a partir des donnees de la camera d'Intel.
-	public IntelHandController intelHandController;
+	// Englobe tout ce qui doit etre active/desactive quand le piano est active/desactive.
+	public GameObject pianoWrapper;
 
 	public void Prepare() {
 		KinectPowerInterop.SetKinectAngle (15);
@@ -15,12 +15,12 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 
 	// Methode appelee quand l'instrument "piano" est choisi.
 	void OnEnable() {
-		intelHandController.gameObject.SetActive (true);
+		//pianoWrapper.SetActive (true);
 	}
 	
 	// Methode appelee quand l'instrument "piano" n'est plus choisi.
 	void OnDisable () {
-		intelHandController.gameObject.SetActive (false);
+		//pianoWrapper.SetActive (false);
 	}
 
 	// Methode appelee a chaque frame quand le piano est l'instrument courant.
