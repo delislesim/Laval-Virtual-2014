@@ -15,12 +15,14 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 
 	// Methode appelee quand l'instrument "piano" est choisi.
 	void OnEnable() {
-		//pianoWrapper.SetActive (true);
+		Debug.Log ("start active");
+		pianoWrapper.SetActive (true);
+		Debug.Log ("stop active");
 	}
 	
 	// Methode appelee quand l'instrument "piano" n'est plus choisi.
 	void OnDisable () {
-		//pianoWrapper.SetActive (false);
+		pianoWrapper.SetActive (false);
 	}
 
 	// Methode appelee a chaque frame quand le piano est l'instrument courant.
