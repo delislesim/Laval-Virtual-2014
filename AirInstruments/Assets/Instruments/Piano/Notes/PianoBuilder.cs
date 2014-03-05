@@ -74,9 +74,9 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 		CreerNoire   (19, clips [11], 2);  // La#
 		CreerBlanche (20, clips [11], 3);  // Si
 
-		CreerBlanche (21, clips [9], -1);  // Do
-		CreerNoire   (21, clips [9], 0);  // Do#
-		CreerBlanche (22, clips [9], 1);  // Re
+		CreerBlanche (21, clips [12], 1);  // Do
+		CreerNoire   (21, clips [12], 2);  // Do#
+		CreerBlanche (22, clips [12], 3);  // Re
 		CreerNoire   (22, clips [9], 2);  // Re#
 		CreerBlanche (23, clips [10], -1);  // Mi
 		CreerBlanche (24, clips [10], 0);  // Fa

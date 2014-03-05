@@ -16,11 +16,12 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 	}
 
 	// Charge un fichier de partition et demarre le mode assiste.
-	public void ChargerPartition(string fichierPartition) {
+	public void ChargerPartition(string fichierPartition, float speed) {
 		Reinitialiser ();
 
 		partition = new PartitionPiano ();
 		partition.ChargerFichier (fichierPartition);
+		this.speed = speed;
 		
 		instrumentScript = (Instrument)(instrument.GetComponent (typeof(PianoBuilder)));
 		cubesTombantsScript = (CubesTombants)(cubesTombants.GetComponent (typeof(CubesTombants)));
@@ -54,6 +55,12 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 		tempsActuel = 0.0f;
 		peutContinuer = true;
 		partition = null;
+		speed = 0;
+
+		// Mettre toutes les notes muettes.
+		for (int i = 0; i < nombreNotes; ++i) {
+			instrumentScript.DefinirStatutNote (i, PartitionPiano.StatutNote.Muette);
+		}
 	}
 
 	void Update () {
@@ -85,14 +92,41 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 				for (int i = dernierTempsJoue; i < tempsAJouerEchantillons; ++i) {
 					int tempsAJouerEchantillonsModulo = i % nombreEchantillons;
 
-					// Passer toutes les notes.
+					// Passer toutes les notes que le joueur doit jouer.
 					for (int j = 0; j < nombreNotes; ++j) {
 						// Jouer la note si necessaire.
 						PartitionPiano.StatutNote statutNote = prochainesNotes [tempsAJouerEchantillonsModulo, j];
-						instrumentScript.DefinirStatutNote (j, statutNote);
+						if (statutNote != PartitionPiano.StatutNote.Accompagnement) {
+							instrumentScript.DefinirStatutNote (j, statutNote);
+						}
+					}
 
-						// Nettoyer le tableau.
-						prochainesNotes [tempsAJouerEchantillonsModulo, j] = PartitionPiano.StatutNote.Muette;
+					// Verifier si on peut continuer.
+					bool peutContinuerARemplir = true;
+					for (int j = 0; j < nombreNotes; ++j) {
+						PianoNote note = instrumentScript.ObtenirNote(j);
+						if (!note.PeutContinuer()) {
+							peutContinuerARemplir = false;
+							break;
+						}
+					}
+
+					if (peutContinuerARemplir) {
+						// Faire l'accompagnement.
+						for (int j = 0; j < nombreNotes; ++j) {
+							PartitionPiano.StatutNote statutNote = prochainesNotes [tempsAJouerEchantillonsModulo, j];
+							
+							if (statutNote == PartitionPiano.StatutNote.Accompagnement) {
+								instrumentScript.DefinirStatutNote (j, statutNote);
+							}
+
+							// Nettoyer le tableau.
+							prochainesNotes [tempsAJouerEchantillonsModulo, j] = PartitionPiano.StatutNote.Muette;
+						}
+					} else {
+						tempsAJouerEchantillons = i;
+						tempsActuel = (tempsAttendreDebutMusique * speed) + tempsAJouerEchantillons * resolution;
+						break;
 					}
 				}
 
@@ -111,7 +145,7 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 				peutContinuer = false;
 		}
 
-		// Mettre les timers des notes enfoncees par erreur et jouer les notes au besoin.
+		// Mettre a jour les timers des notes enfoncees par erreur et jouer les notes au besoin.
 		for (int indexNote = 0; indexNote < nombreNotes; ++indexNote) {
 			PianoNote note = instrumentScript.ObtenirNote(indexNote);
 			note.MettreAJourTimerEnfonceeParErreur();
@@ -121,6 +155,12 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 		for (int indexNote = 0; indexNote < nombreNotes; ++indexNote) {
 			PianoNote note = instrumentScript.ObtenirNote(indexNote);
 			note.DefinirAngle(0);
+		}
+
+		// Verifier si la musique est terminee.
+		float tempsFin = partition.ObtenirTempsFin ();
+		if (tempsFin != -1.0f && tempsActuel > tempsFin) {
+			ActiverLibre();
 		}
 	}
 
@@ -143,7 +183,7 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 	private PartitionPiano.StatutNote[,] prochainesNotes;
 
 	// Facteur pour jouer plus rapidement.
-	private const float speed = 1.0f;
+	private float speed = 0;
 
 	// Temps a attendre avant de commencer a jouer la musique, en secondes.
 	// Ceci correspond au decalage entre le remplissage et le jouage.
@@ -156,10 +196,10 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 	private const float resolutionInverse = 10.0f;
 
 	// Nombre d'echantillons presents dans le tableau de prochaines notes a jouer.
-	private const int nombreEchantillons = (int)(120 * speed);
+	private const int nombreEchantillons = (int)(600 * 6);
 
 	// Nombre de notes de l'instrument controle par ce mode.
-	private const int nombreNotes = 48;
+	private const int nombreNotes = 52;
 
 	// Interface Instrument de l'instrument controle par ce mode.
 	private Instrument instrumentScript;

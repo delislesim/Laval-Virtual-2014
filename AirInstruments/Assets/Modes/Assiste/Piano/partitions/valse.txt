@@ -1,0 +1,60 @@
+6   [Re2] {Re4}
+5.5 [Fa2] [La2] [Re3] {Re4}
+0.5 [Fa2] [La2] [Re3] {Do4}
+6   [La1] {Si3}
+3   [Do2] [Mi2] [Si2] {Si3}
+3   [Do2] [Mi2] [Si2] {La3}
+6   [Re2] {Re4}
+2.5 [Fa2] [La2] [Re3] {Re4}
+0.5 [Fa2] [La2] [Re3] {Mi4}
+0.5 [Fa2] [La2] [Re3] {Re4}
+0.5 [Fa2] [La2] [Re3] {Do4}
+0.5 [Fa2] [La2] [Re3] {Si3}
+0.5 [Fa2] [La2] [Re3] {Do4}
+6   [La1] {Si3}
+3   [Do2] [Mi2] [Si2] {Si3}
+3   [Do2] [Mi2] [Si2] {La3}
+6   [Fa2] {Do4}
+5.5 [La2] [Do3] [Fa3] {Do4}
+0.5 [La2] [Do3] [Fa3] {Si3}
+6   [Do2] {Mi3}
+6   [Mi2] [Sol2] [Si2] {Mi3}
+6   [Fa2] {Do4}
+2.5 [Si2] [Do3] [Fa3] {Do4}
+0.5 [Si2] [Do3] [Fa3] {Re4}
+0.5 [Si2] [Do3] [Fa3] {Do4}
+0.5 [Si2] [Do3] [Fa3] {Si3}
+0.5 [Si2] [Do3] [Fa3] {Do4}
+0.5 [Si2] [Do3] [Fa3] {Si3}
+6   [Do2] {Mi3}
+6   [Mi2] [Sol2] [Si2] {Mi3}
+6   [Re2] {Re4} [Re5]
+5.5 [Fa2] [La2] [Re2] {Re4} [Re5]
+0.5 [Fa2] [La2] [Re2] {Do4} [Do5]
+6   [La1] {Si3} [Si4]
+3   [Do2] [Mi2] [Si2] {Si3} [Si4]
+3   [Do2] [Mi2] [Si2] {La3} [La4]
+6   [Re2] {Re4} [Re5]
+2.5 [Fa2] [La2] [Re3] {Re4} [Re5]
+0.5 [Fa2] [La2] [Re3] {Mi4}
+0.5 [Fa2] [La2] [Re3] {Re4}
+0.5 [Fa2] [La2] [Re3] {Do4}
+0.5 [Fa2] [La2] [Re3] {Si3}
+0.5 [Fa2] [La2] [Re3] {Do4}
+6   [La1] {Si3} [Si4]
+3   [Do2] [Mi2] [Si2] {Si3} [Si4]
+3   [Do2] [Mi2] [Si2] {La3} [La4]
+6   [Fa2] {Do4} [Do5]
+5.5 [La2] [Do3] [Fa3] {Do4} [Do5]
+0.5 [La2] [Do3] [Fa3] {Si3} [Si4]
+6   [Do2] {Mi3} [Mi4]
+6   [Mi2] [Sol2] [Si2] {Mi3} [Mi4]
+6   [Fa2] {Do4} [Do5]
+2.5 [La2] [Do3] [Fa3] {Do4} [Do5]
+0.5 [La2] [Do3] [Fa3] {Re4}
+0.5 [La2] [Do3] [Fa3] {Do4}
+0.5 [La2] [Do3] [Fa3] {Si3}
+0.5 [La2] [Do3] [Fa3] {Do4}
+0.5 [La2] [Do3] [Fa3] {Si3}
+6   [Do2] {Mi3} [Mi4]
+6   [Mi2] [Sol2] [Si2] {Mi3} [Mi4]

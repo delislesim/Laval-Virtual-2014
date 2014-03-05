@@ -200,6 +200,16 @@ public class PianoNote : MonoBehaviour {
 		}
 	}
 
+	public bool PeutContinuer() {
+		if (statut != PartitionPiano.StatutNote.Joueur)
+			return true;
+
+		if (aEteJouee || angleCourant >= kAngleCommencerSon)
+			return true;
+
+		return false;
+	}
+
 	// Retourne vrai si la note est dans un etat qui permet a la partie de continuer.
 	public bool GererNoteQuiDoitEtreJouee() {
 		if (statut != PartitionPiano.StatutNote.Joueur)

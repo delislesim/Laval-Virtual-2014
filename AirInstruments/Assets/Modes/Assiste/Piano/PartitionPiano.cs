@@ -59,10 +59,29 @@ public class PartitionPiano {
 		noteToIndex.Add ("La4", 45);
 		noteToIndex.Add ("La#4", 46);
 		noteToIndex.Add ("Si4", 47);
+
+		noteToIndex.Add ("Do5", 48);
+		noteToIndex.Add ("Do#5", 49);
+		noteToIndex.Add ("Re5", 50);
+		noteToIndex.Add ("Re#5", 51);
+		noteToIndex.Add ("Mi5", 52);
+		noteToIndex.Add ("Fa5", 53);
+		noteToIndex.Add ("Fa#5", 54);
+		noteToIndex.Add ("Sol5", 55);
+		noteToIndex.Add ("Sol#5", 56);
+		noteToIndex.Add ("La5", 57);
+		noteToIndex.Add ("La#5", 58);
+		noteToIndex.Add ("Si5", 59);
 	}
 
 	public void ChargerFichier(string nomFichier) {
 		streamReader = new StreamReader (nomFichier);
+	}
+
+	// Retourne le temps auquel la partition se termine, ou -1 si
+	// ce temps n'est pas encore connnu.
+	public float ObtenirTempsFin() {
+		return tempsFin;
 	}
 
 	// Retourne vrai quand il reste des notes, faux quand la musique est finie.
@@ -84,7 +103,8 @@ public class PartitionPiano {
 			float tempsDebut = tempsDerniereNote;
 
 			// Lire les notes.
-			while (ReadNoteDePartition(tempsDebut, ligne, ref pos,
+			while (ReadNoteDePartition(tempsDebut, dureeEnsemble,
+			                           ligne, ref pos,
 			                           prochainesNotes,
 			                           nombreEchantillons,
 			                           resolutionInverse,
@@ -98,6 +118,7 @@ public class PartitionPiano {
 			}
 		}
 
+		tempsFin = tempsDerniereNote + 0.5f;
 		return false;
 	}
 
@@ -123,7 +144,8 @@ public class PartitionPiano {
 		}
 	}
 
-	private bool ReadNoteDePartition(float tempsDebut, string ligne, ref int pos,
+	private bool ReadNoteDePartition(float tempsDebut, float dureeEnsemble,
+	                                 string ligne, ref int pos,
 	                                 PartitionPiano.StatutNote[,] prochainesNotes,
 	                                 int nombreEchantillons,
 	                                 float resolutionInverse,
@@ -172,7 +194,7 @@ public class PartitionPiano {
 		// Lire la duree.
 		float duree = ReadNumber (ligne, ref pos);
 		if (duree < 0)
-			duree = dureeParDefaut;
+			duree = dureeEnsemble;
 
 		// Lire le caractere de fin.
 		for (int i = pos; i < ligne.Length; ++i) {
@@ -215,8 +237,8 @@ public class PartitionPiano {
 	// Temps de la derniere note chargee du fichier.
 	private float tempsDerniereNote = 0.0f;
 
-	// Duree des notes pour lesquelles aucune duree n'est specifiee.
-	private const float dureeParDefaut = 1.0f;
+	// Temps auquel se termine la partition.
+	private float tempsFin = -1.0f;
 
 	// Table qui fait le lien entre les notes et leur index.
 	private Dictionary<String, int> noteToIndex = new Dictionary<String, int>();

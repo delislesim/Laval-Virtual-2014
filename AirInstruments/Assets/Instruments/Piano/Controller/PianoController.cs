@@ -49,15 +49,15 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 				pianoWrapper.SetActive (true);
 				break;
 			case 2:
-				assistedModeController.ChargerPartition (".\\Assets\\Modes\\Assiste\\Piano\\partitions\\fur_elise.txt");
+				assistedModeController.ChargerPartition (".\\Assets\\Modes\\Assiste\\Piano\\partitions\\fur_elise.txt", 1.0f);
 				pianoWrapper.SetActive (true);
 				break;
 			case 3:
-				assistedModeController.ChargerPartition (".\\Assets\\Modes\\Assiste\\Piano\\partitions\\fur_elise.txt");
+				assistedModeController.ChargerPartition (".\\Assets\\Modes\\Assiste\\Piano\\partitions\\valse.txt", 4.0f);
 				pianoWrapper.SetActive (true);
 				break;
 			case 4:
-				assistedModeController.ChargerPartition (".\\Assets\\Modes\\Assiste\\Piano\\partitions\\fur_elise.txt");
+				assistedModeController.ChargerPartition (".\\Assets\\Modes\\Assiste\\Piano\\partitions\\fur_elise.txt", 1.0f);
 				pianoWrapper.SetActive (true);
 				break;
 			}
