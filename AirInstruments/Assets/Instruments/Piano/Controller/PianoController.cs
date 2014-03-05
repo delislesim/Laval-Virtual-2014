@@ -6,6 +6,9 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 	// Englobe tout ce qui doit etre active/desactive quand le piano est active/desactive.
 	public GameObject pianoWrapper;
 
+	// Controleur du mode assiste.
+	public AssistedModeControllerPiano assistedModeController;
+
 	public void Prepare() {
 		KinectPowerInterop.SetKinectAngle (15);
 	}
@@ -23,7 +26,9 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 		pianoWrapper.SetActive (false);
 
 		// Desactiver le menu du mode assiste.
-		MenuAssisteController.ObtenirInstance ().gameObject.SetActive (false);
+		MenuAssisteController menuAssiste = MenuAssisteController.ObtenirInstance();
+		if (menuAssiste != null)
+			menuAssiste.gameObject.SetActive (false);
 		menuModeAssisteActif = false;
 	}
 
@@ -41,15 +46,19 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 				break;
 			case 1:
 				Debug.Log("Mode Libre");
+				pianoWrapper.SetActive (true);
 				break;
 			case 2:
-				Debug.Log("Fur Elise");
+				assistedModeController.ChargerPartition (".\\Assets\\Modes\\Assiste\\Piano\\partitions\\fur_elise.txt");
+				pianoWrapper.SetActive (true);
 				break;
 			case 3:
-				Debug.Log("Comptine d'ete");
+				assistedModeController.ChargerPartition (".\\Assets\\Modes\\Assiste\\Piano\\partitions\\fur_elise.txt");
+				pianoWrapper.SetActive (true);
 				break;
 			case 4:
-				Debug.Log("Boubou the Boubou");
+				assistedModeController.ChargerPartition (".\\Assets\\Modes\\Assiste\\Piano\\partitions\\fur_elise.txt");
+				pianoWrapper.SetActive (true);
 				break;
 			}
 

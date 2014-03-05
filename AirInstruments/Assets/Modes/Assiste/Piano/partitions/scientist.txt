@@ -1,0 +1,45 @@
+0  [Re2] [La2] [Do3] {Fa3} {La3}
+1  {Re3}
+2  [Re2] [La2] [Do3] {Fa3} {La3}
+3  {Re3}
+4  [Re2] [La2] [Do3] {Fa3} {La3}
+5  {Re3}
+6  [Re2] [La2] [Do3] {Fa3} {La3}
+7  {Re3}
+8  [La#1] [Fa2] [La#2] {Fa3} {La#3}
+9  {Re3}
+10  [La#1] [Fa2] [La#2] {Fa3} {La#3}
+11  {Re3}
+12  [La#1] [Fa2] [La#2] {Fa3} {La#3}
+13  {Re3}
+14  [La#1] [Fa2] [La#2] {Fa3} {La#3}
+15  {Do3} {Do4}
+16  [Do2] [Fa2] [La2] {Fa3} {La3}
+17  {Do3}
+18  [Do2] [Fa2] [La2] {Fa3} {La3}
+19  {Do3}
+20  [Do2] [Fa2] [La2] {Fa3} {La3}
+21  {Do3}
+22  [Do2] [Fa2] [La2] {Fa3} {La3}
+23  {Do3}
+24  [Do2] [Fa2] [La2] {Mi3} {Sol3}
+25  {Do3}
+26  [Do2] [Fa2] [La2] {Mi3} {Sol3}
+27  {Do3}
+28  [Do2] [Fa2] [La2] {Mi3} {Sol3}
+29  {Do3}
+30  [Do2] [Fa2] [La2] {Mi3} {Sol3}
+31  {Do3}
+32  [Re2] [La2] {Fa3} {La3}
+33  {Do3}
+34  [Re2] [La2] {Fa3} {La3}
+35  {Do3}
+36  [Re2] [La2] {Fa3} {La3}
+37  {Do3}
+38  [La#1] [Fa2] [La#2] {Fa3} {La#3}
+39  {Do3}
+40  [La#1] [Fa2] [La#2] {Fa3} {La#3}
+41  {Do3}
+42  [La#1] [Fa2] [La#2] {Fa3} {La#3}
+43  {Do3}
+44  [La#1] [Fa2] [La#2] {Fa3} {La#3}

@@ -9,12 +9,51 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 	// GameObject de cubes tombants.
 	public GameObject cubesTombants;
 
+	// Indique s'il y a presentement une musique en train d'etre jouee
+	// dans le mode assiste.
 	public static bool EstActive () {
 		return estActive;
 	}
 
-	void Start () {
-		//ChargerPartition ("C:\\piano\\scientist.txt");
+	// Charge un fichier de partition et demarre le mode assiste.
+	public void ChargerPartition(string fichierPartition) {
+		Reinitialiser ();
+
+		partition = new PartitionPiano ();
+		partition.ChargerFichier (fichierPartition);
+		
+		instrumentScript = (Instrument)(instrument.GetComponent (typeof(PianoBuilder)));
+		cubesTombantsScript = (CubesTombants)(cubesTombants.GetComponent (typeof(CubesTombants)));
+		cubesTombantsScript.AssignerInstrument (instrumentScript);
+		
+		// Remplir tout le tableau de prochaines notes avec des notes muettes.
+		for (int i = 0; i < nombreEchantillons; ++i) {
+			for (int j = 0; j < nombreNotes; ++j) {
+				prochainesNotes[i, j] = PartitionPiano.StatutNote.Muette;
+			}
+		}
+
+		// Activer les cubes tombants.
+		cubesTombants.SetActive (true);
+
+		// Se rappeler qu'il y a une chanson en cours.
+		estActive = true;
+	}
+
+	// Active le mode libre (desactive toute partition en cours).
+	public void ActiverLibre() {
+		estActive = false;
+		cubesTombants.SetActive (false);
+		Reinitialiser ();
+	}
+
+	// Reinitialise les cubes, la musique et tout :)
+	private void Reinitialiser() {
+		prochainesNotes = new PartitionPiano.StatutNote[nombreEchantillons, nombreNotes];
+		dernierTempsJoue = 0;
+		tempsActuel = 0.0f;
+		peutContinuer = true;
+		partition = null;
 	}
 
 	void Update () {
@@ -85,27 +124,23 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 		}
 	}
 
-	// Charge un fichier de partition et demarre le mode assiste.
-	private void ChargerPartition(string fichierPartition) {
-		partition = new PartitionPiano ();
-		partition.ChargerFichier (fichierPartition);
-		
-		instrumentScript = (Instrument)(instrument.GetComponent (typeof(PianoBuilder)));
-		cubesTombantsScript = (CubesTombants)(cubesTombants.GetComponent (typeof(CubesTombants)));
-		cubesTombantsScript.AssignerInstrument (instrumentScript);
-		
-		// Remplir tout le tableau de prochaines notes avec des notes muettes.
-		for (int i = 0; i < nombreEchantillons; ++i) {
-			for (int j = 0; j < nombreNotes; ++j) {
-				prochainesNotes[i, j] = PartitionPiano.StatutNote.Muette;
-			}
-		}
-
-		estActive = true;
-	}
-
 	// Indique si le mode assiste est active.
 	private static bool estActive = false;
+
+	// Dernier temps qu'on a joue (non inclusivement), en nombre d'echantillons.
+	private int dernierTempsJoue = 0;
+
+	// Temps auquel la musique a commence a jouer.
+	private float tempsActuel = 0.0f;
+	
+	// Indique si la musique peut continuer a avancer au temps suivant.
+	private bool peutContinuer = true;
+	
+	// Partition a jouer.
+	private PartitionPiano partition;
+
+	// Tableau qui contient les prochaines notes a jouer.
+	private PartitionPiano.StatutNote[,] prochainesNotes;
 
 	// Facteur pour jouer plus rapidement.
 	private const float speed = 1.0f;
@@ -113,12 +148,6 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 	// Temps a attendre avant de commencer a jouer la musique, en secondes.
 	// Ceci correspond au decalage entre le remplissage et le jouage.
 	private const float tempsAttendreDebutMusique = 6.0f;
-
-	// Dernier temps qu'on a joue (non inclusivement), en nombre d'echantillons.
-	private int dernierTempsJoue = 0;
-
-	// Tableau qui contient les prochaines notes a jouer.
-	private PartitionPiano.StatutNote[,] prochainesNotes = new PartitionPiano.StatutNote[nombreEchantillons, nombreNotes];
 	
 	// Resolution du tableau de prochaines notes a jouer.
 	private const float resolution = 0.1f;
@@ -137,13 +166,4 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 
 	// Script du GameObject de cubes tombants.
 	private CubesTombants cubesTombantsScript;
-
-	// Temps auquel la musique a commence a jouer.
-	private float tempsActuel = 0.0f;
-
-	// Indique si la musique peut continuer a avancer au temps suivant.
-	private bool peutContinuer = true;
-
-	// Partition a jouer.
-	private PartitionPiano partition;
 }
