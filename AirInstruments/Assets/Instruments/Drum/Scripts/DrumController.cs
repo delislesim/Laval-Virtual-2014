@@ -19,6 +19,9 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 		KinectPowerInterop.SetKinectAngle (4);
 	}
 
+	public void PrepareToStop() {
+	}
+
 	// Methode appelee quand l'instrument "drum" est choisi.
 	void OnEnable() {
 		dude.gameObject.SetActive (true);

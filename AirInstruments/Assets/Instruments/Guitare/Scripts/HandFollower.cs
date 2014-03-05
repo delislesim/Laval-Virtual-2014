@@ -45,7 +45,6 @@ public class HandFollower : MonoBehaviour {
 			RaycastHit hitInfo;
 			//Physics.Raycast (
 			if (Physics.Raycast (lastPosition, direction, out hitInfo, direction.magnitude + rayon * kMultiplicateurRayon, guitarPlayerLayer)) {
-
 				//float distanceReelle = hitInfo.distance - direction.magnitude;
 				//if (distanceReelle < 0)
 				//	distanceReelle = 0;

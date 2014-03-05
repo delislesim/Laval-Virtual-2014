@@ -85,7 +85,6 @@ public class MoveJoints : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		//Create valid skeleton with joints positions/rotations
 		m_player_one.ReloadSkeleton ();
 		if (m_player_one.IsDifferent()) {
 			moveJoints (m_player_one);

@@ -10,6 +10,9 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 		KinectPowerInterop.SetKinectAngle (15);
 	}
 
+	public void PrepareToStop() {
+	}
+
 	// Methode appelee quand l'instrument "piano" est choisi.
 	void OnEnable() {
 		intelHandController.gameObject.SetActive (true);

@@ -61,14 +61,17 @@ public class MoveJointsForGuitar : MonoBehaviour {
 		last_rotations = new Quaternion[(int)Skeleton.Joint.Count];
 		current_rotations = new Quaternion[(int)Skeleton.Joint.Count];
 		accumulated_time = 0.0f;
+
+		// Se "connecter" au squelette 0.
+		m_player_one = new Skeleton(0);
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		//Create valid skeleton with joints positions/rotations
-		m_player_one = new Skeleton(0);
-		if (SkeletonIsTrackedAndValid(m_player_one))
+		m_player_one.ReloadSkeleton ();
+		if (m_player_one.IsDifferent() && SkeletonIsTrackedAndValid(m_player_one)) {
 			moveJoints (m_player_one);
+		}
 	}
 
 	bool SkeletonIsTrackedAndValid(Skeleton player)

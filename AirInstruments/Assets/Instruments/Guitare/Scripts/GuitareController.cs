@@ -3,14 +3,8 @@ using System.Collections;
 
 public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 
-	// Controleur du mode assiste de la guitare.
-	public AssistedModeControllerGuitar assistedModeController;
-
-	// Controleur du squelette du joueur de guitare.
-	public MoveJointsForGuitar moveJoints;
-
-	// Joueur de guitare.
-	public GuitarPlayer guitarPlayer;
+	// Wrapper de tout ce qui doit etre active pour la guitare.
+	public GameObject guitareWrapper;
 
 	// joints unity
 	public Joints jointsObject;
@@ -18,47 +12,71 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 	//Objet de guitare
 	public Transform GuitarContainer;
 
-	private Vector3 DEFAULT_GUIT_POS;
-	private Vector3 DEFAULT_GUIT_ROT;
+	// Giga spot a allumer pour switcher la guitare.
+	public Light gigaSpotGuitare;
+
+	// Guitare decorative, pour le menu de choix d'instrument.
+	public GameObject guitareDecorative;
 
 	public void Prepare() {
 		KinectPowerInterop.SetKinectAngle (10);
+		tempsPreparation = 0;
+		aFaitSwitch = false;
+		estEnTrainDeQuitter = false;
+		gameObject.SetActive (true);
 	}
 
-	private void Start(){
-		GuitarContainer.transform.position = DEFAULT_GUIT_POS;
-		GuitarContainer.transform.rotation = Quaternion.Euler(DEFAULT_GUIT_ROT);
+	public void PrepareToStop() {
+		tempsPreparation = -4.0f;
+		aFaitSwitch = false;
+		estEnTrainDeQuitter = true;
 	}
 
-	//Show/Hide joints
-	//place guitar
-	public void ShowJoints(bool show)
-	{
-		jointsObject.gameObject.SetActive(show);
-		if(!show)
-		{
-			DEFAULT_GUIT_POS = new Vector3(-5.187511f, 4.332658f, 9.69f);
-			DEFAULT_GUIT_ROT = new Vector3(0, 180, 90);
-			GuitarContainer.transform.localPosition = DEFAULT_GUIT_POS;
-			GuitarContainer.transform.rotation = Quaternion.Euler(DEFAULT_GUIT_ROT);
+	public void Update() {
+		// Faire l'animation du gigaspot qui permet de switcher la guitare subtilement.
+		tempsPreparation += Time.deltaTime;
+		if (tempsPreparation > 0) {
+			if (tempsPreparation < 0.5f) {
+				gigaSpotGuitare.intensity += 16.0f * Time.deltaTime;
+			} else if (tempsPreparation < 2.0f) {
+				gigaSpotGuitare.intensity -= 5.33f * Time.deltaTime;
+			} else if (gigaSpotGuitare.intensity != 0) {
+				gigaSpotGuitare.intensity = 0;
+			}
+
+			// Switcher la guitare decorative / controlee par le joueur.
+			if (tempsPreparation > 0.5f && !aFaitSwitch) {
+				if (estEnTrainDeQuitter) {
+					guitareWrapper.SetActive (false);
+					guitareDecorative.SetActive (true);
+				} else {
+					guitareWrapper.SetActive (true);
+					guitareDecorative.SetActive (false);
+				}
+				aFaitSwitch = true;
+			}
 		}
 	}
 
 	// Methode appelee quand l'instrument "guitare" est choisi.
 	void OnEnable() {
-		assistedModeController.gameObject.SetActive (true);
-		moveJoints.gameObject.SetActive (true);
-		guitarPlayer.gameObject.SetActive (true);
+		// L'initialisation se fait dans "Prepare".
 	}
 
 	// Methode appelee quand l'instrument "guitare" n'est plus choisi.
 	void OnDisable () {
-		assistedModeController.gameObject.SetActive (false);
-		moveJoints.gameObject.SetActive (false);
-		guitarPlayer.gameObject.SetActive (false);
+		// Faire le switch de guitare au cas ou il n'a pas deja ete fait.
+		guitareWrapper.SetActive (false);
+		guitareDecorative.SetActive (true);
 	}
 
-	// Methode appelee a chaque frame quand la guitare est l'instrument courant.
-	void Update () {
-	}
+	// Temps depuis que le mode a commencé a se préparer.
+	private float tempsPreparation;
+
+	// Indique si on a fait le switch de guitare.
+	private bool aFaitSwitch = false;
+
+	// Indique si on est en train de quitter la scene.
+	private bool estEnTrainDeQuitter = false;
+
 }

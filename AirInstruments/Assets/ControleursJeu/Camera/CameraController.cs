@@ -38,7 +38,7 @@ public class CameraController : MonoBehaviour {
 			Quaternion rotActuel = mainCamera.transform.rotation;
 			Quaternion newRot = Quaternion.RotateTowards(rotActuel,
 			                                             targetRotation,
-			                                             rotationSpeed);
+			                                             rotationSpeed * Time.deltaTime);
 			mainCamera.transform.rotation = newRot;
 		}
 	}
@@ -146,7 +146,7 @@ public class CameraController : MonoBehaviour {
 	private const float kFovGuitare = 76.2f;
 
 	// Angle de la caméra lors de la guitare.
-	private Vector3 kAngleGuitare = new Vector3(0, 0, 0);
+	private Vector3 kAngleGuitare = new Vector3(0.09139769f, 195.2244f, 0f);
 
 	// Vitesse de changement du field of view, en unités par deltaTime.
 	public const float kFieldOfViewSpeed = 10.0f;

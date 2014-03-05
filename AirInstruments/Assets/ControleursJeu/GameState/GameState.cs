@@ -44,6 +44,12 @@ public class GameState : MonoBehaviour {
 		} else if (Input.GetButtonDown("Guitare")) {
 			AccederEtat (State.Guitar);
 		}
+
+		// La guitare a besoin de continuer a animer son spot apres la
+		// fin de l'animation de camera.
+		if (transitionTerminee && previousState == State.Guitar) {
+			guitareController.Update();
+		}
 	}
 
 	// Acceder a un nouvel etat.
@@ -52,19 +58,19 @@ public class GameState : MonoBehaviour {
 			return;
 		}
 
-		GameState.State previousState = currentState;
+		previousState = currentState;
 
-		// Voler la camera.
+		// Voler la camera et lui faire reprendre son angle.
 		cameraController.ReprendreCamera ();
 
 		// Arreter l'etat presentement actif.
-		choixInstrumentControleur.gameObject.SetActive (false);
-		pianoController.gameObject.SetActive (false);
-		
-		drumController.gameObject.SetActive (false);
-
-		guitareController.ShowJoints(false);
-		guitareController.gameObject.SetActive (false);
+		if (previousState == State.Drum) {
+			drumController.PrepareToStop();
+		} else if (previousState == State.Piano) {
+			pianoController.PrepareToStop();
+		} else if (previousState == State.Guitar) {
+			guitareController.PrepareToStop();			
+		}
 
 		transitionTerminee = false;
 
@@ -100,6 +106,17 @@ public class GameState : MonoBehaviour {
 	// Appele lorsque l'animation de camera permettant de se rendre a l'etat
 	// suivant est terminee.
 	public void OnCompleteTransition() {
+		// Arreter l'etat presentement actif.
+		if (previousState == State.Drum) {
+			drumController.gameObject.SetActive (false);
+		} else if (previousState == State.Piano) {
+			pianoController.gameObject.SetActive (false);
+		} else if (previousState == State.Guitar) {
+			guitareController.gameObject.SetActive (false);		
+		} else if (previousState == State.ChooseInstrument) {
+			choixInstrumentControleur.gameObject.SetActive (false);
+		}
+
 		cameraController.AjusterRotation ();
 
 		if (currentState == State.ChooseInstrument) {
@@ -117,7 +134,6 @@ public class GameState : MonoBehaviour {
 		} else if (currentState == State.Guitar) {
 
 			guitareController.gameObject.SetActive (true);
-			guitareController.ShowJoints(true);
 			
 		}
 
@@ -135,6 +151,9 @@ public class GameState : MonoBehaviour {
 
 	// Etat presentement actif.
 	private State currentState = State.Unknown;
+
+	// Etat precedent.
+	private GameState.State previousState = State.Unknown;
 
 	// Indique si la transition vers l'etat courant est terminee.
 	private bool transitionTerminee = true;
