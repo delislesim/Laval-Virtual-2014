@@ -17,6 +17,14 @@ public class CubesTombants : MonoBehaviour {
 	void Update () {
 	}
 
+	public void ViderCubes() {
+		while (cubes.Count != 0) {
+			GameObject cube = cubes.Peek();
+			cubes.Dequeue();
+			Destroy(cube);
+		}
+	}
+
 	public void AssignerTempsCourant(float tempsCourant) {
 		transform.localPosition = new Vector3 (positionDepart.x,
 		                                       positionDepart.y - tempsCourant,

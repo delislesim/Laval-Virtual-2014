@@ -52,6 +52,7 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 		peutContinuer = true;
 		partition = null;
 		speed = 0;
+		cubesTombantsScript.ViderCubes ();
 
 		// Mettre toutes les notes muettes.
 		for (int i = 0; i < nombreNotes; ++i) {
