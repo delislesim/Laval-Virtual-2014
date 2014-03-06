@@ -7,10 +7,25 @@ public class BoutonMusique : MonoBehaviour {
 	public void AssignerTexte(string texteHaut, string texteBas) {
 		transform.Find ("texteBoutonHaut").GetComponent<TextMesh> ().text = texteHaut;
 		transform.Find ("texteBoutonBas").GetComponent<TextMesh> ().text = texteBas;
+		DefinirDesactive (false);
+	}
+
+	// Activer / desactiver le bouton. Un bouton desactive ne
+	// s'affiche pas dans le menu courant.
+	public void DefinirDesactive(bool estDesactive) {
+		this.estDesactive = estDesactive;
+	}
+
+	// Indique si le bouton est desactivé.
+	public bool EstDesactive() {
+		return estDesactive;
 	}
 
 	// Afficher le bouton avec une animation.
 	public void Afficher() {
+		if (EstDesactive ())
+			return;
+
 		tempsAfficher = (float)random.NextDouble () * kTempsCommencerAnimationmax;
 		tempsCacher = kTempsInvalide;
 		timer = 0;
@@ -70,6 +85,10 @@ public class BoutonMusique : MonoBehaviour {
 
 	// Temps au bout duquel on va se cacher.
 	private float tempsCacher = kTempsInvalide;
+
+	// Indique si le bouton est désactivé, c'est a dire qu'il ne
+	// s'affiche pas dans le menu courant.
+	private bool estDesactive = false;
 
 	// Distance a parcourir en z pour se cacher, en coordonnées locales.
 	private const float kDistanceCacher = 18.0f;

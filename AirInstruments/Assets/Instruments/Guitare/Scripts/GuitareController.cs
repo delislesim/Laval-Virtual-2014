@@ -21,6 +21,9 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 	// Controleur du mode assiste.
 	public AssistedModeControllerGuitar assistedModeController;
 
+	// Joueur de guitare.
+	public GuitarPlayer guitarPlayer;
+
 	public void Prepare() {
 		KinectPowerInterop.SetKinectAngle (10);
 		tempsPreparation = 0;
@@ -69,12 +72,13 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 		MenuAssisteController menuAssiste = MenuAssisteController.ObtenirInstance();
 
 		// Bras dans les airs == afficher le menu.
-		if (!menuModeAssisteActif && (
+		if (!menuModeAssisteActif && !doitAfficherChoixGamme && !menuChoixGammeActif && (
 			Input.GetButtonDown ("MenuAssiste") ||
 			GestureRecognition.ObtenirInstance().GetCurrentGesture() == GestureId.GESTURE_MENU)) {
 
 			// Positionner le menu du mode assiste.
-			menuAssiste.transform.position = new Vector3(8.126709f, 9.3f, -18.44f);
+			//menuAssiste.transform.position = new Vector3(7.020516f, 7.6f, -16.13901f);
+			menuAssiste.transform.position = new Vector3(7.02124f, 9.326828f, -16.13635f);
 			menuAssiste.transform.eulerAngles = new Vector3(0.09139769f, 15.2244f, 0);
 			menuAssiste.transform.localScale = new Vector3(1.48f, 1.48f, 1.2f);
 
@@ -98,6 +102,29 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 			menuModeAssisteActif = true;
 		}
 
+		// Afficher le menu de choix de gamme.
+		if (doitAfficherChoixGamme && !menuAssiste.gameObject.activeSelf) {
+			// Positionner le menu du choix de gamme.
+			//menuAssiste.transform.position = new Vector3(7.020516f, 7.6f, -16.13901f);
+			menuAssiste.transform.position = new Vector3(7.02124f, 9.326828f, -16.13635f);
+			menuAssiste.transform.eulerAngles = new Vector3(0.09139769f, 15.2244f, 0);
+			menuAssiste.transform.localScale = new Vector3(1.48f, 1.48f, 1.2f);
+
+			// Mettre le texte dans les boutons du choix de gamme.
+			menuAssiste.DesactiverBouton(0);
+			menuAssiste.AssignerTexte(1, "Gamme", "Majeure");
+			menuAssiste.AssignerTexte(2, "Gamme", "Mineure");
+			menuAssiste.AssignerTexte(3, "Gamme", "Pentatonique");
+			menuAssiste.AssignerTexte(4, "Gamme", "Blues");
+
+			// Activer le menu du mode assiste.
+			menuAssiste.Afficher();
+
+			// Se rappeler que le menu est active.
+			menuChoixGammeActif = true;
+			doitAfficherChoixGamme = false;
+		}
+
 		// Traiter les choix de l'utilisateur dans le menu du mode assisté.
 		if (menuModeAssisteActif) {
 			int boutonPresse = menuAssiste.ObtenirBoutonPresse();
@@ -108,7 +135,7 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 				break;
 			case 1:
 				assistedModeController.StopSong();
-				CameraController.ObtenirInstance().ForcerFieldOfView(CameraController.kFovGuitare);
+				doitAfficherChoixGamme = true;
 				break;
 			case 2:
 				assistedModeController.StartSong(AssistedModeControllerGuitar.Chanson.LONELY_BOY);
@@ -128,6 +155,37 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 				// Fermer le menu du mode assiste.
 				MenuAssisteController.ObtenirInstance ().Cacher();
 				menuModeAssisteActif = false;
+				return;
+			}
+		}
+
+		// Traiter les choix de l'utilisateur dans le menu de gamme.
+		if (menuChoixGammeActif) {
+			Debug.Log("upd choix gamme");
+
+			int boutonPresse = menuAssiste.ObtenirBoutonPresse();
+			switch (boutonPresse) {
+			case 1:
+				guitarPlayer.SetScaleModeAndTone(GuitarPlayer.Mode.MAJOR, GuitarPlayer.Tone.E);
+				break;
+			case 2:
+				guitarPlayer.SetScaleModeAndTone(GuitarPlayer.Mode.MINOR, GuitarPlayer.Tone.E);
+				break;
+			case 3:
+				guitarPlayer.SetScaleModeAndTone(GuitarPlayer.Mode.PENT, GuitarPlayer.Tone.E);
+				break;
+			case 4:
+				guitarPlayer.SetScaleModeAndTone(GuitarPlayer.Mode.BLUES, GuitarPlayer.Tone.E);
+				break;
+			}
+			
+			if (boutonPresse != -1) {
+				// Retablir le zoom.
+				CameraController.ObtenirInstance().ForcerFieldOfView(CameraController.kFovGuitare);
+				Debug.Log ("cacher");
+				// Fermer le menu du mode assiste.
+				MenuAssisteController.ObtenirInstance ().Cacher();
+				menuChoixGammeActif = false;
 				return;
 			}
 		}
@@ -156,5 +214,11 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 
 	// Indique si le menu du mode assiste est affiche.
 	private bool menuModeAssisteActif = false;
+
+	// Indique si on doit afficher le menu de choix de gamme.
+	private bool doitAfficherChoixGamme = false;
+
+	// Indique si le menu de choix de gamme est affiche.
+	private bool menuChoixGammeActif = false;
 
 }

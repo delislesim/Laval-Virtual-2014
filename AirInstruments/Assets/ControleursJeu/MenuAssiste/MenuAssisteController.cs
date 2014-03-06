@@ -29,7 +29,11 @@ public class MenuAssisteController : MonoBehaviour {
 		numBoutonsDesactives = 0;
 		estEnTrainDeCacher = true;
 		for (int i = 0; i < boutons.Count; ++i) {
-			boutons[i].GetComponent<BoutonMusique>().Cacher();
+			if (!boutons[i].GetComponent<BoutonMusique>().EstDesactive()) {
+				boutons[i].GetComponent<BoutonMusique>().Cacher();
+			} else {
+				SignalerBoutonDesactive();
+			}
 		}
 
 		// Desactiver le pointeur.
@@ -49,6 +53,11 @@ public class MenuAssisteController : MonoBehaviour {
 	// Assigne un texte a un bouton du menu.
 	public void AssignerTexte(int indexBouton, string texteHaut, string texteBas) {
 		boutons [indexBouton].GetComponent<BoutonMusique> ().AssignerTexte (texteHaut, texteBas);
+	}
+
+	// Desactiver un bouton.
+	public void DesactiverBouton(int indexBouton) {
+		boutons [indexBouton].GetComponent<BoutonMusique> ().DefinirDesactive (true);
 	}
 
 	// Obtient l'index du bouton presse. -1 si aucun bouton n'est presse.
@@ -75,11 +84,20 @@ public class MenuAssisteController : MonoBehaviour {
 
 		// Mettre les bonnes cibles pour le pointeur.
 		pointeur.RemoveAllTargets ();
-		pointeur.AddTarget (0, new Vector2 (0, 0.1f), new Vector2 (0.25f, 0.5f));
-		pointeur.AddTarget (1, new Vector2 (0.9f, -0.4f), new Vector2 (0.25f, 0.25f));
-		pointeur.AddTarget (2, new Vector2 (1.8f, -0.4f), new Vector2 (0.25f, 0.25f));
-		pointeur.AddTarget (3, new Vector2 (0.9f,  0.5f), new Vector2 (0.25f, 0.25f));
-		pointeur.AddTarget (4, new Vector2 (1.8f,  0.5f), new Vector2 (0.25f, 0.25f));
+		if (!boutons[0].GetComponent<BoutonMusique> ().EstDesactive())
+			pointeur.AddTarget (0, new Vector2 (0, 0.1f), new Vector2 (0.25f, 0.5f));
+
+		if (!boutons[1].GetComponent<BoutonMusique> ().EstDesactive())
+			pointeur.AddTarget (1, new Vector2 (0.9f, -0.4f), new Vector2 (0.25f, 0.25f));
+
+		if (!boutons[2].GetComponent<BoutonMusique> ().EstDesactive())
+			pointeur.AddTarget (2, new Vector2 (1.8f, -0.4f), new Vector2 (0.25f, 0.25f));
+
+		if (!boutons[3].GetComponent<BoutonMusique> ().EstDesactive())
+			pointeur.AddTarget (3, new Vector2 (0.9f,  0.5f), new Vector2 (0.25f, 0.25f));
+
+		if (!boutons[4].GetComponent<BoutonMusique> ().EstDesactive())
+			pointeur.AddTarget (4, new Vector2 (1.8f,  0.5f), new Vector2 (0.25f, 0.25f));
 
 		// Activer le pointeur.
 		pointeur.gameObject.SetActive (true);
