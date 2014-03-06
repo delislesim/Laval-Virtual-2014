@@ -161,19 +161,10 @@ public class GuitarPlayer : MonoBehaviour {
 			elapsedTime = elapsedTime + Time.deltaTime;
 			if(elapsedTime >= StartDelay && isAssisted)
 			{
-				AssistedCtrl.StartSong();
+				AssistedCtrl.StartSong(".\\Assets\\Modes\\Assiste\\Guitare\\Chansons\\Lonely Boy Audacity.aup");
 				HasStarted = true;
 			}
 		}
-	}
-	
-	void OnTriggerEnter(Collider col)
-	{
-		/*
-		//Debug.Log ("Trigger with guitar player! : " + col.gameObject.tag);
-		if(col.gameObject.tag == "PlayHand")
-			PlayNextNote();
-			*/
 	}
 
 	/// <summary>

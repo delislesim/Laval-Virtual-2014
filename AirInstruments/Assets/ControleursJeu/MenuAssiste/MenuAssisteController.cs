@@ -40,8 +40,6 @@ public class MenuAssisteController : MonoBehaviour {
 		if (!estEnTrainDeCacher)
 			return;
 
-		Debug.Log ("signaler bouton desactive");
-
 		++numBoutonsDesactives;
 		if (numBoutonsDesactives == boutons.Count) {
 			gameObject.SetActive (false);

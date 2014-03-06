@@ -72,7 +72,7 @@ public class BoutonMusique : MonoBehaviour {
 	private float tempsCacher = kTempsInvalide;
 
 	// Distance a parcourir en z pour se cacher, en coordonnées locales.
-	private const float kDistanceCacher = 16.0f;
+	private const float kDistanceCacher = 18.0f;
 
 	// Temps invalide.
 	private const float kTempsInvalide = -1.0f;

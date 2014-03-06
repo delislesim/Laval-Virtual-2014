@@ -6,6 +6,14 @@ public class CameraController : MonoBehaviour {
 	// Camera du jeu.
 	public Camera mainCamera;
 
+	public CameraController() {
+		instance = this;
+	}
+
+	public static CameraController ObtenirInstance() {
+		return instance;
+	}
+
 	// Update is called once per frame.
 	void Update () {
 		// Ajustements du zoom.
@@ -118,6 +126,16 @@ public class CameraController : MonoBehaviour {
 		ajusterRotation = true;
 	}
 
+	// Unique instance du controleur de camera.
+	public void ForcerFieldOfView(float targetFieldOfView) {
+		fieldOfViewSpeed = 0;
+		this.targetFieldOfView = targetFieldOfView;
+
+	}
+
+	// Instance unique du controleur de camera.
+	private static CameraController instance;
+
 	// Indique si on doit ajuster la rotation de la caméra. On n'ajuste pas
 	// la rotation pendant les animations.
 	private bool ajusterRotation = false;
@@ -150,7 +168,7 @@ public class CameraController : MonoBehaviour {
 	private Vector3 kAnglePiano = new Vector3(35.9f, 0, 0);
 
 	// FOV de la guitare.
-	private const float kFovGuitare = 76.2f;
+	public const float kFovGuitare = 76.2f;
 
 	// Vitesse de rotation pour la guitare.
 	private const float kRotationSpeedPiano = 10.0f;
@@ -162,16 +180,16 @@ public class CameraController : MonoBehaviour {
 	private Vector3 kAngleGuitare = new Vector3(0.09139769f, 195.2244f, 0f);
 
 	// Vitesse de changement du field of view, en unités par deltaTime, pour cette trajectoire.
-	public float fieldOfViewSpeed = 0;
+	private float fieldOfViewSpeed = 0;
 
 	// Vitesse de rotation pour cette trajectoire.
 	private float rotationSpeed = 0;
 
 	// Vitesse de changement du field of view, en unités par deltaTime.
-	public const float kFieldOfViewSpeed = 10.0f;
+	private const float kFieldOfViewSpeed = 10.0f;
 
 	// Acceleration pour changer FOV.
-	public const float kAccelerationFov = 6.0f;
+	private const float kAccelerationFov = 6.0f;
 
 	// Vitesse de rotation par defaut.
 	private const float kRotationSpeedDefault = 5f;

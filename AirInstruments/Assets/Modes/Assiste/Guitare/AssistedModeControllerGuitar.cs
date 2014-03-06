@@ -16,48 +16,46 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 		return currentOctave;
 	}
 
-	public void StartSong()
+	public void StartSong(string fichierPartition)
 	{
-		HasStarted = true;
-		audio.volume = 0.35f;
-		audio.Play();
-	}
-
-	void Start () {
+		// Reinitialiser les variables.
 		tempsEcoule = 0.0f;
 		tempsNotes = 0.0f;
+		
+		// Lire la partition.
 		partitionMaker = new PartitionGuitar ();
-		partitionMaker.ChargerFichier(".\\Assets\\Modes\\Assiste\\Guitare\\Chansons\\Lonely Boy Audacity.aup");
+		partitionMaker.ChargerFichier(fichierPartition);
 		partition = new List<PartitionGuitar.Playable>();
-		// Remplir des notes jusqu'au temps actuel.
+
 		partitionMaker.RemplirPartition( partition );
 		currentPartitionIndex = 0;
 		currentTone = partition[currentPartitionIndex].note;
 		currentStyle = partition[currentPartitionIndex].style;
 		currentOctave = partition[currentPartitionIndex].octave;
-		HasStarted = false;
-		//audio.source = ... toune de fond
-		//audio.play
+
+		// Partir la musique.
+		audio.volume = 0.35f;
+		audio.Play();
 	}
 
 	void Update () {
-		if(HasStarted)
-		{
-			// Temps actuel, en secondes.
-			//Set le tone et style de la note a jouer
-			tempsEcoule = tempsEcoule + Time.deltaTime;
-			//Debug.Log("Temps ecoulé : " + tempsEcoule);
-			if(currentPartitionIndex < partition.Count-1){
-				if (tempsEcoule > partition[currentPartitionIndex+1].time)
-				{
-					tempsNotes = tempsNotes + partition[currentPartitionIndex+1].time;
-						currentPartitionIndex ++;
-				}
+		if (partition == null)
+			return;
+		
+		// Temps actuel, en secondes.
+		//Set le tone et style de la note a jouer
+		tempsEcoule = tempsEcoule + Time.deltaTime;
+		//Debug.Log("Temps ecoulé : " + tempsEcoule);
+		if(currentPartitionIndex < partition.Count-1){
+			if (tempsEcoule > partition[currentPartitionIndex+1].time)
+			{
+				tempsNotes = tempsNotes + partition[currentPartitionIndex+1].time;
+					currentPartitionIndex ++;
 			}
-			currentTone = partition[currentPartitionIndex].note;
-			currentStyle = partition[currentPartitionIndex].style;
-			currentOctave = partition[currentPartitionIndex].octave;
 		}
+		currentTone = partition[currentPartitionIndex].note;
+		currentStyle = partition[currentPartitionIndex].style;
+		currentOctave = partition[currentPartitionIndex].octave;
 	}
 	
 	private PartitionGuitar partitionMaker;
@@ -70,6 +68,5 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 	private int currentOctave;
 
 	private GuitarPlayer.Tone currentTone;
-	private GuitarPlayer.Style currentStyle; 
-	private bool HasStarted;
+	private GuitarPlayer.Style currentStyle;
 }
