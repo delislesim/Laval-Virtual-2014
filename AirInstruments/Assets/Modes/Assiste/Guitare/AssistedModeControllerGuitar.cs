@@ -4,6 +4,21 @@ using System.Collections.Generic;
 
 public class AssistedModeControllerGuitar : MonoBehaviour {
 
+	public AudioClip clipLonelyBoy;
+	public AudioClip clipPointVirgule;
+	public AudioClip clipBoubou;
+
+	private string fichierLonelyBoy = ".\\Assets\\Modes\\Assiste\\Guitare\\Chansons\\Lonely Boy Audacity.aup";
+	private string fichierPointVirgule = ".\\Assets\\Modes\\Assiste\\Guitare\\Chansons\\Lonely Boy Audacity.aup";
+	private string fichierBoubou = ".\\Assets\\Modes\\Assiste\\Guitare\\Chansons\\Lonely Boy Audacity.aup";
+
+	public enum Chanson
+	{
+		LONELY_BOY,
+		POINT_VIRGULE,
+		BOUBOU
+	}
+
 	public GuitarPlayer.Tone getCurrentTone(){
 		return currentTone;
 	}
@@ -16,15 +31,34 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 		return currentOctave;
 	}
 
-	public void StartSong(string fichierPartition)
+	public void StartSong(Chanson chanson)
 	{
 		// Reinitialiser les variables.
 		tempsEcoule = 0.0f;
 		tempsNotes = 0.0f;
+
+		string nomFichier;
+		AudioClip clip;
+		switch (chanson) {
+		case Chanson.LONELY_BOY:
+			nomFichier = fichierLonelyBoy;
+			clip = clipLonelyBoy;
+			break;
+		case Chanson.POINT_VIRGULE:
+			nomFichier = fichierPointVirgule;
+			clip = clipPointVirgule;
+			break;
+		case Chanson.BOUBOU:
+			nomFichier = fichierBoubou;
+			clip = clipBoubou;
+			break;
+		default:
+			return;
+		}
 		
 		// Lire la partition.
 		partitionMaker = new PartitionGuitar ();
-		partitionMaker.ChargerFichier(fichierPartition);
+		partitionMaker.ChargerFichier(nomFichier);
 		partition = new List<PartitionGuitar.Playable>();
 
 		partitionMaker.RemplirPartition( partition );
@@ -34,12 +68,22 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 		currentOctave = partition[currentPartitionIndex].octave;
 
 		// Partir la musique.
+		audio.clip = clip;
 		audio.volume = 0.35f;
 		audio.Play();
 	}
 
+	public void StopSong() {
+		audio.Stop ();
+		partition = null;
+	}
+
+	public bool EstActive() {
+		return partition != null;
+	}
+
 	void Update () {
-		if (partition == null)
+		if (!EstActive())
 			return;
 		
 		// Temps actuel, en secondes.

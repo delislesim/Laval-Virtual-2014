@@ -18,6 +18,9 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 	// Guitare decorative, pour le menu de choix d'instrument.
 	public GameObject guitareDecorative;
 
+	// Controleur du mode assiste.
+	public AssistedModeControllerGuitar assistedModeController;
+
 	public void Prepare() {
 		KinectPowerInterop.SetKinectAngle (10);
 		tempsPreparation = 0;
@@ -104,16 +107,20 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 				GameState.ObtenirInstance().AccederEtat(GameState.State.ChooseInstrument);
 				break;
 			case 1:
-				Debug.Log("Mode Libre");
+				assistedModeController.StopSong();
+				CameraController.ObtenirInstance().ForcerFieldOfView(CameraController.kFovGuitare);
 				break;
 			case 2:
-				Debug.Log("Lonely boy");
+				assistedModeController.StartSong(AssistedModeControllerGuitar.Chanson.LONELY_BOY);
+				CameraController.ObtenirInstance().ForcerFieldOfView(CameraController.kFovGuitare);
 				break;
 			case 3:
-				Debug.Log("Point virgule");
+				assistedModeController.StartSong(AssistedModeControllerGuitar.Chanson.POINT_VIRGULE);
+				CameraController.ObtenirInstance().ForcerFieldOfView(CameraController.kFovGuitare);
 				break;
 			case 4:
-				Debug.Log("Boubou the Boubou");
+				assistedModeController.StartSong(AssistedModeControllerGuitar.Chanson.BOUBOU);
+				CameraController.ObtenirInstance().ForcerFieldOfView(CameraController.kFovGuitare);
 				break;
 			}
 			

@@ -31,8 +31,6 @@ public class GuitarPlayer : MonoBehaviour {
 		PENT
 	}
 
-	public bool isAssisted;
-
 	private int dummy_counter;
 	//List of audio lists.
 	//The different lists for different pitch level (left hand position)
@@ -40,7 +38,6 @@ public class GuitarPlayer : MonoBehaviour {
 	private const float LONGUEUR_MANCHE = 3.0f;
 	private float StartDelay = 5.0f;
 	private bool HasStarted;
-	private float elapsedTime;
 
 /*********************************************************/
 	public void SetScaleModeAndTone(Mode mode, Tone tone)
@@ -93,7 +90,7 @@ public class GuitarPlayer : MonoBehaviour {
 		if (level == -1)
 			return;
 
-		if(isAssisted)
+		if(AssistedCtrl.EstActive())
 		{
 			///get the note 
 			Style style = AssistedCtrl.getCurrentStyle();
@@ -156,15 +153,6 @@ public class GuitarPlayer : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if(!HasStarted)
-		{
-			elapsedTime = elapsedTime + Time.deltaTime;
-			if(elapsedTime >= StartDelay && isAssisted)
-			{
-				AssistedCtrl.StartSong(".\\Assets\\Modes\\Assiste\\Guitare\\Chansons\\Lonely Boy Audacity.aup");
-				HasStarted = true;
-			}
-		}
 	}
 
 	/// <summary>

@@ -128,7 +128,7 @@ public class CameraController : MonoBehaviour {
 
 	// Unique instance du controleur de camera.
 	public void ForcerFieldOfView(float targetFieldOfView) {
-		fieldOfViewSpeed = 0;
+		vitesseFovActuelle = 0;
 		this.targetFieldOfView = targetFieldOfView;
 
 	}
@@ -178,9 +178,6 @@ public class CameraController : MonoBehaviour {
 
 	// Angle de la caméra lors de la guitare.
 	private Vector3 kAngleGuitare = new Vector3(0.09139769f, 195.2244f, 0f);
-
-	// Vitesse de changement du field of view, en unités par deltaTime, pour cette trajectoire.
-	private float fieldOfViewSpeed = 0;
 
 	// Vitesse de rotation pour cette trajectoire.
 	private float rotationSpeed = 0;
