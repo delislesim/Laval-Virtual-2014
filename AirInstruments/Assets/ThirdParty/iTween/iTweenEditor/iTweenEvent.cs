@@ -204,7 +204,15 @@ public class iTweenEvent : MonoBehaviour{
 	public void OnDrawGizmos() {
 		if(showIconInInspector) Gizmos.DrawIcon(transform.position, "iTweenIcon.tif");
 	}
-	
+
+	public void OverridePosition(Vector3 position) {
+		this.position = position;
+		this.positionOverridden = true;
+	}
+
+	private bool positionOverridden = false;
+	private Vector3 position;
+
 	IEnumerator StartEvent() {
 		if(delay > 0) yield return new WaitForSeconds(delay);
 		
@@ -213,6 +221,9 @@ public class iTweenEvent : MonoBehaviour{
 		var optionsHash = new Hashtable();
 		foreach(var pair in Values) {
 			if("path" == pair.Key && pair.Value.GetType() == typeof(string)) optionsHash.Add(pair.Key, iTweenPath.GetPath((string)pair.Value, reverse));
+			else if (pair.Key == "position" && positionOverridden) {
+				optionsHash.Add("position", position);
+			}
 			else optionsHash.Add(pair.Key, pair.Value);
 		}
 		

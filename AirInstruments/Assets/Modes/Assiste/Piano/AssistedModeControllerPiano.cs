@@ -23,10 +23,6 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 		partition.ChargerFichier (fichierPartition);
 		this.speed = speed;
 		
-		instrumentScript = (Instrument)(instrument.GetComponent (typeof(PianoBuilder)));
-		cubesTombantsScript = (CubesTombants)(cubesTombants.GetComponent (typeof(CubesTombants)));
-		cubesTombantsScript.AssignerInstrument (instrumentScript);
-		
 		// Remplir tout le tableau de prochaines notes avec des notes muettes.
 		for (int i = 0; i < nombreEchantillons; ++i) {
 			for (int j = 0; j < nombreNotes; ++j) {
@@ -61,6 +57,12 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 		for (int i = 0; i < nombreNotes; ++i) {
 			instrumentScript.DefinirStatutNote (i, PartitionPiano.StatutNote.Muette);
 		}
+	}
+
+	void Start () {
+		instrumentScript = (Instrument)(instrument.GetComponent (typeof(PianoBuilder)));
+		cubesTombantsScript = (CubesTombants)(cubesTombants.GetComponent (typeof(CubesTombants)));
+		cubesTombantsScript.AssignerInstrument (instrumentScript);
 	}
 
 	void Update () {

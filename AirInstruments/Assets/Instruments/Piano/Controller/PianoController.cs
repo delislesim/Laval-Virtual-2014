@@ -64,15 +64,21 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 
 			if (boutonPresse != -1) {
 				// Fermer le menu du mode assiste.
-				MenuAssisteController.ObtenirInstance ().gameObject.SetActive (false);
+				MenuAssisteController.ObtenirInstance ().Cacher();
 				menuModeAssisteActif = false;
 				return;
 			}
 		}
 		
 		// Verifier si le mode assiste est demande.
-		if (Input.GetButtonDown ("MenuAssiste") ||
-		    GestureRecognition.ObtenirInstance().GetCurrentGesture() == GestureId.GESTURE_MENU) {
+		if (!menuModeAssisteActif && (
+			Input.GetButtonDown ("MenuAssiste") ||
+		    GestureRecognition.ObtenirInstance().GetCurrentGesture() == GestureId.GESTURE_MENU)) {
+
+			// Positionner le menu du mode assiste.
+			menuAssiste.transform.position = new Vector3(-13.40673f, 1.765814f, -13.54324f);
+			menuAssiste.transform.eulerAngles = new Vector3(324.1f, 180f, 0);
+			menuAssiste.transform.localScale = new Vector3(0.32f, 0.32f, 0.32f);
 
 			// Mettre le texte dans les boutons du mode assiste.
 			menuAssiste.AssignerTexte(0, "Retour aux", "instruments");
@@ -81,16 +87,11 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 			menuAssiste.AssignerTexte(3, "Comptine", "d'été");
 			menuAssiste.AssignerTexte(4, "Boubou", "the Boubou");
 
-			// Positionner le menu du mode assiste.
-			menuAssiste.transform.position = new Vector3(-13.40673f, 1.765814f, -13.54324f);
-			menuAssiste.transform.eulerAngles = new Vector3(324.1f, 180f, 0);
-			menuAssiste.transform.localScale = new Vector3(0.32f, 0.32f, 0.32f);
-
 			// Desactive le piano.
 			pianoWrapper.SetActive (false);
 
 			// Activer le menu du mode assiste.
-			menuAssiste.gameObject.SetActive (true);
+			menuAssiste.Afficher();
 
 			// Se rappeler que le menu est active.
 			menuModeAssisteActif = true;

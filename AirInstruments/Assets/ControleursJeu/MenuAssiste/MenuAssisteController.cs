@@ -16,6 +16,38 @@ public class MenuAssisteController : MonoBehaviour {
 		return instance;
 	}
 
+	public void Afficher() {
+		numBoutonsDesactives = 0;
+		estEnTrainDeCacher = false;
+		gameObject.SetActive (true);
+		for (int i = 0; i < boutons.Count; ++i) {
+			boutons[i].GetComponent<BoutonMusique>().Afficher();
+		}
+	}
+
+	public void Cacher() {
+		numBoutonsDesactives = 0;
+		estEnTrainDeCacher = true;
+		for (int i = 0; i < boutons.Count; ++i) {
+			boutons[i].GetComponent<BoutonMusique>().Cacher();
+		}
+
+		// Desactiver le pointeur.
+		Pointeur.obtenirInstance ().gameObject.SetActive (false);
+	}
+
+	public void SignalerBoutonDesactive() {
+		if (!estEnTrainDeCacher)
+			return;
+
+		Debug.Log ("signaler bouton desactive");
+
+		++numBoutonsDesactives;
+		if (numBoutonsDesactives == boutons.Count) {
+			gameObject.SetActive (false);
+		}
+	}
+
 	// Assigne un texte a un bouton du menu.
 	public void AssignerTexte(int indexBouton, string texteHaut, string texteBas) {
 		boutons [indexBouton].GetComponent<BoutonMusique> ().AssignerTexte (texteHaut, texteBas);
@@ -28,7 +60,6 @@ public class MenuAssisteController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		
 	}
 	
 	// Update is called once per frame
@@ -57,9 +88,13 @@ public class MenuAssisteController : MonoBehaviour {
 	}
 	
 	void OnDisable () {
-		// Desactive le pointeur.
-		Pointeur.obtenirInstance ().gameObject.SetActive (false);
 	}
+
+	// Indique si on est en train de se cacher.
+	private bool estEnTrainDeCacher = false;
+
+	// Nombre de boutons qui se sont desactives correctement.
+	private int numBoutonsDesactives = 0;
 
 	// Unique instance de cette classe.
 	private static MenuAssisteController instance;
