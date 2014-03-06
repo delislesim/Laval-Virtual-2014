@@ -271,7 +271,7 @@ public class PianoNote : MonoBehaviour {
 	private const float kVitesseMinPourSon = 2.0f;
 	
 	// Proportion des notes blanches qui ne peuvent pas etre jourées (réservées aux notes noire)
-	private const float kProportionNoteBlancheNonJouable = 0.62f;
+	private const float kProportionNoteBlancheNonJouable = 0.8f;
 
 	// Temps que la note doit etre enfoncee par erreur avant qu'on entende un son.
 	private const float kTempsEnfonceeParErreurMax = 0.3f;
