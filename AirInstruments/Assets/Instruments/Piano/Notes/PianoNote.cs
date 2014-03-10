@@ -209,7 +209,7 @@ public class PianoNote : MonoBehaviour {
 		if (statut != PartitionPiano.StatutNote.Joueur)
 			return true;
 
-		if (aEteJouee || angleCourant >= kAngleCommencerSon)
+		if (aEteJouee || angleCourant >= kAngleCommencerSonAssisteVoulu)
 			return true;
 
 		return false;
@@ -227,7 +227,7 @@ public class PianoNote : MonoBehaviour {
 			return true;
 		}
 
-		if (angleCourant >= kAngleCommencerSon) {
+		if (angleCourant >= kAngleCommencerSonAssisteVoulu) {
 			JouerSon(1.0f);
 			aEteJouee = true;
 			return true;
@@ -242,7 +242,8 @@ public class PianoNote : MonoBehaviour {
 		if (statut != PartitionPiano.StatutNote.Muette)
 			return;
 
-		if (angleCourant >= kAngleCommencerSon) {
+		if (angleCourant >= kAngleCommencerSonAssisteInvalide ||
+		    (estJouee && angleCourant >= kAngleCommencerSonAssisteVoulu)) {
 			tempsEnfonceeParErreur += Time.deltaTime;
 			if (tempsEnfonceeParErreur >= kTempsEnfonceeParErreurMax) {
 				// Appliquer l'angle et jouer la note.
@@ -268,6 +269,12 @@ public class PianoNote : MonoBehaviour {
 	
 	// Angle pour commencer a jouer la note.
 	private const float kAngleCommencerSon = 4.0f;
+
+	// Angle pour commencer a jouer la note dans le mode assiste, quand la note ne doit pas etre jouee.
+	private const float kAngleCommencerSonAssisteInvalide = 6.0f;
+
+	// Angle pour commencer a jouer la note dans le mode assiste, quand la note doit etre jouee.
+	private const float kAngleCommencerSonAssisteVoulu = 2.0f;
 	
 	// Angle maximal permis.
 	private const float kAngleMaxPermis = 6.0f;
