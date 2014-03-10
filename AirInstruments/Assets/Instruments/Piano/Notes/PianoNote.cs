@@ -80,7 +80,7 @@ public class PianoNote : MonoBehaviour {
 
 	public void ToucherAvecSphere(FingerSphere sphere) {
 		// Calculer la position du bas de la boule rouge.
-		Vector3 spherePositionWorld = sphere.transform.position + Vector3.down * sphere.transform.localScale.y * 0.5f;
+		Vector3 spherePositionWorld = sphere.transform.position + Vector3.down * sphere.ObtenirRayon ();
 		Vector3 spherePositionLocal = transform.InverseTransformPoint (spherePositionWorld);
 
 		// Accepter la note seulement si le centre de la boule rouge est au-dessus de la note.
@@ -271,7 +271,7 @@ public class PianoNote : MonoBehaviour {
 	private const float kVitesseMinPourSon = 2.0f;
 	
 	// Proportion des notes blanches qui ne peuvent pas etre jourées (réservées aux notes noire)
-	private const float kProportionNoteBlancheNonJouable = 0.8f;
+	private const float kProportionNoteBlancheNonJouable = 0.65f;
 
 	// Temps que la note doit etre enfoncee par erreur avant qu'on entende un son.
 	private const float kTempsEnfonceeParErreurMax = 0.3f;

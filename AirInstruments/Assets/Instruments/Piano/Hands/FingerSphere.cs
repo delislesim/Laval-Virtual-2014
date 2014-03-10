@@ -62,6 +62,10 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 		                            	       kalmanPosition.z);
 	}
 
+	public float ObtenirRayon() {
+		return rayon;
+	}
+
 	public bool IsValid() {
 		return valid && compteurInvalide <= compteurInvalideMax;
 	}
