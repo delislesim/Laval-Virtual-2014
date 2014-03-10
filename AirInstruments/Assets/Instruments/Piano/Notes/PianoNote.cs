@@ -58,7 +58,7 @@ public class PianoNote : MonoBehaviour {
 			
 			// Réinitialiser l'angle de la note.
 			angleCourant = 0;
-		}
+		}  // Fin «mode libre»
 
 		// Si on est en train de faire le fade out du son.
 		if (estFadeout) {
@@ -78,7 +78,12 @@ public class PianoNote : MonoBehaviour {
 		}
 	}
 
-	public void ToucherAvecSphere(FingerSphere sphere) {
+	public void ToucherAvecSphere(FingerSphere sphere, bool estDescenduSousBlanches) {
+		// Empecher de jouer les notes noires par en-dessous.
+		if (noire && estDescenduSousBlanches && !estJouee && !estFadeout) {
+			return;
+		}
+
 		// Calculer la position du bas de la boule rouge.
 		Vector3 spherePositionWorld = sphere.transform.position + Vector3.down * sphere.ObtenirRayon ();
 		Vector3 spherePositionLocal = transform.InverseTransformPoint (spherePositionWorld);

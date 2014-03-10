@@ -21,7 +21,7 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 			Collider collider = hitColliders[i];
 			PianoNote note = collider.GetComponent<PianoNote>();
 			if (note != null) {
-				note.ToucherAvecSphere(this);
+				note.ToucherAvecSphere(this, estDescenduSousBlanches);
 			}
 		}
 	}
@@ -35,7 +35,7 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 		this.valid = valid;
 		if (!valid) {
 			++compteurInvalide;
-			if (compteurInvalide > compteurInvalideMax) {
+			if (compteurInvalide > kCompteurInvalideMax) {
 				renderer.enabled = false;
 			}
 			return;
@@ -60,14 +60,23 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 		transform.localPosition = new Vector3 (kalmanPosition.x,
 		                       		           kalmanPosition.y,
 		                            	       kalmanPosition.z);
+
+		// Noter si on est sous les blanches / au-desuss des noires.
+		float basSphere = transform.position.y - ObtenirRayon ();
+		if (basSphere < kHauteurBlanches) {
+			estDescenduSousBlanches = true;
+		} else if (basSphere > kHauteurNoires) {
+			estDescenduSousBlanches = false;
+		}
 	}
 
+	// Retourne le rayon de la sphere representant un doigt.
 	public float ObtenirRayon() {
 		return rayon;
 	}
 
 	public bool IsValid() {
-		return valid && compteurInvalide <= compteurInvalideMax;
+		return valid && compteurInvalide <= kCompteurInvalideMax;
 	}
 	
 	private bool initialized = false;
@@ -77,8 +86,18 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 	// Rayon de la sphere en coordonnes du monde.
 	private float rayon;
 
+	// Indique que le doigt est descendu sous le niveau des notes
+	// blanches sans aller au-dessus des notes noires depuis.
+	private bool estDescenduSousBlanches = false; 
+
+	// Hauteur des notes blanches.
+	private const float kHauteurBlanches = 2.171061f;
+
+	// Hauteur des notes noires.
+	private const float kHauteurNoires = 2.33302f;
+
 	// Gerer les donnees invalides.
 	private bool valid = false;
 	private int compteurInvalide = 0;
-	private const int compteurInvalideMax = 10;
+	private const int kCompteurInvalideMax = 10;
 }
