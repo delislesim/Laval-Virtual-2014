@@ -3,6 +3,9 @@ using System.Collections;
 
 public class FingerSphere : MonoBehaviour, HandJointSphereI {
 
+	// Projecteur générant l'ombre du doigt.
+	public GameObject projector;
+
 	// Use this for initialization
 	void Start () {
 		Vector3 worldScale = VectorConversions.CalculerWorldScale (transform);
@@ -37,11 +40,13 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 			++compteurInvalide;
 			if (compteurInvalide > kCompteurInvalideMax) {
 				renderer.enabled = false;
+				projector.SetActive (false);
 			}
 			return;
 		}
 		compteurInvalide = 0;
 		renderer.enabled = true;
+		projector.SetActive (true);
 		
 		// Mettre a jour la position.
 		if (!initialized) {
