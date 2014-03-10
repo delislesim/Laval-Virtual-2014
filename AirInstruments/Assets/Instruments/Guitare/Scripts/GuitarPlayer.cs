@@ -36,8 +36,6 @@ public class GuitarPlayer : MonoBehaviour {
 	//The different lists for different pitch level (left hand position)
 	private List<List<AudioClip>> HighVelocityPlayableNotes;
 	private const float LONGUEUR_MANCHE = 3.0f;
-	private float StartDelay = 5.0f;
-	private bool HasStarted;
 
 /*********************************************************/
 	public void SetScaleModeAndTone(Mode mode, Tone tone)
@@ -148,7 +146,6 @@ public class GuitarPlayer : MonoBehaviour {
 		dummy_counter = 0;
 		HighVelocityPlayableNotes = new List<List<AudioClip>>();
 		SetScaleModeAndTone(Mode.BLUES, Tone.E);
-		HasStarted = false;
 	}
 	
 	// Update is called once per frame

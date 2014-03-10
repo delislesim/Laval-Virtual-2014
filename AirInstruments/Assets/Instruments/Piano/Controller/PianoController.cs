@@ -9,6 +9,7 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 	// Controleur du mode assiste.
 	public AssistedModeControllerPiano assistedModeController;
 
+
 	public void Prepare() {
 		KinectPowerInterop.SetKinectAngle (15);
 	}

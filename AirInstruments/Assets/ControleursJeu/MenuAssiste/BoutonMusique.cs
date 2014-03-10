@@ -68,9 +68,6 @@ public class BoutonMusique : MonoBehaviour {
 		transform.localPosition = positionCachee;
 	}
 
-	// Indique si on s'est rappele de nos parametres une premiere fois.
-	private bool parametresEnregistres = false;
-
 	// Position par defaut en coordonnées locales.
 	private Vector3 positionDefaut;
 

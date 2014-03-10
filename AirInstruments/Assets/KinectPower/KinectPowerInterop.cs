@@ -226,19 +226,7 @@ public class KinectPowerInterop
 	[DllImport(@"kinect_lib.dll", EntryPoint = "GetHandsSkeletons", CallingConvention = CallingConvention.Cdecl)]
 	public static extern bool GetHandsSkeletons(HandJointInfo[] hand_joints);
 
-	// Piano experimentations.
-	[DllImport(@"kinect_lib.dll", EntryPoint = "GetPianoDepth", CallingConvention = CallingConvention.Cdecl)]
-	public static extern bool GetPianoDepth(byte[] pixels, uint pixels_size);
+	[DllImport(@"kinect_lib.dll", EntryPoint = "SetHandMeasurements", CallingConvention = CallingConvention.Cdecl)]
+	public static extern bool SetHandMeasurements(float width, float height);
 
-	[DllImport(@"kinect_lib.dll", EntryPoint = "GetPianoImage", CallingConvention = CallingConvention.Cdecl)]
-	public static extern bool GetPianoImage(byte[] pixels, uint pixels_size);
-
-	[DllImport(@"kinect_lib.dll", EntryPoint = "GetPianoHands", CallingConvention = CallingConvention.Cdecl)]
-	public static extern bool GetPianoHands(int[] positions, byte[] known);
-
-	[DllImport(@"kinect_lib.dll", EntryPoint = "GetPianoFingers", CallingConvention = CallingConvention.Cdecl)]
-	public static extern bool GetPianoFingers(uint[] positions, byte[] known);
-  
-	[DllImport(@"kinect_lib.dll", EntryPoint = "GetGestureStatus", CallingConvention = CallingConvention.Cdecl)]
-	public static extern bool GetGestureStatus(int[] gestureId);
 }

@@ -25,6 +25,8 @@ class CreativeWrapper {
     memcpy_s(joints, GetNumJoints() * sizeof(JointInfo), &joints_[0], joints_.size() * sizeof(JointInfo));
   }
 
+  void SetHandMeasurements(float width, float height);
+
  private:
   hskl::Tracker tracker_;
 

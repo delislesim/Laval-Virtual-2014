@@ -64,4 +64,7 @@ InitializeHandTracker();
 extern "C" bool __declspec(dllexport)
 GetHandsSkeletons(creative::JointInfo* joints);
 
+extern "C" bool __declspec(dllexport)
+SetHandMeasurements(float width, float height);
+
 #endif
