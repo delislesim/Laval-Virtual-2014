@@ -31,6 +31,14 @@ public class Kalman  {
 		x.w = initialObservation.w;
 	}
 
+	// Definit la force qui empeche les positions de bouger, pour chaque axe.
+	public void SetForce(Vector3 force) {
+		r.SetRow (0, new Vector4 (force.x, 0,       0,       0));
+		r.SetRow (1, new Vector4 (0,       force.y, 0,       0));
+		r.SetRow (2, new Vector4 (0,       0,       force.z, 0));
+		r.SetRow (3, new Vector4 (0,       0,       0,       1.0f));
+	}
+
 	public Vector4 Update(Vector4 observation) {
 		Vector4 z = observation - x;
 		p = AddMatrixes (p, q);

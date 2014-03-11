@@ -45,6 +45,10 @@ void CreativeWrapper::UpdateJoints() {
   }
 }
 
+void CreativeWrapper::SetHandMeasurements(float width, float height) {
+  tracker_.SetHandMeasurements(width, height);
+}
+
 }  // namespace creative
 
 #endif

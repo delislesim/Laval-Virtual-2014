@@ -28,9 +28,18 @@ public class IntelHandController : MonoBehaviour {
 	// Nombre de cylindres a créer.
 	private const int nombreCylindres = nombreCylindresParDoigt * 2;
 
+	// Tailles de mains.
+	private float[] kLargeur = {0.06f, 0.07f, 0.08f, 0.095f};
+	private float[] kHauteur = {0.14f, 0.15f, 0.19f, 0.21f};
+	private int kIndexTailleDefaut = 2;
+
 	void Start () {
 		// Initialiser la caméra Creative.
 		KinectPowerInterop.InitializeHandTracker ();
+
+		// Taille de mains par defaut.
+		KinectPowerInterop.SetHandMeasurements (kLargeur [kIndexTailleDefaut],
+		                                        kHauteur [kIndexTailleDefaut]);
 
 		// Créer les boules de doigts et de jointures.
 		for (int i = 0; i < nombreSpheres; ++i) {
@@ -64,6 +73,17 @@ public class IntelHandController : MonoBehaviour {
 	}
 
 	void Update () {
+		// Changer la taille des mains.
+		if (Input.GetButtonDown ("TailleMain1")) {
+			KinectPowerInterop.SetHandMeasurements (kLargeur [0], kHauteur [0]);
+		} else if (Input.GetButtonDown ("TailleMain2")) {
+			KinectPowerInterop.SetHandMeasurements (kLargeur [1], kHauteur [1]);
+		} else if (Input.GetButtonDown ("TailleMain3")) {
+			KinectPowerInterop.SetHandMeasurements (kLargeur [2], kHauteur [2]);
+		} else if (Input.GetButtonDown ("TailleMain4")) {
+			KinectPowerInterop.SetHandMeasurements (kLargeur [3], kHauteur [3]);
+		}
+
 		// Mettre a jour la position des boules rouge en fonction des donnees de la caméra Creative.
 		KinectPowerInterop.GetHandsSkeletons (hand_joints);
 

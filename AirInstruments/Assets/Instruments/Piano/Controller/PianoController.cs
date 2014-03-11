@@ -9,11 +9,16 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 	// Controleur du mode assiste.
 	public AssistedModeControllerPiano assistedModeController;
 
+	// Spotlight du piano.
+	public SpotlightControl spotlightPiano;
+
 	public void Prepare() {
 		KinectPowerInterop.SetKinectAngle (15);
+		spotlightPiano.SetTargetIntensity (kSpotlightIntensityPlaying, 1.0f);
 	}
 
 	public void PrepareToStop() {
+		spotlightPiano.SetTargetIntensity (kSpotlightIntensityDefault, 1.0f);
 	}
 
 	// Methode appelee quand l'instrument "piano" est choisi.
@@ -100,4 +105,10 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 
 	// Indique si le menu du mode assiste est presentement affiche.
 	private bool menuModeAssisteActif = false;
+
+	// Intensité du spotlight piano par defaut.
+	private const float kSpotlightIntensityDefault = 6.92f;
+
+	// Intensité du spotlight piano quand on est au piano.
+	private const float kSpotlightIntensityPlaying = 2.04f;
 }

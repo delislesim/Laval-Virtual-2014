@@ -235,6 +235,11 @@ bool GetHandsSkeletons(creative::JointInfo* joints) {
   return true;
 }
 
+bool SetHandMeasurements(float width, float height) {
+  creative_wrapper.SetHandMeasurements(width, height);
+  return true;
+}
+
 #endif
 
 bool GetGestureStatus(int* gestureID)

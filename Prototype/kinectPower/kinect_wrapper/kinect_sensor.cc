@@ -315,6 +315,8 @@ bool KinectSensor::PollNextSkeletonFrame(KinectSensorData* data) {
 
 void KinectSensor::AvoidCurrentSkeleton() {
   if (skeleton_sticky_ids_[0] == 0) {
+    skeleton_sticky_ids_[0] = skeleton_sticky_ids_[1];
+    skeleton_sticky_ids_[1] = 0;
     return;
   }
 
