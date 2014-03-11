@@ -102,7 +102,7 @@ public class SkeletonDrawer : MonoBehaviour {
 		}
 
 		//RightLeg
-		for(i = 1 ; i < spine_spheres.Count ; i++)
+		for(i = 1 ; i < right_leg_spheres.Count ; i++)
 		{	
 			if (right_leg_spheres[i-1]!=null && right_leg_spheres[i]!=null) {
 				HandCylinder handCylinder = (HandCylinder)cylindres[boneIdx].GetComponent (typeof(HandCylinder));

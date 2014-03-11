@@ -5,17 +5,17 @@ using System.Collections.Generic;
 public class AssistedModeControllerGuitar : MonoBehaviour {
 
 	public AudioClip clipLonelyBoy;
-	public AudioClip clipPointVirgule;
+	public AudioClip clipTNT;
 	public AudioClip clipBoubou;
 
 	private string fichierLonelyBoy = ".\\Assets\\Modes\\Assiste\\Guitare\\Chansons\\Lonely Boy Audacity.aup";
-	private string fichierPointVirgule = ".\\Assets\\Modes\\Assiste\\Guitare\\Chansons\\Lonely Boy Audacity.aup";
+	private string fichierTNT = ".\\Assets\\Modes\\Assiste\\Guitare\\Chansons\\TNT.aup";
 	private string fichierBoubou = ".\\Assets\\Modes\\Assiste\\Guitare\\Chansons\\Lonely Boy Audacity.aup";
 
 	public enum Chanson
 	{
 		LONELY_BOY,
-		POINT_VIRGULE,
+		TNT,
 		BOUBOU
 	}
 
@@ -44,9 +44,9 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 			nomFichier = fichierLonelyBoy;
 			clip = clipLonelyBoy;
 			break;
-		case Chanson.POINT_VIRGULE:
-			nomFichier = fichierPointVirgule;
-			clip = clipPointVirgule;
+		case Chanson.TNT:
+			nomFichier = fichierTNT;
+			clip = clipTNT;
 			break;
 		case Chanson.BOUBOU:
 			nomFichier = fichierBoubou;
