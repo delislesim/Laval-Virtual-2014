@@ -90,11 +90,15 @@ public class PianoNote : MonoBehaviour {
 		
 		// Accepter la note seulement si le centre de la boule rouge est au-dessus de la note.
 		float scaleXCollider = ((BoxCollider)collider).size.x;
-		if (spherePositionLocal.x > 0.5f * scaleXCollider || spherePositionLocal.x < -0.5 * scaleXCollider) {
+		if (spherePositionLocal.x > 0.5f * scaleXCollider ||
+		    spherePositionLocal.x < -0.5 * scaleXCollider) {
 			return false;
 		}
-		
-		if (!noire && spherePositionLocal.y > 0.5f - kProportionNoteBlancheNonJouable) {
+
+		float proportionNonJouable = 
+			AssistedModeControllerPiano.EstActive () && statut == PartitionPiano.StatutNote.Joueur ?
+				kProportionNoteBlancheNonJouableAssiste : kProportionNoteBlancheNonJouable;
+		if (!noire && spherePositionLocal.y > 0.5f - proportionNonJouable) {
 			return false;
 		}
 
@@ -297,8 +301,11 @@ public class PianoNote : MonoBehaviour {
 	// Vitesse a laquelle il faut appuyer la note pour faire un son (degres par seconde).
 	private const float kVitesseMinPourSon = 2.0f;
 	
-	// Proportion des notes blanches qui ne peuvent pas etre jourées (réservées aux notes noire)
+	// Proportion des notes blanches qui ne peuvent pas etre jouées (réservées aux notes noire)
 	private const float kProportionNoteBlancheNonJouable = 0.65f;
+
+	// Proportion des notes blanches qui ne peuvent pas etre jouées, lors du mode assisté.
+	private const float kProportionNoteBlancheNonJouableAssiste = 0.45f;
 
 	// Temps que la note doit etre enfoncee par erreur avant qu'on entende un son.
 	private const float kTempsEnfonceeParErreurMax = 0.3f;

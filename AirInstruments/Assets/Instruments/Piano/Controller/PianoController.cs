@@ -25,7 +25,7 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 	void OnEnable() {
 		pianoWrapper.SetActive (true);
 
-		//assistedModeController.ChargerPartition (".\\Assets\\Modes\\Assiste\\Piano\\partitions\\fur_elise.txt", 1.0f);
+		assistedModeController.ChargerPartition (".\\Assets\\Modes\\Assiste\\Piano\\partitions\\valse.txt", 4.0f);
 	}
 	
 	// Methode appelee quand l'instrument "piano" n'est plus choisi.
