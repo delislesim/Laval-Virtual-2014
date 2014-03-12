@@ -9,6 +9,9 @@ public class DrumHand : MonoBehaviour {
 
 	// Baguette.
 	public Collider baguette;
+	public Collider autreBaguette;
+	public Collider autreMain;
+	public Collider autreTip;
 
 	// Use this for initialization
 	void Start () {
@@ -17,6 +20,9 @@ public class DrumHand : MonoBehaviour {
 
 		// Ignore les collisions entre les elements d'une meme main.
 		Physics.IgnoreCollision (collider, baguette);
+		Physics.IgnoreCollision (collider, autreBaguette);
+		Physics.IgnoreCollision (collider, autreMain);
+		Physics.IgnoreCollision (collider, autreTip);
 
 		// Initialiser Kalman.
 		kalman.SetInitialObservation (Vector4.zero);
