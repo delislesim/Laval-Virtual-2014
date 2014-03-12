@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class DrumHand : MonoBehaviour {
 
@@ -19,6 +20,11 @@ public class DrumHand : MonoBehaviour {
 
 		// Initialiser Kalman.
 		kalman.SetInitialObservation (Vector4.zero);
+
+		if (name == "HandLeft")
+			anglesCorrects = kAnglesCorrectsGauche;
+		else
+			anglesCorrects = kAnglesCorrectsDroite;
 	}
 
 	void OnDisable () {
@@ -34,21 +40,27 @@ public class DrumHand : MonoBehaviour {
 	}
 
 	private void MettreAJourRotation(Vector3 rotation) {
+		return;
+		/*
 		Vector4 previousRotation = kalman.GetFilteredVector ();
+		// x, y, z
 		for (int i = 0; i < 3; ++i) {
-			if (rotation[i] > 300 && previousRotation[i] < 60) {
+			float diffRotationDepasseHaut = Mathf.Abs(rotation[i] + 360 - previousRotation[i]);
+			float diffRotationDepasseBas = Mathf.Abs(rotation[i] - 360 - previousRotation[i]);
+			float diffRotation = Math.Abs(rotation[i] - previousRotation[i]);
+
+			if (diffRotationDepasseBas < diffRotation && diffRotationDepasseBas < diffRotationDepasseHaut) {
 				rotation[i] -= 360;
-			} else if (rotation[i] < 60 && previousRotation[i] > 300) {
+			} else if (diffRotationDepasseHaut < diffRotation && diffRotationDepasseHaut < diffRotationDepasseBas) {
 				rotation[i] += 360;
 			}
 		}
-		
+
+		//if (rotation.z < 10 || rotation.z > 70) {
+		//	rotation = anglesCorrects;
+		//}
+
 		Vector4 smoothedRotation = kalman.Update (new Vector4(rotation.x, rotation.y, rotation.z, 0));
-		Quaternion smoothedRotationQuaternion = Quaternion.Euler (new Vector3 (smoothedRotation.x,
-		                                                                       smoothedRotation.y,
-		                                                                       smoothedRotation.z));
-		transform.localRotation = smoothedRotationQuaternion;
-		
 		for (int i = 0; i < 3; ++i) {
 			while (smoothedRotation[i] > 360) {
 				smoothedRotation[i] -= 360;
@@ -56,8 +68,38 @@ public class DrumHand : MonoBehaviour {
 			while (smoothedRotation[i] < 0) {
 				smoothedRotation[i] += 360;
 			}
+
+
+			float max = anglesCorrects[i] + kAnglesCorrectsTolerance[i];
+			float min = anglesCorrects[i] - kAnglesCorrectsTolerance[i];
+			if (smoothedRotation[i] > max || smoothedRotation[i] <  min) {
+				float diffMax = DifferenceAngle(smoothedRotation[i], max);
+				float diffMin = DifferenceAngle(smoothedRotation[i], min);
+				if (diffMax < diffMin) {
+					smoothedRotation[i] = max;
+				}
+				else {
+					smoothedRotation[i] = min;
+				}
+			}
+
 		}
+
+		Quaternion smoothedRotationQuaternion = Quaternion.Euler (new Vector3 (smoothedRotation.x,
+		                                                                       smoothedRotation.y,
+		                                                                       smoothedRotation.z));
+		//transform.localRotation = Quaternion.identity;
+		//smoothedRotationQuaternion;
 		kalman.SetInitialObservation (smoothedRotation);
+		
+		*/
+	}
+
+	float DifferenceAngle(float angle, float target) {
+		float diffExact = Mathf.Abs(angle - target);
+		float diffPlus = Mathf.Abs(angle + 360 - target);
+		float diffMoins = Mathf.Abs(angle - 360 - target);
+		return Math.Min(Math.Min(diffPlus, diffMoins), diffExact);
 	}
 
 	private void MettreAJourPosition(Vector3 position) {
@@ -76,10 +118,15 @@ public class DrumHand : MonoBehaviour {
 	}
 
 	// Filtre de Kalman pour smoother la rotation des mains.
-	private Kalman kalman = new Kalman(20.0f);
+	private Kalman kalman = new Kalman(30.0f);
 
 	// Distance maximale pour une teleportation.
 	private const float kDistanceTeleportation = 2.0f;
+
+	private Vector3 anglesCorrects;
+	private Vector3 kAnglesCorrectsGauche = new Vector3(300.0f, 205.0f, 40.0f);
+	private Vector3 kAnglesCorrectsDroite = new Vector3(300.0f, 205.0f, 40.0f);
+	private Vector3 kAnglesCorrectsTolerance = new Vector3(58.0f, 70.0f, 0); 
 
 	// Position initiale.
 	private Vector3 positionInitiale;
