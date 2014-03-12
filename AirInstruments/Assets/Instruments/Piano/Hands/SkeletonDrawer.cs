@@ -38,6 +38,9 @@ public class SkeletonDrawer : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		PlacerCylindres();
+
+		left_arm_spheres[3].transform.rotation = cylindres[5].transform.rotation;
+		right_arm_spheres[3].transform.rotation = cylindres[8].transform.rotation;
 	}
 
 	//TODO : avoir un tableau de listes pour avoir une seule boucle for double (imbriquée)

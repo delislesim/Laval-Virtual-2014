@@ -9,10 +9,16 @@ public class BaguetteDrum : MonoBehaviour {
 	// Bout de la baguette suppose etre dans la main.
 	public GameObject boutBaguetteMain;
 
+	public Collider autreBaguette;
+	public Collider autreTip;
+
 	void Start () {
 		Debug.Log ("start baguette");
 		positionInitiale = transform.position;
 		rotationInitiale = transform.rotation;
+
+		Physics.IgnoreCollision (collider, autreTip);
+		Physics.IgnoreCollision (collider, autreBaguette);
 	}
 
 	void OnDisable () {
