@@ -131,12 +131,6 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 		pianoNote.ecartDemiTon = ecartDemiTon;
 
 		notes.Add (pianoNote);
-		/*
-		if (position < 7) {
-			// Rendre la note invisible.
-			note.transform.localPosition = kPositionInvalide;
-		}
-		*/
 	}
 
 	void CreerNoire(int position, AudioClip clip, float ecartDemiTon) {
@@ -157,17 +151,21 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 		pianoNote.ecartDemiTon = ecartDemiTon;
 		
 		notes.Add (pianoNote);
-
-		/*
-		if (position < 7) {
-			// Rendre la note invisible.
-			note.transform.localPosition = kPositionInvalide;
-		}
-		*/
 	}
 
 	public void DefinirStatutNote(int index, PartitionPiano.StatutNote statut) {
 		notes [index].DefinirStatut (statut);
+
+		// Rendre les notes adjacentes injouables.
+		for (int i = index - 2; i < index + 2; ++i) {
+			if (i >= 0 && i < notes.Count) {
+				notes [i].DefinirAdjacentAJouer(true);
+			}
+		}
+	}
+
+	public void DefinirAdjacentAJouer(int index, bool adjacentAJouer) {
+		notes [index].DefinirAdjacentAJouer (adjacentAJouer);
 	}
 
 	public void ObtenirInfoNotePourCubesTombants(int index, out float positionHorizontale, out float largeur) {
