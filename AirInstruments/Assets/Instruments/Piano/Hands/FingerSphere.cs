@@ -20,15 +20,26 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 			return;
 		}
 
-		// Trouver des objets en collision avec cette boule.
-		Collider[] hitColliders = Physics.OverlapSphere (transform.position, rayon);
-		for (int i = 0; i < hitColliders.Length; ++i) {
-			Collider collider = hitColliders[i];
-			PianoNote note = collider.GetComponent<PianoNote>();
-			if (note != null) {
-				note.ToucherAvecSphere(this, estDescenduSousBlanches);
+		// Verifier si on est encore sur une note.
+		if (!EstSurNoires () && !EstSurBlanches ()) {
+			noteJouee = null;
+		} else {
+			// Trouver des objets en collision avec cette boule.
+			Collider[] hitColliders = Physics.OverlapSphere (transform.position, rayon);
+			for (int i = 0; i < hitColliders.Length; ++i) {
+				Collider collider = hitColliders[i];
+				PianoNote note = collider.GetComponent<PianoNote>();
+				if (note != null) {
+					if (note.ToucherAvecSphere(this, estDescenduSousBlanches)) {
+						noteJouee = note;
+					}
+				}
 			}
 		}
+	}
+
+	void OnEnable() {
+		noteJouee = null;
 	}
 
 	public void SetTargetPosition(Vector3 targetPosition, bool valid) {
@@ -46,7 +57,18 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 		compteurInvalide = 0;
 		renderer.enabled = true;
 		projector.SetActive (true);
-		
+
+		// Empecher de glisser en x si on est en train de jouer une note.
+		if (noteJouee != null) {
+			Vector3 positionNote = transform.parent.InverseTransformPoint(noteJouee.transform.position);
+			Vector3 positionDoigt = transform.localPosition;
+
+			// Centrer le doigt sur le centre de la note.
+			if (Mathf.Abs(positionNote.x - targetPosition.x) < 1.25f) {
+				targetPosition.x = positionNote.x;
+			}
+		}
+
 		// Mettre a jour la position.
 		if (!initialized) {
 			kalman.SetInitialObservation(new Vector4(targetPosition.x,
@@ -76,12 +98,23 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 		// Ajuster filtre de Kalman selon notre position.
 		Vector3 position = transform.position;
 		float yBas = position.y - ObtenirRayon ();
-		if ((position.z > kZNoires && yBas < kHauteurNoires) ||
-		    (position.z > kZBlanches && yBas < kHauteurBlanches)) {
+		if (EstSurNoires() || EstSurBlanches()) {
 			kalman.SetForce(kForcesKalmanTouche);
 		} else {
 			kalman.SetForce(kForcesKalmanDefaut);
 		}
+	}
+
+	private bool EstSurNoires() {
+		Vector3 position = transform.position;
+		float yBas = position.y - ObtenirRayon ();
+		return (position.z > kZNoires && yBas < kHauteurNoires);
+	}
+
+	private bool EstSurBlanches() {
+		Vector3 position = transform.position;
+		float yBas = position.y - ObtenirRayon ();
+		return (position.z > kZBlanches && yBas < kHauteurBlanches);
 	}
 
 	// Retourne le rayon de la sphere representant un doigt.
@@ -92,10 +125,16 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 	public bool IsValid() {
 		return valid && compteurInvalide <= kCompteurInvalideMax;
 	}
-	
+
+
+	// Indique si la premiere position a ete definie.
 	private bool initialized = false;
-	
+
+	// Filtre de Kalman pour eviter les mouvements brusques du doigt.
 	private Kalman kalman = new Kalman(0.0f);
+
+	// Indique la note jouee par ce doigt.
+	private PianoNote noteJouee;
 
 	// Forces par defaut pour le filtre de Kalman.
 	private Vector3 kForcesKalmanDefaut = new Vector3(1.0f, 1.0f, 1.0f);

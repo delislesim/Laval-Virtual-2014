@@ -24,6 +24,8 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 	// Methode appelee quand l'instrument "piano" est choisi.
 	void OnEnable() {
 		pianoWrapper.SetActive (true);
+
+		//assistedModeController.ChargerPartition (".\\Assets\\Modes\\Assiste\\Piano\\partitions\\valse.txt", 4.0f);
 	}
 	
 	// Methode appelee quand l'instrument "piano" n'est plus choisi.
@@ -48,10 +50,12 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 			case 0:
 				// Quitter le piano.
 				GameState.ObtenirInstance().AccederEtat(GameState.State.ChooseInstrument);
+				assistedModeController.ActiverLibre();
 				break;
 			case 1:
 				Debug.Log("Mode Libre");
 				pianoWrapper.SetActive (true);
+				assistedModeController.ActiverLibre();
 				break;
 			case 2:
 				assistedModeController.ChargerPartition (".\\Assets\\Modes\\Assiste\\Piano\\partitions\\fur_elise.txt", 1.0f);

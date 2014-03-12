@@ -46,12 +46,15 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 
 	// Reinitialise les cubes, la musique et tout :)
 	private void Reinitialiser() {
+		Start ();
+
 		prochainesNotes = new PartitionPiano.StatutNote[nombreEchantillons, nombreNotes];
 		dernierTempsJoue = 0;
 		tempsActuel = 0.0f;
 		peutContinuer = true;
 		partition = null;
 		speed = 0;
+		
 		cubesTombantsScript.ViderCubes ();
 
 		// Mettre toutes les notes muettes.
@@ -60,10 +63,14 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 		}
 	}
 
+	bool initialized = false;
 	void Start () {
+		if (initialized)
+			return;
 		instrumentScript = (Instrument)(instrument.GetComponent (typeof(PianoBuilder)));
 		cubesTombantsScript = (CubesTombants)(cubesTombants.GetComponent (typeof(CubesTombants)));
 		cubesTombantsScript.AssignerInstrument (instrumentScript);
+		initialized = true;
 	}
 
 	void Update () {
