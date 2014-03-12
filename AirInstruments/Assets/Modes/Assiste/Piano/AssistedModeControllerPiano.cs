@@ -102,9 +102,14 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 				for (int i = dernierTempsJoue; i < tempsAJouerEchantillons; ++i) {
 					int tempsAJouerEchantillonsModulo = i % nombreEchantillons;
 
+					// Reinitialiser les booleens indiquant si chaque note est adjacent
+					// a une note a jouer.
+					for (int j = 0; j < nombreNotes; ++j) {
+						instrumentScript.DefinirAdjacentAJouer(j, false);
+					}
+
 					// Passer toutes les notes que le joueur doit jouer.
 					for (int j = 0; j < nombreNotes; ++j) {
-						// Jouer la note si necessaire.
 						PartitionPiano.StatutNote statutNote = prochainesNotes [tempsAJouerEchantillonsModulo, j];
 						if (statutNote != PartitionPiano.StatutNote.Accompagnement) {
 							instrumentScript.DefinirStatutNote (j, statutNote);
