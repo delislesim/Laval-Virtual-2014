@@ -50,7 +50,10 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 					} 
 
 					if (note.ToucherAvecSphere(this, estDescenduSousBlanches)) {
-						noteJouee = note;
+						if (!AssistedModeControllerPiano.EstActive() ||
+						    note.ObtenirStatut() == PartitionPiano.StatutNote.Joueur) {
+							noteJouee = note;
+						}
 					}
 				}
 			}
