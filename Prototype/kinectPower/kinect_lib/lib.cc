@@ -161,6 +161,8 @@ bool GetJointsPositionDepth(int skeleton_id, int* joint_positions) {
     return false;
 
   KinectSensor* sensor = wrapper->GetSensorByIndex(0);
+  if (sensor == NULL)
+    return false;
 
   for (int joint_index = 0;
     joint_index < KinectSkeleton::JointCount; ++joint_index) {
@@ -187,7 +189,11 @@ bool GetJointsPositionDepth(int skeleton_id, int* joint_positions) {
 
 bool AvoidCurrentSkeleton() {
   KinectWrapper* wrapper = KinectWrapper::instance();
-  wrapper->GetSensorByIndex(0)->AvoidCurrentSkeleton();
+  KinectSensor* sensor = wrapper->GetSensorByIndex(0);
+  if (sensor == NULL)
+    return false;
+
+  sensor->AvoidCurrentSkeleton();
   return true;
 }
 
@@ -250,11 +256,19 @@ bool GetGestureStatus(int* gestureID)
 
 int GetKinectAngle() {
   KinectWrapper* wrapper = KinectWrapper::instance();
-  return wrapper->GetSensorByIndex(0)->GetAngle();
+  KinectSensor* sensor = wrapper->GetSensorByIndex(0);
+  if (sensor == NULL)
+    return 0;
+
+  return sensor->GetAngle();
 }
 
 bool SetKinectAngle(int angle) {
   KinectWrapper* wrapper = KinectWrapper::instance();
-  wrapper->GetSensorByIndex(0)->SetAngle(angle);
+  KinectSensor* sensor = wrapper->GetSensorByIndex(0);
+  if (sensor == NULL)
+    return 0;
+
+  sensor->SetAngle(angle);
   return true;
 }

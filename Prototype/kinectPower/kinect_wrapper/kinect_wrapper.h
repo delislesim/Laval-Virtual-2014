@@ -27,7 +27,6 @@ class KinectWrapper {
 
   // Access the sensors.
   KinectSensor* GetSensorByIndex(int index) {
-    assert(sensor_state_[index].GetSensor() != NULL);
     return sensor_state_[index].GetSensor();
   }
   int GetSensorCount();
