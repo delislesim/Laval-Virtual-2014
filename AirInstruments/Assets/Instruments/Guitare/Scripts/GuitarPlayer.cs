@@ -146,7 +146,7 @@ public class GuitarPlayer : MonoBehaviour {
 		dummy_counter = 0;
 		HighVelocityPlayableNotes = new List<List<AudioClip>>();
 		SetScaleModeAndTone(Mode.BLUES, Tone.E);
-		HasStarted = false;
+		//HasStarted = false;
 		audio.pitch = audio.pitch*Mathf.Pow(1.05946f,-1);
 	}
 	
