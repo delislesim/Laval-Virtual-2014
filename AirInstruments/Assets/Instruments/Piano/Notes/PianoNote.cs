@@ -78,10 +78,10 @@ public class PianoNote : MonoBehaviour {
 		}
 	}
 
-	public void ToucherAvecSphere(FingerSphere sphere, bool estDescenduSousBlanches) {
+	public bool ToucherAvecSphere(FingerSphere sphere, bool estDescenduSousBlanches) {
 		// Empecher de jouer les notes noires par en-dessous.
 		if (noire && estDescenduSousBlanches && !estJouee && !estFadeout) {
-			return;
+			return false;
 		}
 
 		// Calculer la position du bas de la boule rouge.
@@ -91,11 +91,11 @@ public class PianoNote : MonoBehaviour {
 		// Accepter la note seulement si le centre de la boule rouge est au-dessus de la note.
 		float scaleXCollider = ((BoxCollider)collider).size.x;
 		if (spherePositionLocal.x > 0.5f * scaleXCollider || spherePositionLocal.x < -0.5 * scaleXCollider) {
-			return;
+			return false;
 		}
 
 		if (!noire && spherePositionLocal.y > 0.5f - kProportionNoteBlancheNonJouable) {
-			return;
+			return false;
 		}
 
 		// Calculer l'angle que la note doit avoir pour ne pas toucher au doigt.
@@ -105,6 +105,8 @@ public class PianoNote : MonoBehaviour {
 		} else if (noteAngle > angleCourant) {
 			angleCourant = noteAngle;
 		}
+		
+		return noteAngle > 0;
 	}
 
 	// Calcule l'angle que doit avoir la note pour ne pas toucher
