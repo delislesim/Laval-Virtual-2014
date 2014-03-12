@@ -58,3 +58,185 @@
 0.5 [La2] [Do3] [Fa3] {Si3}
 6   [Do2] {Mi3} [Mi4]
 6   [Mi2] [Sol2] [Si2] {Mi3} [Mi4]
+1 [Re2] {Re4}
+1 [Re2] [Mi3] {Re4}
+1 [Fa2] [La2] [Fa3] {Re4}
+1             [Mi3] {Re4}
+1 [Fa2] [La2] [Fa3] {Re4}
+1             [Mi3]
+1 [Re2] {Re4}
+1 [Re2] [Mi3] {Re4}
+1 [Fa2] [La2] [Fa3] {Re4}
+1             {Do4}
+1 [Fa2] [La2] [Mi3] {Do4}
+1             [Fa3] {Do4}
+1 [La1] {Si3}
+1 [La1] [Re3] {Si3}
+1 [Mi2] [La2] [Mi3] {Si3}
+1             [Re3] {Si3}
+1 [Mi2] [La2] [Mi3] {Si3}
+1             [Re3] {Si3}
+1 [La1] {La3}
+1 [La1] [Do3] {La3}
+1 [Mi2] [La2] [Re3] {La3}
+1             [Mi3] {La3}
+1 [Mi2] [La2] [Re3] {La3}
+1             [Do3] {La3}
+1 [Re2] {Re4}
+1 [Re2] [Mi3] {Re4}
+1 [Fa2] [La2] [Fa3] {Re4}
+1             [Mi3] {Re4}
+1 [Fa2] [La2] [Fa3] {Re4}
+1             [Mi3]
+1 [Re2] {Re4}
+1 [Re2] [Mi3] {Re4}
+1 [Fa2] [La2] [Fa3] {Re4}
+1 {Do4}
+1 [Fa2] [La2] [Mi3] {Do4}
+1             [Fa3] {Do4}
+1 [La1] {Si3}
+1 [La1] [Re3] {Si3}
+1 [Mi2] [La2] [Mi3] {Si3}
+1             [Re3] {Si3}
+1 [Mi2] [La2] [Mi3] {Si3}
+1             [Re3] {Si3}
+1 [La1] {La3}
+1 [La1] [Do3] {La3}
+1 [Mi2] [La2] [Re3] {La3}
+1             [Mi3] {La3}
+1 [Mi2] [La2] [Re3] {La3}
+1             [Do3] {La3}
+1 [Fa2] {Do4}
+1 [Fa2] [Mi3] {Do4}
+1 [La2] [Do3] {Fa3} {Do4}
+1             {Mi3} {Do4}
+1 [La2] [Do3] {Fa3} {Do4}
+1             {Mi3}
+1 [Fa2] {Do4}
+1 [Fa2] [Mi3] {Do4}
+1 [La2] [Do3] [Fa3] {Do4}
+1             [Mi3] {Do4}
+1 [La2] [Do3] [Fa3] {Do4}
+1 [Re3]
+1 [Do2] {Do4}
+1 [Do2] [Re3] {Do4}
+1 [Mi2] [Sol2] [Mi3] {Do4}
+1              [Re3] {Do4}
+1 [Mi2] [Sol2] [Mi3] {Do4}
+1              [Re3] {Do4}
+1 [Do2] [Mi3] {Do4}
+1 [Do2] [Re3] {Do4}
+1 [Mi2] [Sol2] [Do3] {Do4}
+1              [Mi3] {Do4}
+1 [Mi2] [Sol2] [Re3] {Do4}
+1              [Do3]
+1 [Fa2] {Do4}
+1 [Fa2] [Mi3] {Do4}
+1 [La2] [Do3] [Fa3] {Do4}
+1             [Mi3] {Do4}
+1 [La2] [Do3] [Fa3] {Do4}
+1             [Mi3]
+1 [Fa2] {Do4}
+1 [Fa2] [Mi3] {Do4}
+1 [La2] [Do3] [Fa3] {Do4}
+1             [Mi3] {Do4}
+1 [La2] [Do3] [Fa3] {Do4}
+1             [Re3]
+1 [Do2] {Do4}
+1 [Do2] [Re3] {Do4}
+1 [Mi2] [Sol2] [Mi3] {Do4}
+1              [Re3] {Do4}
+1 [Mi2] [Sol2] [Mi3] {Do4}
+1              [Re3] {Do4}
+1 [Do2] [Mi3] {Do4}
+1 [Do2] [Re3] {Do4}
+1 [Mi2] [Sol2] [Do3] {Do4}
+1              [Mi3] {Do4}
+1 [Mi2] [Sol2] [Re3] {Do4}
+1              [Do3]
+1 [Re2] {Re4}
+1 [Re2] [Re3] {Re4}
+1 [Fa2] [La2] [Mi3] {Re4}
+1             [Re3] {Re4}
+1 [Fa2] [La2] [Mi3] {Re4}
+1             [Re3] {Re4}
+1 [Re2] {Mi4}
+1 [Re2] [Re3] {Mi4}
+1 [Fa2] [La2] [Mi3] {Mi4}
+1             [Do4] {Mi4}
+1 [Fa2] [La2] [Re3] [Do4] {Mi4}
+1             [Mi3] [Do4] {Mi4}
+1 [La1] {Si3}
+1 [La1] [Re3] {Si3}
+1 [Mi2] [La2] [Mi3] {Si3}
+1             [Re3] {Si3}
+1 [Mi2] [La2] [Mi3] {Si3}
+1             [Re3] {Si3}
+1 [La1] {La3}
+1 [La1] [Do3] {La3}
+1 [Mi2] [La2] [Re3] {La3}
+1             [Mi3] {La3}
+1 [Mi2] [La2] [Re3] {La3}
+1             [Do3] {La3}
+1 [Re2] {Re4}
+1 [Re2] [Re3] {Re4}
+1 [Fa2] [La2] [Mi3] {Re4}
+1             [Re3] {Re4}
+1 [Fa2] [La2] [Mi3] {Re4}
+1             [Re3] {Re4}
+1 [Re2] {Mi4}
+1 [Re2] [Re3] {Mi4}
+1 [Fa2] [La2] [Mi3] {Mi4}
+1                   [Do4] {Mi4}
+1 [Fa2] [La2] [Re3] [Do4] {Mi4}
+1             [Mi3] [Do4] {Mi4}
+1 [La1] {Si3}
+1 [La1] [Re3] {Si3}
+1 [Mi2] [La2] [Mi3] {Si3}
+1             [Re3] {Si3}
+1 [Mi2] [La2] [Mi3] {Si3}
+1             [Re3] {Si3}
+1 [La1] {La3}
+1 [La1] [Do3] {La3}
+1 [Mi2] [La2] [Re3] {La3}
+1             [Mi3] {La3}
+1 [Mi2] [La2] [Re3] {La3}
+1             [Do3] {La3}
+1 [Fa2] {Do4}
+1 [Fa2] [Mi3] {Do4}
+1 [Fa2] [Do3] [Fa3] {Do4}
+1             [Mi3] {Do4}
+1 [Fa2] [Do3] [Fa3] {Do4}
+1             [Mi3]
+1 [Fa2] {Do4}
+1 [Fa2] [Mi3] {Do4}
+1 [La2] [Do3] [Fa3] {Do4}
+1                   {Si3}
+1 [La2] [Do3] [Mi3] {Si3}
+1             [Fa3] {Si3}
+1 [Do2] {Sol3}
+1 [Do2] [Re3] {Sol3}
+1 [Mi2] [Sol2] [Mi3] {Sol3}
+1              [Re3] {Sol3}
+1 [Mi2] [Sol2] [Mi3] {Sol3}
+1              [Re3] {Sol3}
+1 [Do2] {Mi3}
+1 [Do2] {Re3}
+1 [Mi2] [Sol2] {Do3}
+1              {Mi3}
+1 [Mi2] [Sol2] {Re3}
+1              {Do3}
+1 [Fa2] {Do4}
+1 [Fa2] [Mi3] {Do4}
+1 [La2] [Do3] [Fa3] {Do4}
+1             [Mi3] {Do4}
+1 [La2] [Do3] [Fa3] {Do4}
+1             [Mi3]
+1 [Fa2] {Do4}
+1 [Fa2] [Mi3] {Do4}
+1 [La2] [Do3] [Fa3] {Do4}
+1                   {Si3}
+1 [La2] [Do3] [Mi3] {Si3}
+1             [Fa3] {Si3}
+2 [Do2] {Do4}
+6 {Do4}
