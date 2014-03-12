@@ -168,12 +168,12 @@ public class MoveJoints : MonoBehaviour {
 				} else {
 					joints[i].transform.position = current_positions[i];
 				}
-
+				/*
 				if (skeletonValid && current_positions[i] != HIDING_POS) {
 					joints[i].renderer.enabled = true;
 				} else {
 					joints[i].renderer.enabled = false;
-				}
+				}*/
 			}
 
 			//Store new current position/rotation
