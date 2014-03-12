@@ -5,7 +5,7 @@ using KinectHelpers;
 public class GestureMenu : Gesture {
 
 	private const float distanceBetweenHands_ = 0.18f;
-	private const float handsToHead_ = 0.10f;
+	private const float handsToHead_ = -0.10f;
 	private const float gestureTime_ = 1.2f;
 	private float elapsedTime_ = 0;
 
@@ -25,8 +25,8 @@ public class GestureMenu : Gesture {
 		leftHandStatus = skeleton.GetJointPosition (Skeleton.Joint.HandLeft, out leftHandPos);
 		headStatus = skeleton.GetJointPosition (Skeleton.Joint.Head, out headPos);
 
-		if(rightHandStatus == Skeleton.JointStatus.NotTracked && leftHandStatus == Skeleton.JointStatus.NotTracked
-		   && headStatus == Skeleton.JointStatus.NotTracked) {
+		if(rightHandStatus == Skeleton.JointStatus.NotTracked || leftHandStatus == Skeleton.JointStatus.NotTracked
+		   || headStatus == Skeleton.JointStatus.NotTracked) {
 			return false;
 		}
 

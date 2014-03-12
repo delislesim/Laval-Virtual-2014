@@ -11,7 +11,7 @@ public class GestureDrum : Gesture {
 	private float[] previousHandsPosition_;
 
 	private const float gestureTimeout_ = 1.0f;
-	private const float gestureTime_ = 2.4f;
+	private const float gestureTime_ = 2.0f;
 
 	private const float minHandDepth_ = 0.14f;
 	private const float minHandsSpeed_ = 0.20f;
