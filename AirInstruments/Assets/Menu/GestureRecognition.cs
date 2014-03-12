@@ -33,7 +33,6 @@ public class GestureRecognition : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		AddGesture (new GesturePiano ());
-		AddGesture (new GestureMenu ());
 		AddGesture (new GestureDrum ());
 		AddGesture (new GestureGuitar ());
 	}
@@ -51,13 +50,51 @@ public class GestureRecognition : MonoBehaviour {
 				Debug.Log ("Gesture: " + currentId);
 			}
 		}
+		DetectGesture (currentId);
 		//print(currentId);
 		//print(gestureId[0]);
 	}
 
-	void AddGesture(Gesture gesture)
+	private void DetectGesture(GestureId gestureId)
+	{
+		switch(gestureId)
+		{
+		case GestureId.NO_GESTURE:
+			break;
+		case GestureId.GESTURE_DRUM:
+			GameState.ObtenirInstance().AccederEtat(GameState.State.Drum);
+			SwitchToInstrument();
+			break;
+		case GestureId.GESTURE_GUITAR:
+			GameState.ObtenirInstance().AccederEtat(GameState.State.Guitar);
+			SwitchToInstrument();
+			break;
+		case GestureId.GESTURE_PIANO:
+			GameState.ObtenirInstance().AccederEtat(GameState.State.Piano);
+			SwitchToInstrument();
+			break;
+		case GestureId.GESTURE_MENU:
+			GameState.ObtenirInstance().AccederEtat(GameState.State.ChooseInstrument);
+			break;
+		}
+	}
+
+	private void SwitchToInstrument()
+	{
+		DeleteGesture (GestureId.GESTURE_DRUM);
+		DeleteGesture (GestureId.GESTURE_PIANO);
+		DeleteGesture (GestureId.GESTURE_GUITAR);
+		AddGesture (new GestureMenu ());
+	}
+
+	private void AddGesture(Gesture gesture)
 	{
 		gestureList.Add(gesture);
+	}
+
+	private void DeleteGesture(GestureId gestureId)
+	{
+		gestureList.RemoveAll (x => x.GestureId_ == gestureId);
 	}
 
 	private Skeleton skeleton_ = new Skeleton(0);
