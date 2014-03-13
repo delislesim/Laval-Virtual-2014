@@ -107,9 +107,6 @@ public class IntelHandController : MonoBehaviour {
 		KinectPowerInterop.HandJointIndex jointIndex;
 		int indexMain;
 		ObtenirJointEtNumeroMain(index, out jointIndex, out indexMain);
-		
-		// Ajuster la hauteur du joint selon le snap (idee de Vanier).
-		jointInfo.z += ajustementsHauteur[indexMain];
 
 		// Allonger le pouce.
 		if (jointIndex == KinectPowerInterop.HandJointIndex.THUMB_TIP) {
@@ -119,6 +116,9 @@ public class IntelHandController : MonoBehaviour {
 
 		// Appliquer de belles multiplications.
 		Vector3 targetPosition = TransformerPositionDoigt(jointInfo);
+
+		// Ajustement de hauteur.
+		targetPosition.y += ajustementsHauteur [indexMain];
 
 		// Appliquer les positions aux boules.
 		HandJointSphereI jointureSphereScript = ObtenirHandJointSphereScript (index);
@@ -254,33 +254,39 @@ public class IntelHandController : MonoBehaviour {
 
 	// "Snap" pour la hauteur des mains.
 	private float[] CalculerAjustementsHauteur() {
-		// Calcul du snap.
-		float[] ajustementsHauteur = new float[2];
+		float[] ajustementsHauteur = {0, 0};
+		float[] hauteursMoyennes = {0, 0};
+
+		/*
 		for (int i = 0; i < 2; ++i) {
 			// Calculer la hauteur moyenne des bases de doigts.
 			float sommeHauteurs = 0.0f;
-			for (int j = (int)KinectPowerInterop.HandJointIndex.PINKY_BASE;
+			int numElements = 0;
+			for (int j = (int)KinectPowerInterop.HandJointIndex.RING_BASE;
 			     j <= (int)KinectPowerInterop.HandJointIndex.INDEX_BASE;
 			     j += 3) {
 				int indexDeBase = (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS*i + j;
-				sommeHauteurs += hand_joints[indexDeBase].z;
+				sommeHauteurs += TransformerPositionDoigt(hand_joints[indexDeBase]).y;
+				++numElements;
 			}
-			float hauteurMoyenne = sommeHauteurs / 4.0f;
-			
-			// Calculer l'ajustement nécessaire pour cette main.
-			float difference = hauteurCibleMain - hauteurMoyenne;
-			float differenceCarre = difference * difference;
-			if (differenceCarre > differenceHauteurCarreMaxPourAjustement) {
-				differenceCarre = differenceHauteurCarreMaxPourAjustement;
+			float hauteurMoyenne = sommeHauteurs / 3.0f;
+			hauteursMoyennes[i] = hauteurMoyenne;
+			if (numElements != 3) {
+				Debug.LogError("Le nombre d'elements pour la hauteur moyenne des jointures n'est pas 3.");
 			}
-			
-			ajustementsHauteur[i] = difference;
-			if (differenceHauteurCarreMaxPourAjustement != 0) {
-				difference *= (differenceHauteurCarreMaxPourAjustement - differenceCarre) /
-					differenceHauteurCarreMaxPourAjustement;
+
+			if (hauteurMoyenne > kHauteurCibleMain &&
+			    hauteurMoyenne < kHauteurMaxSnap) {
+				// Snapper a la hauteur cible.
+				ajustementsHauteur[i] = kHauteurCibleMain - hauteurMoyenne;
+			} else if (hauteurMoyenne < kHauteurMinSnap) {
+				// Snapper a la hauteur minimale.
+				ajustementsHauteur[i] = kHauteurMinSnap - hauteurMoyenne;
+				Debug.Log("min");
 			}
-			ajustementsHauteur[i] = 0;
 		}
+		*/
+
 		return ajustementsHauteur;
 	}
 
@@ -316,8 +322,15 @@ public class IntelHandController : MonoBehaviour {
 	// --- Snap ---
 
 	// Hauteur a laquelle la main doit se trouver.
-	const float hauteurCibleMain = 0.43f;
+	//const float kHauteurCibleMain = -0.4f;
+	const float kHauteurCibleMain = -1.1f;
 
-	// Distance au carre a partir de laquelle ne plus faire de snap.
-	const float differenceHauteurCarreMaxPourAjustement = 0.040f;
+	// Hauteur max pour le snap.
+	//const float kHauteurMaxSnap = 2.0f;
+	const float kHauteurMaxSnap = 1.0f;
+
+	// Hauteur min pour le snap.
+	//const float kHauteurMinSnap = -1.0f;
+	const float kHauteurMinSnap = -2.0f;
+
 }
