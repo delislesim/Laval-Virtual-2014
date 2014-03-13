@@ -44,6 +44,12 @@ public class ChoixInstrumentController : MonoBehaviour {
 				}
 			}
 		}
+
+		// Initialiser le guidage si necessaire.
+		if (!guidageInitialise) {
+			GuidageController.ObtenirInstance ().initialiserGuidage (600, 100, 3, typeGuidage.MENU);
+			guidageInitialise = true;
+		}
 	}
 
 	void OnEnable () {
@@ -64,12 +70,14 @@ public class ChoixInstrumentController : MonoBehaviour {
 		pointeur.gameObject.SetActive (true);
 
 		// Affichage du guidage
-		GuidageController.ObtenirInstance ().initialiserGuidage (600, 100, 3, typeGuidage.MENU);
+		guidageInitialise = false;
 	}
 
 	void OnDisable () {
 		Pointeur.obtenirInstance ().gameObject.SetActive (false);
 	}
+
+	private bool guidageInitialise = false;
 
 	private const int kDrumTargetId = 0;
 	private const int kGuitarTargetId = 1;

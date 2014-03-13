@@ -8,12 +8,12 @@ public enum typeGuidage{
 	MENU = 3
 }
 
-public class guidageController : MonoBehaviour {
+public class GuidageController : MonoBehaviour {
 
 	public MovieTexture pianoGesture;
 	public MovieTexture drumGesture;
 	public MovieTexture guitarGesture;
-	public Texture test;
+	public Texture menu;
 	public GUISkin skinGuidage;
 
 	private Rect rectangleMenu;
@@ -24,10 +24,15 @@ public class guidageController : MonoBehaviour {
 	private int nbGroup;
 	private typeGuidage type; 
 
-	private static guidageController instance;
+	private static GuidageController instance;
+
+	public static GuidageController ObtenirInstance() {
+		return instance;
+	}
 
 	// Use this for initialization
 	void Start () {
+		instance = this;
 	}
 	
 	// Update is called once per frame
@@ -38,14 +43,14 @@ public class guidageController : MonoBehaviour {
 		for (int i = 0; i<nbGroup; i++) {
 			Rect rectangleGroup = new Rect(i*rectWidth/nbGroup, 0, groupWidth, groupHeight);
 			GUI.BeginGroup (rectangleGroup);
-			GUI.DrawTexture (new Rect(0,0,groupWidth, groupHeight), test);
+			GUI.DrawTexture (new Rect(0,0,groupWidth, groupHeight), menu);
 			GUI.EndGroup();
 		}
 		GUI.EndGroup ();
 	}
 
 	private void afficherGuidageGlobal(){
-		/*int groupHeight = 100;
+		int groupHeight = 100;
 		int groupWidth = 600;
 		GUI.BeginGroup(new Rect (Screen.width/2-groupWidth/2,Screen.height-groupHeight,groupWidth,groupHeight));
 
@@ -64,7 +69,7 @@ public class guidageController : MonoBehaviour {
 		GUI.Label(new Rect(0,groupHeight-groupHeight*0.25f,groupWidth/3,groupHeight*0.25f), "Guitare");
 		GUI.EndGroup ();
 
-		GUI.EndGroup ();*/
+		GUI.EndGroup ();
 	}
 
 	public void initialiserGuidage(float width, float height, int nbGroup, typeGuidage instrument) {
