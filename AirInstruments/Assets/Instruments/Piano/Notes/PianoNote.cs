@@ -209,7 +209,9 @@ public class PianoNote : MonoBehaviour {
 			// La note doit etre jouee par le joueur.
 			noteObject.renderer.material = doitJouerMaterial;
 
+			ArreterSon();
 			aEteJouee = false;
+			estFadeout = false;
 
 		} else if (statut == PartitionPiano.StatutNote.Muette) {
 
