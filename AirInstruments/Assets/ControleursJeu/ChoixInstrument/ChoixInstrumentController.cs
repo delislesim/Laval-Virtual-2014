@@ -62,6 +62,9 @@ public class ChoixInstrumentController : MonoBehaviour {
 
 		// Activer le pointeur.
 		pointeur.gameObject.SetActive (true);
+
+		// Affichage du guidage
+		GuidageController.ObtenirInstance ().initialiserGuidage (600, 100, 3, typeGuidage.MENU);
 	}
 
 	void OnDisable () {
