@@ -47,7 +47,7 @@ public class ChoixInstrumentController : MonoBehaviour {
 
 		// Initialiser le guidage si necessaire.
 		if (!guidageInitialise) {
-			GuidageController.ObtenirInstance ().initialiserGuidage (600, 100, 3, typeGuidage.MENU);
+			GuidageController.ObtenirInstance ().changerGuidage(typeGuidage.MENU_PRINCIPAL);
 			guidageInitialise = true;
 		}
 	}

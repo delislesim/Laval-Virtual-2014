@@ -25,6 +25,9 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 	void OnEnable() {
 		pianoWrapper.SetActive (true);
 
+		// Activation du guidage
+		GuidageController.ObtenirInstance ().changerGuidage(typeGuidage.INSTRUMENTS);
+
 		assistedModeController.ChargerPartition (".\\Assets\\Modes\\Assiste\\Piano\\partitions\\valse.txt", 4.0f);
 	}
 	

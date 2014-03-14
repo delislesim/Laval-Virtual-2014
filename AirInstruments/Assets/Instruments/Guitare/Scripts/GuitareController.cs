@@ -194,6 +194,8 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 	// Methode appelee quand l'instrument "guitare" est choisi.
 	void OnEnable() {
 		// L'initialisation se fait dans "Prepare".
+		// Activation du guidage
+		GuidageController.ObtenirInstance ().changerGuidage(typeGuidage.INSTRUMENTS);
 	}
 
 	// Methode appelee quand l'instrument "guitare" n'est plus choisi.

@@ -32,6 +32,9 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 		// Prendre le controle de la camera.
 		mainCamera.transform.parent = teteDrummer.transform;
 		mainCamera.transform.localPosition = Vector3.zero;
+
+		// Activation du guidage
+		GuidageController.ObtenirInstance ().changerGuidage(typeGuidage.INSTRUMENTS);
 	}
 	
 	// Methode appelee quand l'instrument "drum" n'est plus choisi.
