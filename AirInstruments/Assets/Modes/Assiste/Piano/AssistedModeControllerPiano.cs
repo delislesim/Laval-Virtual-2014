@@ -174,7 +174,7 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 
 		// Verifier si la musique est terminee.
 		float tempsFin = partition.ObtenirTempsFin ();
-		if (tempsFin != -1.0f && tempsActuel > tempsFin) {
+		if (tempsFin != -1.0f && tempsActuel / speed > tempsFin) {
 			ActiverLibre();
 		}
 	}
@@ -202,7 +202,7 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 
 	// Temps a attendre avant de commencer a jouer la musique, en secondes.
 	// Ceci correspond au decalage entre le remplissage et le jouage.
-	private const float tempsAttendreDebutMusique = 6.0f;
+	private const float tempsAttendreDebutMusique = 3.0f;
 	
 	// Resolution du tableau de prochaines notes a jouer.
 	private const float resolution = 0.1f;
