@@ -28,6 +28,11 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 		// Activation du guidage
 		GuidageController.ObtenirInstance ().changerGuidage(typeGuidage.INSTRUMENTS);
 
+		// Activation de la reconnaissance du geste de menu.
+		GestureRecognition gestureRecognition = GestureRecognition.ObtenirInstance ();
+		gestureRecognition.AddGesture (new GestureMenu());
+
+		// (Temporaire) Partir le mode assisté.
 		assistedModeController.ChargerPartition (".\\Assets\\Modes\\Assiste\\Piano\\partitions\\valse.txt", 4.0f);
 	}
 	
@@ -44,11 +49,52 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 
 	// Methode appelee a chaque frame quand le piano est l'instrument courant.
 	void Update () {
+		// Gérer les choix de l'utilisateur dans le menu.
+		if (GererMenu ())
+			return;
+		
+		// Afficher le menu.
+		if (!menuModeAssisteActif && (
+			Input.GetButtonDown ("MenuAssiste") ||
+		    GestureRecognition.ObtenirInstance().GetCurrentGesture() == GestureId.GESTURE_MENU)) {
+			AfficherMenu();
+		} 
+	}
+
+	private void AfficherMenu() {
+		MenuAssisteController menuAssiste = MenuAssisteController.ObtenirInstance();
+
+		// Positionner le menu du mode assiste.
+		menuAssiste.transform.position = new Vector3(-13.40673f, 1.765814f, -13.54324f);
+		menuAssiste.transform.eulerAngles = new Vector3(324.1f, 180f, 0);
+		menuAssiste.transform.localScale = new Vector3(0.32f, 0.32f, 0.32f);
+		
+		// Mettre le texte dans les boutons du mode assiste.
+		menuAssiste.AssignerTexte(0, "Retour aux", "instruments");
+		menuAssiste.AssignerTexte(1, "Mode", "libre");
+		menuAssiste.AssignerTexte(2, "Für", "Elise");
+		menuAssiste.AssignerTexte(3, "Comptine", "d'été");
+		menuAssiste.AssignerTexte(4, "Boubou", "the Boubou");
+		
+		// Desactive le piano.
+		pianoWrapper.SetActive (false);
+		
+		// Activer le menu du mode assiste.
+		menuAssiste.Afficher();
+		
+		// Se rappeler que le menu est active.
+		menuModeAssisteActif = true;
+	}
+
+	// Gere les choix de l'utilisateur dans le menu assiste. Retourne
+	// vrai si un choix est fait, faux sinon.
+	private bool GererMenu() {
 		MenuAssisteController menuAssiste = MenuAssisteController.ObtenirInstance();
 
 		// Si le menu du mode assiste est affiche, repondre aux choix de l'utilisateur.
 		if (menuModeAssisteActif) {
 			int boutonPresse = menuAssiste.ObtenirBoutonPresse();
+
 			switch (boutonPresse) {
 			case 0:
 				// Quitter le piano.
@@ -56,7 +102,6 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 				assistedModeController.ActiverLibre();
 				break;
 			case 1:
-				Debug.Log("Mode Libre");
 				pianoWrapper.SetActive (true);
 				assistedModeController.ActiverLibre();
 				break;
@@ -73,41 +118,16 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 				pianoWrapper.SetActive (true);
 				break;
 			}
-
+			
 			if (boutonPresse != -1) {
 				// Fermer le menu du mode assiste.
 				MenuAssisteController.ObtenirInstance ().Cacher();
 				menuModeAssisteActif = false;
-				return;
+				return true;
 			}
 		}
-		
-		// Verifier si le mode assiste est demande.
-		if (!menuModeAssisteActif && (
-			Input.GetButtonDown ("MenuAssiste") ||
-		    GestureRecognition.ObtenirInstance().GetCurrentGesture() == GestureId.GESTURE_MENU)) {
 
-			// Positionner le menu du mode assiste.
-			menuAssiste.transform.position = new Vector3(-13.40673f, 1.765814f, -13.54324f);
-			menuAssiste.transform.eulerAngles = new Vector3(324.1f, 180f, 0);
-			menuAssiste.transform.localScale = new Vector3(0.32f, 0.32f, 0.32f);
-
-			// Mettre le texte dans les boutons du mode assiste.
-			menuAssiste.AssignerTexte(0, "Retour aux", "instruments");
-			menuAssiste.AssignerTexte(1, "Mode", "libre");
-			menuAssiste.AssignerTexte(2, "Für", "Elise");
-			menuAssiste.AssignerTexte(3, "Comptine", "d'été");
-			menuAssiste.AssignerTexte(4, "Boubou", "the Boubou");
-
-			// Desactive le piano.
-			pianoWrapper.SetActive (false);
-
-			// Activer le menu du mode assiste.
-			menuAssiste.Afficher();
-
-			// Se rappeler que le menu est active.
-			menuModeAssisteActif = true;
-		} 
+		return false;
 	}
 
 	// Indique si le menu du mode assiste est presentement affiche.

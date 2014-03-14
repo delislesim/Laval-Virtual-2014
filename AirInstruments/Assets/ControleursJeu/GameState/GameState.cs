@@ -80,6 +80,10 @@ public class GameState : MonoBehaviour {
 			choixInstrumentControleur.PrepareToStop();
 		}
 
+		// Effacer tous les gestes.
+		GestureRecognition gestureRecognition = GestureRecognition.ObtenirInstance ();
+		gestureRecognition.ClearGestures ();
+
 		// Activer le nouvel etat.
 		currentState = state;
 		if (currentState == State.ChooseInstrument) {

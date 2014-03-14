@@ -35,6 +35,10 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 
 		// Activation du guidage
 		GuidageController.ObtenirInstance ().changerGuidage(typeGuidage.INSTRUMENTS);
+
+		// Activation de la reconnaissance du geste de menu.
+		GestureRecognition gestureRecognition = GestureRecognition.ObtenirInstance ();
+		gestureRecognition.AddGesture (new GestureMenu());
 	}
 	
 	// Methode appelee quand l'instrument "drum" n'est plus choisi.
