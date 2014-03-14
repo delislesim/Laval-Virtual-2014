@@ -13,6 +13,9 @@ public class IntelHandController : MonoBehaviour {
 	// Prefab de cylindre.
 	public GameObject cylindrePrefab;
 
+	// Fleches de guidage.
+	public List<PianoArrow> flechesGuidage;
+
 	// Liste des boules rouges affichées dans la scene.
 	private List<GameObject> spheres = new List<GameObject>();
 
@@ -32,6 +35,21 @@ public class IntelHandController : MonoBehaviour {
 	private float[] kLargeur = {0.06f, 0.07f, 0.08f, 0.095f};
 	private float[] kHauteur = {0.14f, 0.15f, 0.19f, 0.21f};
 	private int kIndexTailleDefaut = 2;
+
+	// Index des mains.
+	private const int kIndexMainDroite = 0;
+	private const int kIndexMainGauche = 1;
+
+	// Buffer pour récupérer les positions des boules rouges.
+	private KinectPowerInterop.HandJointInfo[] hand_joints =
+		new KinectPowerInterop.HandJointInfo[(int)KinectPowerInterop.HandJointIndex.NUM_JOINTS * 2];
+	
+	// Erreur maximale permise avant d'etre invalide.
+	private const float kErreurMaxPermise = 5.0f;
+
+	// Limites de positions des bases de doigts avant d'afficher du guidage.
+	private Vector3 kLimitesMin = new Vector3 (-9.0f, -2.5f, -7.35f);
+	private Vector3 kLimitesMax = new Vector3 (8.6f, 0.6026f, -2.0f);
 
 	void Start () {
 		// Initialiser la caméra Creative.
@@ -67,9 +85,16 @@ public class IntelHandController : MonoBehaviour {
 	}
 
 	public Vector3 TransformerPositionDoigt(KinectPowerInterop.HandJointInfo handJointInfo) {
+		// Mettre a jour l'autre overload en meme temps!
 		return new Vector3(-handJointInfo.x * 45,
 		                   -(-handJointInfo.z * 52 + 20),
 		                   -handJointInfo.y * 45 - 5);
+	}
+	public Vector3 TransformerPositionDoigt(Vector3 position) {
+		// Mettre a jour l'autre overload en meme temps!
+		return new Vector3(-position.x * 45,
+		                   -(-position.z * 52 + 20),
+		                   -position.y * 45 - 5);
 	}
 
 	void Update () {
@@ -99,6 +124,72 @@ public class IntelHandController : MonoBehaviour {
 		for (int i = 0; i < cylindres.Count; ++i) {
 			PlacerCylindre(i);
 		}
+
+		// Verifier si du guidage est requis.
+		for (int indexMain = 0; indexMain < 2; ++indexMain) {
+			// Prendre la position de la base du doigt RING.
+			int indexDeBaseRing = (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS*indexMain +
+				(int)KinectPowerInterop.HandJointIndex.RING_BASE;
+			if (hand_joints[indexDeBaseRing].error < kErreurMaxPermise) {
+				Vector3 minBases;
+				Vector3 maxBases;
+				CalculerBoundingBoxMain(indexMain, false, out minBases, out maxBases);
+				Vector3 minMain;
+				Vector3 maxMain;
+				CalculerBoundingBoxMain(indexMain, true, out minMain, out maxMain);
+
+				// Afficher le guidage par ordre de priorite: x, y, z.
+				for (int i = 0; i < 3; ++i) {
+					if (minBases[i] < kLimitesMin[i]) {
+						flechesGuidage[indexMain].AfficherGuidage(i, 1, minMain, maxMain);
+					} else if (maxBases[i] > kLimitesMax[i]) {
+						flechesGuidage[indexMain].AfficherGuidage(i, -1, minMain, maxMain);
+					}
+				} 
+			}
+		}
+	}
+
+	private void CalculerBoundingBoxMain(int indexMain, bool avecDoigts, out Vector3 min, out Vector3 max) {
+		min = new Vector3 (1000, 1000, 1000);
+		max = new Vector3 (-1000, -1000, -1000);
+
+		int indexMin = (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS * (indexMain) + 2;  // +1 pour eviter le bras, la paume.
+		int indexMax = (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS * (indexMain + 1);
+	
+		for (int i = indexMin; i < indexMax; ++i) {
+			KinectPowerInterop.HandJointIndex joint =
+				(KinectPowerInterop.HandJointIndex)(i % (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS);
+
+			if (joint == KinectPowerInterop.HandJointIndex.THUMB_BASE) {
+				continue;
+			}
+			if (!avecDoigts) {
+				if (joint != KinectPowerInterop.HandJointIndex.RING_BASE &&
+				    joint != KinectPowerInterop.HandJointIndex.INDEX_BASE &&
+				    joint != KinectPowerInterop.HandJointIndex.MIDDLE_BASE) {
+					continue;
+				}
+			}
+
+			if (hand_joints[i].y < min.y)
+				min.y = hand_joints[i].y;
+			if (hand_joints[i].y > max.y)
+				max.y = hand_joints[i].y;
+
+			if (hand_joints[i].x < min.x)
+				min.x = hand_joints[i].x;
+			if (hand_joints[i].x > max.x)
+				max.x = hand_joints[i].x;
+
+			if (hand_joints[i].z < min.z)
+				min.z = hand_joints[i].z;
+			if (hand_joints[i].z > max.z)
+				max.z = hand_joints[i].z;
+		}
+
+		min = TransformerPositionDoigt (min);
+		max = TransformerPositionDoigt (max);
 	}
 
 	private void PlacerSphere(int index, float[] ajustementsHauteur) {
@@ -255,7 +346,6 @@ public class IntelHandController : MonoBehaviour {
 	// "Snap" pour la hauteur des mains.
 	private float[] CalculerAjustementsHauteur() {
 		float[] ajustementsHauteur = {0, 0};
-		float[] hauteursMoyennes = {0, 0};
 
 		/*
 		for (int i = 0; i < 2; ++i) {
@@ -311,13 +401,6 @@ public class IntelHandController : MonoBehaviour {
 		handJointSphere.transform.localScale = handJointSpherePrefab.transform.localScale;
 		return handJointSphere;
 	}
-
-	// Buffer pour récupérer les positions des boules rouges.
-	private KinectPowerInterop.HandJointInfo[] hand_joints =
-		new KinectPowerInterop.HandJointInfo[(int)KinectPowerInterop.HandJointIndex.NUM_JOINTS * 2];
-
-	// Erreur maximale permise avant d'etre invalide.
-	private const float kErreurMaxPermise = 5.0f;
 
 	// --- Snap ---
 
