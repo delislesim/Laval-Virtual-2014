@@ -69,19 +69,29 @@ public class HandFollower : MonoBehaviour {
 		}
 		tempsDepuisDerniereNoteAutomatique += Time.deltaTime;
 
+		// Reduire le temps pour la prochaine note.
+		tempsProchaineNote -= Time.deltaTime;
+
 		if(collisionReady) {
 			// Verifier si on a fait une collision depuis la derniere fois.
 			Vector3 direction = transform.position - lastPosition;
 			RaycastHit hitInfo;
-			//Physics.Raycast (
 			if (Physics.Raycast (lastPosition, direction, out hitInfo,
 			                     direction.magnitude + rayon * kMultiplicateurRayon,
 			                     guitarPlayerLayer)) {
 				if (hitInfo.collider.gameObject.tag == "GuitarPlayer"){
-					if (tempsDepuisDerniereNoteAutomatique < kTempsRejouerApresAutomatique) {
-						tempsDepuisDerniereNoteAutomatique = 1000.0f;
+					if (AssistedModeControllerGuitar.EstActive() &&
+					    tempsProchaineNote < 0.15f) {
+						// Ne pas jouer la note tout de suite.
+						aJoueBienDepuisDerniereFois = true;
 					} else {
-						PlayNote ();
+						if (tempsDepuisDerniereNoteAutomatique < kTempsRejouerApresAutomatique) {
+							tempsDepuisDerniereNoteAutomatique = 1000.0f;
+						} else {
+							PlayNote ();
+							Debug.Log("en trop");
+							aJoueMalDepuisDerniereFois = true;
+						}
 					}
 				}
 			}
@@ -110,6 +120,14 @@ public class HandFollower : MonoBehaviour {
 		}
 		indexDernieresDistance = 1;
 		tempsDepuisDerniereNoteAutomatique = 1000.0f;
+		aJoueMalDepuisDerniereFois = false;
+		aJoueBienDepuisDerniereFois = false;
+	}
+
+	// Indique dans combien de temps la prochaine note du mode assisté
+	// doit etre jouée.
+	public void DefinirTempsProchaineNote(float temps) {
+		tempsProchaineNote = temps;
 	}
 
 	// Utilise par le mode assiste pour indiquer quand une note doit
@@ -121,13 +139,27 @@ public class HandFollower : MonoBehaviour {
 		float vitesse = dernieresDistances [indexDernieresDistance] -
 			dernieresDistances [(indexDernieresDistance + 1) % dernieresDistances.Length];
 
-		if (dernieresDistances[indexDernieresDistance] < 0.8f &&
-		    vitesse < -1.0f) {
+		if ((dernieresDistances[indexDernieresDistance] < 1.0f && vitesse < -0.01f) ||
+		     aJoueBienDepuisDerniereFois) {
 			PlayNote();
-			tempsDepuisDerniereNoteAutomatique = 0;
-			Debug.Log("auto-play");
+
+			if (!aJoueBienDepuisDerniereFois) {
+				tempsDepuisDerniereNoteAutomatique = 0;
+				Debug.Log("auto-play proximite");
+			} else {
+				Debug.Log("auto-play en avance");
+				tempsDepuisDerniereNoteAutomatique = 0;
+			}
+		} else {
+			tempsDepuisDerniereNoteAutomatique = 1000.0f;
+			Debug.Log("miss");
 		}
+		aJoueMalDepuisDerniereFois = false;
+		aJoueBienDepuisDerniereFois = false;
 	}
+
+	private bool aJoueMalDepuisDerniereFois = false;
+	private bool aJoueBienDepuisDerniereFois = false;
 
 	public void ReinitialiserMouvementsAmples() {
 		numMouvementsAmples = 0;
@@ -188,5 +220,8 @@ public class HandFollower : MonoBehaviour {
 	float tempsDepuisDerniereNoteAutomatique = 1000.0f;
 
 	// Temps pour rejouer une note apres une note automatique.
-	float kTempsRejouerApresAutomatique = 0.5f;
+	float kTempsRejouerApresAutomatique = 0.4f;
+
+	// Temps avant de jouer la prochaine note.
+	float tempsProchaineNote = 0;
 }

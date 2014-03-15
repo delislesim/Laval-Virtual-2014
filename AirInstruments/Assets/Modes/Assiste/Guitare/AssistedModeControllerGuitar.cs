@@ -72,6 +72,7 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 		currentTone = partition[currentPartitionIndex].note;
 		currentStyle = partition[currentPartitionIndex].style;
 		currentOctave = partition[currentPartitionIndex].octave;
+		handFollower.DefinirTempsProchaineNote(partition[currentPartitionIndex].time);
 
 		// Charger les cubes.
 		cubesTombants.ChargerPartition (partition);
@@ -87,9 +88,9 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 		partition = null;
 	}
 
-	public bool EstActive() {
+	public static bool EstActive() {
 		return partition != null &&
-			tempsEcoule > partition [partition.Count - 1].time + 1.0f; // Attendre 1 seconde apres la fin de la musique.
+			tempsEcoule < partition [partition.Count - 1].time + 1.0f; // Attendre 1 seconde apres la fin de la musique.
 	}
 
 	void Update () {
@@ -101,15 +102,21 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 		tempsEcoule = tempsEcoule + Time.deltaTime;
 		//Debug.Log("Temps ecoulé : " + tempsEcoule);
 		if(currentPartitionIndex < partition.Count-1){
-			if (tempsEcoule > partition[currentPartitionIndex+1].time)
+			if (tempsEcoule >= partition[currentPartitionIndex+1].time)
 			{
 				//tempsNotes = tempsNotes + partition[currentPartitionIndex+1].time;
 				currentPartitionIndex ++;
+				currentTone = partition[currentPartitionIndex].note;
+				currentStyle = partition[currentPartitionIndex].style;
+				currentOctave = partition[currentPartitionIndex].octave;
+
+				handFollower.JouerNoteMaintenant();
+
+				if (currentPartitionIndex + 1 < partition.Count) {
+					handFollower.DefinirTempsProchaineNote(partition[currentPartitionIndex + 1].time - tempsEcoule);
+				}
 			}
 		}
-		currentTone = partition[currentPartitionIndex].note;
-		currentStyle = partition[currentPartitionIndex].style;
-		currentOctave = partition[currentPartitionIndex].octave;
 
 		// Faire avancer les cubes.
 		cubesTombants.AssignerTempsCourant (tempsEcoule);
@@ -117,9 +124,9 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 	
 	private PartitionGuitar partitionMaker;
 	// Partition a jouer.
-	private List<PartitionGuitar.Playable> partition;
+	private static List<PartitionGuitar.Playable> partition;
 
-	private float tempsEcoule;
+	private static float tempsEcoule;
 	//private float tempsNotes; // Temps qui augmente avec les duree des notes. (par step)
 	private int currentPartitionIndex;
 	private int currentOctave;
