@@ -39,6 +39,7 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 	// Sons du tutorial.
 	public AudioClip sonLeverBras;
 	public AudioClip sonCordes;
+	public AudioClip sonAssiste;
 
 	public void Prepare() {
 		KinectPowerInterop.SetKinectAngle (10);
@@ -242,7 +243,11 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 
 	public void AnimationTerminee() {
 		// Demarrer le tutorial.
-		tutorial = new TutorialGuitare (sonLeverBras, sonCordes, handFollower);
+		tutorial = new TutorialGuitare (sonLeverBras,
+		                                sonCordes,
+		                                sonAssiste,
+		                                handFollower,
+		                                assistedModeController);
 		tutorial.Demarrer ();
 		tutorialActif = true;	
 	}
