@@ -20,8 +20,7 @@ public class TutorialPiano {
 	}
 
 	public void Demarrer() {
-		tutorial.Demarrer (kPositionGuidage,
-		                   new Vector3(kTailleGuidage, kTailleGuidage, kTailleGuidage));
+		tutorial.Demarrer (kPositionGuidage);
 	}
 
 	public bool EstComplete() {
@@ -32,8 +31,5 @@ public class TutorialPiano {
 	private Tutorial tutorial;
 
 	// Position du guidage.
-	private Vector3 kPositionGuidage = new Vector3(-13.8f, 3.43f, -17.286f);
-
-	// Taille du guidage.
-	private const float kTailleGuidage = 0.18f;
+	private Vector2 kPositionGuidage = new Vector2(427.0f, 492.0f);
 }

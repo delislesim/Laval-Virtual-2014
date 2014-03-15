@@ -29,12 +29,10 @@ public class Tutorial : MonoBehaviour {
 	}
 
 	// Demarre le tutorial.
-	// @param positionGuidage : position a laquelle le guidage doit s'afficher.
-	// @param tailleGuidage : taille d'affichage du guidage.
-	public void Demarrer(Vector3 positionGuidage, Vector3 tailleGuidage) {
+	// @param position: Position a laquelle afficher le guidage, en pixels.
+	public void Demarrer(Vector2 position) {
 		// Positionner le guidage.
-		guidageTutorial.transform.position = positionGuidage;
-		guidageTutorial.transform.localScale = tailleGuidage;
+		guidageTutorial.DefinirPosition (position);
 
 		// Remettre a 0 le compteur indiquant a quelle etape on est rendu.
 		indexEtape = 0;

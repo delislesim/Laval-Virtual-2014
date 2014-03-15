@@ -24,6 +24,10 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 	// Joueur de guitare.
 	public GuitarPlayer guitarPlayer;
 
+	// Sons du tutorial.
+	public AudioClip sonLeverBras;
+	public AudioClip sonCordes;
+
 	public void Prepare() {
 		KinectPowerInterop.SetKinectAngle (10);
 		tempsPreparation = 0;
@@ -39,6 +43,18 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 	}
 
 	public void Update() {
+		// Gerer la fin du tutorial.
+		if (tutorialActif && tutorial.EstComplete()) {
+			// Affichage du guidage pour le geste du menu.
+			GuidageController.ObtenirInstance ().changerGuidage(typeGuidage.MENU_PRINCIPAL);
+			
+			// Activation de la reconnaissance du geste de menu.
+			GestureRecognition gestureRecognition = GestureRecognition.ObtenirInstance ();
+			gestureRecognition.AddGesture (new GestureMenu());
+			
+			tutorialActif = false;
+		}
+
 		// Faire l'animation du gigaspot qui permet de switcher la guitare subtilement.
 		tempsPreparation += Time.deltaTime;
 		if (tempsPreparation > 0) {
@@ -193,12 +209,13 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 
 	// Methode appelee quand l'instrument "guitare" est choisi.
 	void OnEnable() {
-		// Activation du guidage
-		GuidageController.ObtenirInstance ().changerGuidage(typeGuidage.INSTRUMENTS);
+	}
 
-		// Activation de la reconnaissance du geste de menu.
-		GestureRecognition gestureRecognition = GestureRecognition.ObtenirInstance ();
-		gestureRecognition.AddGesture (new GestureMenu());
+	public void AnimationTerminee() {
+		// Demarrer le tutorial.
+		tutorial = new TutorialGuitare (sonLeverBras, sonCordes);
+		tutorial.Demarrer ();
+		tutorialActif = true;	
 	}
 
 	// Methode appelee quand l'instrument "guitare" n'est plus choisi.
@@ -207,6 +224,12 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 		guitareWrapper.SetActive (false);
 		guitareDecorative.SetActive (true);
 	}
+
+	// Tutorial.
+	private TutorialGuitare tutorial;
+
+	// Indique si le tutorial est en cours.
+	private bool tutorialActif = false;
 
 	// Temps depuis que le mode a commencé a se préparer.
 	private float tempsPreparation;

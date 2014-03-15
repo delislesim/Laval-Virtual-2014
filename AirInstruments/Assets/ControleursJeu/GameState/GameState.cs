@@ -142,6 +142,7 @@ public class GameState : MonoBehaviour {
 		} else if (currentState == State.Guitar) {
 
 			guitareController.gameObject.SetActive (true);
+			guitareController.AnimationTerminee();
 			
 		}
 

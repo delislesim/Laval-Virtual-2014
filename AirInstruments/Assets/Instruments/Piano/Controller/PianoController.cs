@@ -34,10 +34,6 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 	void OnEnable() {
 		pianoWrapper.SetActive (true);
 
-		// Activation de la reconnaissance du geste de menu.
-		GestureRecognition gestureRecognition = GestureRecognition.ObtenirInstance ();
-		gestureRecognition.AddGesture (new GestureMenu());
-
 		// Demarrer le tutorial.
 		tutorial = new TutorialPiano (intelHandController,
 		                              assistedModeController,
@@ -66,6 +62,12 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 		if (tutorialActif && tutorial.EstComplete()) {
 			// Affichage du guidage pour le geste du menu.
 			GuidageController.ObtenirInstance ().changerGuidage(typeGuidage.MENU_PRINCIPAL);
+
+			// Activation de la reconnaissance du geste de menu.
+			GestureRecognition gestureRecognition = GestureRecognition.ObtenirInstance ();
+			gestureRecognition.AddGesture (new GestureMenu());
+
+			tutorialActif = false;
 		}
 
 		// Gérer les choix de l'utilisateur dans le menu.
