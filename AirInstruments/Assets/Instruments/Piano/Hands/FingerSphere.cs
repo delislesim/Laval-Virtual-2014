@@ -21,7 +21,9 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 		}
 
 		// Verifier si on est encore sur une note.
-		if (!EstSurNoires () && !EstSurBlanches ()) {
+		bool estSurNoires = EstSurNoires ();
+		bool estSurBlanches = EstSurBlanches ();
+		if (!estSurNoires && !estSurBlanches) {
 			noteJouee = null;
 		} else {
 			// Trouver des objets en collision avec cette boule.
@@ -30,8 +32,29 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 				Collider collider = hitColliders[i];
 				PianoNote note = collider.GetComponent<PianoNote>();
 				if (note != null) {
+					// Empecher de jouer les mauvaises notes.
+					if (AssistedModeControllerPiano.EstActive() &&
+					    note.ObtenirStatut() != PartitionPiano.StatutNote.Joueur &&
+					    note.AppuieSurNote(this, estDescenduSousBlanches)) {
+
+						if (note.noire) {
+							Vector3 targetPosition = transform.position;
+							targetPosition.y = kHauteurNoires + ObtenirRayon();
+							SetTargetPosition(transform.parent.InverseTransformPoint(targetPosition), valid);
+						} else {
+							Vector3 targetPosition = transform.position;
+							targetPosition.y = kHauteurBlanches + ObtenirRayon();
+							transform.position = targetPosition;
+							SetTargetPosition(transform.parent.InverseTransformPoint(targetPosition), valid);
+						}
+
+					} 
+
 					if (note.ToucherAvecSphere(this, estDescenduSousBlanches)) {
-						noteJouee = note;
+						if (!AssistedModeControllerPiano.EstActive() ||
+						    note.ObtenirStatut() == PartitionPiano.StatutNote.Joueur) {
+							noteJouee = note;
+						}
 					}
 				}
 			}
@@ -87,7 +110,7 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 		                       		           kalmanPosition.y,
 		                            	       kalmanPosition.z);
 
-		// Noter si on est sous les blanches / au-desuss des noires.
+		// Noter si on est sous les blanches / au-dessus des noires.
 		float basSphere = transform.position.y - ObtenirRayon ();
 		if (basSphere < kHauteurBlanches) {
 			estDescenduSousBlanches = true;

@@ -13,7 +13,6 @@ public class BaguetteDrum : MonoBehaviour {
 	public Collider autreTip;
 
 	void Start () {
-		Debug.Log ("start baguette");
 		positionInitiale = transform.position;
 		rotationInitiale = transform.rotation;
 

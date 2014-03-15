@@ -13,6 +13,9 @@ public class IntelHandController : MonoBehaviour {
 	// Prefab de cylindre.
 	public GameObject cylindrePrefab;
 
+	// Fleches de guidage.
+	public List<PianoArrow> flechesGuidage;
+
 	// Liste des boules rouges affichées dans la scene.
 	private List<GameObject> spheres = new List<GameObject>();
 
@@ -32,6 +35,26 @@ public class IntelHandController : MonoBehaviour {
 	private float[] kLargeur = {0.06f, 0.07f, 0.08f, 0.095f};
 	private float[] kHauteur = {0.14f, 0.15f, 0.19f, 0.21f};
 	private int kIndexTailleDefaut = 2;
+
+	// Index des mains.
+	private const int kIndexMainDroite = 0;
+	private const int kIndexMainGauche = 1;
+
+	// Buffer pour récupérer les positions des boules rouges.
+	private KinectPowerInterop.HandJointInfo[] hand_joints =
+		new KinectPowerInterop.HandJointInfo[(int)KinectPowerInterop.HandJointIndex.NUM_JOINTS * 2];
+	
+	// Erreur maximale permise avant d'etre invalide.
+	private const float kErreurMaxPermise = 5.0f;
+
+	// Limites de positions des bases de doigts avant d'afficher du guidage.
+	private Vector3 kLimitesMin = new Vector3 (-9.0f, -2.5f, -7.35f);
+	private Vector3 kLimitesMax = new Vector3 (8.6f, 0.6026f, -2.0f);
+
+	// Limites de positions des bases de doigts pour passer l'etape de
+	// mettre ses mains devant le capteur du tutorial.
+	private Vector3 kLimitesCapteurMin = new Vector3 (-11.0f, -2.5f, -10f);
+	private Vector3 kLimitesCapteurMax = new Vector3 (11.0f, 13.0f, -4.0f);
 
 	void Start () {
 		// Initialiser la caméra Creative.
@@ -67,9 +90,16 @@ public class IntelHandController : MonoBehaviour {
 	}
 
 	public Vector3 TransformerPositionDoigt(KinectPowerInterop.HandJointInfo handJointInfo) {
+		// Mettre a jour l'autre overload en meme temps!
 		return new Vector3(-handJointInfo.x * 45,
 		                   -(-handJointInfo.z * 52 + 20),
 		                   -handJointInfo.y * 45 - 5);
+	}
+	public Vector3 TransformerPositionDoigt(Vector3 position) {
+		// Mettre a jour l'autre overload en meme temps!
+		return new Vector3(-position.x * 45,
+		                   -(-position.z * 52 + 20),
+		                   -position.y * 45 - 5);
 	}
 
 	void Update () {
@@ -99,6 +129,140 @@ public class IntelHandController : MonoBehaviour {
 		for (int i = 0; i < cylindres.Count; ++i) {
 			PlacerCylindre(i);
 		}
+
+		// Verifier si du guidage est requis.
+		for (int indexMain = 0; indexMain < 2; ++indexMain) {
+			// Prendre la position de la base du doigt RING.
+			int indexDeBaseRing = (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS*indexMain +
+				(int)KinectPowerInterop.HandJointIndex.RING_BASE;
+			if (hand_joints[indexDeBaseRing].error < kErreurMaxPermise) {
+				Vector3 minBases;
+				Vector3 maxBases;
+				CalculerBoundingBoxMain(indexMain, false, out minBases, out maxBases);
+				Vector3 minMain;
+				Vector3 maxMain;
+				CalculerBoundingBoxMain(indexMain, true, out minMain, out maxMain);
+
+				// Afficher le guidage par ordre de priorite: x, y, z.
+				for (int i = 0; i < 3; ++i) {
+					if (minBases[i] < kLimitesMin[i]) {
+						flechesGuidage[indexMain].AfficherGuidage(i, 1, minMain, maxMain);
+					} else if (maxBases[i] > kLimitesMax[i]) {
+						flechesGuidage[indexMain].AfficherGuidage(i, -1, minMain, maxMain);
+					}
+				} 
+			}
+		}
+	}
+
+	// Indique si les 2 mains sont suffisamment pres du capteur pour qu'on
+	// puisse dire leur position avec certitude. Aussi, il faut que les
+	// mains aient la bonne orientation.
+	public bool MainsSontVisibles() {
+		for (int indexMain = 0; indexMain < 2; ++indexMain) {
+			// Prendre la position de la base du doigt RING.
+			int indexDeBaseRing = (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS*indexMain +
+				(int)KinectPowerInterop.HandJointIndex.RING_BASE;
+			if (hand_joints[indexDeBaseRing].error < kErreurMaxPermise) {
+				Vector3 minBases;
+				Vector3 maxBases;
+				CalculerBoundingBoxMain(indexMain, false, out minBases, out maxBases);
+				
+				// Afficher le guidage par ordre de priorite: x, y, z.
+				for (int i = 0; i < 3; ++i) {
+					if (minBases[i] < kLimitesCapteurMin[i]) {
+						return false;
+					} else if (maxBases[i] > kLimitesCapteurMax[i]) {
+						return false;
+					}
+				} 
+
+				int indexPouce = (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS*indexMain +
+					(int)KinectPowerInterop.HandJointIndex.THUMB_MID;
+				int indexPinky = (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS*indexMain +
+					(int)KinectPowerInterop.HandJointIndex.PINKY_MID;
+				if (indexMain == kIndexMainGauche) {
+					if (-hand_joints[indexPouce].x < -hand_joints[indexPinky].x)
+						return false;
+				} else if (indexMain == kIndexMainDroite) {
+					if (-hand_joints[indexPouce].x > -hand_joints[indexPinky].x)
+						return false;
+				}
+
+			} else {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	// Indique si les 2 mains sont pres du piano, c'est a dire qu'il n'y a pas de
+	// fleches de guidage requises.
+	public bool MainsSontPresDuPiano() {
+		for (int indexMain = 0; indexMain < 2; ++indexMain) {
+			// Prendre la position de la base du doigt RING.
+			int indexDeBaseRing = (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS*indexMain +
+				(int)KinectPowerInterop.HandJointIndex.RING_BASE;
+			if (hand_joints[indexDeBaseRing].error < kErreurMaxPermise) {
+				Vector3 minBases;
+				Vector3 maxBases;
+				CalculerBoundingBoxMain(indexMain, false, out minBases, out maxBases);
+				
+				// Afficher le guidage par ordre de priorite: x, y, z.
+				for (int i = 0; i < 3; ++i) {
+					if (minBases[i] < kLimitesMin[i]) {
+						return false;
+					} else if (maxBases[i] > kLimitesMax[i]) {
+						return false;
+					}
+				} 
+			} else {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private void CalculerBoundingBoxMain(int indexMain, bool avecDoigts, out Vector3 min, out Vector3 max) {
+		min = new Vector3 (1000, 1000, 1000);
+		max = new Vector3 (-1000, -1000, -1000);
+
+		int indexMin = (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS * (indexMain) + 2;  // +1 pour eviter le bras, la paume.
+		int indexMax = (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS * (indexMain + 1);
+	
+		for (int i = indexMin; i < indexMax; ++i) {
+			KinectPowerInterop.HandJointIndex joint =
+				(KinectPowerInterop.HandJointIndex)(i % (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS);
+
+			if (joint == KinectPowerInterop.HandJointIndex.THUMB_BASE) {
+				continue;
+			}
+			if (!avecDoigts) {
+				if (joint != KinectPowerInterop.HandJointIndex.RING_BASE &&
+				    joint != KinectPowerInterop.HandJointIndex.INDEX_BASE &&
+				    joint != KinectPowerInterop.HandJointIndex.MIDDLE_BASE) {
+					continue;
+				}
+			}
+
+			if (hand_joints[i].y < min.y)
+				min.y = hand_joints[i].y;
+			if (hand_joints[i].y > max.y)
+				max.y = hand_joints[i].y;
+
+			if (hand_joints[i].x < min.x)
+				min.x = hand_joints[i].x;
+			if (hand_joints[i].x > max.x)
+				max.x = hand_joints[i].x;
+
+			if (hand_joints[i].z < min.z)
+				min.z = hand_joints[i].z;
+			if (hand_joints[i].z > max.z)
+				max.z = hand_joints[i].z;
+		}
+
+		min = TransformerPositionDoigt (min);
+		max = TransformerPositionDoigt (max);
 	}
 
 	private void PlacerSphere(int index, float[] ajustementsHauteur) {
@@ -107,9 +271,6 @@ public class IntelHandController : MonoBehaviour {
 		KinectPowerInterop.HandJointIndex jointIndex;
 		int indexMain;
 		ObtenirJointEtNumeroMain(index, out jointIndex, out indexMain);
-		
-		// Ajuster la hauteur du joint selon le snap (idee de Vanier).
-		jointInfo.z += ajustementsHauteur[indexMain];
 
 		// Allonger le pouce.
 		if (jointIndex == KinectPowerInterop.HandJointIndex.THUMB_TIP) {
@@ -119,6 +280,9 @@ public class IntelHandController : MonoBehaviour {
 
 		// Appliquer de belles multiplications.
 		Vector3 targetPosition = TransformerPositionDoigt(jointInfo);
+
+		// Ajustement de hauteur.
+		targetPosition.y += ajustementsHauteur [indexMain];
 
 		// Appliquer les positions aux boules.
 		HandJointSphereI jointureSphereScript = ObtenirHandJointSphereScript (index);
@@ -254,33 +418,38 @@ public class IntelHandController : MonoBehaviour {
 
 	// "Snap" pour la hauteur des mains.
 	private float[] CalculerAjustementsHauteur() {
-		// Calcul du snap.
-		float[] ajustementsHauteur = new float[2];
+		float[] ajustementsHauteur = {0, 0};
+
+		/*
 		for (int i = 0; i < 2; ++i) {
 			// Calculer la hauteur moyenne des bases de doigts.
 			float sommeHauteurs = 0.0f;
-			for (int j = (int)KinectPowerInterop.HandJointIndex.PINKY_BASE;
+			int numElements = 0;
+			for (int j = (int)KinectPowerInterop.HandJointIndex.RING_BASE;
 			     j <= (int)KinectPowerInterop.HandJointIndex.INDEX_BASE;
 			     j += 3) {
 				int indexDeBase = (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS*i + j;
-				sommeHauteurs += hand_joints[indexDeBase].z;
+				sommeHauteurs += TransformerPositionDoigt(hand_joints[indexDeBase]).y;
+				++numElements;
 			}
-			float hauteurMoyenne = sommeHauteurs / 4.0f;
-			
-			// Calculer l'ajustement nécessaire pour cette main.
-			float difference = hauteurCibleMain - hauteurMoyenne;
-			float differenceCarre = difference * difference;
-			if (differenceCarre > differenceHauteurCarreMaxPourAjustement) {
-				differenceCarre = differenceHauteurCarreMaxPourAjustement;
+			float hauteurMoyenne = sommeHauteurs / 3.0f;
+			hauteursMoyennes[i] = hauteurMoyenne;
+			if (numElements != 3) {
+				Debug.LogError("Le nombre d'elements pour la hauteur moyenne des jointures n'est pas 3.");
 			}
-			
-			ajustementsHauteur[i] = difference;
-			if (differenceHauteurCarreMaxPourAjustement != 0) {
-				difference *= (differenceHauteurCarreMaxPourAjustement - differenceCarre) /
-					differenceHauteurCarreMaxPourAjustement;
+
+			if (hauteurMoyenne > kHauteurCibleMain &&
+			    hauteurMoyenne < kHauteurMaxSnap) {
+				// Snapper a la hauteur cible.
+				ajustementsHauteur[i] = kHauteurCibleMain - hauteurMoyenne;
+			} else if (hauteurMoyenne < kHauteurMinSnap) {
+				// Snapper a la hauteur minimale.
+				ajustementsHauteur[i] = kHauteurMinSnap - hauteurMoyenne;
+				Debug.Log("min");
 			}
-			ajustementsHauteur[i] = 0;
 		}
+		*/
+
 		return ajustementsHauteur;
 	}
 
@@ -306,18 +475,18 @@ public class IntelHandController : MonoBehaviour {
 		return handJointSphere;
 	}
 
-	// Buffer pour récupérer les positions des boules rouges.
-	private KinectPowerInterop.HandJointInfo[] hand_joints =
-		new KinectPowerInterop.HandJointInfo[(int)KinectPowerInterop.HandJointIndex.NUM_JOINTS * 2];
-
-	// Erreur maximale permise avant d'etre invalide.
-	private const float kErreurMaxPermise = 5.0f;
-
 	// --- Snap ---
 
 	// Hauteur a laquelle la main doit se trouver.
-	const float hauteurCibleMain = 0.43f;
+	//const float kHauteurCibleMain = -0.4f;
+	const float kHauteurCibleMain = -1.1f;
 
-	// Distance au carre a partir de laquelle ne plus faire de snap.
-	const float differenceHauteurCarreMaxPourAjustement = 0.040f;
+	// Hauteur max pour le snap.
+	//const float kHauteurMaxSnap = 2.0f;
+	const float kHauteurMaxSnap = 1.0f;
+
+	// Hauteur min pour le snap.
+	//const float kHauteurMinSnap = -1.0f;
+	const float kHauteurMinSnap = -2.0f;
+
 }

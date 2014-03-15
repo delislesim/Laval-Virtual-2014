@@ -10,11 +10,11 @@ public class GestureDrum : Gesture {
 	private float elapsedTimeGesture_;
 	private float[] previousHandsPosition_;
 
-	private const float gestureTimeout_ = 1.0f;
-	private const float gestureTime_ = 2.0f;
+	private const float gestureTimeout_ = 0.6f;
+	private const float gestureTime_ = 1.5f;
 
-	private const float minHandDepth_ = 0.14f;
-	private const float minHandsSpeed_ = 0.20f;
+	private const float minHandDepth_ = 0.12f;
+	private const float minHandsSpeed_ = 0.13f;
 
 	public GestureDrum()
 	{

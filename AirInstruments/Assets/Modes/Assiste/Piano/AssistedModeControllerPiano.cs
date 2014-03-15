@@ -82,7 +82,7 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 			tempsActuel += Time.deltaTime * speed;
 
 			// Temps de la note qu'on entend, en secondes.
-			float tempsAJouer = tempsActuel - (tempsAttendreDebutMusique * speed);
+			float tempsAJouer = tempsActuel - tempsAttendreDebutMusique;
 
 			// Temps a jouer, en echantillons.
 			int tempsAJouerEchantillons = (int) (tempsAJouer * resolutionInverse);
@@ -102,9 +102,14 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 				for (int i = dernierTempsJoue; i < tempsAJouerEchantillons; ++i) {
 					int tempsAJouerEchantillonsModulo = i % nombreEchantillons;
 
+					// Reinitialiser les booleens indiquant si chaque note est adjacent
+					// a une note a jouer.
+					for (int j = 0; j < nombreNotes; ++j) {
+						instrumentScript.DefinirAdjacentAJouer(j, false);
+					}
+
 					// Passer toutes les notes que le joueur doit jouer.
 					for (int j = 0; j < nombreNotes; ++j) {
-						// Jouer la note si necessaire.
 						PartitionPiano.StatutNote statutNote = prochainesNotes [tempsAJouerEchantillonsModulo, j];
 						if (statutNote != PartitionPiano.StatutNote.Accompagnement) {
 							instrumentScript.DefinirStatutNote (j, statutNote);
@@ -135,7 +140,7 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 						}
 					} else {
 						tempsAJouerEchantillons = i;
-						tempsActuel = (tempsAttendreDebutMusique * speed) + tempsAJouerEchantillons * resolution;
+						tempsActuel = tempsAttendreDebutMusique + tempsAJouerEchantillons * resolution;
 						break;
 					}
 				}
@@ -169,7 +174,7 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 
 		// Verifier si la musique est terminee.
 		float tempsFin = partition.ObtenirTempsFin ();
-		if (tempsFin != -1.0f && tempsActuel > tempsFin) {
+		if (tempsFin != -1.0f && tempsActuel - tempsAttendreDebutMusique > tempsFin) {
 			ActiverLibre();
 		}
 	}

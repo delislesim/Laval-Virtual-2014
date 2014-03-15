@@ -108,10 +108,10 @@
 1             [Do3] {La3}
 1 [Fa2] {Do4}
 1 [Fa2] [Mi3] {Do4}
-1 [La2] [Do3] {Fa3} {Do4}
-1             {Mi3} {Do4}
-1 [La2] [Do3] {Fa3} {Do4}
-1             {Mi3}
+1 [La2] [Do3] [Fa3] {Do4}
+1             [Mi3] {Do4}
+1 [La2] [Do3] [Fa3] {Do4}
+1             [Mi3]
 1 [Fa2] {Do4}
 1 [Fa2] [Mi3] {Do4}
 1 [La2] [Do3] [Fa3] {Do4}
@@ -220,12 +220,12 @@
 1              [Re3] {Sol3}
 1 [Mi2] [Sol2] [Mi3] {Sol3}
 1              [Re3] {Sol3}
-1 [Do2] {Mi3}
-1 [Do2] {Re3}
-1 [Mi2] [Sol2] {Do3}
-1              {Mi3}
-1 [Mi2] [Sol2] {Re3}
-1              {Do3}
+1 [Do2] [Mi3]
+1 [Do2] [Re3]
+1 [Mi2] [Sol2] [Do3]
+1              [Mi3]
+1 [Mi2] [Sol2] [Re3]
+1              [Do3]
 1 [Fa2] {Do4}
 1 [Fa2] [Mi3] {Do4}
 1 [La2] [Do3] [Fa3] {Do4}

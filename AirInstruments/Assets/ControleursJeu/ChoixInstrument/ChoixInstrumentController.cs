@@ -24,7 +24,7 @@ public class ChoixInstrumentController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
+		/*
 		// Verifier s'il y a un choix d'instrument actif.
 		Pointeur pointeur = Pointeur.obtenirInstance ();
 		int targetid = pointeur.GetCurrentTargetId ();
@@ -44,9 +44,34 @@ public class ChoixInstrumentController : MonoBehaviour {
 				}
 			}
 		}
+		*/
+
+		GestureRecognition gestureRecognition = GestureRecognition.ObtenirInstance ();
+		GestureId gesture = gestureRecognition.GetCurrentGesture ();
+		switch (gesture) {
+		case GestureId.GESTURE_DRUM : {
+			GameState.ObtenirInstance().AccederEtat(GameState.State.Drum);
+			break;
+		}
+		case GestureId.GESTURE_GUITAR : {
+			GameState.ObtenirInstance().AccederEtat(GameState.State.Guitar);
+			break;
+		}
+		case GestureId.GESTURE_PIANO : {
+			GameState.ObtenirInstance().AccederEtat(GameState.State.Piano);
+			break;
+		}
+		}
+
+		// Initialiser le guidage si necessaire.
+		if (!guidageInitialise) {
+			GuidageController.ObtenirInstance ().changerGuidage(typeGuidage.MENU_PRINCIPAL);
+			guidageInitialise = true;
+		}
 	}
 
 	void OnEnable () {
+		/*
 		// Inserer les cibles possibles pour la main.
 		Pointeur pointeur = Pointeur.obtenirInstance ();
 		pointeur.RemoveAllTargets ();
@@ -62,11 +87,23 @@ public class ChoixInstrumentController : MonoBehaviour {
 
 		// Activer le pointeur.
 		pointeur.gameObject.SetActive (true);
+		*/
+
+		// Ajouter les gestes.
+		GestureRecognition gestureRecognition = GestureRecognition.ObtenirInstance ();
+		gestureRecognition.AddGesture (new GesturePiano ());
+		gestureRecognition.AddGesture (new GestureDrum ());
+		gestureRecognition.AddGesture (new GestureGuitar ());
+
+		// Affichage du guidage
+		guidageInitialise = false;
 	}
 
 	void OnDisable () {
 		Pointeur.obtenirInstance ().gameObject.SetActive (false);
 	}
+
+	private bool guidageInitialise = false;
 
 	private const int kDrumTargetId = 0;
 	private const int kGuitarTargetId = 1;

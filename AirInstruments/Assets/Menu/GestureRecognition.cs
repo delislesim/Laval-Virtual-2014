@@ -32,10 +32,6 @@ public class GestureRecognition : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		AddGesture (new GesturePiano ());
-		AddGesture (new GestureMenu ());
-		AddGesture (new GestureDrum ());
-		AddGesture (new GestureGuitar ());
 	}
 	
 	// Update is called once per frame
@@ -51,13 +47,14 @@ public class GestureRecognition : MonoBehaviour {
 				Debug.Log ("Gesture: " + currentId);
 			}
 		}
-		//print(currentId);
-		//print(gestureId[0]);
 	}
 
-	void AddGesture(Gesture gesture)
-	{
+	public void AddGesture(Gesture gesture) {
 		gestureList.Add(gesture);
+	}
+
+	public void ClearGestures() {
+		gestureList.Clear ();
 	}
 
 	private Skeleton skeleton_ = new Skeleton(0);

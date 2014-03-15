@@ -40,7 +40,7 @@ public class GestureGuitar : Gesture {
 
 		//Debug.Log ("hands not too far : " + handsNotTooFar + "\nleft hand far enough : " + leftHandFarEnough + "\n");
 		//Debug.Log ((rightHandPos [0] - leftHandPos [0]) + "\n");
-		Debug.Log ((hipLeftPos[2] - rightHandPos[2]) + " " + (hipLeftPos[2] - leftHandPos[2]) + "\n");
+		//Debug.Log ((hipLeftPos[2] - rightHandPos[2]) + " " + (hipLeftPos[2] - leftHandPos[2]) + "\n");
 		//Debug.Log ((leftHandPos [0] - hipLeftPos [0]) + "\n");
 
 		if (handsNotTooFar && leftHandFarEnough) {

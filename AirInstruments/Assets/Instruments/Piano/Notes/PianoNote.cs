@@ -78,35 +78,49 @@ public class PianoNote : MonoBehaviour {
 		}
 	}
 
-	public bool ToucherAvecSphere(FingerSphere sphere, bool estDescenduSousBlanches) {
+	public bool AppuieSurNote(FingerSphere sphere, bool estDescenduSousBlanches) {
 		// Empecher de jouer les notes noires par en-dessous.
-		if (noire && estDescenduSousBlanches && !estJouee && !estFadeout) {
+		if ((noire && estDescenduSousBlanches && !AssistedModeControllerPiano.EstActive())
+		    && !estJouee && !estFadeout) {
 			return false;
 		}
-
+		
 		// Calculer la position du bas de la boule rouge.
 		Vector3 spherePositionWorld = sphere.transform.position + Vector3.down * sphere.ObtenirRayon ();
 		Vector3 spherePositionLocal = transform.InverseTransformPoint (spherePositionWorld);
-
+		
 		// Accepter la note seulement si le centre de la boule rouge est au-dessus de la note.
 		float scaleXCollider = ((BoxCollider)collider).size.x;
-		if (spherePositionLocal.x > 0.5f * scaleXCollider || spherePositionLocal.x < -0.5 * scaleXCollider) {
+		if (spherePositionLocal.x > 0.5f * scaleXCollider ||
+		    spherePositionLocal.x < -0.5 * scaleXCollider) {
 			return false;
 		}
 
-		if (!noire && spherePositionLocal.y > 0.5f - kProportionNoteBlancheNonJouable) {
+		float proportionNonJouable = 
+			AssistedModeControllerPiano.EstActive () && statut == PartitionPiano.StatutNote.Joueur ?
+				kProportionNoteBlancheNonJouableAssiste : kProportionNoteBlancheNonJouable;
+		if (!noire && spherePositionLocal.y > 0.5f - proportionNonJouable) {
 			return false;
 		}
+
+		float noteAngle = AnglePourSphereA (spherePositionWorld);
+		return (noteAngle > 0);
+	}
+
+	public bool ToucherAvecSphere(FingerSphere sphere, bool estDescenduSousBlanches) {
+		if (!AppuieSurNote (sphere, estDescenduSousBlanches))
+			return false;
 
 		// Calculer l'angle que la note doit avoir pour ne pas toucher au doigt.
+		Vector3 spherePositionWorld = sphere.transform.position + Vector3.down * sphere.ObtenirRayon ();
 		float noteAngle = AnglePourSphereA (spherePositionWorld);
 		if (noteAngle > kAngleMaxPermis) {
 			angleCourant = kAngleMaxPermis;
 		} else if (noteAngle > angleCourant) {
 			angleCourant = noteAngle;
 		}
-		
-		return noteAngle > 0;
+
+		return (noteAngle > 0);
 	}
 
 	// Calcule l'angle que doit avoir la note pour ne pas toucher
@@ -196,7 +210,9 @@ public class PianoNote : MonoBehaviour {
 			// La note doit etre jouee par le joueur.
 			noteObject.renderer.material = doitJouerMaterial;
 
+			ArreterSon();
 			aEteJouee = false;
+			estFadeout = false;
 
 		} else if (statut == PartitionPiano.StatutNote.Muette) {
 
@@ -205,6 +221,10 @@ public class PianoNote : MonoBehaviour {
 			tempsEnfonceeParErreur = 0;
 
 		}
+	}
+
+	public void DefinirAdjacentAJouer(bool adjacent) {
+		adjacentAJouer = adjacent;
 	}
 
 	public bool PeutContinuer() {
@@ -244,7 +264,8 @@ public class PianoNote : MonoBehaviour {
 		if (statut != PartitionPiano.StatutNote.Muette)
 			return;
 
-		if (angleCourant >= kAngleCommencerSonAssisteInvalide ||
+		if (!noire &&
+		    angleCourant >= kAngleCommencerSonAssisteInvalide ||
 		    (estJouee && angleCourant >= kAngleCommencerSonAssisteVoulu)) {
 			tempsEnfonceeParErreur += Time.deltaTime;
 			if (tempsEnfonceeParErreur >= kTempsEnfonceeParErreurMax) {
@@ -284,8 +305,11 @@ public class PianoNote : MonoBehaviour {
 	// Vitesse a laquelle il faut appuyer la note pour faire un son (degres par seconde).
 	private const float kVitesseMinPourSon = 2.0f;
 	
-	// Proportion des notes blanches qui ne peuvent pas etre jourées (réservées aux notes noire)
+	// Proportion des notes blanches qui ne peuvent pas etre jouées (réservées aux notes noire)
 	private const float kProportionNoteBlancheNonJouable = 0.65f;
+
+	// Proportion des notes blanches qui ne peuvent pas etre jouées, lors du mode assisté.
+	private const float kProportionNoteBlancheNonJouableAssiste = 0.45f;
 
 	// Temps que la note doit etre enfoncee par erreur avant qu'on entende un son.
 	private const float kTempsEnfonceeParErreurMax = 0.3f;
@@ -327,6 +351,9 @@ public class PianoNote : MonoBehaviour {
 
 	// Statut de la note.
 	PartitionPiano.StatutNote statut = PartitionPiano.StatutNote.Muette;
+
+	// Indique si on est adjacent a une note qui doit etre jouee.
+	bool adjacentAJouer = false;
 
 	// Temps pendant lequel la note a ete enfoncee alors qu'elle ne devrait pas l'etre.
 	float tempsEnfonceeParErreur = 0.0f;

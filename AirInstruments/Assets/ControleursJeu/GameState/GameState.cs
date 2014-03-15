@@ -63,7 +63,6 @@ public class GameState : MonoBehaviour {
 		}
 
 		transitionTerminee = false;
-
 		previousState = currentState;
 
 		// Voler la camera a la tete du drummer.
@@ -79,6 +78,13 @@ public class GameState : MonoBehaviour {
 		} else if (previousState == State.ChooseInstrument) {
 			choixInstrumentControleur.PrepareToStop();
 		}
+
+		// Effacer tous les gestes.
+		GestureRecognition gestureRecognition = GestureRecognition.ObtenirInstance ();
+		gestureRecognition.ClearGestures ();
+
+		// Effacer tous les guidages.
+		GuidageController.ObtenirInstance ().changerGuidage (typeGuidage.AUCUN);
 
 		// Activer le nouvel etat.
 		currentState = state;
@@ -136,6 +142,7 @@ public class GameState : MonoBehaviour {
 		} else if (currentState == State.Guitar) {
 
 			guitareController.gameObject.SetActive (true);
+			guitareController.AnimationTerminee();
 			
 		}
 
