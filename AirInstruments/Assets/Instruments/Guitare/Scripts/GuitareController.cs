@@ -27,6 +27,15 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 	// Hand follower.
 	public HandFollower handFollower;
 
+	// Spot de la guitare.
+	public SpotlightControl spotGuitare;
+
+	// Spot un peu plus haut pointant sur le visage du guitariste.
+	public SpotlightControl spotGuitareHaut;
+
+	// Pied gauche du joueur.
+	public GameObject leftFoot;
+
 	// Sons du tutorial.
 	public AudioClip sonLeverBras;
 	public AudioClip sonCordes;
@@ -74,12 +83,29 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 				if (estEnTrainDeQuitter) {
 					guitareWrapper.SetActive (false);
 					guitareDecorative.SetActive (true);
+
+					joueurVisible = false;
+
+					// Reinitialiser le spot au-dessus de la guitare.
+					spotGuitare.Reinitialiser();
+					spotGuitareHaut.Reinitialiser();
 				} else {
 					guitareWrapper.SetActive (true);
 					guitareDecorative.SetActive (false);
+
+					joueurVisible = true;
+
+					// Rapetisser l'angle du spot au-dessus de la guitare.
+					spotGuitare.SetAngle(24.0f, 8.0f);
+					spotGuitareHaut.SetTargetIntensity(3.32f, 2.0f);
 				}
 				aFaitSwitch = true;
 			}
+		}
+
+		// Bouger le spot vers le guitariste.
+		if (joueurVisible && leftFoot.renderer.enabled) {
+			spotGuitare.SetLookAt(leftFoot.transform.position, 10.0f);
 		}
 
 		// Les autres options ne sont pas disponibles tant qu'on a pas fini
@@ -239,6 +265,9 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 
 	// Indique si on a fait le switch de guitare.
 	private bool aFaitSwitch = false;
+
+	// Indique si le joueur de guitare est visible.
+	private bool joueurVisible = false;
 
 	// Indique si on est en train de quitter la scene.
 	private bool estEnTrainDeQuitter = false;
