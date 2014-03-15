@@ -16,7 +16,6 @@ public class HandFollower : MonoBehaviour {
 		// Calculer le rayon du tip.
 		Vector3 worldScale = VectorConversions.CalculerWorldScale (transform);
 		rayon = worldScale.x / 2.0f;
-
 		collisionReady = true;
 		// Layer des colliders de drum components.
 		guitarPlayerLayer = 1 << LayerMask.NameToLayer ("GuitarPlayer");
