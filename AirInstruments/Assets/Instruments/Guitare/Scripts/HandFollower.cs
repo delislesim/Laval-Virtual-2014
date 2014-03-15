@@ -7,6 +7,10 @@ public class HandFollower : MonoBehaviour {
 	public GameObject objectToFollow;
 	public ColliderManager guitarCollider;
 	public GuitarPlayer guitarPlayer;
+
+	// Lumiere verte indiquant quand les notes sont jouees.
+	public GameObject greenLight;
+
 	// Use this for initialization
 	void Start () {
 		// Calculer le rayon du tip.
@@ -20,6 +24,22 @@ public class HandFollower : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		// --- Animer la lumiere verte. ---
+		if (greenLight.activeSelf) {
+			tempsDepuisDerniereNote += Time.deltaTime;
+			if (tempsDepuisDerniereNote > 0.25f) {
+				Color32 color = greenLight.renderer.material.color;
+				Color32 nextColor = Color.Lerp(color, Color.black, Time.deltaTime * 4.0f);
+				greenLight.renderer.material.color = nextColor;
+
+				if (nextColor == Color.black) {
+					greenLight.SetActive (false);
+				}
+			}
+		}
+
+
+		// --- Gerer les sons de guitare. ---
 		lastPosition = transform.position;
 		
 		// Suivre l'objet auquel on a été assigné.
@@ -54,9 +74,20 @@ public class HandFollower : MonoBehaviour {
 					// Se rappeler que l'on a joue ce component. Il faut s'en eloigner
 					// suffisamment avant de le rejouer.
 					collisionReady = false;
+
+					// Allumer la lumiere verte.
+					greenLight.renderer.material.color = Color.white;
+					greenLight.SetActive (true);
+					tempsDepuisDerniereNote = 0;
 				}
 			}
 		}
+	}
+
+	void OnEnable() {
+		// Desactiver la lumiere verte.
+		greenLight.SetActive (false);
+		greenLight.renderer.material.color = Color.black;
 	}
 
 	public void ReinitialiserMouvementsAmples() {
@@ -98,4 +129,7 @@ public class HandFollower : MonoBehaviour {
 
 	// Indique si le dernier mouvement ample etait au-dessus ou en-dessous de la guitare.
 	bool dernierAuDessus = false;
+
+	// Temps écoulé depuis la derniere note.
+	float tempsDepuisDerniereNote = 0;
 }
