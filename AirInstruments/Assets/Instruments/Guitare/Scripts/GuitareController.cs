@@ -24,6 +24,9 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 	// Joueur de guitare.
 	public GuitarPlayer guitarPlayer;
 
+	// Hand follower.
+	public HandFollower handFollower;
+
 	// Sons du tutorial.
 	public AudioClip sonLeverBras;
 	public AudioClip sonCordes;
@@ -213,7 +216,7 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 
 	public void AnimationTerminee() {
 		// Demarrer le tutorial.
-		tutorial = new TutorialGuitare (sonLeverBras, sonCordes);
+		tutorial = new TutorialGuitare (sonLeverBras, sonCordes, handFollower);
 		tutorial.Demarrer ();
 		tutorialActif = true;	
 	}

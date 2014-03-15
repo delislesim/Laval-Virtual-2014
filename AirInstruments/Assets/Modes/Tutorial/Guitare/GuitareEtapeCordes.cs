@@ -4,8 +4,9 @@ using KinectHelpers;
 
 public class GuitareEtapeCordes : EtapeTutorial {
 	
-	public GuitareEtapeCordes(AudioClip son) {
+	public GuitareEtapeCordes(AudioClip son, HandFollower handFollower) {
 		this.son = son;
+		this.handFollower = handFollower;
 	}
 	
 	// Retourne le texte d'instruction qui doit etre affiche lors de
@@ -26,12 +27,12 @@ public class GuitareEtapeCordes : EtapeTutorial {
 	
 	// Appeler lorsque cette etape du tutorial debute.
 	public void Demarrer() {
-		// Ne rien faire.
+		handFollower.ReinitialiserMouvementsAmples ();
 	}
 	
 	// Indique si l'etape a ete completee avec success par le joueur.
 	public bool EstCompletee() {
-		return true;
+		return handFollower.ObtenirNumMouvementsAmples () > 3;
 	}
 	
 	// Indique si on doit feliciter le joueur (vrai) ou simplement
@@ -45,5 +46,8 @@ public class GuitareEtapeCordes : EtapeTutorial {
 
 	// Squelette.
 	private Skeleton skeleton = new Skeleton(0);
+
+	// Hand follower.
+	private HandFollower handFollower;
 	
 }

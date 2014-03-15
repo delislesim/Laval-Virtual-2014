@@ -31,6 +31,14 @@ public class HandFollower : MonoBehaviour {
 			if (Mathf.Abs(distance) > kDistancePourRejouer) {
 				collisionReady = true;
 			}
+
+			if (distance > kDistanceAmple && !dernierAuDessus) {
+				++numMouvementsAmples;
+				dernierAuDessus = true;
+			} else if (distance < kDistanceAmple && dernierAuDessus) {
+				++numMouvementsAmples;
+				dernierAuDessus = false;
+			}
 		}
 
 		if(collisionReady){
@@ -50,6 +58,15 @@ public class HandFollower : MonoBehaviour {
 			}
 		}
 	}
+
+	public void ReinitialiserMouvementsAmples() {
+		numMouvementsAmples = 0;
+		dernierAuDessus = false;
+	}
+
+	public int ObtenirNumMouvementsAmples() {
+		return numMouvementsAmples;
+	}
 	
 	// Derniere position du tip.
 	private Vector3 lastPosition;
@@ -61,7 +78,7 @@ public class HandFollower : MonoBehaviour {
 	const float kMultiplicateurRayon = 1.0f;
 	
 	// Distance dont il faut s'eloigner du GuitPlayer pour le rejouer.
-	const float kDistancePourRejouer = 0.45f;
+	const float kDistancePourRejouer = 0.35f;
 
 	// Dernier drum component a avoir ete joue.
 	GuitarPlayer guitarPLayerInterface;
@@ -72,4 +89,13 @@ public class HandFollower : MonoBehaviour {
 	// Indique si on s'est eloigne suffisamment de la note
 	// avant de la rejouer.
 	bool collisionReady;
+
+	// Compteur de mouvements amples.
+	int numMouvementsAmples = 0;
+
+	// Distance dont il faut s'eloigner de la guitare pour que le mouvement soit ample.
+	const float kDistanceAmple = 1.0f;
+
+	// Indique si le dernier mouvement ample etait au-dessus ou en-dessous de la guitare.
+	bool dernierAuDessus = false;
 }

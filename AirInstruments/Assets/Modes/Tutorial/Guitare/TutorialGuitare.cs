@@ -4,13 +4,14 @@ using System.Collections;
 public class TutorialGuitare {
 	
 	public TutorialGuitare(AudioClip sonLeverBras,
-	                       AudioClip sonCordes) {
+	                       AudioClip sonCordes,
+	                       HandFollower handFollower) {
 		this.tutorial = Tutorial.ObtenirInstance ();
 		
 		// Creer les etapes du tutorial.
 		tutorial.ReinitialiserEtapes ();
 		tutorial.AjouterEtape (new GuitareEtapeLeverBras (sonLeverBras));
-		tutorial.AjouterEtape (new GuitareEtapeCordes (sonCordes));
+		tutorial.AjouterEtape (new GuitareEtapeCordes (sonCordes, handFollower));
 	}
 	
 	public void Demarrer() {
