@@ -75,6 +75,7 @@ public class Tutorial : MonoBehaviour {
 				// S'il ne reste pas d'étapes, on se désactive et on indique
 				// que le tutorial est complété.
 				gameObject.SetActive (false);
+				estComplete = true;
 			}
 		}
 	}
