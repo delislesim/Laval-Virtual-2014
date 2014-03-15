@@ -80,7 +80,8 @@ public class PianoNote : MonoBehaviour {
 
 	public bool AppuieSurNote(FingerSphere sphere, bool estDescenduSousBlanches) {
 		// Empecher de jouer les notes noires par en-dessous.
-		if (noire && estDescenduSousBlanches && !estJouee && !estFadeout) {
+		if ((noire && estDescenduSousBlanches && !AssistedModeControllerPiano.EstActive())
+		    && !estJouee && !estFadeout) {
 			return false;
 		}
 		
