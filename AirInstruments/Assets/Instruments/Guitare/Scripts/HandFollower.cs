@@ -45,22 +45,31 @@ public class HandFollower : MonoBehaviour {
 		transform.position = objectToFollow.transform.position;
 		
 		// Si on a joue une note recemment, s'assurer qu'on s'en eloigne avant de le rejouer.
-		if (guitarCollider != null) {
-			float distance = guitarCollider.DistanceToPoint(transform.position);
-			if (Mathf.Abs(distance) > kDistancePourRejouer) {
-				collisionReady = true;
-			}
-
-			if (distance > kDistanceAmple && !dernierAuDessus) {
-				++numMouvementsAmples;
-				dernierAuDessus = true;
-			} else if (distance < kDistanceAmple && dernierAuDessus) {
-				++numMouvementsAmples;
-				dernierAuDessus = false;
-			}
+		float distance = guitarCollider.DistanceToPoint(transform.position);
+		if (Mathf.Abs(distance) > kDistancePourRejouer) {
+			collisionReady = true;
 		}
 
-		if(collisionReady){
+		// Compter les mouvements amples.
+		if (distance > kDistanceAmple && !dernierAuDessus) {
+			++numMouvementsAmples;
+			dernierAuDessus = true;
+		} else if (distance < kDistanceAmple && dernierAuDessus) {
+			++numMouvementsAmples;
+			dernierAuDessus = false;
+		}
+
+		// Inscrire les distance par rapport aux cordes.
+		compteurDistance += Time.deltaTime;
+		if (compteurDistance >= kTempsPourEcrireDistance) {
+			compteurDistance = compteurDistance % kTempsPourEcrireDistance;
+
+			indexDernieresDistance = (indexDernieresDistance + 1) % dernieresDistances.Length;
+			dernieresDistances [indexDernieresDistance] = Mathf.Abs(distance);
+		}
+		tempsDepuisDerniereNoteAutomatique += Time.deltaTime;
+
+		if(collisionReady) {
 			// Verifier si on a fait une collision depuis la derniere fois.
 			Vector3 direction = transform.position - lastPosition;
 			RaycastHit hitInfo;
@@ -68,25 +77,56 @@ public class HandFollower : MonoBehaviour {
 			if (Physics.Raycast (lastPosition, direction, out hitInfo,
 			                     direction.magnitude + rayon * kMultiplicateurRayon,
 			                     guitarPlayerLayer)) {
-				if (hitInfo.collider.gameObject.tag == "GuitarPlayer"){	
-					guitarPlayer.PlayNextNote();
-					// Se rappeler que l'on a joue ce component. Il faut s'en eloigner
-					// suffisamment avant de le rejouer.
-					collisionReady = false;
-
-					// Allumer la lumiere verte.
-					greenLight.renderer.material.color = Color.white;
-					greenLight.SetActive (true);
-					tempsDepuisDerniereNote = 0;
+				if (hitInfo.collider.gameObject.tag == "GuitarPlayer"){
+					if (tempsDepuisDerniereNoteAutomatique < kTempsRejouerApresAutomatique) {
+						tempsDepuisDerniereNoteAutomatique = 1000.0f;
+					} else {
+						PlayNote ();
+					}
 				}
 			}
 		}
+	}
+
+	void PlayNote() {
+		guitarPlayer.PlayNextNote();
+		// Se rappeler que l'on a joue ce component. Il faut s'en eloigner
+		// suffisamment avant de le rejouer.
+		collisionReady = false;
+		
+		// Allumer la lumiere verte.
+		greenLight.renderer.material.color = Color.white;
+		greenLight.SetActive (true);
+		tempsDepuisDerniereNote = 0;
 	}
 
 	void OnEnable() {
 		// Desactiver la lumiere verte.
 		greenLight.SetActive (false);
 		greenLight.renderer.material.color = Color.black;
+
+		for (int i = 0; i < dernieresDistances.Length; ++i) {
+			dernieresDistances[i] = 0;
+		}
+		indexDernieresDistance = 1;
+		tempsDepuisDerniereNoteAutomatique = 1000.0f;
+	}
+
+	// Utilise par le mode assiste pour indiquer quand une note doit
+	// etre jouee immediatement selon la partition. La note est jouee
+	// si la main du guitariste semble etre en voie de jouer la note.
+	public void JouerNoteMaintenant() {
+		// On accepte de jouer la note si la main est suffisamment pres
+		// des cordes et qu'elle se dirige vers celles-ci.
+		float vitesse = dernieresDistances [indexDernieresDistance] -
+			dernieresDistances [(indexDernieresDistance + 1) % dernieresDistances.Length];
+
+		if (dernieresDistances[indexDernieresDistance] < 0.8f &&
+		    vitesse < -1.0f) {
+			PlayNote();
+			tempsDepuisDerniereNoteAutomatique = 0;
+			Debug.Log("auto-play");
+		}
 	}
 
 	public void ReinitialiserMouvementsAmples() {
@@ -131,4 +171,22 @@ public class HandFollower : MonoBehaviour {
 
 	// Temps écoulé depuis la derniere note.
 	float tempsDepuisDerniereNote = 0;
+
+	// Dernieres distances entre le collider et la main.
+	float[] dernieresDistances = new float[2];
+
+	// Index de la derniere donnee ecrite dans le tableau de dernieres distances.
+	int indexDernieresDistance = 1;
+
+	// Compteur depuis la derniere inscription d'une distance.
+	float compteurDistance = 0;
+
+	// Temps nécessaire pour inscrire une nouvelle distance.
+	const float kTempsPourEcrireDistance = 1.0f / 30.0f;
+
+	// Indique le temps depuis la derniere note automatique.
+	float tempsDepuisDerniereNoteAutomatique = 1000.0f;
+
+	// Temps pour rejouer une note apres une note automatique.
+	float kTempsRejouerApresAutomatique = 0.5f;
 }

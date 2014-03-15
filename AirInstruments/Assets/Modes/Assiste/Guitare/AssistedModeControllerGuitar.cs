@@ -15,6 +15,9 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 	// Cubes tombants.
 	public CubesTombantsGuitare cubesTombants;
 
+	// Main du guitariste.
+	public HandFollower handFollower;
+
 	public enum Chanson
 	{
 		LONELY_BOY,
@@ -85,7 +88,8 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 	}
 
 	public bool EstActive() {
-		return partition != null;
+		return partition != null &&
+			tempsEcoule > partition [partition.Count - 1].time + 1.0f; // Attendre 1 seconde apres la fin de la musique.
 	}
 
 	void Update () {
