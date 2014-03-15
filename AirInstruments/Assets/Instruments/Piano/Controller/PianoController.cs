@@ -28,10 +28,6 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 	void OnEnable() {
 		pianoWrapper.SetActive (true);
 
-		// Affichage du guidage pour le geste du menu.
-		// TODO: A faire une fois que le tutorial est termine.
-		//GuidageController.ObtenirInstance ().changerGuidage(typeGuidage.MENU_PRINCIPAL);
-
 		// Activation de la reconnaissance du geste de menu.
 		GestureRecognition gestureRecognition = GestureRecognition.ObtenirInstance ();
 		gestureRecognition.AddGesture (new GestureMenu());
@@ -39,9 +35,7 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 		// Demarrer le tutorial.
 		tutorial = new TutorialPiano (intelHandController, assistedModeController);
 		tutorial.Demarrer ();
-
-		// (Temporaire) Partir le mode assisté.
-		//assistedModeController.ChargerPartition (".\\Assets\\Modes\\Assiste\\Piano\\partitions\\valse.txt", 4.0f);
+		tutorialActif = true;
 	}
 	
 	// Methode appelee quand l'instrument "piano" n'est plus choisi.
@@ -57,6 +51,12 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 
 	// Methode appelee a chaque frame quand le piano est l'instrument courant.
 	void Update () {
+		// Gerer la fin du tutorial.
+		if (tutorialActif && tutorial.EstComplete()) {
+			// Affichage du guidage pour le geste du menu.
+			GuidageController.ObtenirInstance ().changerGuidage(typeGuidage.MENU_PRINCIPAL);
+		}
+
 		// Gérer les choix de l'utilisateur dans le menu.
 		if (GererMenu ())
 			return;
@@ -141,6 +141,9 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 
 	// Indique si le menu est presentement affiche.
 	private bool menuActif = false;
+
+	// Indique si un tutorial est en cours.
+	private bool tutorialActif = false;
 
 	// Tutorial.
 	private TutorialPiano tutorial;
