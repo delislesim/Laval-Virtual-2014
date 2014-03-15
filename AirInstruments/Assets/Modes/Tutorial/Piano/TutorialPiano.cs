@@ -32,8 +32,8 @@ public class TutorialPiano {
 	private Tutorial tutorial;
 
 	// Position du guidage.
-	private Vector3 kPositionGuidage = new Vector3(-13.8f, 3.66f, -17.286f);
+	private Vector3 kPositionGuidage = new Vector3(-13.8f, 3.43f, -17.286f);
 
 	// Taille du guidage.
-	private const float kTailleGuidage = 0.15f;
+	private const float kTailleGuidage = 0.18f;
 }

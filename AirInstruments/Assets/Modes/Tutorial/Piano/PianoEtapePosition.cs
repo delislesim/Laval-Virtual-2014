@@ -12,7 +12,7 @@ public class PianoEtapePosition : EtapeTutorial {
 	// Retourne le texte d'instruction qui doit etre affiche lors de
 	// l'execution de cette etape du tutorial.
 	public string ObtenirTexte() {
-		return "Suivez les fleches pour approcher vos mains du piano.";
+		return "Suivez les fleches pour\n approcher vos mains du piano.";
 	}
 	
 	// Retourne la voix lisant l'instruction.
