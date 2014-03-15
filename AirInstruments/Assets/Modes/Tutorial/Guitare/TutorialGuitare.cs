@@ -5,13 +5,16 @@ public class TutorialGuitare {
 	
 	public TutorialGuitare(AudioClip sonLeverBras,
 	                       AudioClip sonCordes,
-	                       HandFollower handFollower) {
+	                       AudioClip sonAssiste,
+	                       HandFollower handFollower,
+	                       AssistedModeControllerGuitar assistedModeController) {
 		this.tutorial = Tutorial.ObtenirInstance ();
 		
 		// Creer les etapes du tutorial.
 		tutorial.ReinitialiserEtapes ();
 		tutorial.AjouterEtape (new GuitareEtapeLeverBras (sonLeverBras));
 		tutorial.AjouterEtape (new GuitareEtapeCordes (sonCordes, handFollower));
+		tutorial.AjouterEtape (new GuitareEtapeAssiste (sonAssiste, assistedModeController));
 	}
 	
 	public void Demarrer() {

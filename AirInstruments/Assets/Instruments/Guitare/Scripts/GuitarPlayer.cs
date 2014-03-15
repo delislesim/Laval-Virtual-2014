@@ -88,7 +88,7 @@ public class GuitarPlayer : MonoBehaviour {
 		if (level == -1)
 			return;
 
-		if(AssistedCtrl.EstActive())
+		if(AssistedModeControllerGuitar.EstActive())
 		{
 			///get the note 
 			Style style = AssistedCtrl.getCurrentStyle();
