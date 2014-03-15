@@ -15,6 +15,9 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 	// Camera principale du jeu.
 	public Camera mainCamera;
 
+	//Assisted Controller
+	public DrumAssistedController assistedcontroller;
+
 	public void Prepare() {
 		KinectPowerInterop.SetKinectAngle (4);
 	}
@@ -25,6 +28,7 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 	// Methode appelee quand l'instrument "drum" est choisi.
 	void OnEnable() {
 		dude.gameObject.SetActive (true);
+		assistedcontroller.gameObject.SetActive(true);
 
 		// Mettre la tete du drummer a la position de la camera.
 		teteDrummer.transform.position = mainCamera.transform.position;
@@ -44,6 +48,8 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 	// Methode appelee quand l'instrument "drum" n'est plus choisi.
 	void OnDisable () {
 		dude.gameObject.SetActive (false);
+		assistedcontroller.gameObject.SetActive(false);
+
 	}
 	
 	// Methode appelee a chaque frame quand le drum est l'instrument courant.
