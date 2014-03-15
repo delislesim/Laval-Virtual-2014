@@ -12,6 +12,9 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 	private string fichierTNT = ".\\Assets\\Modes\\Assiste\\Guitare\\Chansons\\TNT.aup";
 	private string fichierBoubou = ".\\Assets\\Modes\\Assiste\\Guitare\\Chansons\\Lonely Boy Audacity.aup";
 
+	// Cubes tombants.
+	public CubesTombantsGuitare cubesTombants;
+
 	public enum Chanson
 	{
 		LONELY_BOY,
@@ -35,7 +38,7 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 	{
 		// Reinitialiser les variables.
 		tempsEcoule = 0.0f;
-		tempsNotes = 0.0f;
+		//tempsNotes = 0.0f;
 
 		string nomFichier;
 		AudioClip clip;
@@ -67,6 +70,9 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 		currentStyle = partition[currentPartitionIndex].style;
 		currentOctave = partition[currentPartitionIndex].octave;
 
+		// Charger les cubes.
+		cubesTombants.ChargerPartition (partition);
+
 		// Partir la musique.
 		audio.clip = clip;
 		audio.volume = 0.35f;
@@ -93,13 +99,16 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 		if(currentPartitionIndex < partition.Count-1){
 			if (tempsEcoule > partition[currentPartitionIndex+1].time)
 			{
-				tempsNotes = tempsNotes + partition[currentPartitionIndex+1].time;
-					currentPartitionIndex ++;
+				//tempsNotes = tempsNotes + partition[currentPartitionIndex+1].time;
+				currentPartitionIndex ++;
 			}
 		}
 		currentTone = partition[currentPartitionIndex].note;
 		currentStyle = partition[currentPartitionIndex].style;
 		currentOctave = partition[currentPartitionIndex].octave;
+
+		// Faire avancer les cubes.
+		cubesTombants.AssignerTempsCourant (tempsEcoule);
 	}
 	
 	private PartitionGuitar partitionMaker;
@@ -107,7 +116,7 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 	private List<PartitionGuitar.Playable> partition;
 
 	private float tempsEcoule;
-	private float tempsNotes; // Temps qui augmente avec les duree des notes. (par step)
+	//private float tempsNotes; // Temps qui augmente avec les duree des notes. (par step)
 	private int currentPartitionIndex;
 	private int currentOctave;
 
