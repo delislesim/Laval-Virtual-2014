@@ -31,6 +31,7 @@ public class SkeletonDrawer : MonoBehaviour {
 			GameObject cylindre = (GameObject)Instantiate (cylindrePrefab);
 			cylindre.transform.parent = this.transform;
 			cylindre.transform.localScale = cylindrePrefab.transform.localScale;
+			cylindre.SetActive (false);
 			cylindres.Add (cylindre);
 		}
 	}
@@ -39,6 +40,7 @@ public class SkeletonDrawer : MonoBehaviour {
 	void Update () {
 		PlacerCylindres();
 
+		// Rotation des mains.
 		left_arm_spheres[3].transform.rotation = cylindres[5].transform.rotation;
 		right_arm_spheres[3].transform.rotation = cylindres[8].transform.rotation;
 	}
@@ -52,7 +54,8 @@ public class SkeletonDrawer : MonoBehaviour {
 		//Spine
 		for(i = 1 ; i < spine_spheres.Count ; i++)
 		{	
-			if (spine_spheres[i-1]!=null && spine_spheres[i]!=null) {
+			if (spine_spheres[i-1]!=null && spine_spheres[i]!=null &&
+			    spine_spheres[i-1].renderer.enabled && spine_spheres[i].renderer.enabled) {
 				HandCylinder handCylinder = (HandCylinder)cylindres[boneIdx].GetComponent (typeof(HandCylinder));
 				handCylinder.DefinirExtremites (spine_spheres[i-1].transform.position,
 				                                spine_spheres[i].transform.position);
@@ -65,7 +68,8 @@ public class SkeletonDrawer : MonoBehaviour {
 		//LeftArm
 		for(i = 1 ; i < left_arm_spheres.Count ; i++)
 		{	
-			if (left_arm_spheres[i-1]!=null && left_arm_spheres[i]!=null) {
+			if (left_arm_spheres[i-1]!=null && left_arm_spheres[i]!=null &&
+			    left_arm_spheres[i-1].renderer.enabled && left_arm_spheres[i].renderer.enabled) {
 				HandCylinder handCylinder = (HandCylinder)cylindres[boneIdx].GetComponent (typeof(HandCylinder));
 				handCylinder.DefinirExtremites (left_arm_spheres[i-1].transform.position,
 				                                left_arm_spheres[i].transform.position);
@@ -79,7 +83,8 @@ public class SkeletonDrawer : MonoBehaviour {
 		//RightArm
 		for(i = 1 ; i < right_arm_spheres.Count ; i++)
 		{	
-			if (right_arm_spheres[i-1]!=null && right_arm_spheres[i]!=null) {
+			if (right_arm_spheres[i-1]!=null && right_arm_spheres[i]!=null &&
+			    right_arm_spheres[i-1].renderer.enabled && right_arm_spheres[i].renderer.enabled) {
 				HandCylinder handCylinder = (HandCylinder)cylindres[boneIdx].GetComponent (typeof(HandCylinder));
 				handCylinder.DefinirExtremites (right_arm_spheres[i-1].transform.position,
 				                                right_arm_spheres[i].transform.position);
@@ -93,7 +98,8 @@ public class SkeletonDrawer : MonoBehaviour {
 		//LeftLeg
 		for(i = 1 ; i < left_leg_spheres.Count ; i++)
 		{	
-			if (left_leg_spheres[i-1]!=null && left_leg_spheres[i]!=null) {
+			if (left_leg_spheres[i-1]!=null && left_leg_spheres[i]!=null &&
+			    left_leg_spheres[i-1].renderer.enabled && left_leg_spheres[i].renderer.enabled) {
 				HandCylinder handCylinder = (HandCylinder)cylindres[boneIdx].GetComponent (typeof(HandCylinder));
 				handCylinder.DefinirExtremites (left_leg_spheres[i-1].transform.position,
 				                                left_leg_spheres[i].transform.position);
@@ -107,7 +113,8 @@ public class SkeletonDrawer : MonoBehaviour {
 		//RightLeg
 		for(i = 1 ; i < right_leg_spheres.Count ; i++)
 		{	
-			if (right_leg_spheres[i-1]!=null && right_leg_spheres[i]!=null) {
+			if (right_leg_spheres[i-1]!=null && right_leg_spheres[i]!=null  &&
+			    right_leg_spheres[i-1].renderer.enabled && right_leg_spheres[i].renderer.enabled) {
 				HandCylinder handCylinder = (HandCylinder)cylindres[boneIdx].GetComponent (typeof(HandCylinder));
 				handCylinder.DefinirExtremites (right_leg_spheres[i-1].transform.position,
 				                                right_leg_spheres[i].transform.position);

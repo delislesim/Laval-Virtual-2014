@@ -162,6 +162,12 @@ public class MoveJoints : MonoBehaviour {
 				} else {
 					joints[i].transform.position = current_positions[i];
 				}
+
+				if (current_positions[i] == HIDING_POS) {
+					joints[i].renderer.enabled = false;
+				} else {
+					joints[i].renderer.enabled = true;
+				}
 			}
 
 			//Store new current position/rotation
@@ -183,7 +189,7 @@ public class MoveJoints : MonoBehaviour {
 						Vector3.Distance (positionCoude, positionMain);
 		*/
 
-		// Le centre des épaules ne peut pas etre plus loin que 2.35 en y.
+		// Le centre des épaules doit etre pret de la position fixee.
 		Vector3 positionCentreEpaules = current_positions [(int)Skeleton.Joint.ShoulderCenter];
 		Vector3 positionCentreEpaulesMax = kCibleEpaules + kToleranceCibleEpaules;
 		Vector3 positionCentreEpaulesMin = kCibleEpaules - kToleranceCibleEpaules;

@@ -112,10 +112,14 @@ public class MoveJointsForGuitar : MonoBehaviour {
 					//Apply head rotation
 					if(i == (int)Skeleton.Joint.Head)
 						joints[i].transform.localRotation = player.GetFaceRotation();
+
+					joints[i].renderer.enabled = true;
 				}
 				//If not tracked, hide!
-				else
+				else {
 					joints[i].transform.position = HIDING_POS;
+					joints[i].renderer.enabled = false;
+				}
 
 				//Store new current position/rotation
 				current_positions[i] = joints[i].transform.position;
