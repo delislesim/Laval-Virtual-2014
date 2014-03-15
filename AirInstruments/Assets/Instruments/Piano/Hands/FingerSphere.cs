@@ -32,6 +32,7 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 				Collider collider = hitColliders[i];
 				PianoNote note = collider.GetComponent<PianoNote>();
 				if (note != null) {
+					// Empecher de jouer les mauvaises notes.
 					if (AssistedModeControllerPiano.EstActive() &&
 					    note.ObtenirStatut() != PartitionPiano.StatutNote.Joueur &&
 					    note.AppuieSurNote(this, estDescenduSousBlanches)) {

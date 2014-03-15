@@ -264,7 +264,8 @@ public class PianoNote : MonoBehaviour {
 		if (statut != PartitionPiano.StatutNote.Muette)
 			return;
 
-		if (angleCourant >= kAngleCommencerSonAssisteInvalide ||
+		if (!noire &&
+		    angleCourant >= kAngleCommencerSonAssisteInvalide ||
 		    (estJouee && angleCourant >= kAngleCommencerSonAssisteVoulu)) {
 			tempsEnfonceeParErreur += Time.deltaTime;
 			if (tempsEnfonceeParErreur >= kTempsEnfonceeParErreurMax) {

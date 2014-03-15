@@ -82,7 +82,7 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 			tempsActuel += Time.deltaTime * speed;
 
 			// Temps de la note qu'on entend, en secondes.
-			float tempsAJouer = tempsActuel - (tempsAttendreDebutMusique * speed);
+			float tempsAJouer = tempsActuel - tempsAttendreDebutMusique;
 
 			// Temps a jouer, en echantillons.
 			int tempsAJouerEchantillons = (int) (tempsAJouer * resolutionInverse);
@@ -140,7 +140,7 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 						}
 					} else {
 						tempsAJouerEchantillons = i;
-						tempsActuel = (tempsAttendreDebutMusique * speed) + tempsAJouerEchantillons * resolution;
+						tempsActuel = tempsAttendreDebutMusique + tempsAJouerEchantillons * resolution;
 						break;
 					}
 				}
@@ -174,7 +174,7 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 
 		// Verifier si la musique est terminee.
 		float tempsFin = partition.ObtenirTempsFin ();
-		if (tempsFin != -1.0f && tempsActuel - tempsAttendreDebutMusique * speed > tempsFin) {
+		if (tempsFin != -1.0f && tempsActuel - tempsAttendreDebutMusique > tempsFin) {
 			ActiverLibre();
 		}
 	}
@@ -202,7 +202,7 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 
 	// Temps a attendre avant de commencer a jouer la musique, en secondes.
 	// Ceci correspond au decalage entre le remplissage et le jouage.
-	private const float tempsAttendreDebutMusique = 2.0f;
+	private const float tempsAttendreDebutMusique = 6.0f;
 	
 	// Resolution du tableau de prochaines notes a jouer.
 	private const float resolution = 0.1f;
