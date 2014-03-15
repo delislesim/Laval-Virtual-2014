@@ -102,7 +102,7 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 			menuAssiste.AssignerTexte(0, "Retour aux", "instruments");
 			menuAssiste.AssignerTexte(1, "Mode", "libre");
 			menuAssiste.AssignerTexte(2, "Lonely", "Boy");
-			menuAssiste.AssignerTexte(3, "Point", "virgule");
+			menuAssiste.AssignerTexte(3, "TNT", "");
 			menuAssiste.AssignerTexte(4, "Boubou", "the Boubou");
 
 			// Desactiver le son de la guitare.
