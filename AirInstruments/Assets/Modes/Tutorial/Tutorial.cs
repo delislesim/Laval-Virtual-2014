@@ -62,7 +62,7 @@ public class Tutorial : MonoBehaviour {
 			AccederProchaineEtape();
 		} else if (guidageTutorial.EstVisible() &&
 				   !guidageTutorial.EstEnAnimation() &&
-		           etapes[indexEtape - 1].EstCompletee()) {
+		           etapes[indexEtape - 1].EstCompletee() || Input.GetKeyDown(KeyCode.RightArrow)) {
 			// L'etape est completee: Faire l'animation de sortie
 			// du guidage courant.
 			guidageTutorial.Masquer();

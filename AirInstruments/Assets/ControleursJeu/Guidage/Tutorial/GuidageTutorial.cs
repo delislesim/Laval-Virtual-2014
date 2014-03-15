@@ -6,8 +6,12 @@ public class GuidageTutorial : MonoBehaviour {
 	// GameObject affichant le texte du guidage.
 	public GUIText texte;
 
+	public GUISkin tutorialSkin;
+
 	// GameObject affichant le background du guidage.
 	public GUITexture background;
+	public Texture backgroundCompleted;
+	public Texture backgroundBeginning;
 
 	// Use this for initialization
 	void Start () {
@@ -19,17 +23,45 @@ public class GuidageTutorial : MonoBehaviour {
 		tailleTexte = texte.fontSize;
 		positionTexte = texte.pixelOffset;
 
+		texte.font = tutorialSkin.font;
+
 		initialized = true;
 	}
 
 	// Update is called once per frame
 	void Update () {
+		if(EstEnTrainEntrer) {
+			if(positionGuidage.x < positionArrivee.x){
+				positionGuidage.x += vitesseAnimation;
+				DefinirPositionReelle();
+			} else {
+				EstEnTrainEntrer = false;
+			}
+		}
+
+		if(EstEnTrainDeMasquer) {
+			//tempsEcoule += Time.deltaTime;
+			if(positionGuidage.x <= Screen.width + (tailleBackground.x/2)){
+				background.texture = backgroundCompleted;
+				positionGuidage.x += vitesseAnimation;
+				DefinirPositionReelle();
+			} else {
+				//tempsEcoule = 0;
+				EstEnTrainDeMasquer = false;
+				gameObject.SetActive (false);
+				positionGuidage.x = -tailleBackground.x/2;
+			}
+		}
 	}
 
 	public void DefinirPosition(Vector2 position) {
 		Start ();
+		positionArrivee = position;
+		positionGuidage.y = position.y;
+	}
 
-		Vector2 positionTransformee = TransformerCoordonnees (position);
+	private void DefinirPositionReelle() {
+		Vector2 positionTransformee = TransformerCoordonnees (positionGuidage);
 		Vector2 tailleTransformee = TransformerCoordonnees (tailleBackground);
 		Rect pixelInset = background.pixelInset;
 		pixelInset.x = positionTransformee.x;
@@ -37,10 +69,10 @@ public class GuidageTutorial : MonoBehaviour {
 		pixelInset.width = tailleTransformee.x;
 		pixelInset.height = tailleTransformee.y;
 		background.pixelInset = pixelInset;
-
+		
 		Vector2 positionTexteTransformee = positionTransformee + TransformerCoordonnees (positionTexte);
 		texte.pixelOffset = positionTexteTransformee;
-
+		
 		int tailleTexteTransformee = (int) (tailleTexte * ((float)Screen.width) / 1755f);
 		texte.fontSize = tailleTexteTransformee;
 	}
@@ -51,7 +83,9 @@ public class GuidageTutorial : MonoBehaviour {
 
 	public void AfficherEtape(EtapeTutorial etape) {
 		texte.text = etape.ObtenirTexte ();
+		background.texture = backgroundBeginning;
 		gameObject.SetActive (true);
+		EstEnTrainEntrer = true;
 
 		// Jouer le son.
 		audio.clip = etape.ObtenirAudio ();
@@ -59,7 +93,8 @@ public class GuidageTutorial : MonoBehaviour {
 	}
 
 	public void Masquer() {
-		gameObject.SetActive (false);
+		EstEnTrainDeMasquer = true;
+		//gameObject.SetActive (false);
 	}
 
 	// Indique si le guidage est en train de faire une animation.
@@ -83,4 +118,25 @@ public class GuidageTutorial : MonoBehaviour {
 
 	// Position relative du texte pour une résolution de 1080 * 768.
 	private Vector2 positionTexte;
+
+	// Position actuelle du tutorial
+	private Vector2 positionGuidage;
+
+	// Position cible du tutorial
+	private Vector2 positionArrivee;
+
+	// Indique si l'animation pour masquer l'objet est en cours
+	private bool EstEnTrainDeMasquer = false;
+
+	// Indique si l'animation pour afficher l'objet est en cours
+	private bool EstEnTrainEntrer = false;
+
+	// Temps de l'animation
+	private float tempsAnimationMasquer = 1f;
+
+	// Vitesse de l'animation
+	private float vitesseAnimation = 15;
+
+	// Temps écoulé depuis le début de l'animation
+	private float tempsEcoule = 0;
 }
