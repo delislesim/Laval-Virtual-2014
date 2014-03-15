@@ -128,6 +128,9 @@ public class MoveJoints : MonoBehaviour {
 		// Determiner si le squelette est valide.
 		bool skeletonValid = SkeletonIsTrackedAndValid ();
 
+		// Fixer la position du squelette.
+		FixerSquelette ();
+
 		// Appliquer les positions aux articulations.
 		for(int i = 0; i < jointsCount; i++) {
 
@@ -149,15 +152,6 @@ public class MoveJoints : MonoBehaviour {
 				joints[i].transform.position = Vector3.MoveTowards(joints[i].transform.position,
 				                                                   targetPosition,
 				                                                   kDeplacementMaxTete * Time.deltaTime);
-
-				/* TODO: Face tracker.
-				Quaternion faceRotation = player.GetFaceRotation();
-				if(player.GetFaceTrackingStatus())
-				{
-					Debug.Log("Head rotation" + player.GetFaceRotation());
-					joints[i].transform.localRotation = faceRotation;
-				}
-				*/
 			} else {
 				if (i == (int)Skeleton.Joint.HandRight || i == (int)Skeleton.Joint.HandLeft) {
 					if (current_positions[i] != HIDING_POS) {
@@ -168,12 +162,6 @@ public class MoveJoints : MonoBehaviour {
 				} else {
 					joints[i].transform.position = current_positions[i];
 				}
-				/*
-				if (skeletonValid && current_positions[i] != HIDING_POS) {
-					joints[i].renderer.enabled = true;
-				} else {
-					joints[i].renderer.enabled = false;
-				}*/
 			}
 
 			//Store new current position/rotation
@@ -185,22 +173,34 @@ public class MoveJoints : MonoBehaviour {
 		manageMouvementsAndSounds(current_positions, last_positions);
 	}
 
-	// Indique si 2 tableaux sont égaux.
-	static bool ArraysEqual (Vector3[] a1, Vector3[] a2)
-	{
-		if (ReferenceEquals(a1,a2))
-			return true;
-		
-		if (a1 == null || a2 == null)
-			return false;
-		
-		if (a1.Length != a2.Length)
-			return false;
+	void FixerSquelette() {
+		/*
+		// Mesurer les bras.
+		Vector3 positionEpaule = current_positions [(int)Skeleton.Joint.ShoulderLeft];
+		Vector3 positionCoude = current_positions [(int)Skeleton.Joint.ElbowLeft];
+		Vector3 positionMain = current_positions [(int)Skeleton.Joint.HandLeft];
+		float longueurBras = Vector3.Distance (positionEpaule, positionCoude) +
+						Vector3.Distance (positionCoude, positionMain);
+		*/
 
-		for (int i = 0; i < a1.Length; i++) {
-			if (a1[i] != a2[i]) return false;
+		// Le centre des épaules ne peut pas etre plus loin que 2.35 en y.
+		Vector3 positionCentreEpaules = current_positions [(int)Skeleton.Joint.ShoulderCenter];
+		Vector3 positionCentreEpaulesMax = kCibleEpaules + kToleranceCibleEpaules;
+		Vector3 positionCentreEpaulesMin = kCibleEpaules - kToleranceCibleEpaules;
+		Vector3 ajustement = Vector3.zero;
+		for (int i = 0; i < 3; ++i) {
+			if (positionCentreEpaules[i] < positionCentreEpaulesMin[i]) {
+				ajustement[i] = positionCentreEpaulesMin[i] - positionCentreEpaules[i];
+			} else if (positionCentreEpaules[i] > positionCentreEpaulesMax[i]) {
+				ajustement[i] = positionCentreEpaulesMax[i] - positionCentreEpaules[i];
+			}
 		}
-		return true;
+
+		for (int i = 0; i < (int)Skeleton.Joint.Count; ++i) {
+			if (current_positions[i] != HIDING_POS) {
+				current_positions[i] += ajustement;
+			}
+		}
 	}
 	
 	Vector3 WorldPositionFromKinectPosition(Vector3 kinectPosition) {
@@ -244,5 +244,12 @@ public class MoveJoints : MonoBehaviour {
 
 	// Layer des colliders de drum components.
 	private int drumComponentLayer;
+
+	// Position cible des épaules.
+	private Vector3 kCibleEpaules = new Vector3(-0.2f, 2.2f, -10.2f);
+
+	// Tolérance pour la position cible des épaules.
+	private Vector3 kToleranceCibleEpaules = new Vector3 (0.5f, 0.1f, 0.1f);
+
 }
 

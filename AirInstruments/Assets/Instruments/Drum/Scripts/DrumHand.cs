@@ -11,7 +11,6 @@ public class DrumHand : MonoBehaviour {
 	public Collider baguette;
 	public Collider autreBaguette;
 	public Collider autreMain;
-	public Collider autreTip;
 
 	// Use this for initialization
 	void Start () {
@@ -22,7 +21,6 @@ public class DrumHand : MonoBehaviour {
 		Physics.IgnoreCollision (collider, baguette);
 		Physics.IgnoreCollision (collider, autreBaguette);
 		Physics.IgnoreCollision (collider, autreMain);
-		Physics.IgnoreCollision (collider, autreTip);
 
 		// Initialiser Kalman.
 		kalman.SetInitialObservation (Vector4.zero);

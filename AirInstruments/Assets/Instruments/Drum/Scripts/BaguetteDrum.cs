@@ -10,13 +10,11 @@ public class BaguetteDrum : MonoBehaviour {
 	public GameObject boutBaguetteMain;
 
 	public Collider autreBaguette;
-	public Collider autreTip;
 
 	void Start () {
 		positionInitiale = transform.position;
 		rotationInitiale = transform.rotation;
 
-		Physics.IgnoreCollision (collider, autreTip);
 		Physics.IgnoreCollision (collider, autreBaguette);
 	}
 
