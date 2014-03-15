@@ -2,9 +2,10 @@
 using System.Collections;
 
 public enum typeGuidage{
-	INSTRUMENTS = 0,
-	MENU_PRINCIPAL = 1,
-	TUTORIEL = 2
+	AUCUN,
+	INSTRUMENTS,
+	MENU_PRINCIPAL,
+	TUTORIEL,
 }
 
 public class GuidageController : MonoBehaviour {
@@ -46,33 +47,33 @@ public class GuidageController : MonoBehaviour {
 		GUI.skin = skinGuidage;
 
 		switch (typeGuidage) {
-				case typeGuidage.INSTRUMENTS:
-						GUI.BeginGroup (rectangleInstruments, skinGuidage.customStyles[0]);
-						GUI.DrawTexture (new Rect (textureOffset, textureOffset, rectWidth / 2 - 2*textureOffset, rectHeight - 2*textureOffset), menu);
-						GUI.Label (new Rect (rectWidth / 2, 0, rectWidth / 2, rectHeight), "Menu");
-						GUI.EndGroup ();
-						break;
-				case typeGuidage.MENU_PRINCIPAL:
-						GUI.BeginGroup (rectangleMenu);
+			case typeGuidage.INSTRUMENTS:
+					GUI.BeginGroup (rectangleInstruments, skinGuidage.customStyles[0]);
+					GUI.DrawTexture (new Rect (textureOffset, textureOffset, rectWidth / 2 - 2*textureOffset, rectHeight - 2*textureOffset), menu);
+					GUI.Label (new Rect (rectWidth / 2, 0, rectWidth / 2, rectHeight), "Menu");
+					GUI.EndGroup ();
+					break;
+			case typeGuidage.MENU_PRINCIPAL:
+					GUI.BeginGroup (rectangleMenu);
 
-						GUI.BeginGroup (new Rect (0, 0, rectWidth, rectHeight), skinGuidage.customStyles[0]);
-						GUI.DrawTexture (new Rect (textureOffset, textureOffset, rectWidth / 2 - 2*textureOffset, rectHeight - 2*textureOffset), menu);
-						GUI.Label (new Rect (rectWidth / 2, 0, rectWidth / 2, rectHeight), "Piano");
-						GUI.EndGroup ();
+					GUI.BeginGroup (new Rect (0, 0, rectWidth, rectHeight), skinGuidage.customStyles[0]);
+					GUI.DrawTexture (new Rect (textureOffset, textureOffset, rectWidth / 2 - 2*textureOffset, rectHeight - 2*textureOffset), menu);
+					GUI.Label (new Rect (rectWidth / 2, 0, rectWidth / 2, rectHeight), "Piano");
+					GUI.EndGroup ();
 			
-						GUI.BeginGroup (new Rect ((rectangleMenu.width - rectWidth)/2, 0, rectWidth, rectHeight), skinGuidage.customStyles[0]);
-						GUI.DrawTexture (new Rect (textureOffset, textureOffset, rectWidth / 2 - 2*textureOffset, rectHeight - 2*textureOffset), menu);
-						GUI.Label (new Rect (rectWidth / 2, 0, rectWidth / 2, rectHeight), "Drum");
-						GUI.EndGroup ();
+					GUI.BeginGroup (new Rect ((rectangleMenu.width - rectWidth)/2, 0, rectWidth, rectHeight), skinGuidage.customStyles[0]);
+					GUI.DrawTexture (new Rect (textureOffset, textureOffset, rectWidth / 2 - 2*textureOffset, rectHeight - 2*textureOffset), menu);
+					GUI.Label (new Rect (rectWidth / 2, 0, rectWidth / 2, rectHeight), "Drum");
+					GUI.EndGroup ();
 			
-						GUI.BeginGroup (new Rect (rectangleMenu.width - rectWidth, 0, rectWidth, rectHeight), skinGuidage.customStyles[0]);
-						GUI.DrawTexture (new Rect (textureOffset, textureOffset, rectWidth / 2 - 2*textureOffset, rectHeight - 2*textureOffset), menu);
-						GUI.Label (new Rect (rectWidth / 2, 0, rectWidth / 2, rectHeight), "Guitare");
-						GUI.EndGroup ();
+					GUI.BeginGroup (new Rect (rectangleMenu.width - rectWidth, 0, rectWidth, rectHeight), skinGuidage.customStyles[0]);
+					GUI.DrawTexture (new Rect (textureOffset, textureOffset, rectWidth / 2 - 2*textureOffset, rectHeight - 2*textureOffset), menu);
+					GUI.Label (new Rect (rectWidth / 2, 0, rectWidth / 2, rectHeight), "Guitare");
+					GUI.EndGroup ();
 
-						GUI.EndGroup ();
-						break;
-				}
+					GUI.EndGroup ();
+					break;
+			}
 	}
 
 	public void changerGuidage(typeGuidage type) {

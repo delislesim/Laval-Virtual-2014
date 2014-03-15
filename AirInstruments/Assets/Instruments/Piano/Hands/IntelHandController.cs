@@ -51,6 +51,11 @@ public class IntelHandController : MonoBehaviour {
 	private Vector3 kLimitesMin = new Vector3 (-9.0f, -2.5f, -7.35f);
 	private Vector3 kLimitesMax = new Vector3 (8.6f, 0.6026f, -2.0f);
 
+	// Limites de positions des bases de doigts pour passer l'etape de
+	// mettre ses mains devant le capteur du tutorial.
+	private Vector3 kLimitesCapteurMin = new Vector3 (-11.0f, -2.5f, -10f);
+	private Vector3 kLimitesCapteurMax = new Vector3 (11.0f, 13.0f, -4.0f);
+
 	void Start () {
 		// Initialiser la caméra Creative.
 		KinectPowerInterop.InitializeHandTracker ();
@@ -148,6 +153,74 @@ public class IntelHandController : MonoBehaviour {
 				} 
 			}
 		}
+	}
+
+	// Indique si les 2 mains sont suffisamment pres du capteur pour qu'on
+	// puisse dire leur position avec certitude. Aussi, il faut que les
+	// mains aient la bonne orientation.
+	public bool MainsSontVisibles() {
+		for (int indexMain = 0; indexMain < 2; ++indexMain) {
+			// Prendre la position de la base du doigt RING.
+			int indexDeBaseRing = (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS*indexMain +
+				(int)KinectPowerInterop.HandJointIndex.RING_BASE;
+			if (hand_joints[indexDeBaseRing].error < kErreurMaxPermise) {
+				Vector3 minBases;
+				Vector3 maxBases;
+				CalculerBoundingBoxMain(indexMain, false, out minBases, out maxBases);
+				
+				// Afficher le guidage par ordre de priorite: x, y, z.
+				for (int i = 0; i < 3; ++i) {
+					if (minBases[i] < kLimitesCapteurMin[i]) {
+						return false;
+					} else if (maxBases[i] > kLimitesCapteurMax[i]) {
+						return false;
+					}
+				} 
+
+				int indexPouce = (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS*indexMain +
+					(int)KinectPowerInterop.HandJointIndex.THUMB_MID;
+				int indexPinky = (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS*indexMain +
+					(int)KinectPowerInterop.HandJointIndex.PINKY_MID;
+				if (indexMain == kIndexMainGauche) {
+					if (-hand_joints[indexPouce].x < -hand_joints[indexPinky].x)
+						return false;
+				} else if (indexMain == kIndexMainDroite) {
+					if (-hand_joints[indexPouce].x > -hand_joints[indexPinky].x)
+						return false;
+				}
+
+			} else {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	// Indique si les 2 mains sont pres du piano, c'est a dire qu'il n'y a pas de
+	// fleches de guidage requises.
+	public bool MainsSontPresDuPiano() {
+		for (int indexMain = 0; indexMain < 2; ++indexMain) {
+			// Prendre la position de la base du doigt RING.
+			int indexDeBaseRing = (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS*indexMain +
+				(int)KinectPowerInterop.HandJointIndex.RING_BASE;
+			if (hand_joints[indexDeBaseRing].error < kErreurMaxPermise) {
+				Vector3 minBases;
+				Vector3 maxBases;
+				CalculerBoundingBoxMain(indexMain, false, out minBases, out maxBases);
+				
+				// Afficher le guidage par ordre de priorite: x, y, z.
+				for (int i = 0; i < 3; ++i) {
+					if (minBases[i] < kLimitesMin[i]) {
+						return false;
+					} else if (maxBases[i] > kLimitesMax[i]) {
+						return false;
+					}
+				} 
+			} else {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private void CalculerBoundingBoxMain(int indexMain, bool avecDoigts, out Vector3 min, out Vector3 max) {

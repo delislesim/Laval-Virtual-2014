@@ -174,7 +174,7 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 
 		// Verifier si la musique est terminee.
 		float tempsFin = partition.ObtenirTempsFin ();
-		if (tempsFin != -1.0f && tempsActuel / speed > tempsFin) {
+		if (tempsFin != -1.0f && tempsActuel - tempsAttendreDebutMusique * speed > tempsFin) {
 			ActiverLibre();
 		}
 	}

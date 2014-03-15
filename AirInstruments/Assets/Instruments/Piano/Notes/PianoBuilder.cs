@@ -181,7 +181,4 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 
 	// Espace horizontal entre le centre de 2 notes noires.
 	private const float spaceBetweenBlackNotes = spaceBetweenWhiteNotes / 2.0f;
-
-	// Position invalide.
-	private Vector3 kPositionInvalide = new Vector3(0, 100.0f, 0);
 }

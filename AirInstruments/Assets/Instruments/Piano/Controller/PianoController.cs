@@ -9,6 +9,9 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 	// Controleur du mode assiste.
 	public AssistedModeControllerPiano assistedModeController;
 
+	// Controleur des mains.
+	public IntelHandController intelHandController;
+
 	// Spotlight du piano.
 	public SpotlightControl spotlightPiano;
 
@@ -25,15 +28,20 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 	void OnEnable() {
 		pianoWrapper.SetActive (true);
 
-		// Activation du guidage
-		GuidageController.ObtenirInstance ().changerGuidage(typeGuidage.INSTRUMENTS);
+		// Affichage du guidage pour le geste du menu.
+		// TODO: A faire une fois que le tutorial est termine.
+		//GuidageController.ObtenirInstance ().changerGuidage(typeGuidage.MENU_PRINCIPAL);
 
 		// Activation de la reconnaissance du geste de menu.
 		GestureRecognition gestureRecognition = GestureRecognition.ObtenirInstance ();
 		gestureRecognition.AddGesture (new GestureMenu());
 
+		// Demarrer le tutorial.
+		tutorial = new TutorialPiano (intelHandController, assistedModeController);
+		tutorial.Demarrer ();
+
 		// (Temporaire) Partir le mode assisté.
-		assistedModeController.ChargerPartition (".\\Assets\\Modes\\Assiste\\Piano\\partitions\\valse.txt", 4.0f);
+		//assistedModeController.ChargerPartition (".\\Assets\\Modes\\Assiste\\Piano\\partitions\\valse.txt", 4.0f);
 	}
 	
 	// Methode appelee quand l'instrument "piano" n'est plus choisi.
@@ -44,7 +52,7 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 		MenuAssisteController menuAssiste = MenuAssisteController.ObtenirInstance();
 		if (menuAssiste != null)
 			menuAssiste.gameObject.SetActive (false);
-		menuModeAssisteActif = false;
+		menuActif = false;
 	}
 
 	// Methode appelee a chaque frame quand le piano est l'instrument courant.
@@ -54,13 +62,14 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 			return;
 		
 		// Afficher le menu.
-		if (!menuModeAssisteActif && (
+		if (!menuActif && (
 			Input.GetButtonDown ("MenuAssiste") ||
 		    GestureRecognition.ObtenirInstance().GetCurrentGesture() == GestureId.GESTURE_MENU)) {
 			AfficherMenu();
 		} 
 	}
 
+	// Affiche le menu.
 	private void AfficherMenu() {
 		MenuAssisteController menuAssiste = MenuAssisteController.ObtenirInstance();
 
@@ -83,7 +92,7 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 		menuAssiste.Afficher();
 		
 		// Se rappeler que le menu est active.
-		menuModeAssisteActif = true;
+		menuActif = true;
 	}
 
 	// Gere les choix de l'utilisateur dans le menu assiste. Retourne
@@ -92,7 +101,7 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 		MenuAssisteController menuAssiste = MenuAssisteController.ObtenirInstance();
 
 		// Si le menu du mode assiste est affiche, repondre aux choix de l'utilisateur.
-		if (menuModeAssisteActif) {
+		if (menuActif) {
 			int boutonPresse = menuAssiste.ObtenirBoutonPresse();
 
 			switch (boutonPresse) {
@@ -120,9 +129,9 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 			}
 			
 			if (boutonPresse != -1) {
-				// Fermer le menu du mode assiste.
+				// Fermer le menu.
 				MenuAssisteController.ObtenirInstance ().Cacher();
-				menuModeAssisteActif = false;
+				menuActif = false;
 				return true;
 			}
 		}
@@ -130,8 +139,11 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 		return false;
 	}
 
-	// Indique si le menu du mode assiste est presentement affiche.
-	private bool menuModeAssisteActif = false;
+	// Indique si le menu est presentement affiche.
+	private bool menuActif = false;
+
+	// Tutorial.
+	private TutorialPiano tutorial;
 
 	// Intensité du spotlight piano par defaut.
 	private const float kSpotlightIntensityDefault = 6.92f;
