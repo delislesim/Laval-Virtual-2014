@@ -12,7 +12,7 @@ public class HandFollower : MonoBehaviour {
 		// Calculer le rayon du tip.
 		Vector3 worldScale = VectorConversions.CalculerWorldScale (transform);
 		rayon = worldScale.x / 2.0f;
-		Debug.Log("Rayon du hand follower : " + rayon);
+
 		collisionReady = true;
 		// Layer des colliders de drum components.
 		guitarPlayerLayer = 1 << LayerMask.NameToLayer ("GuitarPlayer");
@@ -26,33 +26,25 @@ public class HandFollower : MonoBehaviour {
 		transform.position = objectToFollow.transform.position;
 		
 		// Si on a joue une note recemment, s'assurer qu'on s'en eloigne avant de le rejouer.
-	
 		if (guitarCollider != null) {
 			float distance = guitarCollider.DistanceToPoint(transform.position);
-			//Debug.Log(distance);
-			
 			if (Mathf.Abs(distance) > kDistancePourRejouer) {
 				collisionReady = true;
 			}
-
 		}
-
-
 
 		if(collisionReady){
 			// Verifier si on a fait une collision depuis la derniere fois.
 			Vector3 direction = transform.position - lastPosition;
 			RaycastHit hitInfo;
 			//Physics.Raycast (
-			if (Physics.Raycast (lastPosition, direction, out hitInfo, direction.magnitude + rayon * kMultiplicateurRayon, guitarPlayerLayer)) {
-				//float distanceReelle = hitInfo.distance - direction.magnitude;
-				//if (distanceReelle < 0)
-				//	distanceReelle = 0;
-
-				if (hitInfo.collider.gameObject.tag == "GuitarPlayer" /*&& distanceReelle < kDistancePourJouer*/){	
+			if (Physics.Raycast (lastPosition, direction, out hitInfo,
+			                     direction.magnitude + rayon * kMultiplicateurRayon,
+			                     guitarPlayerLayer)) {
+				if (hitInfo.collider.gameObject.tag == "GuitarPlayer"){	
 					guitarPlayer.PlayNextNote();
-					// Se rappeler que l'on a joue ce component.
-					distanceMainGuit = guitarCollider.DistanceToPoint(transform.position);
+					// Se rappeler que l'on a joue ce component. Il faut s'en eloigner
+					// suffisamment avant de le rejouer.
 					collisionReady = false;
 				}
 			}
@@ -66,10 +58,7 @@ public class HandFollower : MonoBehaviour {
 	float rayon;
 	
 	// Multiplicateur du rayon pour produire un son.
-	const float kMultiplicateurRayon = 8.0f;
-	
-	// Distance entre la main et le guitarPlayer lors de l'impact.
-	float distanceMainGuit;
+	const float kMultiplicateurRayon = 1.0f;
 	
 	// Distance dont il faut s'eloigner du GuitPlayer pour le rejouer.
 	const float kDistancePourRejouer = 0.45f;
@@ -80,5 +69,7 @@ public class HandFollower : MonoBehaviour {
 	// Layer des colliders de guitar components.
 	int guitarPlayerLayer;
 
+	// Indique si on s'est eloigne suffisamment de la note
+	// avant de la rejouer.
 	bool collisionReady;
 }
