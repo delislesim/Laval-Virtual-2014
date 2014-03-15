@@ -202,7 +202,7 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 
 	// Temps a attendre avant de commencer a jouer la musique, en secondes.
 	// Ceci correspond au decalage entre le remplissage et le jouage.
-	private const float tempsAttendreDebutMusique = 3.0f;
+	private const float tempsAttendreDebutMusique = 2.0f;
 	
 	// Resolution du tableau de prochaines notes a jouer.
 	private const float resolution = 0.1f;

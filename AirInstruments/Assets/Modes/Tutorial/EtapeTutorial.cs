@@ -7,8 +7,8 @@ public interface EtapeTutorial {
 	// l'execution de cette etape du tutorial.
 	string ObtenirTexte();
 
-	// Retourne le nom du fichier audio a jouer.
-	string ObtenirAudio();
+	// Retourne le fichier audio a jouer.
+	AudioClip ObtenirAudio();
 
 	// Retourne le nom de l'animation a jouer.
 	string ObtenirAnimation();

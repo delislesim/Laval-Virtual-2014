@@ -15,6 +15,12 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 	// Spotlight du piano.
 	public SpotlightControl spotlightPiano;
 
+	// Sons du tutorial.
+	public AudioClip sonCapteur;
+	public AudioClip sonPosition;
+	public AudioClip sonGamme;
+	public AudioClip sonAssiste;
+
 	public void Prepare() {
 		KinectPowerInterop.SetKinectAngle (15);
 		spotlightPiano.SetTargetIntensity (kSpotlightIntensityPlaying, 1.0f);
@@ -33,7 +39,12 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 		gestureRecognition.AddGesture (new GestureMenu());
 
 		// Demarrer le tutorial.
-		tutorial = new TutorialPiano (intelHandController, assistedModeController);
+		tutorial = new TutorialPiano (intelHandController,
+		                              assistedModeController,
+		                              sonCapteur,
+		                              sonPosition,
+		                              sonGamme,
+		                              sonAssiste);
 		tutorial.Demarrer ();
 		tutorialActif = true;
 	}

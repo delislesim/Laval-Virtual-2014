@@ -18,6 +18,10 @@ public class GuidageTutorial : MonoBehaviour {
 	public void AfficherEtape(EtapeTutorial etape) {
 		text.text = etape.ObtenirTexte ();
 		gameObject.SetActive (true);
+
+		// Jouer le son.
+		audio.clip = etape.ObtenirAudio ();
+		audio.Play ();
 	}
 
 	public void Masquer() {
@@ -26,7 +30,7 @@ public class GuidageTutorial : MonoBehaviour {
 
 	// Indique si le guidage est en train de faire une animation.
 	public bool EstEnAnimation() {
-		return false;
+		return audio.isPlaying;
 	}
 
 	// Indique si le guidage est visible (meme s'il est en train de faire une animation).

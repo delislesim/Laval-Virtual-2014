@@ -3,8 +3,10 @@ using System.Collections;
 
 public class PianoEtapeGamme : EtapeTutorial {
 
-	public PianoEtapeGamme(IntelHandController handController,
+	public PianoEtapeGamme(AudioClip son,
+	                       IntelHandController handController,
 	                       AssistedModeControllerPiano assistedModeController) {
+		this.son = son;
 		this.handController = handController;
 		this.assistedModeController = assistedModeController;
 	}
@@ -15,9 +17,9 @@ public class PianoEtapeGamme : EtapeTutorial {
 		return "Appuyez sur les notes bleues.";
 	}
 	
-	// Retourne le nom du fichier audio a jouer.
-	public string ObtenirAudio() {
-		return "piano-etape-gamme.wav";
+	// Retourne la voix lisant l'instruction.
+	public AudioClip ObtenirAudio() {
+		return son;
 	}
 	
 	// Retourne le nom de l'animation a jouer.
@@ -40,6 +42,9 @@ public class PianoEtapeGamme : EtapeTutorial {
 	public bool DoitFeliciter() {
 		return true;
 	}
+
+	// Voix lisant l'instruction.
+	private AudioClip son;
 
 	// Controleur de mains, permettant de savoir si l'etape est completee.
 	private IntelHandController handController;
