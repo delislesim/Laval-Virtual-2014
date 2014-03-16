@@ -143,6 +143,9 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 
 			// Activer le menu du mode assiste.
 			menuAssiste.Afficher();
+
+			// Decaler le pointeur.
+			Pointeur.obtenirInstance().AppliquerDecalageVertical(-0.4f);
 			
 			// Se rappeler que le menu est active.
 			menuModeAssisteActif = true;
