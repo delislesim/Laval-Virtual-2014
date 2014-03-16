@@ -115,6 +115,7 @@ public class GuidageTutorial : MonoBehaviour {
 	public void AfficherEtape(EtapeTutorial etape) {
 		texte.text = etape.ObtenirTexte ();
 		background.texture = backgroundBeginning;
+		doitFeliciter = etape.DoitFeliciter ();
 		gameObject.SetActive (true);
 		EstEnTrainEntrer = true;
 		tempsEcoule = 0;
@@ -132,6 +133,10 @@ public class GuidageTutorial : MonoBehaviour {
 
 	public void Masquer() {
 		EstEnTrainDeMasquer = true;
+
+		if (doitFeliciter) {
+			background.texture = backgroundCompleted;
+		}
 		tempsEcoule = 0;
 	}
 
@@ -195,4 +200,7 @@ public class GuidageTutorial : MonoBehaviour {
 
 	// Position pour se cacher en bas de l'écran.
 	private const float kPositionCacherBas = -300.0f;
+
+	// Indique si on doit feliciter le jouer.
+	private bool doitFeliciter;
 }

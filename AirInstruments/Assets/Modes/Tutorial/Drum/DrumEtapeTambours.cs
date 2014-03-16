@@ -66,7 +66,7 @@ public class DrumEtapeTambours : EtapeTutorial {
 	// Indique si on doit feliciter le joueur (vrai) ou simplement
 	// passer a l'etape suivante (faux).
 	public bool DoitFeliciter() {
-		return false;
+		return true;
 	}
 
 	// Index du prochain composant a frapper.

@@ -47,7 +47,7 @@ public class DrumEtapePosition : EtapeTutorial {
 	// Indique si on doit feliciter le joueur (vrai) ou simplement
 	// passer a l'etape suivante (faux).
 	public bool DoitFeliciter() {
-		return false;
+		return true;
 	}
 	
 	// Voix lisant l'instruction.
