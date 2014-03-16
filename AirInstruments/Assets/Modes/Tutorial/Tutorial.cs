@@ -30,7 +30,7 @@ public class Tutorial : MonoBehaviour {
 
 	// Demarre le tutorial.
 	// @param position: Position a laquelle afficher le guidage, en pixels.
-	public void Demarrer(Vector2 position) {
+	public void Demarrer(GuidageTutorial.Position position) {
 		// Positionner le guidage.
 		guidageTutorial.DefinirPosition (position);
 
