@@ -18,6 +18,9 @@ public abstract class Gesture {
 	}
 
 	public abstract bool trackGesture(Skeleton skeleton);
+
+	// Indique de 0 a 1 a quel point le gesture est complete.
+	public abstract float isPartiallyTracked();
 	
 	protected uint nbSteps_;
 	protected uint achievedSteps_;

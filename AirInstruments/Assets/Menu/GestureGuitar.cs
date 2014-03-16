@@ -70,4 +70,8 @@ public class GestureGuitar : Gesture {
 		return false;
 
 	}
+
+	public override float isPartiallyTracked() {
+		return elapsedTime_ / gestureTime_;
+	}
 }

@@ -92,6 +92,10 @@ public class GesturePiano : Gesture {
 		else
 			return false;
 	}
+
+	public override float isPartiallyTracked() {
+		return elapsedTime_ / gestureTime_;
+	}
 	
 	private void updateHandPositionX(float rightHandPos, float leftHandPos )
 	{

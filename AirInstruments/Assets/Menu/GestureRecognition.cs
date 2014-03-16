@@ -30,6 +30,15 @@ public class GestureRecognition : MonoBehaviour {
 		return currentId;
 	}
 
+	public float GetGestureCompletion(GestureId gestureId) {
+		foreach (Gesture gesture in gestureList) {
+			if (gesture.GestureId_ == gestureId) {
+				return gesture.isPartiallyTracked();
+			}
+		}
+		return 0;
+	}
+
 	// Use this for initialization
 	void Start () {
 	}
