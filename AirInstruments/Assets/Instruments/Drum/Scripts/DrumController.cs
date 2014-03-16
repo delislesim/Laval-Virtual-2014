@@ -23,6 +23,7 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 	}
 
 	public void PrepareToStop() {
+		gameObject.SetActive (false);
 	}
 
 	// Methode appelee quand l'instrument "drum" est choisi.

@@ -37,7 +37,7 @@ public class MoveJoints : MonoBehaviour {
 	private Quaternion[] last_rotations;
 	private const float KICK_SPEED = 1.0f;
 	private const float HH_SPEED = 1.0f;
-	private Vector3 HIDING_POS = new Vector3(0,-10,0);
+	private Vector3 HIDING_POS = new Vector3(0,-150,0);
 	private bool kick_ready;
 	private bool hit_hat_ready;
 	private const float PLAYER_HIGHT = 5.0f;
@@ -141,7 +141,7 @@ public class MoveJoints : MonoBehaviour {
 
 				// Cas spécial de la tete.
 				Vector3 targetPosition;
-				if (skeletonValid && current_positions[i] != HIDING_POS) {
+				if (current_positions[i] != HIDING_POS) {
 					targetPosition = current_positions[i];
 				} else {
 					targetPosition = kPositionTeteDefaut;
@@ -191,9 +191,13 @@ public class MoveJoints : MonoBehaviour {
 
 		// Le centre des épaules doit etre pret de la position fixee.
 		Vector3 positionCentreEpaules = current_positions [(int)Skeleton.Joint.ShoulderCenter];
+		if (positionCentreEpaules == HIDING_POS)
+			return;
+
 		Vector3 positionCentreEpaulesMax = kCibleEpaules + kToleranceCibleEpaules;
 		Vector3 positionCentreEpaulesMin = kCibleEpaules - kToleranceCibleEpaules;
 		Vector3 ajustement = Vector3.zero;
+
 		for (int i = 0; i < 3; ++i) {
 			if (positionCentreEpaules[i] < positionCentreEpaulesMin[i]) {
 				ajustement[i] = positionCentreEpaulesMin[i] - positionCentreEpaules[i];
