@@ -9,6 +9,8 @@ public class DrumComponent : MonoBehaviour, ComponentInterface {
 	// Spotlight qui eclaire ce composant.
 	public DrumSpot spot;
 
+
+
 	public void PlaySound()
 	{
 		audio.Play();
@@ -33,6 +35,19 @@ public class DrumComponent : MonoBehaviour, ComponentInterface {
 			planeMath = new Plane (normal.normalized, plane.transform.position);
 		}
 	}
+
+	public void AjouterCoupAuTemps()
+	{
+		nbCoupsDernierTemps ++;
+	}
+	public int GetCoupsDernierTemps()
+	{
+		return nbCoupsDernierTemps;
+	}
+	public void ResetCoupsDernierTemps()
+	{
+		nbCoupsDernierTemps = 0;
+	}
 	
 	// Update is called once per frame
 	void Update () {
@@ -53,4 +68,6 @@ public class DrumComponent : MonoBehaviour, ComponentInterface {
 	// Representation mathematique du plan situe sur sur la surface
 	// du composant a jouer.
 	private Plane planeMath;
+
+	private int nbCoupsDernierTemps;
 }

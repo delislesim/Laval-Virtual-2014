@@ -12,6 +12,8 @@ public class HighHatComponent : MonoBehaviour, ComponentInterface {
 	// Spotlight qui eclaire ce composant.
 	public DrumSpot spot;
 
+
+
 	public void PlaySound()
 	{
 		if(opened){
@@ -23,6 +25,20 @@ public class HighHatComponent : MonoBehaviour, ComponentInterface {
 			audio.Play();
 		}
 		spot.Play ();
+	}
+
+	//Mise a jour des coups enregistrés
+	public void AjouterCoupAuTemps()
+	{
+		nbCoupsDernierTemps++;
+	}
+	public int GetCoupsDernierTemps()
+	{
+		return nbCoupsDernierTemps;
+	}
+	public void ResetCoupsDernierTemps()
+	{
+		nbCoupsDernierTemps = 0;
 	}
 
 	public float DistanceToPoint (Vector3 point) {
@@ -60,4 +76,5 @@ public class HighHatComponent : MonoBehaviour, ComponentInterface {
 	// Representation mathematique du plan situe sur sur la surface
 	// du composant a jouer.
 	private Plane planeMath;
+	private int nbCoupsDernierTemps;
 }

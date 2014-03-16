@@ -6,13 +6,19 @@ using System.Collections.Generic;
 public class DrumAssistedController : MonoBehaviour {
 	public TipFollower tipRight;
 	public TipFollower tipLeft;
-	public GameObject bigTom;
-	public GameObject tom1;
-	public GameObject tom2;
-	public GameObject snare;
-	public GameObject crash;
-	public GameObject ride;
-	public GameObject hihat;
+
+
+	public GameObject[] DrumComponentObjects;
+	public enum DrumComponentIndexes : int{
+		BIGTOM = 0,
+		TOM1,
+		TOM2,
+		SNARE,
+		CRASH,
+		RIDE,
+		HIHAT,
+		COUNT
+	}
 
 	public AudioSource baseRythmA;
 	public AudioSource baseRythmB;
@@ -40,16 +46,16 @@ public class DrumAssistedController : MonoBehaviour {
 		baseRythmA.clip = (AudioClip)Resources.Load("DrumTracks/BaseRythm");
 		baseRythmB.clip = (AudioClip)Resources.Load("DrumTracks/BaseRythm");
 
-		track1_A.clip = TracksCollection[bigTom][3][0];
-		track1_B.clip = TracksCollection[bigTom][3][0];
+		track1_A.clip = TracksCollection[DrumComponentObjects[(int)DrumComponentIndexes.BIGTOM]][3][0];
+		track1_B.clip = TracksCollection[DrumComponentObjects[(int)DrumComponentIndexes.BIGTOM]][3][0];
 
-		track2_A.clip = TracksCollection[snare][0][0];
-		track2_B.clip = TracksCollection[snare][0][0];
+		track2_A.clip = TracksCollection[DrumComponentObjects[(int)DrumComponentIndexes.SNARE]][0][0];
+		track2_B.clip = TracksCollection[DrumComponentObjects[(int)DrumComponentIndexes.SNARE]][0][0];
 
 		trackBplaying = false;
 		trackAplaying = true;
-		track1Needed = true;
-		track2Needed = true;
+		track1Needed = false;
+		track2Needed = false;
 		choiceNeeded = true;
 
 		SAMPLE_TIME = baseRythmA.clip.length; 
@@ -65,15 +71,16 @@ public class DrumAssistedController : MonoBehaviour {
 		//Track Logic
 		if (elapsedTime >= (SAMPLE_TIME - CHOICE_DELAY) && choiceNeeded)
 		{
-			SetUpAudioSources();
+			MakeTrackChoices();
 			choiceNeeded = false;
 		}
 
 		//Track Control
 		if (elapsedTime >= (SAMPLE_TIME - S_DELAY))
 		{
-			Debug.Log ("Elapsed time : " + elapsedTime + ", SAMPLE_TIME : " + SAMPLE_TIME + " , S_DELAY : " + S_DELAY); 
+			//Debug.Log ("Elapsed time : " + elapsedTime + ", SAMPLE_TIME : " + SAMPLE_TIME + " , S_DELAY : " + S_DELAY); 
 			PlayTracks ();
+			resetCoupsEnregistres();
 			choiceNeeded = true;
 			elapsedTime = 0;
 		}
@@ -107,10 +114,70 @@ public class DrumAssistedController : MonoBehaviour {
 		}
 	}
 
-	void SetUpAudioSources()
+	void MakeTrackChoices()
 	{
+		GameObject closestFromLeft = new GameObject();
+		GameObject closestFromRight = new GameObject();
+
+		track1Needed = getClosestDrumComponent(tipLeft, out closestFromLeft);
+		track2Needed = getClosestDrumComponent(tipRight, out closestFromRight);
+
+		//No need of 2 tracks if we're hitting the same component with both tips
+		//track2Needed = !(track1Needed && (closestFromLeft == closestFromRight));
+
+		if(track1Needed)
+		{
+			if(trackBplaying){
+				track1_A.clip = TracksCollection[closestFromLeft][1][0];
+			}
+			else{
+				track1_B.clip = TracksCollection[closestFromLeft][1][0];
+			}
+		}
+		if(track2Needed)
+		{
+			if(trackBplaying){
+				track2_A.clip = TracksCollection[closestFromRight][1][0];
+			}
+			else{
+				track2_B.clip = TracksCollection[closestFromRight][1][0];
+			}
+		}
 
 	}
+
+	//ugly
+	//TODO make array of drumComponent gameObjects
+	bool getClosestDrumComponent(TipFollower tip,  out GameObject closest)
+	{
+		float dist = 9999999 ;
+		float bestDist = dist;
+		GameObject result = null; 
+
+		for(int i = 0 ; i < (int)DrumComponentIndexes.COUNT ; i++)
+		{
+			dist = Vector3.Distance (tip.transform.position, DrumComponentObjects[i].transform.position);
+			if(dist<bestDist){
+				bestDist = dist;
+				result = DrumComponentObjects[i];
+			}
+		}
+		closest=result;
+		return bestDist < 0.8;
+
+	}
+
+	void resetCoupsEnregistres()
+	{
+		for(int i = 0 ; i < (int)DrumComponentIndexes.COUNT ; i++)
+		{
+			if(i != (int)DrumComponentIndexes.HIHAT)
+				DrumComponentObjects[i].GetComponent<DrumComponent>().ResetCoupsDernierTemps();
+		}
+		DrumComponentObjects[(int)DrumComponentIndexes.HIHAT].GetComponent<HighHatComponent>().ResetCoupsDernierTemps();
+	}
+
+	
 
 	void FillDictionary()
 	{
@@ -148,7 +215,7 @@ public class DrumAssistedController : MonoBehaviour {
 			ComponentList.Add (new List<AudioClip>(ProbLists[i]));
 		}
 
-		TracksCollection.Add(bigTom, new List<List<AudioClip>>(ComponentList));
+		TracksCollection.Add(DrumComponentObjects[(int)DrumComponentIndexes.BIGTOM], new List<List<AudioClip>>(ComponentList));
 
 		// **  CLEAR  ** //
 		for(int i = 0 ; i < 8 ; i++)
@@ -178,7 +245,7 @@ public class DrumAssistedController : MonoBehaviour {
 			ComponentList.Add (new List<AudioClip>(ProbLists[i]));
 		}
 		
-		TracksCollection.Add(tom1, new List<List<AudioClip>>(ComponentList));
+		TracksCollection.Add(DrumComponentObjects[(int)DrumComponentIndexes.TOM1], new List<List<AudioClip>>(ComponentList));
 		
 		// **  CLEAR  ** //
 		for(int i = 0 ; i < 8 ; i++)
@@ -204,7 +271,7 @@ public class DrumAssistedController : MonoBehaviour {
 			ComponentList.Add (new List<AudioClip>(ProbLists[i]));
 		}
 		
-		TracksCollection.Add(tom2, new List<List<AudioClip>>(ComponentList));
+		TracksCollection.Add(DrumComponentObjects[(int)DrumComponentIndexes.TOM2], new List<List<AudioClip>>(ComponentList));
 		
 		// **  CLEAR  ** //
 		for(int i = 0 ; i < 8 ; i++)
@@ -234,7 +301,7 @@ public class DrumAssistedController : MonoBehaviour {
 			ComponentList.Add (new List<AudioClip>(ProbLists[i]));
 		}
 		
-		TracksCollection.Add(snare, new List<List<AudioClip>>(ComponentList));
+		TracksCollection.Add(DrumComponentObjects[(int)DrumComponentIndexes.SNARE], new List<List<AudioClip>>(ComponentList));
 		
 		// **  CLEAR  ** //
 		for(int i = 0 ; i < 8 ; i++)
@@ -253,7 +320,7 @@ public class DrumAssistedController : MonoBehaviour {
 			ComponentList.Add (new List<AudioClip>(ProbLists[i]));
 		}
 		
-		TracksCollection.Add(crash, new List<List<AudioClip>>(ComponentList));
+		TracksCollection.Add(DrumComponentObjects[(int)DrumComponentIndexes.CRASH], new List<List<AudioClip>>(ComponentList));
 		
 		// **  CLEAR  ** //
 		for(int i = 0 ; i < 8 ; i++)
@@ -279,7 +346,7 @@ public class DrumAssistedController : MonoBehaviour {
 			ComponentList.Add (new List<AudioClip>(ProbLists[i]));
 		}
 		
-		TracksCollection.Add(hihat, new List<List<AudioClip>>(ComponentList));
+		TracksCollection.Add(DrumComponentObjects[(int)DrumComponentIndexes.HIHAT], new List<List<AudioClip>>(ComponentList));
 		
 		// **  CLEAR  ** //
 		for(int i = 0 ; i < 8 ; i++)
@@ -320,7 +387,7 @@ public class DrumAssistedController : MonoBehaviour {
 			ComponentList.Add (new List<AudioClip>(ProbLists[i]));
 		}
 		
-		TracksCollection.Add(ride, new List<List<AudioClip>>(ComponentList));
+		TracksCollection.Add(DrumComponentObjects[(int)DrumComponentIndexes.RIDE], new List<List<AudioClip>>(ComponentList));
 		
 		// **  CLEAR  ** //
 		for(int i = 0 ; i < 8 ; i++)

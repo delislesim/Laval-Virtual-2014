@@ -53,6 +53,8 @@ public class TipFollower : MonoBehaviour {
 			if (componentInterface != dernierDrumComponent && distanceReelle < kDistancePourJouer) {
 				// Jouer le son.
 				componentInterface.PlaySound();
+				//On enregistre le coup
+				componentInterface.AjouterCoupAuTemps();
 
 				// Se rappeler que l'on a joue ce component.
 				dernierDrumComponent = componentInterface;
