@@ -12,7 +12,12 @@ public class HighHatComponent : MonoBehaviour, ComponentInterface {
 	// Spotlight qui eclaire ce composant.
 	public DrumSpot spot;
 
+	// Materiel pour indiquer que le composant doit etre joue.
+	public Material materielDoitEtreJoue;
 
+	// GameObject qui doit changer de couleur pour indiquer que
+	// ce drum component doit etre joue.
+	public GameObject gameObjectVisible;
 
 	public void PlaySound()
 	{
@@ -25,6 +30,9 @@ public class HighHatComponent : MonoBehaviour, ComponentInterface {
 			audio.Play();
 		}
 		spot.Play ();
+
+		aEteJoue = true;
+		gameObjectVisible.renderer.material = materialDefaut;
 	}
 
 	//Mise a jour des coups enregistrés
@@ -56,22 +64,44 @@ public class HighHatComponent : MonoBehaviour, ComponentInterface {
 		// Calculer le plan situe sur la surface a jouer.
 		Vector3 normal = plane.transform.rotation * Vector3.up;
 		planeMath = new Plane (normal.normalized, plane.transform.position);
+
+		// Sauvegarder le materiel par defaut.
+		materialDefaut = gameObjectVisible.renderer.material;
 	}
 	
 	// Update is called once per frame
 	void Update () {
 	}
-	
+
+	/*
 	void OnCollisionEnter(Collision col)
 	{
 		if(col.gameObject.tag == "Tip")
 			PlaySound();
 	}
+	*/
 	
 	void OnMouseDown()
 	{
 		PlaySound();
 	}
+
+	// Indique que le composant doit etre joue.
+	public void DoitEtreJoue() {
+		aEteJoue = false;
+		gameObjectVisible.renderer.material = materielDoitEtreJoue;
+	}
+	
+	// Indique si le composant a ete joue depuis la derniere 
+	// fois qu'on a demande qu'il soit joue.
+	public bool AEteJoue() {
+		return aEteJoue;
+	}
+
+	private bool aEteJoue = false;
+
+	// Materiel par defaut.
+	private Material materialDefaut;
 
 	// Representation mathematique du plan situe sur sur la surface
 	// du composant a jouer.

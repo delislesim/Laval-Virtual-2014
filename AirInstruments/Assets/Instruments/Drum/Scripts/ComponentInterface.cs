@@ -9,6 +9,13 @@ public interface ComponentInterface
 	void AjouterCoupAuTemps();
 	int GetCoupsDernierTemps();
 	void ResetCoupsDernierTemps();
+
+	// Indique que le composant doit etre joue.
+	void DoitEtreJoue();
+
+	// Indique si le composant a ete joue depuis la derniere 
+	// fois qu'on a demande qu'il soit joue.
+	bool AEteJoue();
 }
 
 

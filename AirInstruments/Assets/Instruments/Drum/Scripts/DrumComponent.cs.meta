@@ -2,7 +2,11 @@ fileFormatVersion: 2
 guid: 55630dcd093363545a58f690a585d41b
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - plane: {instanceID: 0}
+  - spot: {instanceID: 0}
+  - materielDoitEtreJoue: {fileID: 2100000, guid: 119a5c6a0f3ba19458e96d60b846ceb9,
+      type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

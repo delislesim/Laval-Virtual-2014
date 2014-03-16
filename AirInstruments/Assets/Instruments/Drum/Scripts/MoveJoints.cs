@@ -37,7 +37,7 @@ public class MoveJoints : MonoBehaviour {
 	private Quaternion[] last_rotations;
 	private const float KICK_SPEED = 1.0f;
 	private const float HH_SPEED = 1.0f;
-	private Vector3 HIDING_POS = new Vector3(0,-150,0);
+	private Vector3 HIDING_POS = new Vector3(0,-150,-150);
 	private bool kick_ready;
 	private bool hit_hat_ready;
 	private const float PLAYER_HIGHT = 5.0f;
