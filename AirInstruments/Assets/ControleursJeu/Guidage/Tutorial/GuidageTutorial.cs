@@ -52,7 +52,6 @@ public class GuidageTutorial : MonoBehaviour {
 				DefinirPositionReelle(position);
 			}
 		} else if(EstEnTrainDeMasquer) {
-			Debug.Log(proportion);
 			if (proportion > 1.0f) {
 				proportion = 1.0f;
 				EstEnTrainDeMasquer = false;

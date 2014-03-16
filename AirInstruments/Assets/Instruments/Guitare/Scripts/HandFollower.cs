@@ -84,6 +84,8 @@ public class HandFollower : MonoBehaviour {
 					    tempsProchaineNote < 0.15f) {
 						// Ne pas jouer la note tout de suite.
 						aJoueBienDepuisDerniereFois = true;
+
+						Debug.Log("temps prochaine note: " + tempsProchaineNote);
 					} else {
 						if (tempsDepuisDerniereNoteAutomatique < kTempsRejouerApresAutomatique) {
 							tempsDepuisDerniereNoteAutomatique = 1000.0f;
@@ -127,6 +129,7 @@ public class HandFollower : MonoBehaviour {
 	// Indique dans combien de temps la prochaine note du mode assisté
 	// doit etre jouée.
 	public void DefinirTempsProchaineNote(float temps) {
+		Debug.Log ("definir " + temps);
 		tempsProchaineNote = temps;
 	}
 
