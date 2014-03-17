@@ -173,7 +173,7 @@ public class MoveJoints : MonoBehaviour {
 					joints[i].transform.position = current_positions[i];
 				}
 
-				if (current_positions[i] == HIDING_POS || !IsReliable) {
+				if (current_positions[i] == HIDING_POS || !IsReliable || i == (int) Skeleton.Joint.WristLeft  || i == (int) Skeleton.Joint.WristRight) {
 					joints[i].renderer.enabled = false;
 				} else {
 					joints[i].renderer.enabled = true;
@@ -269,7 +269,7 @@ public class MoveJoints : MonoBehaviour {
 	private int drumComponentLayer;
 
 	// Position cible des épaules.
-	private Vector3 kCibleEpaules = new Vector3(-0.2f, 2.0f, -10.2f);
+	private Vector3 kCibleEpaules = new Vector3(-0.2f, 2.0f, -10.4f);
 
 	// Tolérance pour la position cible des épaules.
 	private Vector3 kToleranceCibleEpaules = new Vector3 (0.5f, 0.001f, 0.1f);
