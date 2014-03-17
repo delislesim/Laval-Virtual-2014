@@ -31,7 +31,7 @@ public class PianoArrow : MonoBehaviour {
 
 	// Activer le guidage. Le parametre axe est 0 pour x, 1 pour y, 2 pour z.
 	// Le parametre direction indique la direction de la fleche par rapport a l'axe.
-	public void AfficherGuidage(int axe, int direction, Vector3 minMain, Vector3 maxMain) {
+	public void AfficherGuidage(int axe, int direction, Vector3 minMain, Vector3 maxMain, Vector3 palm) {
 
 		// Prendre en compte seulement si on n'a pas encore de guidage pour
 		// cette frame ou que le guidage etait present a la frame precedente.
@@ -53,7 +53,7 @@ public class PianoArrow : MonoBehaviour {
 			}
 		} else if (axe == 1) {
 			targetPosition.y = maxMain.y + 2.0f;
-			targetPosition.z -= 2.0f;
+			targetPosition.z = ((targetPosition.z + palm.z) / 2.0f) - 2.0f;
 
 			if (direction < 0) {
 				targetRotation.z = 90;

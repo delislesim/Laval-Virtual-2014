@@ -143,12 +143,15 @@ public class IntelHandController : MonoBehaviour {
 				Vector3 maxMain;
 				CalculerBoundingBoxMain(indexMain, true, out minMain, out maxMain);
 
+				int indexPalm = (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS*indexMain +
+					(int)KinectPowerInterop.HandJointIndex.PALM;
+
 				// Afficher le guidage par ordre de priorite: x, y, z.
 				for (int i = 0; i < 3; ++i) {
 					if (minBases[i] < kLimitesMin[i]) {
-						flechesGuidage[indexMain].AfficherGuidage(i, 1, minMain, maxMain);
+						flechesGuidage[indexMain].AfficherGuidage(i, 1, minMain, maxMain, TransformerPositionDoigt(hand_joints[indexPalm]));
 					} else if (maxBases[i] > kLimitesMax[i]) {
-						flechesGuidage[indexMain].AfficherGuidage(i, -1, minMain, maxMain);
+						flechesGuidage[indexMain].AfficherGuidage(i, -1, minMain, maxMain, TransformerPositionDoigt(hand_joints[indexPalm]));
 					}
 				} 
 			}
