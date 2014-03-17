@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System;
 using System.Collections.Generic;
 
 public class DrumAssistedController : MonoBehaviour {
@@ -125,22 +124,33 @@ public class DrumAssistedController : MonoBehaviour {
 		//No need of 2 tracks if we're hitting the same component with both tips
 		//track2Needed = !(track1Needed && (closestFromLeft == closestFromRight));
 
+		int idxCoups;
+		int idxProb;
+
+
+
 		if(track1Needed)
 		{
+			idxCoups = Random.Range(0, TracksCollection[closestFromLeft].Count);
+			idxProb = Random.Range(0, TracksCollection[closestFromLeft][idxCoups].Count);
+
 			if(trackBplaying){
-				track1_A.clip = TracksCollection[closestFromLeft][1][0];
+				track1_A.clip = TracksCollection[closestFromLeft][idxCoups][idxProb];
 			}
 			else{
-				track1_B.clip = TracksCollection[closestFromLeft][1][0];
+				track1_B.clip = TracksCollection[closestFromLeft][idxCoups][idxProb];
 			}
 		}
 		if(track2Needed)
 		{
+			idxCoups = Random.Range(0, TracksCollection[closestFromRight].Count);
+			idxProb = Random.Range(0, TracksCollection[closestFromRight][idxCoups].Count);
+
 			if(trackBplaying){
-				track2_A.clip = TracksCollection[closestFromRight][1][0];
+				track2_A.clip = TracksCollection[closestFromRight][idxCoups][idxProb];
 			}
 			else{
-				track2_B.clip = TracksCollection[closestFromRight][1][0];
+				track2_B.clip = TracksCollection[closestFromRight][idxCoups][idxProb];
 			}
 		}
 
@@ -163,7 +173,7 @@ public class DrumAssistedController : MonoBehaviour {
 			}
 		}
 		closest=result;
-		return bestDist < 0.8;
+		return bestDist < 1.5;
 
 	}
 
@@ -208,7 +218,7 @@ public class DrumAssistedController : MonoBehaviour {
 		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/BigTom/4b"));
 		ProbLists[4].Add ((AudioClip)Resources.Load("DrumTracks/BigTom/5a"));
 		ProbLists[5].Add ((AudioClip)Resources.Load("DrumTracks/BigTom/6a"));
-		ProbLists[7].Add ((AudioClip)Resources.Load("DrumTracks/BigTom/8a"));
+		ProbLists[6].Add ((AudioClip)Resources.Load("DrumTracks/BigTom/8a"));
 
 		for(int i = 0 ; i < 8 ; i++)
 		{
@@ -255,16 +265,16 @@ public class DrumAssistedController : MonoBehaviour {
 		ComponentList.Clear();
 
 		//TOM2
-		ProbLists[0].Add ((AudioClip)Resources.Load("DrumTracks/Tom1/1a"));
-		ProbLists[1].Add ((AudioClip)Resources.Load("DrumTracks/Tom1/2a"));
-		ProbLists[1].Add ((AudioClip)Resources.Load("DrumTracks/Tom1/2b"));
-		ProbLists[2].Add ((AudioClip)Resources.Load("DrumTracks/Tom1/3a"));
-		ProbLists[2].Add ((AudioClip)Resources.Load("DrumTracks/Tom1/3b"));
-		ProbLists[2].Add ((AudioClip)Resources.Load("DrumTracks/Tom1/3c"));
-		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/Tom1/4a"));
-		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/Tom1/4b"));
-		ProbLists[5].Add ((AudioClip)Resources.Load("DrumTracks/Tom1/6a"));
-		ProbLists[7].Add ((AudioClip)Resources.Load("DrumTracks/Tom1/6b"));
+		ProbLists[0].Add ((AudioClip)Resources.Load("DrumTracks/Tom2/1a"));
+		ProbLists[1].Add ((AudioClip)Resources.Load("DrumTracks/Tom2/2a"));
+		ProbLists[1].Add ((AudioClip)Resources.Load("DrumTracks/Tom2/2b"));
+		ProbLists[2].Add ((AudioClip)Resources.Load("DrumTracks/Tom2/3a"));
+		ProbLists[2].Add ((AudioClip)Resources.Load("DrumTracks/Tom2/3b"));
+		ProbLists[2].Add ((AudioClip)Resources.Load("DrumTracks/Tom2/3c"));
+		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/Tom2/4a"));
+		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/Tom2/4b"));
+		ProbLists[4].Add ((AudioClip)Resources.Load("DrumTracks/Tom2/6a"));
+		ProbLists[5].Add ((AudioClip)Resources.Load("DrumTracks/Tom2/6b"));
 	
 		for(int i = 0 ; i < 8 ; i++)
 		{
@@ -294,7 +304,7 @@ public class DrumAssistedController : MonoBehaviour {
 		ProbLists[4].Add ((AudioClip)Resources.Load("DrumTracks/Snare/5a"));
 		ProbLists[5].Add ((AudioClip)Resources.Load("DrumTracks/Snare/6a"));
 		ProbLists[5].Add ((AudioClip)Resources.Load("DrumTracks/Snare/6b"));
-		ProbLists[7].Add ((AudioClip)Resources.Load("DrumTracks/Snare/8a"));
+		ProbLists[6].Add ((AudioClip)Resources.Load("DrumTracks/Snare/8a"));
 		
 		for(int i = 0 ; i < 8 ; i++)
 		{
@@ -337,9 +347,9 @@ public class DrumAssistedController : MonoBehaviour {
 		ProbLists[1].Add ((AudioClip)Resources.Load("DrumTracks/HiHat/2a"));
 		ProbLists[1].Add ((AudioClip)Resources.Load("DrumTracks/HiHat/2b"));
 		ProbLists[1].Add ((AudioClip)Resources.Load("DrumTracks/HiHat/2c"));
-		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/HiHat/4a"));
-		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/HiHat/4b"));
-		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/HiHat/4c"));
+		ProbLists[2].Add ((AudioClip)Resources.Load("DrumTracks/HiHat/4a"));
+		ProbLists[2].Add ((AudioClip)Resources.Load("DrumTracks/HiHat/4b"));
+		ProbLists[2].Add ((AudioClip)Resources.Load("DrumTracks/HiHat/4c"));
 		
 		for(int i = 0 ; i < 8 ; i++)
 		{
@@ -357,30 +367,30 @@ public class DrumAssistedController : MonoBehaviour {
 
 
 		//RIDE
-		ProbLists[0].Add ((AudioClip)Resources.Load("DrumTracks/Snare/1a"));
-		ProbLists[0].Add ((AudioClip)Resources.Load("DrumTracks/Snare/1b"));
-		ProbLists[0].Add ((AudioClip)Resources.Load("DrumTracks/Snare/1c"));
-		ProbLists[0].Add ((AudioClip)Resources.Load("DrumTracks/Snare/1d"));
-		ProbLists[1].Add ((AudioClip)Resources.Load("DrumTracks/Snare/2a"));
-		ProbLists[1].Add ((AudioClip)Resources.Load("DrumTracks/Snare/2b"));
-		ProbLists[1].Add ((AudioClip)Resources.Load("DrumTracks/Snare/2c"));
-		ProbLists[1].Add ((AudioClip)Resources.Load("DrumTracks/Snare/2c"));
-		ProbLists[1].Add ((AudioClip)Resources.Load("DrumTracks/Snare/2d"));
-		ProbLists[2].Add ((AudioClip)Resources.Load("DrumTracks/Snare/3a"));
-		ProbLists[2].Add ((AudioClip)Resources.Load("DrumTracks/Snare/3b"));
-		ProbLists[2].Add ((AudioClip)Resources.Load("DrumTracks/Snare/3c"));
-		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/Snare/4a"));
-		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/Snare/4b"));
-		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/Snare/4c"));
-		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/Snare/4d"));
-		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/Snare/4e"));
-		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/Snare/4f"));
-		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/Snare/4g"));
-		ProbLists[4].Add ((AudioClip)Resources.Load("DrumTracks/Snare/5a"));
-		ProbLists[5].Add ((AudioClip)Resources.Load("DrumTracks/Snare/6a"));
-		ProbLists[7].Add ((AudioClip)Resources.Load("DrumTracks/Snare/8a"));
-		ProbLists[7].Add ((AudioClip)Resources.Load("DrumTracks/Snare/8b"));
-		ProbLists[7].Add ((AudioClip)Resources.Load("DrumTracks/Snare/8c"));
+		ProbLists[0].Add ((AudioClip)Resources.Load("DrumTracks/Ride/1a"));
+		ProbLists[0].Add ((AudioClip)Resources.Load("DrumTracks/Ride/1b"));
+		ProbLists[0].Add ((AudioClip)Resources.Load("DrumTracks/Ride/1c"));
+		ProbLists[0].Add ((AudioClip)Resources.Load("DrumTracks/Ride/1d"));
+		ProbLists[1].Add ((AudioClip)Resources.Load("DrumTracks/Ride/2a"));
+		ProbLists[1].Add ((AudioClip)Resources.Load("DrumTracks/Ride/2b"));
+		ProbLists[1].Add ((AudioClip)Resources.Load("DrumTracks/Ride/2c"));
+		ProbLists[1].Add ((AudioClip)Resources.Load("DrumTracks/Ride/2c"));
+		ProbLists[1].Add ((AudioClip)Resources.Load("DrumTracks/Ride/2d"));
+		ProbLists[2].Add ((AudioClip)Resources.Load("DrumTracks/Ride/3a"));
+		ProbLists[2].Add ((AudioClip)Resources.Load("DrumTracks/Ride/3b"));
+		ProbLists[2].Add ((AudioClip)Resources.Load("DrumTracks/Ride/3c"));
+		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/Ride/4a"));
+		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/Ride/4b"));
+		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/Ride/4c"));
+		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/Ride/4d"));
+		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/Ride/4e"));
+		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/Ride/4f"));
+		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/Ride/4g"));
+		ProbLists[4].Add ((AudioClip)Resources.Load("DrumTracks/Ride/5a"));
+		ProbLists[5].Add ((AudioClip)Resources.Load("DrumTracks/Ride/6a"));
+		ProbLists[6].Add ((AudioClip)Resources.Load("DrumTracks/Ride/8a"));
+		ProbLists[6].Add ((AudioClip)Resources.Load("DrumTracks/Ride/8b"));
+		ProbLists[6].Add ((AudioClip)Resources.Load("DrumTracks/Ride/8c"));
 		
 		for(int i = 0 ; i < 8 ; i++)
 		{

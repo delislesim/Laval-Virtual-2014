@@ -18,7 +18,7 @@ public class DrumComponent : MonoBehaviour, ComponentInterface {
 
 	public void PlaySound()
 	{
-		audio.Play();
+		//audio.Play();
 		if (spot != null) {
 			spot.Play ();
 		}
