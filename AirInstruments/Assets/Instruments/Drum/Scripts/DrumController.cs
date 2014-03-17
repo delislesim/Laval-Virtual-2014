@@ -47,7 +47,6 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 	// Methode appelee quand l'instrument "drum" est choisi.
 	void OnEnable() {
 		dude.gameObject.SetActive (true);
-		assistedcontroller.gameObject.SetActive(true);
 
 		// Mettre la tete du drummer a la position de la camera.
 		teteDrummer.transform.position = mainCamera.transform.position;
@@ -85,6 +84,8 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 	void Update () {
 		// Gerer la fin du tutorial.
 		if (tutorialActif && tutorial.EstComplete ()) {
+
+			assistedcontroller.gameObject.SetActive(true);
 			// Activation du guidage
 			GuidageController.ObtenirInstance ().changerGuidage(typeGuidage.INSTRUMENTS);
 			
