@@ -28,7 +28,7 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 
 	public void PrepareToStop() {
 		spotlightPiano.SetTargetIntensity (kSpotlightIntensityDefault, 1.0f);
-
+		assistedModeController.Cacher ();
 		MenuAssisteController.ObtenirInstance ().Cacher ();
 	}
 

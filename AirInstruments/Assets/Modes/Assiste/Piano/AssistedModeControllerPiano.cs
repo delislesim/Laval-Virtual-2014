@@ -37,6 +37,14 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 		estActive = true;
 	}
 
+	public void Cacher()
+	{
+		// Mettre toutes les notes muettes.
+		for (int i = 0; i < nombreNotes; ++i) {
+			instrumentScript.DefinirStatutNote (i, PartitionPiano.StatutNote.Muette);
+		}
+	}
+
 	// Active le mode libre (desactive toute partition en cours).
 	public void ActiverLibre() {
 		estActive = false;
