@@ -74,6 +74,12 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 		                             sonImprovisez);
 		tutorial.Demarrer ();
 		tutorialActif = true;
+
+		// S'assurer que Move Joints est active.
+		MoveJoints moveJoints = MoveJoints.ObtenirInstance ();
+		if (moveJoints != null) {
+			moveJoints.gameObject.SetActive(false);
+		}
 	}
 	
 	// Methode appelee quand l'instrument "drum" n'est plus choisi.
@@ -99,6 +105,10 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 			tutorialActif = false;
 		}
 
+		// Gérer les choix de l'utilisateur dans le menu.
+		if (GererMenu ())
+			return;
+
 		// Afficher le menu.
 		if (!menuActif && !tutorialActif && (
 			Input.GetButtonDown ("MenuAssiste") ||
@@ -112,10 +122,19 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 		MenuAssisteController menuAssiste = MenuAssisteController.ObtenirInstance();
 		
 		// Positionner le menu du mode assiste.
-		menuAssiste.transform.position = new Vector3(0, 0, 0);
-		menuAssiste.transform.rotation = mainCamera.transform.rotation;
-		menuAssiste.transform.localScale = new Vector3(0.32f, 0.32f, 0.32f);
-		
+		Vector3 kPositionPourTeteDefaut = new Vector3(1.44f, 4.24f, -0.6465988f);
+		Vector3 differenceAvecTeteDefaut = kPositionPourTeteDefaut - MoveJoints.kPositionTeteDefaut;
+
+		menuAssiste.transform.position = mainCamera.transform.position + differenceAvecTeteDefaut;
+		menuAssiste.transform.eulerAngles = new Vector3 (346.2f, 180f, 0);
+		menuAssiste.transform.localScale = new Vector3(0.75f, 0.75f, 0.75f);
+
+		// Desactiver Move joints.
+		MoveJoints moveJoints = MoveJoints.ObtenirInstance ();
+		if (moveJoints != null) {
+			moveJoints.gameObject.SetActive(false);
+		}
+
 		// Mettre le texte dans les boutons du mode assiste.
 		menuAssiste.AssignerTexte(0, "Retour aux", "instruments");
 		menuAssiste.AssignerTexte(1, "Mode", "libre");
@@ -128,6 +147,48 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 		
 		// Se rappeler que le menu est active.
 		menuActif = true;
+	}
+
+	// Gere les choix de l'utilisateur dans le menu assiste. Retourne
+	// vrai si un choix est fait, faux sinon.
+	private bool GererMenu() {
+		MenuAssisteController menuAssiste = MenuAssisteController.ObtenirInstance();
+		
+		// Si le menu du mode assiste est affiche, repondre aux choix de l'utilisateur.
+		if (menuActif) {
+			int boutonPresse = menuAssiste.ObtenirBoutonPresse();
+			
+			switch (boutonPresse) {
+			case 0:
+				// Quitter drum.
+				GameState.ObtenirInstance().AccederEtat(GameState.State.ChooseInstrument);
+				break;
+			case 1:
+				// Mode libre.
+				assistedcontroller.gameObject.SetActive(true);
+				break;
+			case 2:
+				// Assiste.
+				assistedcontroller.gameObject.SetActive(false);
+				break;
+			}
+			
+			if (boutonPresse != -1) {
+				// Fermer le menu.
+				MenuAssisteController.ObtenirInstance ().Cacher();
+
+				// Reactiver move joints.
+				MoveJoints moveJoints = MoveJoints.ObtenirInstance ();
+				if (moveJoints != null) {
+					moveJoints.gameObject.SetActive(true);
+				}
+
+				menuActif = false;
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	// Indique si le menu est presentement affiche.

@@ -46,7 +46,7 @@ public class MoveJoints : MonoBehaviour {
 	private const float DIST_MIN_KINECT = 2.0f; //dist min...
 
 	// Position par défaut de la tete, lorsqu'aucun squelette n'est visible.
-	private Vector3 kPositionTeteDefaut = new Vector3(0.1f, 3.1f, -10.3f);
+	public static Vector3 kPositionTeteDefaut = new Vector3(0.1f, 3.1f, -10.3f);
 
 	// Deplacement maximum de la tete par deltaTime.
 	private float kDeplacementMaxTete = 10.0f;
@@ -55,8 +55,14 @@ public class MoveJoints : MonoBehaviour {
 	private bool right_hand_freez_speedY_positive;
 	private bool left_hand_freez_speedY_positive;
 
+	public static MoveJoints ObtenirInstance() {
+		return instance;
+	}
+
 	// Use this for initialization
 	void Start () {
+		instance = this;
+
 		joints = new GameObject[(int)Skeleton.Joint.Count] {
 			Hip_Center, Spine, Shoulder_Center, Head,
 			Shoulder_Left, Elbow_Left, Wrist_Left, Hand_Left,
@@ -255,6 +261,9 @@ public class MoveJoints : MonoBehaviour {
 		}
 		           
 	}
+
+	// Unique instance de cette classe.
+	private static MoveJoints instance;
 
 	// Layer des colliders de drum components.
 	private int drumComponentLayer;
