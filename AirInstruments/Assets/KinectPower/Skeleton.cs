@@ -202,8 +202,7 @@ namespace KinectHelpers
 
 	public bool IsSkeletonReliable()
 	{
-		int test = Array.FindAll (joint_status, x => x == JointStatus.Inferred || x == JointStatus.NotTracked).Length;
-		//Debug.Log (test + "\n");	
+		int test = Array.FindAll (joint_status, x => x == JointStatus.Inferred || x == JointStatus.NotTracked).Length;	
 		if(Array.FindAll(joint_status, x => x == JointStatus.Inferred || x == JointStatus.NotTracked).Length >= 5)
 			return false;
 		else

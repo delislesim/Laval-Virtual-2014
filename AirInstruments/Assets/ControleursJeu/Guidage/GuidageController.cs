@@ -54,19 +54,19 @@ public class GuidageController : MonoBehaviour {
 					GUI.EndGroup ();
 					break;
 			case typeGuidage.MENU_PRINCIPAL:
-					GUI.BeginGroup (rectangleMenu);
+					GUI.BeginGroup (rectangleMenu, skinGuidage.customStyles[0]);
 
-					GUI.BeginGroup (new Rect (0, 0, rectWidth, rectHeight), skinGuidage.customStyles[0]);
+					GUI.BeginGroup (new Rect (0, 0, rectWidth, rectHeight));
 					GUI.DrawTexture (new Rect (textureOffset, textureOffset, rectWidth / 2 - 2*textureOffset, rectHeight - 2*textureOffset), menu);
 					GUI.Label (new Rect (rectWidth / 2, 0, rectWidth / 2, rectHeight), "Piano");
 					GUI.EndGroup ();
 			
-					GUI.BeginGroup (new Rect ((rectangleMenu.width - rectWidth)/2, 0, rectWidth, rectHeight), skinGuidage.customStyles[0]);
+					GUI.BeginGroup (new Rect ((rectangleMenu.width - rectWidth)/2, 0, rectWidth, rectHeight));
 					GUI.DrawTexture (new Rect (textureOffset, textureOffset, rectWidth / 2 - 2*textureOffset, rectHeight - 2*textureOffset), menu);
 					GUI.Label (new Rect (rectWidth / 2, 0, rectWidth / 2, rectHeight), "Drum");
 					GUI.EndGroup ();
 			
-					GUI.BeginGroup (new Rect (rectangleMenu.width - rectWidth, 0, rectWidth, rectHeight), skinGuidage.customStyles[0]);
+					GUI.BeginGroup (new Rect (rectangleMenu.width - rectWidth, 0, rectWidth, rectHeight));
 					GUI.DrawTexture (new Rect (textureOffset, textureOffset, rectWidth / 2 - 2*textureOffset, rectHeight - 2*textureOffset), menu);
 					GUI.Label (new Rect (rectWidth / 2, 0, rectWidth / 2, rectHeight), "Guitare");
 					GUI.EndGroup ();

@@ -89,9 +89,9 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 		menuAssiste.transform.localScale = new Vector3(0.32f, 0.32f, 0.32f);
 		
 		// Mettre le texte dans les boutons du mode assiste.
+		menuAssiste.DesactiverTousBoutons ();
 		menuAssiste.AssignerTexte(0, "Retour aux", "instruments");
 		menuAssiste.AssignerTexte(1, "Mode", "libre");
-		menuAssiste.DesactiverBouton (2);
 		menuAssiste.AssignerTexte(3, "Für", "Elise");
 		menuAssiste.AssignerTexte(4, "Comptine", "d'été");
 		

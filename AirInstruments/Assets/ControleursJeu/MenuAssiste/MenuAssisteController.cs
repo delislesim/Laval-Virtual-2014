@@ -50,23 +50,25 @@ public class MenuAssisteController : MonoBehaviour {
 		}
 	}
 
+	public void DesactiverTousBoutons() {
+		for (int i = 0; i < boutons.Count; ++i) {
+			DesactiverBouton(i);
+		}
+	}
+
 	// Assigne un texte a un bouton du menu.
 	public void AssignerTexte(int indexBouton, string texteHaut, string texteBas) {
 		boutons [indexBouton].GetComponent<BoutonMusique> ().AssignerTexte (texteHaut, texteBas);
 	}
 
 	// Desactiver un bouton.
-	public void DesactiverBouton(int indexBouton) {
+	private void DesactiverBouton(int indexBouton) {
 		boutons [indexBouton].GetComponent<BoutonMusique> ().DefinirDesactive (true);
 	}
 
 	// Obtient l'index du bouton presse. -1 si aucun bouton n'est presse.
 	public int ObtenirBoutonPresse() {
 		return Pointeur.obtenirInstance ().GetCurrentTargetId ();
-	}
-
-	// Use this for initialization
-	void Start () {
 	}
 	
 	// Update is called once per frame
@@ -78,8 +80,12 @@ public class MenuAssisteController : MonoBehaviour {
 
 		// Mettre les bonnes cibles pour le pointeur.
 		pointeur.RemoveAllTargets ();
-		if (!boutons[0].GetComponent<BoutonMusique> ().EstDesactive())
+		if (!boutons[0].GetComponent<BoutonMusique> ().EstDesactive()) {
 			pointeur.AddTarget (0, new Vector2 (0, 0.1f), new Vector2 (0.35f, 0.5f));
+			pointeur.SetBoutonRetourPresent (true);
+		} else {
+			pointeur.SetBoutonRetourPresent (false);
+		}
 
 		if (!boutons[1].GetComponent<BoutonMusique> ().EstDesactive())
 			pointeur.AddTarget (1, new Vector2 (1.35f, -0.4f), new Vector2 (0.5f, 0.35f));
@@ -92,6 +98,12 @@ public class MenuAssisteController : MonoBehaviour {
 
 		if (!boutons[4].GetComponent<BoutonMusique> ().EstDesactive())
 			pointeur.AddTarget (4, new Vector2 (1.8f,  0.5f), new Vector2 (0.35f, 0.35f));
+
+		if (!boutons[5].GetComponent<BoutonMusique> ().EstDesactive())
+			pointeur.AddTarget (5, new Vector2 (0.9f, -0.4f), new Vector2 (0.35f, 0.35f));
+		
+		if (!boutons[6].GetComponent<BoutonMusique> ().EstDesactive())
+			pointeur.AddTarget (6, new Vector2 (1.8f, -0.4f), new Vector2 (0.35f, 0.35f));
 
 		// Activer le pointeur.
 		pointeur.gameObject.SetActive (true);
