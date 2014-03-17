@@ -14,6 +14,7 @@ public class BoutonMusique : MonoBehaviour {
 	// s'affiche pas dans le menu courant.
 	public void DefinirDesactive(bool estDesactive) {
 		this.estDesactive = estDesactive;
+		gameObject.SetActive (!estDesactive);
 	}
 
 	// Indique si le bouton est desactivé.

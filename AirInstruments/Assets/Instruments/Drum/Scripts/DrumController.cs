@@ -136,11 +136,10 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 		}
 
 		// Mettre le texte dans les boutons du mode assiste.
+		menuAssiste.DesactiverTousBoutons ();
 		menuAssiste.AssignerTexte(0, "Retour aux", "instruments");
 		menuAssiste.AssignerTexte(1, "Mode", "libre");
 		menuAssiste.AssignerTexte(2, "Mode", "assiste");
-		menuAssiste.DesactiverBouton (3);
-		menuAssiste.DesactiverBouton (4);
 		
 		// Activer le menu du mode assiste.
 		menuAssiste.Afficher();

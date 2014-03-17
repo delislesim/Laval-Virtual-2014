@@ -129,7 +129,6 @@ public class HandFollower : MonoBehaviour {
 	// Indique dans combien de temps la prochaine note du mode assisté
 	// doit etre jouée.
 	public void DefinirTempsProchaineNote(float temps) {
-		Debug.Log ("definir " + temps);
 		tempsProchaineNote = temps;
 	}
 

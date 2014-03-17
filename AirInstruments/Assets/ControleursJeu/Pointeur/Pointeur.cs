@@ -39,18 +39,21 @@ public class Pointeur : MonoBehaviour {
 	}
 
 	public int GetCurrentTargetId() {
-		if (Input.GetButtonDown ("ChoixMenu1")) {
-			return 1;
-		} else if (Input.GetButtonDown("ChoixMenu2")) {
-			if (targets.Count == 4) {
-				return 3;
-			} else {
-				return 2;
-			}
-		} else if (Input.GetButtonDown("ChoixMenu3")) {
-			return 4;
-		}
+		int decalageBoutonRetour = boutonRetourPresent ? 0 : -1;
 
+		if (Input.GetButtonDown ("ChoixMenu1")) {
+			if (targets.Count > 1 + decalageBoutonRetour)
+				return targets[1 + decalageBoutonRetour].id;
+		} else if (Input.GetButtonDown("ChoixMenu2")) {
+			if (targets.Count > 2)
+				return targets[2 + decalageBoutonRetour].id;
+		} else if (Input.GetButtonDown("ChoixMenu3")) {
+			if (targets.Count > 3 + decalageBoutonRetour)
+				return targets[3 + decalageBoutonRetour].id;
+		} else if (Input.GetButtonDown("ChoixMenu4")) {
+			if (targets.Count > 4 + decalageBoutonRetour)
+				return targets[4 + decalageBoutonRetour].id;
+		}
 
 		if (indexCibleActuelle != kIndexCibleInvalide &&
 		    tempsCibleActuelle > kTempsCibleChoisie) {
@@ -145,6 +148,10 @@ public class Pointeur : MonoBehaviour {
 		}
 	}
 
+	public void SetBoutonRetourPresent(bool boutonRetourPresent) {
+		this.boutonRetourPresent = boutonRetourPresent;
+	}
+
 	// Structure décrivant une cible potentiel pour le pointeur.
 	private struct Target {
 			public int id;
@@ -154,6 +161,9 @@ public class Pointeur : MonoBehaviour {
 
 	// Unique instance du pointeur dans le jeu.
 	private static Pointeur instance;
+
+	// Indique si le bouton de retour au menu est affiche a l'ecran.
+	private bool boutonRetourPresent = false;
 
 	// Index de la cible actuelle dans le tableau de cibles.
 	private int indexCibleActuelle = kIndexCibleInvalide;

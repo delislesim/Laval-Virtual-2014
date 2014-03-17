@@ -10,7 +10,6 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 
 	private string fichierLonelyBoy = ".\\Assets\\Modes\\Assiste\\Guitare\\Chansons\\Lonely Boy Audacity.aup";
 	private string fichierTNT = ".\\Assets\\Modes\\Assiste\\Guitare\\Chansons\\TNT.aup";
-	private string fichierBoubou = ".\\Assets\\Modes\\Assiste\\Guitare\\Chansons\\Lonely Boy Audacity.aup";
 
 	// Cubes tombants.
 	public CubesTombantsGuitare cubesTombants;
@@ -92,6 +91,7 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 	public void StopSong() {
 		audio.Stop ();
 		partition = null;
+		cubesTombants.ViderCubes ();
 	}
 
 	public static bool EstActive() {

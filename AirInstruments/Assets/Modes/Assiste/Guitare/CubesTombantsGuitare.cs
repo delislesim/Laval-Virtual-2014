@@ -39,7 +39,7 @@ public class CubesTombantsGuitare : MonoBehaviour {
 		}
 	}
 
-	private void ViderCubes() {
+	public void ViderCubes() {
 		while (cubes.Count != 0) {
 			GameObject cube = cubes.Peek();
 			cubes.Dequeue();
