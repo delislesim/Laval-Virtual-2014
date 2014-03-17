@@ -199,6 +199,7 @@ public class KinectPowerInterop
 	}
 
 	public enum HandJointIndex {
+	NO_JOINT = -1,
 	FOREARM = 0,
 	PALM,
 	PINKY_BASE,

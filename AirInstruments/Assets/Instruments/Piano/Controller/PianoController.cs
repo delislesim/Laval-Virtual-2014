@@ -105,6 +105,13 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 		menuActif = true;
 	}
 
+	// Calcule les moyennes des hauteurs des coups
+	// pour permettre de calibrer le snap ultérieurement.
+	private void CalculerMoyennes()
+	{
+
+	}
+
 	// Gere les choix de l'utilisateur dans le menu assiste. Retourne
 	// vrai si un choix est fait, faux sinon.
 	private bool GererMenu() {
