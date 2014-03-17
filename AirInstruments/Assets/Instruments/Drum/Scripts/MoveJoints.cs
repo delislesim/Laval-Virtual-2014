@@ -86,6 +86,7 @@ public class MoveJoints : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () {
 		m_player_one.ReloadSkeleton ();
+
 		if (m_player_one.IsDifferent()) {
 			moveJoints (m_player_one);
 		}
@@ -131,10 +132,12 @@ public class MoveJoints : MonoBehaviour {
 		// Fixer la position du squelette.
 		FixerSquelette ();
 
+		bool IsReliable = player.IsSkeletonReliable ();
+
 		// Appliquer les positions aux articulations.
 		for(int i = 0; i < jointsCount; i++) {
 
-			if (joints[i] == null)  // TODO: Pourquoi ca arriverait?
+			if (joints[i] == null)  // TODO: Pourquoi ca arriverait? Aucune idée honnetement
 				continue;
 
 			if(i == (int)Skeleton.Joint.Head) {
@@ -143,7 +146,7 @@ public class MoveJoints : MonoBehaviour {
 				Vector3 targetPosition;
 				if (current_positions[i] != HIDING_POS) {
 					targetPosition = current_positions[i];
-					Debug.Log (current_positions[i]);
+//					Debug.Log (current_positions[i]);
 				} else {
 					targetPosition = kPositionTeteDefaut;
 				}
@@ -164,7 +167,7 @@ public class MoveJoints : MonoBehaviour {
 					joints[i].transform.position = current_positions[i];
 				}
 
-				if (current_positions[i] == HIDING_POS) {
+				if (current_positions[i] == HIDING_POS || !IsReliable) {
 					joints[i].renderer.enabled = false;
 				} else {
 					joints[i].renderer.enabled = true;
@@ -257,10 +260,10 @@ public class MoveJoints : MonoBehaviour {
 	private int drumComponentLayer;
 
 	// Position cible des épaules.
-	private Vector3 kCibleEpaules = new Vector3(-0.2f, 2.2f, -10.2f);
+	private Vector3 kCibleEpaules = new Vector3(-0.2f, 2.0f, -10.2f);
 
 	// Tolérance pour la position cible des épaules.
-	private Vector3 kToleranceCibleEpaules = new Vector3 (0.5f, 0.1f, 0.1f);
+	private Vector3 kToleranceCibleEpaules = new Vector3 (0.5f, 0.001f, 0.1f);
 
 }
 

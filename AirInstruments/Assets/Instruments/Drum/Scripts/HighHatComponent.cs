@@ -23,13 +23,15 @@ public class HighHatComponent : MonoBehaviour, ComponentInterface {
 	{
 		if(opened){
 			audio.clip = soundOpened;
-			audio.Play();
+			//audio.Play();
 		}
 		else{
 			audio.clip = soundClosed;
-			audio.Play();
+			//audio.Play();
 		}
-		spot.Play ();
+		if (spot != null) {
+			spot.Play ();
+		}
 
 		aEteJoue = true;
 		gameObjectVisible.renderer.material = materialDefaut;

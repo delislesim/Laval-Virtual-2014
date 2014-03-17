@@ -91,6 +91,8 @@ public class MoveJointsForGuitar : MonoBehaviour {
 		// update the local positions of the bones
 		int jointsCount = (int)Skeleton.Joint.Count;
 
+		bool isReliable = player.IsSkeletonReliable ();
+
 		for(int i = 0; i < jointsCount; i++) 
 		{
 			//Store last positions/rotations
@@ -101,7 +103,7 @@ public class MoveJointsForGuitar : MonoBehaviour {
 			{
 				Vector3 posJoint = Vector3.zero;
 				Skeleton.JointStatus jointStatus = player.GetJointPosition((Skeleton.Joint)i, out posJoint);
-				if(jointStatus != Skeleton.JointStatus.NotTracked)
+				if(jointStatus != Skeleton.JointStatus.NotTracked && isReliable)
 				{
 					//POSITIONS
 					joints[i].transform.position = 

@@ -200,6 +200,16 @@ namespace KinectHelpers
 		return skeleton_id;
 	}
 
+	public bool IsSkeletonReliable()
+	{
+		int test = Array.FindAll (joint_status, x => x == JointStatus.Inferred || x == JointStatus.NotTracked).Length;
+		Debug.Log (test + "\n");	
+		if(Array.FindAll(joint_status, x => x == JointStatus.Inferred || x == JointStatus.NotTracked).Length >= 5)
+			return false;
+		else
+			return true;
+	}
+
     private int skeleton_id;
 
     private bool skeleton_loaded;
