@@ -12,7 +12,7 @@ public class GuitareEtapeAssiste : EtapeTutorial {
 	// Retourne le texte d'instruction qui doit etre affiche lors de
 	// l'execution de cette etape du tutorial.
 	public string ObtenirTexte() {
-		return "Jouez une note lorsqu'une\nligne bleue touche le manche\nde la guitare.";
+		return "Jouez une note lorsqu'une ligne bleue\ntouche le manche de la guitare.";
 	}
 	
 	// Retourne la voix lisant l'instruction.

@@ -5,6 +5,7 @@ public class GuidageTutorial : MonoBehaviour {
 
 	// GameObject affichant le texte du guidage.
 	public GUIText texte;
+	public GUISkin tutorialSkin;
 
 	// GameObject affichant le pictogramme.
 	public GUITexture pictogramme;
@@ -13,8 +14,10 @@ public class GuidageTutorial : MonoBehaviour {
 	public GUITexture background;
 
 	// Images de fond.
-	public Texture backgroundCompleted;
-	public Texture backgroundBeginning;
+	public Texture backgroundCompletedTop;
+	public Texture backgroundCompletedBottom;
+	public Texture backgroundBeginningTop;
+	public Texture backgroundBeginningBottom;
 
 	// Use this for initialization
 	void Start () {
@@ -24,6 +27,7 @@ public class GuidageTutorial : MonoBehaviour {
 		tailleBackground = new Vector2 (background.pixelInset.width,
 		                                background.pixelInset.height);
 		tailleTexte = texte.fontSize;
+		texte.font = tutorialSkin.font;
 		positionTexte = texte.pixelOffset;
 
 		taillePictogramme = new Vector2 (pictogramme.pixelInset.width,
@@ -113,7 +117,10 @@ public class GuidageTutorial : MonoBehaviour {
 
 	public void AfficherEtape(EtapeTutorial etape) {
 		texte.text = etape.ObtenirTexte ();
-		background.texture = backgroundBeginning;
+		if(positionCible == Position.HAUT)
+			background.texture = backgroundBeginningTop;
+		else
+			background.texture = backgroundBeginningBottom;
 		doitFeliciter = etape.DoitFeliciter ();
 		gameObject.SetActive (true);
 		EstEnTrainEntrer = true;
@@ -134,7 +141,10 @@ public class GuidageTutorial : MonoBehaviour {
 		EstEnTrainDeMasquer = true;
 
 		if (doitFeliciter) {
-			background.texture = backgroundCompleted;
+			if(positionCible == Position.HAUT)
+				background.texture = backgroundCompletedTop;
+			else
+				background.texture = backgroundCompletedBottom;
 		}
 		tempsEcoule = 0;
 	}

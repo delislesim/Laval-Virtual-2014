@@ -14,7 +14,7 @@ public class DrumEtapePosition : EtapeTutorial {
 	// Retourne le texte d'instruction qui doit etre affiche lors de
 	// l'execution de cette etape du tutorial.
 	public string ObtenirTexte() {
-		return "Positionnez le bout de vos\nbaguettes au-dessus de la\nbatterie.";
+		return "Positionnez le bout de vos baguettes au-dessus de la batterie.";
 	}
 	
 	// Retourne la voix lisant l'instruction.
