@@ -42,6 +42,8 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 
 	public void PrepareToStop() {
 		gameObject.SetActive (false);
+		MenuAssisteController.ObtenirInstance ().Cacher ();
+		Tutorial.ObtenirInstance ().gameObject.SetActive (false);
 	}
 
 	// Methode appelee quand l'instrument "drum" est choisi.
@@ -77,8 +79,7 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 	// Methode appelee quand l'instrument "drum" n'est plus choisi.
 	void OnDisable () {
 		dude.gameObject.SetActive (false);
-		assistedcontroller.gameObject.SetActive(false);
-		Tutorial.ObtenirInstance ().gameObject.SetActive (false);
+		assistedcontroller.gameObject.SetActive (false);
 	}
 	
 	// Methode appelee a chaque frame quand le drum est l'instrument courant.
@@ -87,6 +88,7 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 		if (tutorialActif && tutorial.EstComplete ()) {
 
 			assistedcontroller.gameObject.SetActive(true);
+
 			// Activation du guidage
 			GuidageController.ObtenirInstance ().changerGuidage(typeGuidage.INSTRUMENTS);
 			
@@ -97,12 +99,39 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 			tutorialActif = false;
 		}
 
-		// Retour au menu de choix d'instrument a l'aide d'un geste.
-		if (GestureRecognition.ObtenirInstance ().GetCurrentGesture () == GestureId.GESTURE_MENU) {
-			GameState.ObtenirInstance().AccederEtat (GameState.State.ChooseInstrument);
-			return;
+		// Afficher le menu.
+		if (!menuActif && !tutorialActif && (
+			Input.GetButtonDown ("MenuAssiste") ||
+			GestureRecognition.ObtenirInstance().GetCurrentGesture() == GestureId.GESTURE_MENU)) {
+			AfficherMenu();
 		}
 	}
+
+	// Affiche le menu.
+	private void AfficherMenu() {
+		MenuAssisteController menuAssiste = MenuAssisteController.ObtenirInstance();
+		
+		// Positionner le menu du mode assiste.
+		menuAssiste.transform.position = new Vector3(0, 0, 0);
+		menuAssiste.transform.rotation = mainCamera.transform.rotation;
+		menuAssiste.transform.localScale = new Vector3(0.32f, 0.32f, 0.32f);
+		
+		// Mettre le texte dans les boutons du mode assiste.
+		menuAssiste.AssignerTexte(0, "Retour aux", "instruments");
+		menuAssiste.AssignerTexte(1, "Mode", "libre");
+		menuAssiste.AssignerTexte(2, "Mode", "assiste");
+		menuAssiste.DesactiverBouton (3);
+		menuAssiste.DesactiverBouton (4);
+		
+		// Activer le menu du mode assiste.
+		menuAssiste.Afficher();
+		
+		// Se rappeler que le menu est active.
+		menuActif = true;
+	}
+
+	// Indique si le menu est presentement affiche.
+	private bool menuActif = false;
 
 	// Tutorial.
 	TutorialDrum tutorial;
