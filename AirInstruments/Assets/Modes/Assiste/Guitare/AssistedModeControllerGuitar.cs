@@ -72,7 +72,12 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 		currentTone = partition[currentPartitionIndex].note;
 		currentStyle = partition[currentPartitionIndex].style;
 		currentOctave = partition[currentPartitionIndex].octave;
-		handFollower.DefinirTempsProchaineNote(partition[currentPartitionIndex].time);
+
+		if (partition[currentPartitionIndex].time > 0.15f) {
+			handFollower.DefinirTempsProchaineNote(partition[currentPartitionIndex].time);
+		} else {
+			handFollower.DefinirTempsProchaineNote(1000.0f);
+		}
 
 		// Charger les cubes.
 		cubesTombants.ChargerPartition (partition);

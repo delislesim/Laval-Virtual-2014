@@ -6,6 +6,15 @@ public class ChoixInstrumentController : MonoBehaviour {
 	// Controleur de la camera.
 	public CameraController cameraController;
 
+	// Spotlight du piano.
+	public SpotlightControl spotPiano;
+
+	// Spotlight du drum.
+	public SpotlightControl spotDrum;
+
+	// Spotlight de la guitare.
+	public SpotlightControl spotGuitare;
+
 	// Appele avant d'entrer dans le mode de choix d'instrument.
 	public void Prepare() {
 		KinectPowerInterop.SetKinectAngle (15);
@@ -47,17 +56,37 @@ public class ChoixInstrumentController : MonoBehaviour {
 		*/
 
 		GestureRecognition gestureRecognition = GestureRecognition.ObtenirInstance ();
+
+		// Mettre a jour les spots.
+		float completionPiano = gestureRecognition.GetGestureCompletion (GestureId.GESTURE_PIANO);
+		float completionDrum = gestureRecognition.GetGestureCompletion (GestureId.GESTURE_DRUM);
+		float completionGuitare = gestureRecognition.GetGestureCompletion (GestureId.GESTURE_GUITAR);
+
+		if (completionPiano < 0.2f && completionDrum < 0.2f && completionGuitare < 0.2f) {
+			RallumerSpots();
+		} else {
+			// Ajuster les spots selon le niveau de complétion du geste.
+			spotPiano.SetTargetIntensity(completionPiano == 0 ? 0 : 4.0f * (1.0f + completionPiano), 6.0f);
+			spotDrum.SetTargetIntensity(completionDrum < 0.25 ? 0 : 4.0f * (1.0f + completionDrum), 6.0f);
+			spotGuitare.SetTargetIntensity(completionGuitare == 0 ? 0 : 4.0f * (1.0f + completionGuitare), 6.0f);
+		}
+
+
+		// Aller a l'instrument dont le geste est complete.
 		GestureId gesture = gestureRecognition.GetCurrentGesture ();
 		switch (gesture) {
 		case GestureId.GESTURE_DRUM : {
+			RallumerSpots();
 			GameState.ObtenirInstance().AccederEtat(GameState.State.Drum);
 			break;
 		}
 		case GestureId.GESTURE_GUITAR : {
+			RallumerSpots();
 			GameState.ObtenirInstance().AccederEtat(GameState.State.Guitar);
 			break;
 		}
 		case GestureId.GESTURE_PIANO : {
+			RallumerSpots();
 			GameState.ObtenirInstance().AccederEtat(GameState.State.Piano);
 			break;
 		}
@@ -68,6 +97,12 @@ public class ChoixInstrumentController : MonoBehaviour {
 			GuidageController.ObtenirInstance ().changerGuidage(typeGuidage.MENU_PRINCIPAL);
 			guidageInitialise = true;
 		}
+	}
+
+	void RallumerSpots () {
+		spotPiano.SetTargetIntensity(8.0f, 6.0f);
+		spotDrum.SetTargetIntensity(8.0f, 6.0f);
+		spotGuitare.SetTargetIntensity(8.0f, 6.0f);
 	}
 
 	void OnEnable () {

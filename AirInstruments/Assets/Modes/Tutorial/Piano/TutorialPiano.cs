@@ -20,7 +20,7 @@ public class TutorialPiano {
 	}
 
 	public void Demarrer() {
-		tutorial.Demarrer (kPositionGuidage);
+		tutorial.Demarrer (GuidageTutorial.Position.HAUT);
 	}
 
 	public bool EstComplete() {
@@ -29,7 +29,4 @@ public class TutorialPiano {
 
 	// Tutorial.
 	private Tutorial tutorial;
-
-	// Position du guidage.
-	private Vector2 kPositionGuidage = new Vector2(427.0f, 492.0f);
 }

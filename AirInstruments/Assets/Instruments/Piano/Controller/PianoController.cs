@@ -162,7 +162,7 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 	private TutorialPiano tutorial;
 
 	// Intensité du spotlight piano par defaut.
-	private const float kSpotlightIntensityDefault = 6.92f;
+	private const float kSpotlightIntensityDefault = 8.0f;
 
 	// Intensité du spotlight piano quand on est au piano.
 	private const float kSpotlightIntensityPlaying = 2.04f;

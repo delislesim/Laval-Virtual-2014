@@ -130,4 +130,8 @@ public class GestureDrum : Gesture {
 
 		return false;
 	}
+
+	public override float isPartiallyTracked() {
+		return elapsedTimeGesture_ / gestureTime_;
+	}
 }

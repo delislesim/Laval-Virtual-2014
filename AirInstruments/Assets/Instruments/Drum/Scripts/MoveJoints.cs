@@ -37,7 +37,7 @@ public class MoveJoints : MonoBehaviour {
 	private Quaternion[] last_rotations;
 	private const float KICK_SPEED = 1.0f;
 	private const float HH_SPEED = 1.0f;
-	private Vector3 HIDING_POS = new Vector3(0,-150,0);
+	private Vector3 HIDING_POS = new Vector3(0,-150,-150);
 	private bool kick_ready;
 	private bool hit_hat_ready;
 	private const float PLAYER_HIGHT = 5.0f;
@@ -46,7 +46,7 @@ public class MoveJoints : MonoBehaviour {
 	private const float DIST_MIN_KINECT = 2.0f; //dist min...
 
 	// Position par défaut de la tete, lorsqu'aucun squelette n'est visible.
-	private Vector3 kPositionTeteDefaut = new Vector3(0, 1.88f, -10.88f);
+	private Vector3 kPositionTeteDefaut = new Vector3(0.1f, 3.1f, -10.3f);
 
 	// Deplacement maximum de la tete par deltaTime.
 	private float kDeplacementMaxTete = 10.0f;
@@ -143,6 +143,7 @@ public class MoveJoints : MonoBehaviour {
 				Vector3 targetPosition;
 				if (current_positions[i] != HIDING_POS) {
 					targetPosition = current_positions[i];
+					Debug.Log (current_positions[i]);
 				} else {
 					targetPosition = kPositionTeteDefaut;
 				}

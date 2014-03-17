@@ -16,11 +16,16 @@ public class Pointeur : MonoBehaviour {
 		return instance;
 	}
 
+	public void AppliquerDecalageVertical(float decalageVertical) {
+		this.decalageVertical = decalageVertical;
+	}
+
 	public void RemoveAllTargets() {
 		targets.Clear ();
 		indexCibleActuelle = kIndexCibleInvalide;
 		tempsCibleActuelle = 0;
 		indexImageMain = 0;
+		decalageVertical = 0;
 	}
 
 	public void AddTarget(int targetId,
@@ -44,15 +49,19 @@ public class Pointeur : MonoBehaviour {
 	void Update () {
 		KinectPowerInterop.NuiHandPointerInfo[] hands = new KinectPowerInterop.NuiHandPointerInfo[2];
 
+		float pressExtent = 0;
+
 		// Positionner la main.
 		if (KinectPowerInterop.GetHandsInteraction (0, hands)) {
 			if ((hands[0].State & KinectPowerInterop.NuiHandPointerStatePrimaryForUser) != 0) {
 				handPosition.x = hands[0].X;
 				handPosition.y = hands[0].Y;
+				pressExtent = hands[0].PressExtent;
 				handIsActive = true;
 			} else if ((hands[1].State & KinectPowerInterop.NuiHandPointerStatePrimaryForUser) != 0) {
 				handPosition.x = hands[1].X;
 				handPosition.y = hands[1].Y;
+				pressExtent = hands[1].PressExtent;
 				handIsActive = true;
 			} else {
 				handIsActive = false;
@@ -63,6 +72,8 @@ public class Pointeur : MonoBehaviour {
 
 		if (!handIsActive)
 			return;
+
+		handPosition.y += decalageVertical;
 
 		// Si la main est deja sur une cible, augmenter son compteur.
 		if (indexCibleActuelle != kIndexCibleInvalide) {
@@ -76,7 +87,11 @@ public class Pointeur : MonoBehaviour {
 			}
 
 			// Augmenter le compteur de la cible.
-			tempsCibleActuelle += Time.deltaTime;
+			if (pressExtent > 0) {
+				tempsCibleActuelle += Time.deltaTime * 2.5f;
+			} else {
+				tempsCibleActuelle += Time.deltaTime;
+			}
 
 			// Determiner quelle image de main afficher.
 			indexImageMain = (int)(tempsCibleActuelle * imagesMain.Count / kTempsCibleChoisie);
@@ -150,4 +165,7 @@ public class Pointeur : MonoBehaviour {
 
 	// Temps nécessaire pour qu'une cible soit considérée choisie.
 	private const float kTempsCibleChoisie = 3.0f;
+
+	// Decalage vertical.
+	private float decalageVertical = 0;
 }

@@ -55,4 +55,8 @@ public class GestureMenu : Gesture {
 		else
 			return false;
 	}
+
+	public override float isPartiallyTracked() {
+		return elapsedTime_ / gestureTime_;
+	}
 }

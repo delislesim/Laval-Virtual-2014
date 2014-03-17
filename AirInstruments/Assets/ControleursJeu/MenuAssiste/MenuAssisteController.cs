@@ -85,19 +85,19 @@ public class MenuAssisteController : MonoBehaviour {
 		// Mettre les bonnes cibles pour le pointeur.
 		pointeur.RemoveAllTargets ();
 		if (!boutons[0].GetComponent<BoutonMusique> ().EstDesactive())
-			pointeur.AddTarget (0, new Vector2 (0, 0.1f), new Vector2 (0.25f, 0.5f));
+			pointeur.AddTarget (0, new Vector2 (0, 0.1f), new Vector2 (0.35f, 0.5f));
 
 		if (!boutons[1].GetComponent<BoutonMusique> ().EstDesactive())
-			pointeur.AddTarget (1, new Vector2 (0.9f, -0.4f), new Vector2 (0.25f, 0.25f));
+			pointeur.AddTarget (1, new Vector2 (0.9f, -0.4f), new Vector2 (0.35f, 0.35f));
 
 		if (!boutons[2].GetComponent<BoutonMusique> ().EstDesactive())
-			pointeur.AddTarget (2, new Vector2 (1.8f, -0.4f), new Vector2 (0.25f, 0.25f));
+			pointeur.AddTarget (2, new Vector2 (1.8f, -0.4f), new Vector2 (0.35f, 0.35f));
 
 		if (!boutons[3].GetComponent<BoutonMusique> ().EstDesactive())
-			pointeur.AddTarget (3, new Vector2 (0.9f,  0.5f), new Vector2 (0.25f, 0.25f));
+			pointeur.AddTarget (3, new Vector2 (0.9f,  0.5f), new Vector2 (0.35f, 0.35f));
 
 		if (!boutons[4].GetComponent<BoutonMusique> ().EstDesactive())
-			pointeur.AddTarget (4, new Vector2 (1.8f,  0.5f), new Vector2 (0.25f, 0.25f));
+			pointeur.AddTarget (4, new Vector2 (1.8f,  0.5f), new Vector2 (0.35f, 0.35f));
 
 		// Activer le pointeur.
 		pointeur.gameObject.SetActive (true);

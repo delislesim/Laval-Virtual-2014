@@ -13,7 +13,8 @@ public class TutorialDrum {
 	                    DrumComponent tom2,
 	                    DrumComponent tomBig,
 	                    AudioClip sonPosition,
-	                    AudioClip sonTambours) {
+	                    AudioClip sonTambours,
+	                    AudioClip sonImprovisez) {
 		this.tutorial = Tutorial.ObtenirInstance ();
 		
 		// Creer les etapes du tutorial.
@@ -27,10 +28,11 @@ public class TutorialDrum {
 		                                             tom1,
 		                                             tom2,
 		                                             tomBig));
+		tutorial.AjouterEtape (new DrumEtapeImprovisez(sonImprovisez));
 	}
 	
 	public void Demarrer() {
-		tutorial.Demarrer (kPositionGuidage);
+		tutorial.Demarrer (GuidageTutorial.Position.HAUT);
 	}
 	
 	public bool EstComplete() {
@@ -39,7 +41,4 @@ public class TutorialDrum {
 	
 	// Tutorial.
 	private Tutorial tutorial;
-	
-	// Position du guidage.
-	private Vector2 kPositionGuidage = new Vector2(427.0f, 492.0f);
 }

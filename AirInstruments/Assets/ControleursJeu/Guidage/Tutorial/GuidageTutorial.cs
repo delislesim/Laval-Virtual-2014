@@ -6,10 +6,13 @@ public class GuidageTutorial : MonoBehaviour {
 	// GameObject affichant le texte du guidage.
 	public GUIText texte;
 
-	public GUISkin tutorialSkin;
+	// GameObject affichant le pictogramme.
+	public GUITexture pictogramme;
 
 	// GameObject affichant le background du guidage.
 	public GUITexture background;
+
+	// Images de fond.
 	public Texture backgroundCompleted;
 	public Texture backgroundBeginning;
 
@@ -23,45 +26,60 @@ public class GuidageTutorial : MonoBehaviour {
 		tailleTexte = texte.fontSize;
 		positionTexte = texte.pixelOffset;
 
-		texte.font = tutorialSkin.font;
+		taillePictogramme = new Vector2 (pictogramme.pixelInset.width,
+		                                 pictogramme.pixelInset.height);
+		positionPictogramme = new Vector2 (pictogramme.pixelInset.x,
+		                                   pictogramme.pixelInset.y);
 
 		initialized = true;
 	}
 
 	// Update is called once per frame
 	void Update () {
+		tempsEcoule += Time.deltaTime;
+		float proportion = tempsEcoule / kTempsAnimation;
+
 		if(EstEnTrainEntrer) {
-			if(positionGuidage.x < positionArrivee.x){
-				positionGuidage.x += vitesseAnimation;
-				DefinirPositionReelle();
-			} else {
+			if (proportion > 1.0f) {
+				proportion = 1.0f;
 				EstEnTrainEntrer = false;
 			}
-		}
-
-		if(EstEnTrainDeMasquer) {
-			//tempsEcoule += Time.deltaTime;
-			if(positionGuidage.x <= Screen.width + (tailleBackground.x/2)){
-				background.texture = backgroundCompleted;
-				positionGuidage.x += vitesseAnimation;
-				DefinirPositionReelle();
+			if (positionCible == Position.HAUT) {
+				float position = spring(kPositionCacherHaut, kPositionHaut, proportion);
+				DefinirPositionReelle(position);
 			} else {
-				//tempsEcoule = 0;
+				float position = spring(kPositionCacherBas, kPositionBas, proportion);
+				DefinirPositionReelle(position);
+			}
+		} else if(EstEnTrainDeMasquer) {
+			if (proportion > 1.0f) {
+				proportion = 1.0f;
 				EstEnTrainDeMasquer = false;
 				gameObject.SetActive (false);
-				positionGuidage.x = -tailleBackground.x/2;
+			}
+
+			if (positionCible == Position.HAUT) {
+				float position = spring(kPositionHaut, kPositionCacherHaut, proportion);
+				DefinirPositionReelle(position);
+			} else {
+				float position = spring(kPositionBas, kPositionCacherBas, proportion);
+				DefinirPositionReelle(position);
 			}
 		}
 	}
 
-	public void DefinirPosition(Vector2 position) {
+	public enum Position {
+		HAUT, 
+		BAS
+	};
+
+	public void DefinirPosition(Position positionCible) {
 		Start ();
-		positionArrivee = position;
-		positionGuidage.y = position.y;
+		this.positionCible = positionCible;
 	}
 
-	private void DefinirPositionReelle() {
-		Vector2 positionTransformee = TransformerCoordonnees (positionGuidage);
+	private void DefinirPositionReelle(float positionRelle) {
+		Vector2 positionTransformee = TransformerCoordonnees (new Vector2(0, positionRelle));
 		Vector2 tailleTransformee = TransformerCoordonnees (tailleBackground);
 		Rect pixelInset = background.pixelInset;
 		pixelInset.x = positionTransformee.x;
@@ -75,6 +93,18 @@ public class GuidageTutorial : MonoBehaviour {
 		
 		int tailleTexteTransformee = (int) (tailleTexte * ((float)Screen.width) / 1755f);
 		texte.fontSize = tailleTexteTransformee;
+
+		Rect pixelInsetPictogramme = pictogramme.pixelInset;
+
+		Vector2 positionPictogrammeTransformee = positionTransformee + TransformerCoordonnees (positionPictogramme);
+		pixelInsetPictogramme.x = positionPictogrammeTransformee.x;
+		pixelInsetPictogramme.y = positionPictogrammeTransformee.y;
+
+		Vector2 taillePictogrammeTransformee = TransformerCoordonnees (taillePictogramme);
+		pixelInsetPictogramme.width = taillePictogrammeTransformee.x;
+		pixelInsetPictogramme.height = taillePictogrammeTransformee.y;
+
+		pictogramme.pixelInset = pixelInsetPictogramme;
 	}
 
 	private Vector2 TransformerCoordonnees(Vector2 coord) {
@@ -84,27 +114,45 @@ public class GuidageTutorial : MonoBehaviour {
 	public void AfficherEtape(EtapeTutorial etape) {
 		texte.text = etape.ObtenirTexte ();
 		background.texture = backgroundBeginning;
+		doitFeliciter = etape.DoitFeliciter ();
 		gameObject.SetActive (true);
 		EstEnTrainEntrer = true;
+		tempsEcoule = 0;
 
 		// Jouer le son.
 		audio.clip = etape.ObtenirAudio ();
 		audio.Play ();
+
+		if (positionCible == Position.HAUT) {
+			DefinirPositionReelle(kPositionCacherHaut);
+		} else {
+			DefinirPositionReelle(kPositionCacherBas);
+		}
 	}
 
 	public void Masquer() {
 		EstEnTrainDeMasquer = true;
-		//gameObject.SetActive (false);
+
+		if (doitFeliciter) {
+			background.texture = backgroundCompleted;
+		}
+		tempsEcoule = 0;
 	}
 
 	// Indique si le guidage est en train de faire une animation.
 	public bool EstEnAnimation() {
-		return audio.isPlaying;
+		return audio.isPlaying || EstEnTrainDeMasquer || EstEnTrainEntrer;
 	}
 
 	// Indique si le guidage est visible (meme s'il est en train de faire une animation).
 	public bool EstVisible() {
 		return gameObject.activeSelf;
+	}
+
+	private float spring(float start, float end, float value){
+		value = Mathf.Clamp01(value);
+		value = (Mathf.Sin(value * Mathf.PI * (0.2f + 2.5f * value * value * value)) * Mathf.Pow(1f - value, 2.2f) + value) * (1f + (1.2f * (1f - value)));
+		return start + (end - start) * value;
 	}
 
 	// Indique si le guidage a ete demarre une premiere fois.
@@ -119,11 +167,11 @@ public class GuidageTutorial : MonoBehaviour {
 	// Position relative du texte pour une résolution de 1080 * 768.
 	private Vector2 positionTexte;
 
-	// Position actuelle du tutorial
-	private Vector2 positionGuidage;
+	// Taille du pictogramme pour une résolution de 1080 * 768.
+	private Vector2 taillePictogramme;
 
-	// Position cible du tutorial
-	private Vector2 positionArrivee;
+	// Position relative du pictogramme pour une résolution de 1080 * 768.
+	private Vector2 positionPictogramme;
 
 	// Indique si l'animation pour masquer l'objet est en cours
 	private bool EstEnTrainDeMasquer = false;
@@ -131,12 +179,27 @@ public class GuidageTutorial : MonoBehaviour {
 	// Indique si l'animation pour afficher l'objet est en cours
 	private bool EstEnTrainEntrer = false;
 
-	// Temps de l'animation
-	private float tempsAnimationMasquer = 1f;
-
-	// Vitesse de l'animation
-	private float vitesseAnimation = 15;
+	// Duree d'une animation.
+	private const float kTempsAnimation = 1.0f;
 
 	// Temps écoulé depuis le début de l'animation
 	private float tempsEcoule = 0;
+
+	// Position cible du guidage.
+	private Position positionCible;
+
+	// Position du guidage en haut de l'écran.
+	private const float kPositionHaut = 689.94f;
+
+	// Position pour se cacher en haut de l'écran.
+	private const float kPositionCacherHaut = 1000.0f;
+
+	// Position du guidage en bas de l'écran.
+	private const float kPositionBas = 0;
+
+	// Position pour se cacher en bas de l'écran.
+	private const float kPositionCacherBas = -300.0f;
+
+	// Indique si on doit feliciter le jouer.
+	private bool doitFeliciter;
 }
