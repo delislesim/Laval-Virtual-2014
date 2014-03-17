@@ -27,8 +27,9 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 	}
 
 	public void PrepareToStop() {
+		Tutorial.ObtenirInstance ().gameObject.SetActive (false);
 		spotlightPiano.SetTargetIntensity (kSpotlightIntensityDefault, 1.0f);
-
+		assistedModeController.ActiverLibre ();
 		MenuAssisteController.ObtenirInstance ().Cacher ();
 	}
 
@@ -50,7 +51,6 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 	// Methode appelee quand l'instrument "piano" n'est plus choisi.
 	void OnDisable () {
 		pianoWrapper.SetActive (false);
-		Tutorial.ObtenirInstance ().gameObject.SetActive (false);
 	}
 
 	// Methode appelee a chaque frame quand le piano est l'instrument courant.
