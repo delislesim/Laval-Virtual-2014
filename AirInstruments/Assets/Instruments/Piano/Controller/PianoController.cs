@@ -28,6 +28,8 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 
 	public void PrepareToStop() {
 		spotlightPiano.SetTargetIntensity (kSpotlightIntensityDefault, 1.0f);
+
+		MenuAssisteController.ObtenirInstance ().Cacher ();
 	}
 
 	// Methode appelee quand l'instrument "piano" est choisi.
@@ -54,6 +56,8 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 		if (menuAssiste != null)
 			menuAssiste.gameObject.SetActive (false);
 		menuActif = false;
+
+		Tutorial.ObtenirInstance ().gameObject.SetActive (false);
 	}
 
 	// Methode appelee a chaque frame quand le piano est l'instrument courant.
@@ -75,7 +79,7 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 			return;
 		
 		// Afficher le menu.
-		if (!menuActif && (
+		if (!menuActif && !tutorialActif && (
 			Input.GetButtonDown ("MenuAssiste") ||
 		    GestureRecognition.ObtenirInstance().GetCurrentGesture() == GestureId.GESTURE_MENU)) {
 			AfficherMenu();
@@ -94,9 +98,10 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 		// Mettre le texte dans les boutons du mode assiste.
 		menuAssiste.AssignerTexte(0, "Retour aux", "instruments");
 		menuAssiste.AssignerTexte(1, "Mode", "libre");
-		menuAssiste.AssignerTexte(2, "Für", "Elise");
-		menuAssiste.AssignerTexte(3, "Comptine", "d'été");
-		menuAssiste.AssignerTexte(4, "Boubou", "the Boubou");
+		menuAssiste.DesactiverBouton (2);
+		menuAssiste.AssignerTexte(3, "Für", "Elise");
+		menuAssiste.AssignerTexte(4, "Comptine", "d'été");
+		//menuAssiste.AssignerTexte(4, "Boubou", "the Boubou");
 		
 		// Desactive le piano.
 		pianoWrapper.SetActive (false);
@@ -127,16 +132,12 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 				pianoWrapper.SetActive (true);
 				assistedModeController.ActiverLibre();
 				break;
-			case 2:
-				assistedModeController.ChargerPartition (".\\Assets\\Modes\\Assiste\\Piano\\partitions\\fur_elise.txt", 1.0f);
-				pianoWrapper.SetActive (true);
-				break;
 			case 3:
-				assistedModeController.ChargerPartition (".\\Assets\\Modes\\Assiste\\Piano\\partitions\\valse.txt", 4.0f);
+				assistedModeController.ChargerPartition (".\\Assets\\Modes\\Assiste\\Piano\\partitions\\fur_elise.txt", 1.0f);
 				pianoWrapper.SetActive (true);
 				break;
 			case 4:
-				assistedModeController.ChargerPartition (".\\Assets\\Modes\\Assiste\\Piano\\partitions\\fur_elise.txt", 1.0f);
+				assistedModeController.ChargerPartition (".\\Assets\\Modes\\Assiste\\Piano\\partitions\\valse.txt", 4.0f);
 				pianoWrapper.SetActive (true);
 				break;
 			}

@@ -39,6 +39,19 @@ public class Pointeur : MonoBehaviour {
 	}
 
 	public int GetCurrentTargetId() {
+		if (Input.GetButtonDown ("ChoixMenu1")) {
+			return 1;
+		} else if (Input.GetButtonDown("ChoixMenu2")) {
+			if (targets.Count == 4) {
+				return 3;
+			} else {
+				return 2;
+			}
+		} else if (Input.GetButtonDown("ChoixMenu3")) {
+			return 4;
+		}
+
+
 		if (indexCibleActuelle != kIndexCibleInvalide &&
 		    tempsCibleActuelle > kTempsCibleChoisie) {
 			return targets[indexCibleActuelle].id;
