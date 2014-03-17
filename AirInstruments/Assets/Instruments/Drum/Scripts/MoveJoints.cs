@@ -86,6 +86,7 @@ public class MoveJoints : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () {
 		m_player_one.ReloadSkeleton ();
+
 		if (m_player_one.IsDifferent()) {
 			moveJoints (m_player_one);
 		}
@@ -131,10 +132,12 @@ public class MoveJoints : MonoBehaviour {
 		// Fixer la position du squelette.
 		FixerSquelette ();
 
+		bool IsReliable = player.IsSkeletonReliable ();
+
 		// Appliquer les positions aux articulations.
 		for(int i = 0; i < jointsCount; i++) {
 
-			if (joints[i] == null)  // TODO: Pourquoi ca arriverait?
+			if (joints[i] == null)  // TODO: Pourquoi ca arriverait? Aucune idée honnetement
 				continue;
 
 			if(i == (int)Skeleton.Joint.Head) {
@@ -164,7 +167,7 @@ public class MoveJoints : MonoBehaviour {
 					joints[i].transform.position = current_positions[i];
 				}
 
-				if (current_positions[i] == HIDING_POS) {
+				if (current_positions[i] == HIDING_POS || !IsReliable) {
 					joints[i].renderer.enabled = false;
 				} else {
 					joints[i].renderer.enabled = true;
