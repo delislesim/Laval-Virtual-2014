@@ -21,8 +21,11 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 	public enum Chanson
 	{
 		LONELY_BOY,
-		TNT,
-		BOUBOU
+		TNT
+	}
+
+	public void SetGuitarPlayer(GuitarPlayer guitarPlayer) {
+		this.guitarPlayer = guitarPlayer;
 	}
 
 	public GuitarPlayer.Tone getCurrentTone(){
@@ -49,14 +52,12 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 		case Chanson.LONELY_BOY:
 			nomFichier = fichierLonelyBoy;
 			clip = clipLonelyBoy;
+			guitarPlayer.SetPitch(0);
 			break;
 		case Chanson.TNT:
 			nomFichier = fichierTNT;
 			clip = clipTNT;
-			break;
-		case Chanson.BOUBOU:
-			nomFichier = fichierBoubou;
-			clip = clipBoubou;
+			guitarPlayer.SetPitch(-1);
 			break;
 		default:
 			return;
@@ -105,11 +106,9 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 		// Temps actuel, en secondes.
 		//Set le tone et style de la note a jouer
 		tempsEcoule = tempsEcoule + Time.deltaTime;
-		//Debug.Log("Temps ecoulé : " + tempsEcoule);
-		if(currentPartitionIndex < partition.Count-1){
-			if (tempsEcoule >= partition[currentPartitionIndex+1].time)
-			{
-				//tempsNotes = tempsNotes + partition[currentPartitionIndex+1].time;
+
+		if(currentPartitionIndex < partition.Count-1) {
+			if (tempsEcoule >= partition[currentPartitionIndex+1].time) {
 				currentPartitionIndex ++;
 				currentTone = partition[currentPartitionIndex].note;
 				currentStyle = partition[currentPartitionIndex].style;
@@ -125,6 +124,11 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 
 		// Faire avancer les cubes.
 		cubesTombants.AssignerTempsCourant (tempsEcoule);
+
+		// Reinitialiser le pitch a la fin du mode assiste.
+		if (!EstActive ()) {
+			guitarPlayer.SetPitch (0);		
+		}
 	}
 	
 	private PartitionGuitar partitionMaker;
@@ -138,4 +142,7 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 
 	private GuitarPlayer.Tone currentTone;
 	private GuitarPlayer.Style currentStyle;
+
+	// Guitar player.
+	private GuitarPlayer guitarPlayer;
 }

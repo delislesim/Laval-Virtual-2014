@@ -197,10 +197,6 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 				assistedModeController.StartSong(AssistedModeControllerGuitar.Chanson.TNT);
 				CameraController.ObtenirInstance().ForcerFieldOfView(CameraController.kFovGuitare);
 				break;
-			case 4:
-				assistedModeController.StartSong(AssistedModeControllerGuitar.Chanson.BOUBOU);
-				CameraController.ObtenirInstance().ForcerFieldOfView(CameraController.kFovGuitare);
-				break;
 			}
 			
 			if (boutonPresse != -1) {
