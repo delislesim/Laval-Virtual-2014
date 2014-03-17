@@ -121,13 +121,12 @@ public class DrumAssistedController : MonoBehaviour {
 		track1Needed = getClosestDrumComponent(tipLeft, out closestFromLeft);
 		track2Needed = getClosestDrumComponent(tipRight, out closestFromRight);
 
+		bool OnSameComponent = closestFromLeft = closestFromRight;
 		//No need of 2 tracks if we're hitting the same component with both tips
-		//track2Needed = !(track1Needed && (closestFromLeft == closestFromRight));
+		track2Needed = (track2Needed && (!OnSameComponent));
 
 		int idxCoups;
 		int idxProb;
-
-
 
 		if(track1Needed)
 		{
