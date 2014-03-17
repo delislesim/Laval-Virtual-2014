@@ -34,7 +34,7 @@ public class TutorialDrum {
 	public void Demarrer() {
 		tutorial.Demarrer (GuidageTutorial.Position.HAUT);
 	}
-	
+
 	public bool EstComplete() {
 		return tutorial.EstComplete ();
 	}

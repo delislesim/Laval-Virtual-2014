@@ -71,12 +71,6 @@ public class MenuAssisteController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		// Verifier s'il y a un choix d'instrument actif.
-		Pointeur pointeur = Pointeur.obtenirInstance ();
-		int targetid = pointeur.GetCurrentTargetId ();
-		if (targetid != -1) {
-			// Verifier quel element du menu a ete choisi.
-		}
 	}
 	
 	void OnEnable () {
@@ -88,10 +82,10 @@ public class MenuAssisteController : MonoBehaviour {
 			pointeur.AddTarget (0, new Vector2 (0, 0.1f), new Vector2 (0.35f, 0.5f));
 
 		if (!boutons[1].GetComponent<BoutonMusique> ().EstDesactive())
-			pointeur.AddTarget (1, new Vector2 (0.9f, -0.4f), new Vector2 (0.35f, 0.35f));
-
+			pointeur.AddTarget (1, new Vector2 (1.35f, -0.4f), new Vector2 (0.5f, 0.35f));
+		
 		if (!boutons[2].GetComponent<BoutonMusique> ().EstDesactive())
-			pointeur.AddTarget (2, new Vector2 (1.8f, -0.4f), new Vector2 (0.35f, 0.35f));
+			pointeur.AddTarget (2, new Vector2 (1.35f, -0.4f), new Vector2 (0.5f, 0.35f));
 
 		if (!boutons[3].GetComponent<BoutonMusique> ().EstDesactive())
 			pointeur.AddTarget (3, new Vector2 (0.9f,  0.5f), new Vector2 (0.35f, 0.35f));
