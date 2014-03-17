@@ -55,6 +55,7 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 		estEnTrainDeQuitter = true;
 
 		MenuAssisteController.ObtenirInstance ().Cacher ();
+		Tutorial.ObtenirInstance ().gameObject.SetActive (false);
 	}
 
 	public void Update() {
@@ -261,8 +262,6 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 		// Faire le switch de guitare au cas ou il n'a pas deja ete fait.
 		guitareWrapper.SetActive (false);
 		guitareDecorative.SetActive (true);
-
-		Tutorial.ObtenirInstance ().gameObject.SetActive (false);
 	}
 
 	// Tutorial.
