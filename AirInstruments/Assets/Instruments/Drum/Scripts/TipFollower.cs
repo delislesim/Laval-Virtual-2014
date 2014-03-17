@@ -5,13 +5,14 @@ public class TipFollower : MonoBehaviour {
 
 	// Objet que le tip doit suivre.
 	public GameObject objectToFollow;
+	private bool isAssisted;
 
 	// Use this for initialization
 	void Start () {
 		// Calculer le rayon du tip.
 		Vector3 worldScale = VectorConversions.CalculerWorldScale (transform);
 		rayon = worldScale.x / 2.0f;
-
+		isAssisted = true;
 		// Layer des colliders de drum components.
 		drumComponentLayer = 1 << LayerMask.NameToLayer ("DrumComponent");
 	}
@@ -51,8 +52,11 @@ public class TipFollower : MonoBehaviour {
 				distanceReelle = 0;
 
 			if (componentInterface != dernierDrumComponent && distanceReelle < kDistancePourJouer) {
-				// Jouer le son.
-				componentInterface.PlaySound();
+
+				if(!isAssisted){
+					// Jouer le son.
+					componentInterface.PlaySound();
+				}
 				//On enregistre le coup
 				componentInterface.AjouterCoupAuTemps();
 

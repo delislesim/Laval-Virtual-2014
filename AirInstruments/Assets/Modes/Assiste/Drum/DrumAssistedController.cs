@@ -33,7 +33,7 @@ public class DrumAssistedController : MonoBehaviour {
 	private float S_DELAY;
 	private float CHOICE_DELAY = 0.3f;
 	private bool trackBplaying;
-	private bool trackAplaying;
+	//private bool trackAplaying;
 	private bool track2Needed;
 	private bool track1Needed;
 	private float SAMPLE_TIME;
@@ -46,14 +46,14 @@ public class DrumAssistedController : MonoBehaviour {
 		baseRythmA.clip = (AudioClip)Resources.Load("DrumTracks/BaseRythm");
 		baseRythmB.clip = (AudioClip)Resources.Load("DrumTracks/BaseRythm");
 
-		track1_A.clip = TracksCollection[DrumComponentObjects[(int)DrumComponentIndexes.BIGTOM]][3][0];
-		track1_B.clip = TracksCollection[DrumComponentObjects[(int)DrumComponentIndexes.BIGTOM]][3][0];
+		track1_A.clip = TracksCollection[DrumComponentObjects[(int)DrumComponentIndexes.HIHAT]][0][0];
+		track1_B.clip = TracksCollection[DrumComponentObjects[(int)DrumComponentIndexes.HIHAT]][0][0];
 
 		track2_A.clip = TracksCollection[DrumComponentObjects[(int)DrumComponentIndexes.SNARE]][0][0];
 		track2_B.clip = TracksCollection[DrumComponentObjects[(int)DrumComponentIndexes.SNARE]][0][0];
 
 		trackBplaying = false;
-		trackAplaying = true;
+//		trackAplaying = true;
 		track1Needed = false;
 		track2Needed = false;
 		choiceNeeded = true;
@@ -330,8 +330,8 @@ public class DrumAssistedController : MonoBehaviour {
 		ComponentList.Clear();
 
 		//HI HAT
-		ProbLists[0].Add ((AudioClip)Resources.Load("DrumTracks/HiHat/1a_c"));
-		ProbLists[0].Add ((AudioClip)Resources.Load("DrumTracks/HiHat/1a_o"));
+		//ProbLists[0].Add ((AudioClip)Resources.Load("DrumTracks/HiHat/1a_c"));
+		//ProbLists[0].Add ((AudioClip)Resources.Load("DrumTracks/HiHat/1a_o"));
 		ProbLists[0].Add ((AudioClip)Resources.Load("DrumTracks/HiHat/1b_c"));
 		ProbLists[0].Add ((AudioClip)Resources.Load("DrumTracks/HiHat/1b_o"));
 		ProbLists[1].Add ((AudioClip)Resources.Load("DrumTracks/HiHat/2a"));
