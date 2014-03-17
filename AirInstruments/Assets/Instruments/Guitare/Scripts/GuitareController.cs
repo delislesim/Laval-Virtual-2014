@@ -53,6 +53,8 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 		tempsPreparation = -4.0f;
 		aFaitSwitch = false;
 		estEnTrainDeQuitter = true;
+
+		MenuAssisteController.ObtenirInstance ().Cacher ();
 	}
 
 	public void Update() {
@@ -131,9 +133,9 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 			// Mettre le texte dans les boutons du mode assiste.
 			menuAssiste.AssignerTexte(0, "Retour aux", "instruments");
 			menuAssiste.AssignerTexte(1, "Mode", "libre");
-			menuAssiste.AssignerTexte(2, "Lonely", "Boy");
-			menuAssiste.AssignerTexte(3, "TNT", "");
-			menuAssiste.AssignerTexte(4, "Boubou", "the Boubou");
+			menuAssiste.DesactiverBouton (2);
+			menuAssiste.AssignerTexte(3, "Lonely", "Boy");
+			menuAssiste.AssignerTexte(4, "TNT", "");
 
 			// Desactiver le son de la guitare.
 			// TODO
@@ -231,7 +233,6 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 			if (boutonPresse != -1) {
 				// Retablir le zoom.
 				CameraController.ObtenirInstance().ForcerFieldOfView(CameraController.kFovGuitare);
-				Debug.Log ("cacher");
 				// Fermer le menu du mode assiste.
 				MenuAssisteController.ObtenirInstance ().Cacher();
 				menuChoixGammeActif = false;
@@ -260,6 +261,8 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 		// Faire le switch de guitare au cas ou il n'a pas deja ete fait.
 		guitareWrapper.SetActive (false);
 		guitareDecorative.SetActive (true);
+
+		Tutorial.ObtenirInstance ().gameObject.SetActive (false);
 	}
 
 	// Tutorial.

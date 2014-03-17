@@ -33,6 +33,9 @@ public class BoutonMusique : MonoBehaviour {
 
 	// Masquer le bouton avec une animation.
 	public void Cacher() {
+		if (!gameObject.activeSelf)
+			return;
+
 		tempsAfficher = kTempsInvalide;
 		tempsCacher = (float)random.NextDouble () * kTempsCommencerAnimationmax;
 		timer = 0;

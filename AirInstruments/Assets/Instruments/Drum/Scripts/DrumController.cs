@@ -79,6 +79,7 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 	void OnDisable () {
 		dude.gameObject.SetActive (false);
 		assistedcontroller.gameObject.SetActive(false);
+		Tutorial.ObtenirInstance ().gameObject.SetActive (false);
 	}
 	
 	// Methode appelee a chaque frame quand le drum est l'instrument courant.
