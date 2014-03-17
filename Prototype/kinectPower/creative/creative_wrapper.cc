@@ -23,7 +23,7 @@ void CreativeWrapper::Initialize() {
   // Initialiser le SDK de la caméra creative.
   if (!tracker_.Init()) {
     // TODO(fdoray)
-    assert(false);
+    return;
   }
 
   tracker_.SetHandMeasurements(kHandWidth, kHandLength);
@@ -33,6 +33,9 @@ void CreativeWrapper::Initialize() {
 }
 
 void CreativeWrapper::UpdateJoints() {
+  if (!initialized_)
+    return;
+
   tracker_.Update();
 
   for (size_t i = 0; i < joints_.size(); ++i) {
@@ -46,6 +49,9 @@ void CreativeWrapper::UpdateJoints() {
 }
 
 void CreativeWrapper::SetHandMeasurements(float width, float height) {
+  if (!initialized_)
+    return;
+
   tracker_.SetHandMeasurements(width, height);
 }
 

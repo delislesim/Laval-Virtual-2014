@@ -22,6 +22,9 @@ class CreativeWrapper {
   void UpdateJoints();
 
   void QueryJoints(JointInfo* joints) {
+    if (!initialized_)
+      return;
+
     memcpy_s(joints, GetNumJoints() * sizeof(JointInfo), &joints_[0], joints_.size() * sizeof(JointInfo));
   }
 
