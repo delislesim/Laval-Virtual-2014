@@ -89,9 +89,9 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 		menuAssiste.transform.localScale = new Vector3(0.32f, 0.32f, 0.32f);
 		
 		// Mettre le texte dans les boutons du mode assiste.
+		menuAssiste.DesactiverTousBoutons ();
 		menuAssiste.AssignerTexte(0, "Retour aux", "instruments");
 		menuAssiste.AssignerTexte(1, "Mode", "libre");
-		menuAssiste.DesactiverBouton (2);
 		menuAssiste.AssignerTexte(3, "Für", "Elise");
 		menuAssiste.AssignerTexte(4, "Comptine", "d'été");
 		
@@ -103,6 +103,13 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 		
 		// Se rappeler que le menu est active.
 		menuActif = true;
+	}
+
+	// Calcule les moyennes des hauteurs des coups
+	// pour permettre de calibrer le snap ultérieurement.
+	private void CalculerMoyennes()
+	{
+
 	}
 
 	// Gere les choix de l'utilisateur dans le menu assiste. Retourne

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -15,6 +16,22 @@ public class IntelHandController : MonoBehaviour {
 
 	// Fleches de guidage.
 	public List<PianoArrow> flechesGuidage;
+
+	// Variables pour détecter si un snap est nécessaire
+	private Vector3[] positionPrecedenteDoigts = new Vector3[(int)KinectPowerInterop.HandJointIndex.NUM_JOINTS*2];
+	private const float timeDownMove = 0.15f;
+	private const float timeoutDownMove = 0.05f;
+	private float currentTimeDownMove = 0.0f;
+	private const float vitesseMinimale = -5.6f;
+	private List<DownMoveInfo> downMoveList = new List<DownMoveInfo>();
+
+	private struct DownMoveInfo
+	{
+		public float elapsedTime;
+		public KinectPowerInterop.HandJointIndex index;
+		public float hauteurInitiale;
+		public float elapsedTimeout;
+	}
 
 	// Liste des boules rouges affichées dans la scene.
 	private List<GameObject> spheres = new List<GameObject>();
@@ -89,6 +106,69 @@ public class IntelHandController : MonoBehaviour {
 		}
 	}
 
+	private void DetecterVitesse()
+	{
+		int i = 0;
+		Vector3[] vectVitesse = new Vector3[(int)KinectPowerInterop.HandJointIndex.NUM_JOINTS * 2];
+		foreach(Vector3 pos in positionPrecedenteDoigts)
+		{
+			if(pos != new Vector3(0,0,0))
+			{
+				// Calculer la vitesse magnifique++
+				vectVitesse[i] = (pos - TransformerPositionDoigt (hand_joints[i]))/Time.deltaTime;
+				positionPrecedenteDoigts[i] = TransformerPositionDoigt (hand_joints[i]);
+
+				/*if(i == (int)KinectPowerInterop.HandJointIndex.INDEX_TIP)
+					Debug.Log (vectVitesse[i] + "\n");*/
+			}
+			else
+				positionPrecedenteDoigts[i] = TransformerPositionDoigt (hand_joints[i]);
+			++i;
+		}
+
+		// Trouver les tip admissible a droite et a gauche
+		List<KinectPowerInterop.HandJointIndex> vitesseAdmissible = new List<KinectPowerInterop.HandJointIndex> ();
+
+		for(int j = (int)KinectPowerInterop.HandJointIndex.PINKY_TIP; j <= (int)KinectPowerInterop.HandJointIndex.THUMB_TIP; j += 3)
+		{
+			if(vectVitesse[j].y <= vitesseMinimale)
+			{
+				if(downMoveList.Exists (x => x.index == (KinectPowerInterop.HandJointIndex) j))
+				{
+					DownMoveInfo curDownMove = downMoveList.Find (x => x.index == (KinectPowerInterop.HandJointIndex) j);
+					curDownMove.elapsedTime += Time.deltaTime;
+				}
+				else
+				{
+					DownMoveInfo newDownMove = new DownMoveInfo();
+					newDownMove.index = (KinectPowerInterop.HandJointIndex) j;
+					newDownMove.hauteurInitiale = hand_joints[j].y;
+					newDownMove.elapsedTime = 0.0f;
+					downMoveList.Add (newDownMove);
+				}
+			}
+
+			else
+			{
+				if(downMoveList.Exists (x => x.index == (KinectPowerInterop.HandJointIndex) j))
+				{
+					DownMoveInfo curDownMove = downMoveList.Find (x => x.index == (KinectPowerInterop.HandJointIndex) j);
+					curDownMove.elapsedTimeout += Time.deltaTime;
+					if(curDownMove.elapsedTime >= timeoutDownMove)
+					{
+						downMoveList.Remove(curDownMove);
+					}
+				}
+			}
+		}
+
+		foreach(KinectPowerInterop.HandJointIndex index in vitesseAdmissible)
+		{
+			Debug.Log (index + "\n");
+		}
+		
+	}
+
 	public Vector3 TransformerPositionDoigt(KinectPowerInterop.HandJointInfo handJointInfo) {
 		// Mettre a jour l'autre overload en meme temps!
 		return new Vector3(-handJointInfo.x * 45,
@@ -116,6 +196,8 @@ public class IntelHandController : MonoBehaviour {
 
 		// Mettre a jour la position des boules rouge en fonction des donnees de la caméra Creative.
 		KinectPowerInterop.GetHandsSkeletons (hand_joints);
+
+		DetecterVitesse ();
 
 		// Calculer les ajustements de hauteur.
 		float[] ajustementsHauteur = CalculerAjustementsHauteur ();

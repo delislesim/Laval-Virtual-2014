@@ -141,12 +141,16 @@ public class GuitarPlayer : MonoBehaviour {
 		audio.Play();
 	}
 
+	public void SetPitch(int pitch) {
+		audio.pitch = audio.pitch*Mathf.Pow(1.05946f,-1);
+	}
+
 	// Use this for initialization
 	void Start () {
 		dummy_counter = 0;
+		AssistedCtrl.SetGuitarPlayer (this);
 		HighVelocityPlayableNotes = new List<List<AudioClip>>();
 		SetScaleModeAndTone(Mode.BLUES, Tone.E);
-		audio.pitch = audio.pitch*Mathf.Pow(1.05946f,-1);
 	}
 	
 	// Update is called once per frame
