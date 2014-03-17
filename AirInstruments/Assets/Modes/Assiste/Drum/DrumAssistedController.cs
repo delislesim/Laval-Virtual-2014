@@ -115,8 +115,8 @@ public class DrumAssistedController : MonoBehaviour {
 
 	void MakeTrackChoices()
 	{
-		GameObject closestFromLeft = new GameObject();
-		GameObject closestFromRight = new GameObject();
+		GameObject closestFromLeft;
+		GameObject closestFromRight;
 
 		track1Needed = getClosestDrumComponent(tipLeft, out closestFromLeft);
 		track2Needed = getClosestDrumComponent(tipRight, out closestFromRight);

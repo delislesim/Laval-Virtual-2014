@@ -28,7 +28,7 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 
 	public void PrepareToStop() {
 		spotlightPiano.SetTargetIntensity (kSpotlightIntensityDefault, 1.0f);
-
+		assistedModeController.Cacher ();
 		MenuAssisteController.ObtenirInstance ().Cacher ();
 	}
 
@@ -50,13 +50,6 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 	// Methode appelee quand l'instrument "piano" n'est plus choisi.
 	void OnDisable () {
 		pianoWrapper.SetActive (false);
-
-		// Desactiver le menu du mode assiste.
-		MenuAssisteController menuAssiste = MenuAssisteController.ObtenirInstance();
-		if (menuAssiste != null)
-			menuAssiste.gameObject.SetActive (false);
-		menuActif = false;
-
 		Tutorial.ObtenirInstance ().gameObject.SetActive (false);
 	}
 
@@ -101,7 +94,6 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 		menuAssiste.DesactiverBouton (2);
 		menuAssiste.AssignerTexte(3, "Für", "Elise");
 		menuAssiste.AssignerTexte(4, "Comptine", "d'été");
-		//menuAssiste.AssignerTexte(4, "Boubou", "the Boubou");
 		
 		// Desactive le piano.
 		pianoWrapper.SetActive (false);
