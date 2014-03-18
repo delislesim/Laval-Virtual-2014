@@ -5,6 +5,7 @@ public class TutorialGuitare {
 	
 	public TutorialGuitare(AudioClip sonLeverBras,
 	                       AudioClip sonCordes,
+	                       AudioClip sonChangerNote,
 	                       AudioClip sonAssiste,
 	                       HandFollower handFollower,
 	                       AssistedModeControllerGuitar assistedModeController) {
@@ -14,6 +15,7 @@ public class TutorialGuitare {
 		tutorial.ReinitialiserEtapes ();
 		tutorial.AjouterEtape (new GuitareEtapeLeverBras (sonLeverBras));
 		tutorial.AjouterEtape (new GuitareEtapeCordes (sonCordes, handFollower));
+		tutorial.AjouterEtape (new GuitareEtapeChangerNote (sonChangerNote, handFollower));
 		tutorial.AjouterEtape (new GuitareEtapeAssiste (sonAssiste, assistedModeController));
 	}
 	

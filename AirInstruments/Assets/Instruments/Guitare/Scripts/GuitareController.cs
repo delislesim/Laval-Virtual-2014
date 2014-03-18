@@ -39,6 +39,7 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 	// Sons du tutorial.
 	public AudioClip sonLeverBras;
 	public AudioClip sonCordes;
+	public AudioClip sonChangerNote;
 	public AudioClip sonAssiste;
 
 	public void Prepare() {
@@ -252,6 +253,7 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 		// Demarrer le tutorial.
 		tutorial = new TutorialGuitare (sonLeverBras,
 		                                sonCordes,
+		                                sonChangerNote,
 		                                sonAssiste,
 		                                handFollower,
 		                                assistedModeController);

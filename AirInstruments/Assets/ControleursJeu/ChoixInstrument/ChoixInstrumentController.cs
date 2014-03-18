@@ -18,6 +18,9 @@ public class ChoixInstrumentController : MonoBehaviour {
 	// Appele avant d'entrer dans le mode de choix d'instrument.
 	public void Prepare() {
 		KinectPowerInterop.SetKinectAngle (15);
+
+		// Allumer les spots multicolores.
+		SpolightFou.SetActive (true);
 	}
 
 	public void PrepareToStop() {
@@ -123,6 +126,9 @@ public class ChoixInstrumentController : MonoBehaviour {
 		// Activer le pointeur.
 		pointeur.gameObject.SetActive (true);
 		*/
+
+		// Jouer la voix donnant les instructions.
+		audio.Play ();
 
 		// Ajouter les gestes.
 		GestureRecognition gestureRecognition = GestureRecognition.ObtenirInstance ();

@@ -24,6 +24,9 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 	public void Prepare() {
 		KinectPowerInterop.SetKinectAngle (15);
 		spotlightPiano.SetTargetIntensity (kSpotlightIntensityPlaying, 1.0f);
+
+		// Fermer les spots multicolores.
+		SpolightFou.SetActive (false);
 	}
 
 	public void PrepareToStop() {
