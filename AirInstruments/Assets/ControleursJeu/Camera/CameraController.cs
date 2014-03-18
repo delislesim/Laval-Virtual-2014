@@ -16,14 +16,17 @@ public class CameraController : MonoBehaviour {
 
 	// Update is called once per frame.
 	void Update () {
+		timerAnimation += Time.deltaTime;
+
 		// Ajustements du zoom.
 		float mainCameraFieldOfView = mainCamera.fieldOfView;
 		if (mainCamera.fieldOfView != targetFieldOfView) {
 			// Accelerer la vitesse du zoom.
-			if (vitesseFovActuelle < kFieldOfViewSpeed) {
+			if (vitesseFovActuelle < kFieldOfViewSpeed && (estAnimationDrum || timerAnimation > kTempsAvantFov)) {
+				float fovSpeed = estAnimationDrum ? kFieldOfViewSpeedDrum : kFieldOfViewSpeed;
 				vitesseFovActuelle += kAccelerationFov * Time.deltaTime;
-				if (vitesseFovActuelle > kFieldOfViewSpeed)
-					vitesseFovActuelle = kFieldOfViewSpeed;
+				if (vitesseFovActuelle > fovSpeed)
+					vitesseFovActuelle = fovSpeed;
 			}
 
 			// Changer le zoom.
@@ -60,12 +63,15 @@ public class CameraController : MonoBehaviour {
 	// Deplace la camera entre les etats specifies.
 	public void AccederEtat (GameState.State from, GameState.State to) {
 		ajusterRotation = false;
+		timerAnimation = 0;
 
 		// Remettre la caméra dans le monde global.
 		ReprendreCamera ();
 
 		rotationSpeed = kRotationSpeedDefault;
 		quittePiano = false;
+
+		estAnimationDrum = false;
 
 		// Aller de unknown (au debut) vers le menu de choix d'instrument.
 		if (from == GameState.State.Unknown &&
@@ -80,6 +86,7 @@ public class CameraController : MonoBehaviour {
 			iTweenEvent.GetEvent(mainCamera.gameObject, "trajectoireVersDrum").Play();
 			targetRotation = Quaternion.Euler(kAngleDrum);
 			targetFieldOfView = kFovDrum;
+			estAnimationDrum = true;
 		}
 		// Aller vers le piano.
 		else if (from == GameState.State.ChooseInstrument &&
@@ -101,6 +108,7 @@ public class CameraController : MonoBehaviour {
 			iTweenEvent.GetEvent(mainCamera.gameObject, "trajectoireQuitterDrum").Play();
 			targetRotation = Quaternion.Euler(kAngleChooseInstrument);
 			targetFieldOfView = kFovChoixInstrument;
+			estAnimationDrum = true;
 		}
 		// Quitter le piano.
 		else if (to == GameState.State.ChooseInstrument &&
@@ -136,9 +144,18 @@ public class CameraController : MonoBehaviour {
 	// Instance unique du controleur de camera.
 	private static CameraController instance;
 
+	// Indique si l'animation est pour le drum.
+	private bool estAnimationDrum = false;
+
 	// Indique si on doit ajuster la rotation de la caméra. On n'ajuste pas
 	// la rotation pendant les animations.
 	private bool ajusterRotation = false;
+
+	// Timer pour animations.
+	private float timerAnimation = 0;
+
+	// Temps a partir duquel ajuster le FOV.
+	private const float kTempsAvantFov = 1.5f;
 
 	// Field of view que la caméra doit atteindre.
 	private float targetFieldOfView;
@@ -150,7 +167,7 @@ public class CameraController : MonoBehaviour {
 	private float vitesseFovActuelle = 0;
 
 	// FOV du menu de choix d'instrument.
-	private const float kFovChoixInstrument = 35.3f;
+	private const float kFovChoixInstrument = 55f;
 
 	// Angle de la caméra lors du menu de choix d'instrument.
 	private Vector3 kAngleChooseInstrument = new Vector3 (15f, 0, 0);
@@ -182,11 +199,14 @@ public class CameraController : MonoBehaviour {
 	// Vitesse de rotation pour cette trajectoire.
 	private float rotationSpeed = 0;
 
+	// Vitesse de changement du field of view pour le drum, en unités par deltaTime.
+	private const float kFieldOfViewSpeedDrum = 5.0f;
+
 	// Vitesse de changement du field of view, en unités par deltaTime.
-	private const float kFieldOfViewSpeed = 10.0f;
+	private const float kFieldOfViewSpeed = 8.0f;
 
 	// Acceleration pour changer FOV.
-	private const float kAccelerationFov = 6.0f;
+	private const float kAccelerationFov = 20.0f;
 
 	// Vitesse de rotation par defaut.
 	private const float kRotationSpeedDefault = 5f;
