@@ -85,6 +85,11 @@ public class MoveJointsForGuitar : MonoBehaviour {
 		// Se "connecter" au squelette 0.
 		m_player_one = new Skeleton(0);
 	}
+
+	void OnEnable () {
+		kalmanMainGauche = new Kalman (15.0f);
+		kalmanMainDroite = new Kalman (15.0f);
+	}
 	
 	// Update is called once per frame
 	void Update () {
@@ -131,10 +136,38 @@ public class MoveJointsForGuitar : MonoBehaviour {
 
 			if(joints[i] != null)
 			{
-				Vector3 posJoint = Vector3.zero;
+				Vector3 posJoint;
 				Skeleton.JointStatus jointStatus = player.GetJointPosition((Skeleton.Joint)i, out posJoint);
 				if(jointStatus != Skeleton.JointStatus.NotTracked && isReliable)
 				{
+					/*
+					// Ajustement de la position des mains -> c'est seulement un prolongement des bras.
+					if (i == (int)Skeleton.Joint.HandLeft) {
+						Vector3 positionCoude;
+						player.GetJointPosition(Skeleton.Joint.ElbowLeft, out positionCoude);
+						Vector3 positionPoignet;
+						player.GetJointPosition(Skeleton.Joint.WristLeft, out positionPoignet);
+						posJoint = PositionMainAjustee(positionCoude, positionPoignet);
+					} else if (i == (int)Skeleton.Joint.HandRight) {
+						Vector3 positionCoude;
+						player.GetJointPosition(Skeleton.Joint.ElbowRight, out positionCoude);
+						Vector3 positionPoignet;
+						player.GetJointPosition(Skeleton.Joint.WristRight, out positionPoignet);
+						posJoint = PositionMainAjustee(positionCoude, positionPoignet);
+					}
+					*/
+
+					// Appliquer un filtre de Kalman au mains.
+					if (i == (int)Skeleton.Joint.HandLeft) {
+						Vector3 positionPoignet;
+						player.GetJointPosition(Skeleton.Joint.WristLeft, out positionPoignet);
+						posJoint = AppliquerKalmanMain(kalmanMainGauche, positionPoignet, posJoint);
+					} else if (i == (int)Skeleton.Joint.HandRight) {
+						Vector3 positionPoignet;
+						player.GetJointPosition(Skeleton.Joint.WristRight, out positionPoignet);
+						posJoint = AppliquerKalmanMain(kalmanMainDroite, positionPoignet, posJoint);
+					}
+
 					//POSITIONS
 					joints[i].transform.position = 
 						new Vector3(posJoint.x*PLAYER_HIGHT, posJoint.y*PLAYER_HIGHT+2.5f, -posJoint.z*PLAYER_HIGHT)
@@ -169,6 +202,21 @@ public class MoveJointsForGuitar : MonoBehaviour {
 
 		//Predict sounds?
 		manageMouvementsAndSounds(current_positions, last_positions);
+	}
+
+	// Retourne une position ajustee pour la main.
+	Vector3 PositionMainAjustee(Vector3 positionCoude, Vector3 positionPoignet) {
+		if (positionCoude == positionPoignet)
+			return positionPoignet;
+
+		Vector3 avantBras = positionPoignet - positionCoude;
+		return positionPoignet + avantBras.normalized * kLongueurPoignetMain;
+	}
+
+	Vector3 AppliquerKalmanMain(Kalman kalman, Vector3 posPoignet, Vector3 posMain) {
+		Vector3 posRelative = posMain - posPoignet;
+		Vector4 newPosRelative = kalman.Update(new Vector4(posRelative.x, posRelative.y, posRelative.z, 0));
+		return posPoignet + new Vector3(newPosRelative.x, newPosRelative.y, newPosRelative.z);
 	}
 
 	void manageMouvementsAndSounds(Vector3[] currentPos, Vector3[] pastPos)
@@ -210,5 +258,13 @@ public class MoveJointsForGuitar : MonoBehaviour {
 	// Sert a ne pas etre au meme endroit que le drummer.
 	private Vector3 kDeplacementJoueur = new Vector3(13.25f, 0, 0);
 
+	// Longueur entre le poignet et la main.
+	private const float kLongueurPoignetMain = 0.1f;
+
+	// Kalman pour la main gauche (position relative au poignet).
+	private Kalman kalmanMainGauche;
+
+	// Kalman pour la main droite (position relative au poignet).
+	private Kalman kalmanMainDroite;
 
 }
