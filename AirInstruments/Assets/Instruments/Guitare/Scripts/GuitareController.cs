@@ -238,6 +238,14 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 
 	// Methode appelee quand l'instrument "guitare" est choisi.
 	void OnEnable() {
+		// Reinitialiser tous les bools.
+		tutorialActif = false;
+		aFaitSwitch = false;
+		joueurVisible = false;
+		estEnTrainDeQuitter = false;
+		menuModeAssisteActif = false;
+		doitAfficherChoixGamme = false;
+		menuChoixGammeActif = false;
 	}
 
 	public void AnimationTerminee() {
@@ -259,16 +267,12 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 
 		// Reinitialiser le mode assiste.
 		assistedModeController.StopSong ();
+	}
 
-		// Reinitialiser tous les bools.
-		tutorialActif = false;
-		aFaitSwitch = false;
-		joueurVisible = false;
-		estEnTrainDeQuitter = false;
-		menuModeAssisteActif = false;
-		doitAfficherChoixGamme = false;
-		menuChoixGammeActif = false;
-
+	// Indique si le joueur est visible, c'est a dire que le switch
+	// de guitare a ete fait.
+	public static bool JoueurEstVisible() {
+		return joueurVisible && !menuModeAssisteActif && !menuChoixGammeActif;
 	}
 
 	// Tutorial.
@@ -284,18 +288,18 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 	private bool aFaitSwitch = false;
 
 	// Indique si le joueur de guitare est visible.
-	private bool joueurVisible = false;
+	private static bool joueurVisible = false;
 
 	// Indique si on est en train de quitter la scene.
 	private bool estEnTrainDeQuitter = false;
 
 	// Indique si le menu du mode assiste est affiche.
-	private bool menuModeAssisteActif = false;
+	private static bool menuModeAssisteActif = false;
 
 	// Indique si on doit afficher le menu de choix de gamme.
 	private bool doitAfficherChoixGamme = false;
 
 	// Indique si le menu de choix de gamme est affiche.
-	private bool menuChoixGammeActif = false;
+	private static bool menuChoixGammeActif = false;
 
 }

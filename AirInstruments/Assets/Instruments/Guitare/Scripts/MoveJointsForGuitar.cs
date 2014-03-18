@@ -25,9 +25,17 @@ public class MoveJointsForGuitar : MonoBehaviour {
 	public GameObject Ankle_Right;
 	public GameObject Foot_Right;
 
+	// Hand follower.
+	public HandFollower handFollower;
+
 	//public GuitarPlayer GuitPlayer;
-	public LineRenderer GuitarLine;
 	public Transform GuitarContainer;
+
+	// Guitare.
+	public GameObject guitare;
+
+	// Ligne verte sur la guitare.
+	public GameObject ligneVerte;
 
 	//Private
 	private Skeleton m_player_one;
@@ -37,16 +45,28 @@ public class MoveJointsForGuitar : MonoBehaviour {
 	private Quaternion[] current_rotations;
 	private Quaternion[] last_rotations;
 	private const float STRUMMING_HAND_SPEED = 2.0f;
-	private Vector3 HIDING_POS = new Vector3(0,-10,0);
+	private Vector3 HIDING_POS = new Vector3(100, 100, 100);
 	private const float PLAYER_HIGHT = 5.0f;
 	private const float DELTA_CHECK_TIME = 5.0f;
 	private float accumulated_time;
 	private const float DIST_MAX_KINECT = 10.0f; //2m
 	private const float DIST_MIN_KINECT = 2.0f; //dist min...
 
+	// Layer d'affichage prioritaire.
+	private int kLayerPrioritaire;
+
+	// Layer d'affichage prioritaire extra.
+	private int kLayerPrioritaireExtra;
+	
+	// Layer d'affichage par défaut.
+	private int kLayerDefault;
 
 	// Use this for initialization
 	void Start () {
+		kLayerPrioritaire = LayerMask.NameToLayer ("AffichagePrioritaireExtra");
+		kLayerPrioritaireExtra = LayerMask.NameToLayer ("AffichagePrioritaireExtra");
+		kLayerDefault = LayerMask.NameToLayer ("Default");
+
 		joints = new GameObject[(int)Skeleton.Joint.Count] {
 			Hip_Center, Spine, Shoulder_Center, Head,
 			Shoulder_Left, Elbow_Left, Wrist_Left, Hand_Left,
@@ -71,6 +91,16 @@ public class MoveJointsForGuitar : MonoBehaviour {
 		m_player_one.ReloadSkeleton ();
 		if (m_player_one.IsDifferent() && SkeletonIsTrackedAndValid(m_player_one)) {
 			moveJoints (m_player_one);
+			handFollower.SignalerNouvellePosition();
+		}
+
+		// Mettre le bon layer a la guitare et a sa ligne verte.
+		if (GuitareController.JoueurEstVisible ()) {
+			guitare.layer = kLayerPrioritaire;
+			ligneVerte.layer = kLayerPrioritaire;
+		} else {
+			guitare.layer = kLayerDefault;
+			ligneVerte.SetActive (false);
 		}
 	}
 
@@ -116,6 +146,14 @@ public class MoveJointsForGuitar : MonoBehaviour {
 						joints[i].transform.localRotation = player.GetFaceRotation();
 
 					joints[i].renderer.enabled = true;
+
+					// Mettre sur le bon layer.
+					if (GuitareController.JoueurEstVisible() && EstIndexBras(i)) {
+						joints[i].layer = kLayerPrioritaireExtra;
+					} else {
+						joints[i].layer = kLayerDefault;
+					}
+
 				}
 				//If not tracked, hide!
 				else {
@@ -152,6 +190,18 @@ public class MoveJointsForGuitar : MonoBehaviour {
 
 		Quaternion GuitarRotation = Quaternion.Euler (0, -AngleRotY-90, AngleRotZ);
 		GuitarContainer.rotation = GuitarRotation;
+	}
+
+	private bool EstIndexBras(int i) {
+		return i == (int)Skeleton.Joint.ElbowLeft ||
+				i == (int)Skeleton.Joint.ElbowRight ||
+				i == (int)Skeleton.Joint.ShoulderLeft ||
+				i == (int)Skeleton.Joint.ShoulderRight ||
+				i == (int)Skeleton.Joint.ShoulderCenter ||
+				i == (int)Skeleton.Joint.WristLeft ||
+				i == (int)Skeleton.Joint.WristRight ||
+				i == (int)Skeleton.Joint.HandLeft ||
+				i == (int)Skeleton.Joint.HandRight;
 	}
 
 	// --- Constantes ---

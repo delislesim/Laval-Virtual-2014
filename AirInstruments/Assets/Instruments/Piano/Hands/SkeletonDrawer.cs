@@ -7,6 +7,9 @@ public class SkeletonDrawer : MonoBehaviour {
 	// Prefab de cylindre.
 	public GameObject cylindrePrefab;
 
+	// Indique si on est la guitare.
+	public bool estGuitare;
+
 	// Joints
 	public List<GameObject> spine_spheres = new List<GameObject>();
 	public List<GameObject> left_arm_spheres = new List<GameObject>();
@@ -23,9 +26,17 @@ public class SkeletonDrawer : MonoBehaviour {
 	// Nombre de cylindre a créer par main.
 	private const int NB_CYLINDRES = 19;
 
+	// Layer d'affichage prioritaire.
+	private int kLayerPrioritaire;
+
+	// Layer d'affichage par défaut.
+	private int kLayerDefault;
 
 	// Use this for initialization
 	void Start () {
+		kLayerPrioritaire = LayerMask.NameToLayer ("AffichagePrioritaireExtra");
+		kLayerDefault = LayerMask.NameToLayer ("Default");
+
 		// Creer les cylindres.
 		for (int i = 0; i < NB_CYLINDRES; ++i) {
 			GameObject cylindre = (GameObject)Instantiate (cylindrePrefab);
@@ -74,6 +85,14 @@ public class SkeletonDrawer : MonoBehaviour {
 				handCylinder.DefinirExtremites (left_arm_spheres[i-1].transform.position,
 				                                left_arm_spheres[i].transform.position);
 				cylindres[boneIdx].SetActive(true);
+
+				if (estGuitare) {
+					if (GuitareController.JoueurEstVisible()) {
+						cylindres[boneIdx].layer = kLayerPrioritaire;
+					} else {
+						cylindres[boneIdx].layer = kLayerDefault;
+					}
+				}
 			} else {
 				cylindres[boneIdx].SetActive(false);
 			}
@@ -89,6 +108,14 @@ public class SkeletonDrawer : MonoBehaviour {
 				handCylinder.DefinirExtremites (right_arm_spheres[i-1].transform.position,
 				                                right_arm_spheres[i].transform.position);
 				cylindres[boneIdx].SetActive(true);
+
+				if (estGuitare) {
+					if (GuitareController.JoueurEstVisible()) {
+						cylindres[boneIdx].layer = kLayerPrioritaire;
+					} else {
+						cylindres[boneIdx].layer = kLayerDefault;
+					}
+				}
 			} else {
 				cylindres[boneIdx].SetActive(false);
 			}

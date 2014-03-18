@@ -72,9 +72,9 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 			return;
 		
 		// Afficher le menu.
-		if (!menuActif && !tutorialActif && (
+		if (!menuActif && (
 			Input.GetButtonDown ("MenuAssiste") ||
-		    GestureRecognition.ObtenirInstance().GetCurrentGesture() == GestureId.GESTURE_MENU)) {
+			(!tutorialActif && GestureRecognition.ObtenirInstance().GetCurrentGesture() == GestureId.GESTURE_MENU))) {
 			AfficherMenu();
 		} 
 	}

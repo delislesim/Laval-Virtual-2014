@@ -142,7 +142,7 @@ public class GuitarPlayer : MonoBehaviour {
 	}
 
 	public void SetPitch(int pitch) {
-		audio.pitch = audio.pitch*Mathf.Pow(1.05946f,-1);
+		audio.pitch = 1.0f * Mathf.Pow(1.05946f, pitch);
 	}
 
 	// Use this for initialization

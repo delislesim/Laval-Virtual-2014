@@ -11,6 +11,12 @@ public class HandFollower : MonoBehaviour {
 	// Lumiere verte indiquant quand les notes sont jouees.
 	public GameObject greenLight;
 
+	public void SignalerNouvellePosition() {
+		float distance = guitarCollider.DistanceToPoint(transform.position);
+		indexDernieresDistance = (indexDernieresDistance + 1) % dernieresDistances.Length;
+		dernieresDistances [indexDernieresDistance] = distance;
+	}
+
 	// Use this for initialization
 	void Start () {
 		// Calculer le rayon du tip.
@@ -59,14 +65,7 @@ public class HandFollower : MonoBehaviour {
 			dernierAuDessus = false;
 		}
 
-		// Inscrire les distance par rapport aux cordes.
-		compteurDistance += Time.deltaTime;
-		if (compteurDistance >= kTempsPourEcrireDistance) {
-			compteurDistance = compteurDistance % kTempsPourEcrireDistance;
-
-			indexDernieresDistance = (indexDernieresDistance + 1) % dernieresDistances.Length;
-			dernieresDistances [indexDernieresDistance] = Mathf.Abs(distance);
-		}
+		// Timers.
 		tempsDepuisDerniereNoteAutomatique += Time.deltaTime;
 
 		// Reduire le temps pour la prochaine note.
@@ -81,17 +80,14 @@ public class HandFollower : MonoBehaviour {
 			                     guitarPlayerLayer)) {
 				if (hitInfo.collider.gameObject.tag == "GuitarPlayer"){
 					if (AssistedModeControllerGuitar.EstActive() &&
-					    tempsProchaineNote < 0.15f) {
+					    tempsProchaineNote < 0.20f) {
 						// Ne pas jouer la note tout de suite.
 						aJoueBienDepuisDerniereFois = true;
-
-						Debug.Log("temps prochaine note: " + tempsProchaineNote);
 					} else {
 						if (tempsDepuisDerniereNoteAutomatique < kTempsRejouerApresAutomatique) {
 							tempsDepuisDerniereNoteAutomatique = 1000.0f;
 						} else {
 							PlayNote ();
-							Debug.Log("en trop");
 							aJoueMalDepuisDerniereFois = true;
 						}
 					}
@@ -138,23 +134,24 @@ public class HandFollower : MonoBehaviour {
 	public void JouerNoteMaintenant() {
 		// On accepte de jouer la note si la main est suffisamment pres
 		// des cordes et qu'elle se dirige vers celles-ci.
-		float vitesse = dernieresDistances [indexDernieresDistance] -
-			dernieresDistances [(indexDernieresDistance + 1) % dernieresDistances.Length];
+		float posPrecedente = dernieresDistances [(indexDernieresDistance + 1) % dernieresDistances.Length];
+		float posCourante = dernieresDistances [indexDernieresDistance];
+		float vitesse = posCourante - posPrecedente;
+		if (posCourante > 0) {
+			vitesse = -vitesse;
+		}
 
-		if ((dernieresDistances[indexDernieresDistance] < 1.0f && vitesse < -0.01f) ||
+		if ((Mathf.Abs(posCourante) < 1.0f && vitesse > 0.01f) ||
 		     aJoueBienDepuisDerniereFois) {
 			PlayNote();
 
 			if (!aJoueBienDepuisDerniereFois) {
 				tempsDepuisDerniereNoteAutomatique = 0;
-				Debug.Log("auto-play proximite");
 			} else {
-				Debug.Log("auto-play en avance");
 				tempsDepuisDerniereNoteAutomatique = 0;
 			}
 		} else {
 			tempsDepuisDerniereNoteAutomatique = 1000.0f;
-			Debug.Log("miss");
 		}
 		aJoueMalDepuisDerniereFois = false;
 		aJoueBienDepuisDerniereFois = false;
@@ -211,12 +208,6 @@ public class HandFollower : MonoBehaviour {
 
 	// Index de la derniere donnee ecrite dans le tableau de dernieres distances.
 	int indexDernieresDistance = 1;
-
-	// Compteur depuis la derniere inscription d'une distance.
-	float compteurDistance = 0;
-
-	// Temps nécessaire pour inscrire une nouvelle distance.
-	const float kTempsPourEcrireDistance = 1.0f / 30.0f;
 
 	// Indique le temps depuis la derniere note automatique.
 	float tempsDepuisDerniereNoteAutomatique = 1000.0f;
