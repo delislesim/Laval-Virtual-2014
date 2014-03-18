@@ -109,12 +109,16 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 
 		if(currentPartitionIndex < partition.Count-1) {
 			if (tempsEcoule >= partition[currentPartitionIndex+1].time) {
+				Debug.Log("index note:" + currentPartitionIndex);
+
 				currentPartitionIndex ++;
 				currentTone = partition[currentPartitionIndex].note;
 				currentStyle = partition[currentPartitionIndex].style;
 				currentOctave = partition[currentPartitionIndex].octave;
 
-				handFollower.JouerNoteMaintenant();
+				float tempsNoteCourante = partition[currentPartitionIndex].time;
+				float tempsNotePrecedente = partition[currentPartitionIndex - 1].time;
+				handFollower.JouerNoteMaintenant(tempsNoteCourante - tempsNotePrecedente);
 
 				if (currentPartitionIndex + 1 < partition.Count) {
 					handFollower.DefinirTempsProchaineNote(partition[currentPartitionIndex + 1].time - tempsEcoule);

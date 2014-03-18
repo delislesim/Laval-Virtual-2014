@@ -80,15 +80,17 @@ public class HandFollower : MonoBehaviour {
 			                     guitarPlayerLayer)) {
 				if (hitInfo.collider.gameObject.tag == "GuitarPlayer"){
 					if (AssistedModeControllerGuitar.EstActive() &&
-					    tempsProchaineNote < 0.20f) {
+					    tempsProchaineNote < 0.25f) {
 						// Ne pas jouer la note tout de suite.
 						aJoueBienDepuisDerniereFois = true;
 					} else {
 						if (tempsDepuisDerniereNoteAutomatique < kTempsRejouerApresAutomatique) {
 							tempsDepuisDerniereNoteAutomatique = 1000.0f;
+							Debug.Log("bloque - prochaine note: " + tempsProchaineNote);
 						} else {
 							PlayNote ();
 							aJoueMalDepuisDerniereFois = true;
+							Debug.Log("en trop - prochaine note: " + tempsProchaineNote);
 						}
 					}
 				}
@@ -131,7 +133,7 @@ public class HandFollower : MonoBehaviour {
 	// Utilise par le mode assiste pour indiquer quand une note doit
 	// etre jouee immediatement selon la partition. La note est jouee
 	// si la main du guitariste semble etre en voie de jouer la note.
-	public void JouerNoteMaintenant() {
+	public void JouerNoteMaintenant(float tempsDepuisDerniereNotePartition) {
 		// On accepte de jouer la note si la main est suffisamment pres
 		// des cordes et qu'elle se dirige vers celles-ci.
 		float posPrecedente = dernieresDistances [(indexDernieresDistance + 1) % dernieresDistances.Length];
@@ -141,16 +143,20 @@ public class HandFollower : MonoBehaviour {
 			vitesse = -vitesse;
 		}
 
-		if ((Mathf.Abs(posCourante) < 1.0f && vitesse > 0.01f) ||
+		if ((tempsDepuisDerniereNote < kTempsPlusFacile && Mathf.Abs(posCourante) < 0.8f) ||
+		    (Mathf.Abs(posCourante) < 1.15f && vitesse > 0.01f) ||
 		     aJoueBienDepuisDerniereFois) {
 			PlayNote();
 
 			if (!aJoueBienDepuisDerniereFois) {
 				tempsDepuisDerniereNoteAutomatique = 0;
+				Debug.Log("auto-play proximite");
 			} else {
 				tempsDepuisDerniereNoteAutomatique = 0;
+				Debug.Log("auto-play avance");
 			}
 		} else {
+			Debug.Log("miss - posCourante:" + posCourante + "  vitesse: " + vitesse);
 			tempsDepuisDerniereNoteAutomatique = 1000.0f;
 		}
 		aJoueMalDepuisDerniereFois = false;
@@ -212,8 +218,11 @@ public class HandFollower : MonoBehaviour {
 	// Indique le temps depuis la derniere note automatique.
 	float tempsDepuisDerniereNoteAutomatique = 1000.0f;
 
+	// Temps entre des notes de partition pour rendre la jouabilité plus facile.
+	float kTempsPlusFacile = 0.45f;
+
 	// Temps pour rejouer une note apres une note automatique.
-	float kTempsRejouerApresAutomatique = 0.4f;
+	float kTempsRejouerApresAutomatique = 0.5f;
 
 	// Temps avant de jouer la prochaine note.
 	float tempsProchaineNote = 0;
