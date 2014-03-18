@@ -11,7 +11,7 @@ public class GuitareEtapeLeverBras : EtapeTutorial {
 	// Retourne le texte d'instruction qui doit etre affiche lors de
 	// l'execution de cette etape du tutorial.
 	public string ObtenirTexte() {
-		return "Levez le bras gauche\npour tenir la guitare.";
+		return "Levez le bras gauche pour tenir la guitare.";
 	}
 	
 	// Retourne la voix lisant l'instruction.

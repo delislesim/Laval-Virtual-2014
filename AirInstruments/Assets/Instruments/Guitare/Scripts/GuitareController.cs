@@ -62,7 +62,7 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 		// Gerer la fin du tutorial.
 		if (tutorialActif && tutorial.EstComplete()) {
 			// Affichage du guidage pour le geste du menu.
-			GuidageController.ObtenirInstance ().changerGuidage(typeGuidage.INSTRUMENTS);
+			GuidageController.ObtenirInstance ().changerGuidage(typeGuidage.GUITARE_DRUM);
 			
 			// Activation de la reconnaissance du geste de menu.
 			GestureRecognition gestureRecognition = GestureRecognition.ObtenirInstance ();

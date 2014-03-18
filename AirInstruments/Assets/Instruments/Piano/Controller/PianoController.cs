@@ -58,7 +58,7 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 		// Gerer la fin du tutorial.
 		if (tutorialActif && tutorial.EstComplete()) {
 			// Affichage du guidage pour le geste du menu.
-			GuidageController.ObtenirInstance ().changerGuidage(typeGuidage.INSTRUMENTS);
+			GuidageController.ObtenirInstance ().changerGuidage(typeGuidage.PIANO);
 
 			// Activation de la reconnaissance du geste de menu.
 			GestureRecognition gestureRecognition = GestureRecognition.ObtenirInstance ();
@@ -103,6 +103,13 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 		
 		// Se rappeler que le menu est active.
 		menuActif = true;
+	}
+
+	// Calcule les moyennes des hauteurs des coups
+	// pour permettre de calibrer le snap ultérieurement.
+	private void CalculerMoyennes()
+	{
+
 	}
 
 	// Gere les choix de l'utilisateur dans le menu assiste. Retourne
