@@ -48,7 +48,7 @@ public class GuidageController : MonoBehaviour {
 		rectangleGuitareDrum = new Rect (0, Screen.height - rectHeight, rectWidth, rectHeight);
 		rectanglePiano = new Rect (0, 0, rectWidth, rectHeight);
 	}
-	
+
 	// Update is called once per frame
 	void OnGUI () {
 		GUI.skin = skinGuidage;
