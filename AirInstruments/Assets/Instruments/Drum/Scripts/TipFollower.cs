@@ -5,7 +5,6 @@ public class TipFollower : MonoBehaviour {
 
 	// Objet que le tip doit suivre.
 	public GameObject objectToFollow;
-	private bool isAssisted;
 
 	// Use this for initialization
 	void Start () {
@@ -15,6 +14,7 @@ public class TipFollower : MonoBehaviour {
 		isAssisted = true;
 		// Layer des colliders de drum components.
 		drumComponentLayer = 1 << LayerMask.NameToLayer ("DrumComponent");
+		composanteVisee = null;
 	}
 	
 	// Update is called once per frame
@@ -42,6 +42,7 @@ public class TipFollower : MonoBehaviour {
 		if (Physics.Raycast (lastPosition, direction, out hitInfo, direction.magnitude + kDistanceRaycast, drumComponentLayer)) {
 
 			GameObject drumComponentGameObject = hitInfo.collider.gameObject;
+			composanteVisee = drumComponentGameObject;
 			ComponentInterface componentInterface = drumComponentGameObject.GetComponent<DrumComponent>();
 			if (componentInterface == null) {
 				componentInterface = drumComponentGameObject.GetComponent<HighHatComponent>();
@@ -66,8 +67,19 @@ public class TipFollower : MonoBehaviour {
 		}
 	}
 
+	public GameObject GetAimedComponent()
+	{
+		return composanteVisee;
+	}
+
 	// Derniere position du tip.
 	private Vector3 lastPosition;
+
+	// Derniere cuisiniere derniere
+	private bool isAssisted;
+
+	//DrumComponent visée
+	private GameObject composanteVisee;
 	
 	// Rayon du tip.
 	float rayon;
