@@ -13,7 +13,7 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 
 		kalman.SetForce (kForcesKalmanDefaut);
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
 		if (!IsValid ()) {
@@ -39,7 +39,12 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 
 						if (note.noire) {
 							Vector3 targetPosition = transform.position;
-							targetPosition.y = kHauteurNoires + ObtenirRayon();
+
+							// Pour les noires, on y va tranquillement pour éviter les
+							// mouvements brusques.
+							float targetY = kHauteurNoires + ObtenirRayon();
+							targetPosition.y = Lerp.LerpFloat(targetPosition.y, targetY, 0.6f * Time.deltaTime);
+
 							SetTargetPosition(transform.parent.InverseTransformPoint(targetPosition), valid);
 						} else {
 							Vector3 targetPosition = transform.position;
