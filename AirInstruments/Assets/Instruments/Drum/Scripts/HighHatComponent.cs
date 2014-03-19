@@ -23,12 +23,14 @@ public class HighHatComponent : MonoBehaviour, ComponentInterface {
 	{
 		if(opened){
 			audio.clip = soundOpened;
-			//audio.Play();
 		}
 		else{
 			audio.clip = soundClosed;
-			//audio.Play();
 		}
+
+		if (!DrumAssistedController.EstActive())
+			audio.Play();
+
 		if (spot != null) {
 			spot.Play ();
 		}

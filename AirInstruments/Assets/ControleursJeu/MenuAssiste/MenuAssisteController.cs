@@ -91,7 +91,7 @@ public class MenuAssisteController : MonoBehaviour {
 			pointeur.AddTarget (1, new Vector2 (1.35f, -0.4f), new Vector2 (0.5f, 0.35f));
 		
 		if (!boutons[2].GetComponent<BoutonMusique> ().EstDesactive())
-			pointeur.AddTarget (2, new Vector2 (1.35f, -0.4f), new Vector2 (0.5f, 0.35f));
+			pointeur.AddTarget (2, new Vector2 (1.35f, 0.5f), new Vector2 (0.5f, 0.35f));
 
 		if (!boutons[3].GetComponent<BoutonMusique> ().EstDesactive())
 			pointeur.AddTarget (3, new Vector2 (0.9f,  0.5f), new Vector2 (0.35f, 0.35f));

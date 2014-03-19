@@ -225,7 +225,7 @@ public class MoveJointsForGuitar : MonoBehaviour {
 		Vector3 lHandPos = current_positions[(int)Skeleton.Joint.HandLeft];
 
 		// Tricher en montant le hip pos un peu.
-		hipPos += new Vector3 (0.0f, 0.15f, 0.0f);
+		hipPos += new Vector3 (0.0f, 0.05f, 0.0f);
 
 		//Guit position
 		GuitarContainer.position = hipPos;

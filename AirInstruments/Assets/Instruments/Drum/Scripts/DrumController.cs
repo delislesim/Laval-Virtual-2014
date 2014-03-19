@@ -164,11 +164,11 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 				break;
 			case 1:
 				// Mode libre.
-				assistedcontroller.gameObject.SetActive(true);
+				assistedcontroller.gameObject.SetActive(false);
 				break;
 			case 2:
 				// Assiste.
-				assistedcontroller.gameObject.SetActive(false);
+				assistedcontroller.gameObject.SetActive(true);
 				break;
 			}
 			

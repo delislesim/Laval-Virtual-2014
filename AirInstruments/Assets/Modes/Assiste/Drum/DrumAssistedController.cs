@@ -40,6 +40,9 @@ public class DrumAssistedController : MonoBehaviour {
 	private float SAMPLE_TIME;
 	private bool choiceNeeded;
 
+	// Indique si le mode assiste est active.
+	private static bool estActive;
+
 	// Use this for initialization
 	void Start () {
 
@@ -57,8 +60,18 @@ public class DrumAssistedController : MonoBehaviour {
 		track2Needed = false;
 		choiceNeeded = true;
 		elapsedTime = 0;
+
+		estActive = true;
 	}
-	
+
+	void OnDisable() {
+		estActive = false;
+	}
+
+	public static bool EstActive() {
+		return estActive;
+	}
+
 	// Update is called once per frame
 	void Update () {
 		elapsedTime = elapsedTime + Time.deltaTime;
