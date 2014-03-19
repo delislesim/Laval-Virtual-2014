@@ -16,6 +16,18 @@ public class DrumComponent : MonoBehaviour, ComponentInterface {
 	// ce drum component doit etre joue.
 	public GameObject gameObjectVisible;
 
+	public void PlaySoundWhenAssisted()
+	{
+		audio.Play();
+		//Debug.Log ("Play when assisted called");
+		
+		if (spot != null) {
+			spot.Play ();
+		}
+		aEteJoue = true;
+		gameObjectVisible.renderer.material = materialDefaut;
+	}
+
 	public void PlaySound()
 	{
 		if (!DrumAssistedController.EstActive())

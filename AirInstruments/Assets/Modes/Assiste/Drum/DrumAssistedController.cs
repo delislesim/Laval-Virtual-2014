@@ -8,7 +8,7 @@ public class DrumAssistedController : MonoBehaviour {
 	public TipFollower tipLeft;
 
 
-	public GameObject[] DrumComponentObjects;
+	public DrumComponent[] DrumComponentObjects;
 	public enum DrumComponentIndexes : int{
 		BIGTOM = 0,
 		TOM1,
@@ -27,19 +27,24 @@ public class DrumAssistedController : MonoBehaviour {
 	public AudioSource track2_A;
 	public AudioSource track2_B;
 
-	private Dictionary<GameObject, List<List<AudioClip>>> TracksCollection = new Dictionary<GameObject, List<List<AudioClip>>>();
+	private Dictionary<DrumComponent, List<List<AudioClip>>> TracksCollection = new Dictionary<DrumComponent, List<List<AudioClip>>>();
 
 	private float elapsedTime;
 	private const float S_DELAY = 0.1f;
-	private const float CHOICE_DELAY = 0.15f;
-	private const float MIN_DIST = 0.1f;
+	private const float MIN_DIST = 2.5f;
 	private const float MIN_SPEED = 1.0f;
+	private const int BEAT_MEMORY = 1;
 	private bool trackBplaying;
 	//private bool trackAplaying;
+	private bool baseTrackNeeded;
 	private bool track2Needed;
 	private bool track1Needed;
 	private float SAMPLE_TIME;
-	private bool choiceNeeded;
+	private int memLeft;
+	private int memRight;
+
+
+
 
 	// Indique si le mode assiste est active.
 	private static bool estActive;
@@ -55,11 +60,11 @@ public class DrumAssistedController : MonoBehaviour {
 	}
 
 	void OnEnable(){
+		baseTrackNeeded = false;
 		trackBplaying = false;
 		//		trackAplaying = true;
 		track1Needed = false;
 		track2Needed = false;
-		choiceNeeded = true;
 		elapsedTime = 0;
 
 		estActive = true;
@@ -77,56 +82,56 @@ public class DrumAssistedController : MonoBehaviour {
 	void Update () {
 		elapsedTime = elapsedTime + Time.deltaTime;
 
-		//Track Logic
-		if (elapsedTime >= (SAMPLE_TIME - CHOICE_DELAY) && choiceNeeded)
-		{
-			MakeTrackChoices();
-			choiceNeeded = false;
-		}
-
 		//Track Control
 		if (elapsedTime >= (SAMPLE_TIME - S_DELAY))
 		{
-			//Debug.Log ("Elapsed time : " + elapsedTime + ", SAMPLE_TIME : " + SAMPLE_TIME + " , S_DELAY : " + S_DELAY); 
+			//Debug.Log ("Elapsed time : " + elapsedTime + ", SAMPLE_TIME : " + SAMPLE_TIME + " , S_DELAY : " + S_DELAY);
+			MakeTrackChoices();
 			PlayTracks ();
 			resetCoupsEnregistres();
-			choiceNeeded = true;
 			elapsedTime = 0;
 		}
+
+		if(memLeft > BEAT_MEMORY && memRight > BEAT_MEMORY)
+			baseTrackNeeded = false;
+		else
+			baseTrackNeeded = true;
 	}
 
 	void PlayTracks()
 	{
 		//ALTERNATE A and B so transitions are fluid and on time
 		if(trackBplaying){
-			baseRythmA.Play();
+			if(baseTrackNeeded)
+				baseRythmA.Play();
 			
-			if(track1Needed){
+			if(track1Needed)
 				track1_A.Play ();
-			}
-			if(track2Needed){
+			
+			if(track2Needed)
 				track2_A.Play ();
-			}
+			
 
 			trackBplaying=false;
 		}
 		else{
-			baseRythmB.Play();
+			if(baseTrackNeeded)
+				baseRythmB.Play();
 			
-			if(track1Needed){
+			if(track1Needed)
 				track1_B.Play ();
-			}
-			if(track2Needed){
+			
+			if(track2Needed)
 				track2_B.Play ();
-			}
+			
 			trackBplaying=true;
 		}
 	}
 
 	void MakeTrackChoices()
 	{
-		GameObject closestFromLeft;
-		GameObject closestFromRight;
+		DrumComponent closestFromLeft;
+		DrumComponent closestFromRight;
 
 		track1Needed = getClosestDrumComponent(tipLeft, out closestFromLeft);
 		track2Needed = getClosestDrumComponent(tipRight, out closestFromRight);
@@ -140,20 +145,16 @@ public class DrumAssistedController : MonoBehaviour {
 		int idxCoups = 0;
 		int idxProb = 0;
 		int bonusForBothHands = OnSameComponent ? 1 : 0;
-		int randomBonus;
 
 		if(track1Needed) // LEFT HAND
 		{
+			memLeft = 0;
 			try {
-				//Get l'interface
-				ComponentInterface componentInterface = closestFromLeft.GetComponent<DrumComponent>();
-				if (componentInterface == null) {
-					componentInterface = closestFromLeft.GetComponent<HighHatComponent>();
-				}
-				int nbCoups = Mathf.Min(componentInterface.GetCoupsDernierTemps()  + bonusForBothHands , TracksCollection[closestFromLeft].Count-1);
-				idxCoups = Mathf.Max(0, nbCoups);
+				//nombre de coups a jouer
+				int nbCoups = Mathf.Min(closestFromLeft.GetCoupsDernierTemps()  + bonusForBothHands , TracksCollection[closestFromLeft].Count-1);
 				idxCoups = nbCoups;
 
+				//Choisir track a, b, .... Les chances réduisent linéairement
 				List<int> idxList = new List<int>();
 				for(int i = 0 ; i < TracksCollection[closestFromLeft][idxCoups].Count ; i++){
 					for(int j = 0 ; j < TracksCollection[closestFromLeft][idxCoups].Count - i ; j++){
@@ -162,29 +163,30 @@ public class DrumAssistedController : MonoBehaviour {
 				}
 
 				idxProb = idxList[UnityEngine.Random.Range(0, idxList.Count)];
-				Debug.Log("LEFT NAME : " + closestFromLeft.name + ", NB COUPS: " + nbCoups);
-				Debug.Log("COUNT : " + TracksCollection[closestFromLeft][idxCoups].Count + ", IDX PROB : " + idxProb);
+				//Debug.Log("LEFT NAME : " + closestFromLeft.name + ", NB COUPS: " + nbCoups);
+				//Debug.Log("COUNT : " + TracksCollection[closestFromLeft][idxCoups].Count + ", IDX PROB : " + idxProb);
 				//Debug.Log( "COUNT PROB + " + TracksCollection[closestFromdLeft][idxCoups].Count + ",  PROB : " + idxProb);
 
 				setTrack1(TracksCollection[closestFromLeft][idxCoups][idxProb]);
 			}
 			catch (Exception e) {
-				Debug.Log("FUCK");
+				Debug.Log("OOPS!  " + e.Message);
 			}
-
-
-
 		}
+		else
+		{
+			memLeft++;
+			if (memLeft >= BEAT_MEMORY)
+				tipLeft.resetLastOldComponentMemory();
+				
+		}
+		tipLeft.resetLastComponentMemory();
 
 		if(track2Needed) //RIGHT HAND
 		{
-			ComponentInterface componentInterface = closestFromRight.GetComponent<DrumComponent>();
-			if (componentInterface == null) {
-				componentInterface = closestFromRight.GetComponent<HighHatComponent>();
-			}
-
-			int nbCoups = Mathf.Min(componentInterface.GetCoupsDernierTemps() + bonusForBothHands, TracksCollection[closestFromRight].Count-1);
-			idxCoups = Mathf.Max(0, nbCoups);
+			memRight = 0;
+			
+			int nbCoups = Mathf.Min(closestFromRight.GetCoupsDernierTemps() + bonusForBothHands, TracksCollection[closestFromRight].Count-1);
 			idxCoups = nbCoups;
 
 			List<int> idxList = new List<int>();
@@ -195,35 +197,25 @@ public class DrumAssistedController : MonoBehaviour {
 			}
 			
 			idxProb = idxList[UnityEngine.Random.Range(0, idxList.Count)];
-			Debug.Log("RIGHT NAME : " + closestFromRight.name + ", NB COUPS: " + nbCoups);
-			Debug.Log("COUNT : " + TracksCollection[closestFromRight][idxCoups].Count + ", IDX PROB : " + idxProb);
+			//Debug.Log("RIGHT NAME : " + closestFromRight.name + ", NB COUPS: " + nbCoups);
+			//Debug.Log("COUNT : " + TracksCollection[closestFromRight][idxCoups].Count + ", IDX PROB : " + idxProb);
 
 			setTrack2(TracksCollection[closestFromRight][idxCoups][idxProb]);
 		}
+		else
+		{
+			memRight++;
+			if (memRight >= BEAT_MEMORY)
+			tipRight.resetLastOldComponentMemory();
+		}
+		tipRight.resetLastComponentMemory();
 
 	}
 	
-	bool getClosestDrumComponent(TipFollower tip,  out GameObject closest)
+	bool getClosestDrumComponent(TipFollower tip,  out DrumComponent closest)
 	{
-
-		float dist = 9999999 ;
-		float bestDist = dist;
-		GameObject result = null; 
-
-		for(int i = 0 ; i < (int)DrumComponentIndexes.COUNT ; i++)
-		{
-			dist = Vector3.Distance (tip.transform.position, DrumComponentObjects[i].transform.position);
-			if(dist<bestDist){
-				bestDist = dist;
-				result = DrumComponentObjects[i];
-			}
-		}
-		closest=result;
-
-		closest = tip.GetAimedComponent();
-		bestDist = Vector3.Distance(closest.transform.position, tip.transform.position);
-		return ( (bestDist < MIN_DIST) && (tip.GetSpeed() > MIN_SPEED)) ;
-
+		closest = tip.GetLastComponentHit();
+		return (closest != null);
 	}
 
 	void setTrack1(AudioClip clip){
@@ -248,10 +240,8 @@ public class DrumAssistedController : MonoBehaviour {
 	{
 		for(int i = 0 ; i < (int)DrumComponentIndexes.COUNT ; i++)
 		{
-			if(i != (int)DrumComponentIndexes.HIHAT)
-				DrumComponentObjects[i].GetComponent<DrumComponent>().ResetCoupsDernierTemps();
+			DrumComponentObjects[i].GetComponent<DrumComponent>().ResetCoupsDernierTemps();
 		}
-		DrumComponentObjects[(int)DrumComponentIndexes.HIHAT].GetComponent<HighHatComponent>().ResetCoupsDernierTemps();
 	}
 
 	

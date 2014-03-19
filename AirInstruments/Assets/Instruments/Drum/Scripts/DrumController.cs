@@ -20,7 +20,7 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 
 	// Composants du drum.
 	public DrumComponent crash;
-	public HighHatComponent highHat;
+	public DrumComponent highHat;
 	public DrumComponent ride;
 	public DrumComponent snare;
 	public DrumComponent tom1;

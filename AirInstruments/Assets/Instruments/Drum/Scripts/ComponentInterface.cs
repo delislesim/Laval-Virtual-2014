@@ -4,6 +4,7 @@ using UnityEngine;
 public interface ComponentInterface
 {
 	void PlaySound ();
+	void PlaySoundWhenAssisted();
 	float DistanceToPoint (Vector3 point);
 	void DefinirLuminosite(float luminosite);
 	void AjouterCoupAuTemps();

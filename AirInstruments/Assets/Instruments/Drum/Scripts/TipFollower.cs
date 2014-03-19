@@ -11,15 +11,19 @@ public class TipFollower : MonoBehaviour {
 		// Calculer le rayon du tip.
 		Vector3 worldScale = VectorConversions.CalculerWorldScale (transform);
 		rayon = worldScale.x / 2.0f;
-		isAssisted = true;
 		// Layer des colliders de drum components.
 		drumComponentLayer = 1 << LayerMask.NameToLayer ("DrumComponent");
 		composanteVisee = null;
+		resetLastComponentMemory();
+		resetLastOldComponentMemory();
 	}
 	
 	// Update is called once per frame
 	void Update () {
+		beforeLastPos = lastPosition;
 		lastPosition = transform.position;
+
+		currentSpeed = Vector3.Distance (transform.position , beforeLastPos) / Time.deltaTime;
 
 		// Suivre l'objet auquel on a été assigné.
 		transform.position = objectToFollow.transform.position;
@@ -43,20 +47,30 @@ public class TipFollower : MonoBehaviour {
 
 			GameObject drumComponentGameObject = hitInfo.collider.gameObject;
 			composanteVisee = drumComponentGameObject;
-			ComponentInterface componentInterface = drumComponentGameObject.GetComponent<DrumComponent>();
-			if (componentInterface == null) {
-				componentInterface = drumComponentGameObject.GetComponent<HighHatComponent>();
-			}
+			DrumComponent componentInterface = drumComponentGameObject.GetComponent<DrumComponent>();
 
 			float distanceReelle = hitInfo.distance - direction.magnitude;
 			if (distanceReelle < 0)
 				distanceReelle = 0;
 
 			if (componentInterface != dernierDrumComponent && distanceReelle < kDistancePourJouer) {
+				if(DrumAssistedController.EstActive() && dernierLongMemory != componentInterface)
+				{
+					if(componentInterface !=null)
+					{
+						//Debug.Log ("componentInterface: " + componentInterface.name);
+						dernierLongMemory = componentInterface;
+						if(dernierLongMemory != dernierVeryLongMemory)
+							componentInterface.PlaySoundWhenAssisted();
 
-				// Jouer le son.
-				componentInterface.PlaySound();
-
+						dernierVeryLongMemory = dernierLongMemory;
+					}
+				}
+				else
+				{
+					// Jouer le son.
+					componentInterface.PlaySound();
+				}
 				//On enregistre le coup
 				componentInterface.AjouterCoupAuTemps();
 
@@ -67,9 +81,19 @@ public class TipFollower : MonoBehaviour {
 		}
 	}
 
+	public void resetLastComponentMemory()
+	{
+		dernierLongMemory = null;
+	}
+
+	public void resetLastOldComponentMemory()
+	{
+		dernierVeryLongMemory = null;
+	}
+
 	public float GetSpeed()
 	{
-		return 	rigidbody.velocity.magnitude;
+		return 	currentSpeed;
 	}
 
 	public GameObject GetAimedComponent()
@@ -77,11 +101,17 @@ public class TipFollower : MonoBehaviour {
 		return composanteVisee;
 	}
 
+	public DrumComponent GetLastComponentHit()
+	{
+		return dernierLongMemory;
+	}
+
 	// Derniere position du tip.
 	private Vector3 lastPosition;
+	private Vector3 beforeLastPos;
 
-	// Derniere cuisiniere derniere
-	private bool isAssisted;
+	//Vitesse
+	private float currentSpeed;
 
 	//DrumComponent visée
 	private GameObject composanteVisee;
@@ -90,7 +120,13 @@ public class TipFollower : MonoBehaviour {
 	float rayon;
 
 	// Dernier drum component a avoir ete joue.
-	ComponentInterface dernierDrumComponent;
+	DrumComponent dernierDrumComponent;
+
+	// Dernier drum component a avoir ete joué et persistent!
+	DrumComponent dernierLongMemory;
+
+	// Dernier drum component a avoir ete joué et tres persistent!
+	DrumComponent dernierVeryLongMemory;
 
 	// Distance entre le bout de la baguette et le drum component lors de l'impact.
 	float distanceDernierDrumComponent;

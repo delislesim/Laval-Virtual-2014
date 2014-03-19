@@ -184,9 +184,6 @@ public class MoveJoints : MonoBehaviour {
 			current_positions[i] = joints[i].transform.position;
 			current_rotations[i] = joints[i].transform.localRotation;
 		}
-
-		// Predict sounds
-		manageMouvementsAndSounds(current_positions, last_positions);
 	}
 
 	void FixerSquelette() {
@@ -228,40 +225,7 @@ public class MoveJoints : MonoBehaviour {
 		                   kinectPosition.y*PLAYER_HIGHT,
 		                   -kinectPosition.z*PLAYER_HIGHT);
 	}
-
-	void manageMouvementsAndSounds(Vector3[] currentPos, Vector3[] pastPos)
-	{
-		//Play bass kick
-		if(pastPos[(int)Skeleton.Joint.KneeRight] != HIDING_POS){
-			if(pastPos[(int)Skeleton.Joint.KneeRight].y - currentPos[(int)Skeleton.Joint.KneeRight].y > (KICK_SPEED * Time.deltaTime)
-			   && kick_ready == true){
-				Bass_Kick.PlaySound();
-				kick_ready = false;
-			}
-
-			if(pastPos[(int)Skeleton.Joint.KneeRight].y - currentPos[(int)Skeleton.Joint.KneeRight].y < (-KICK_SPEED/2 * Time.deltaTime)
-			   && kick_ready == false){
-				kick_ready = true;
-			}
-		}
-
-		//Manage High-Hat state
-		if(pastPos[(int)Skeleton.Joint.KneeLeft] != HIDING_POS){
-			if(pastPos[(int)Skeleton.Joint.KneeLeft].y - currentPos[(int)Skeleton.Joint.KneeLeft].y > (HH_SPEED * Time.deltaTime)
-			   && hit_hat_ready == true){
-				High_Hat.opened = false;
-				hit_hat_ready = false;
-			}
-			
-			if(pastPos[(int)Skeleton.Joint.KneeLeft].y - currentPos[(int)Skeleton.Joint.KneeLeft].y < (-HH_SPEED * Time.deltaTime)
-			   && hit_hat_ready == false){
-				High_Hat.opened = true;
-				hit_hat_ready = true;
-			}
-		}
-		           
-	}
-
+	
 	// Unique instance de cette classe.
 	private static MoveJoints instance;
 
@@ -269,10 +233,10 @@ public class MoveJoints : MonoBehaviour {
 	private int drumComponentLayer;
 
 	// Position cible des épaules.
-	private Vector3 kCibleEpaules = new Vector3(-0.2f, 2.0f, -10.4f);
+	private Vector3 kCibleEpaules = new Vector3(0.2f, 2.0f, -10.4f);
 
 	// Tolérance pour la position cible des épaules.
-	private Vector3 kToleranceCibleEpaules = new Vector3 (0.5f, 0.001f, 0.1f);
+	private Vector3 kToleranceCibleEpaules = new Vector3 (0.2f, 0.001f, 0.1f);
 
 }
 

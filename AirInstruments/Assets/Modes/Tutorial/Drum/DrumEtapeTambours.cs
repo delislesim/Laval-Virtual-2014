@@ -6,7 +6,7 @@ public class DrumEtapeTambours : EtapeTutorial {
 	
 	public DrumEtapeTambours(AudioClip son,
 	                         DrumComponent crash,
-	                         HighHatComponent highHat,
+	                         DrumComponent highHat,
 	                         DrumComponent ride,
 	                         DrumComponent snare,
 	                         DrumComponent tom1,

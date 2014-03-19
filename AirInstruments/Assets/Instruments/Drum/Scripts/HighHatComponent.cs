@@ -19,6 +19,17 @@ public class HighHatComponent : MonoBehaviour, ComponentInterface {
 	// ce drum component doit etre joue.
 	public GameObject gameObjectVisible;
 
+	public void PlaySoundWhenAssisted()
+	{
+		audio.Play();
+		
+		if (spot != null) {
+			spot.Play ();
+		}
+		aEteJoue = true;
+		gameObjectVisible.renderer.material = materialDefaut;
+	}
+
 	public void PlaySound()
 	{
 		if(opened){

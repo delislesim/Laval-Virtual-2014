@@ -6,7 +6,7 @@ public class TutorialDrum {
 	public TutorialDrum(GameObject tipLeft,
 	                    GameObject tipRight,
 						DrumComponent crash,
-	                    HighHatComponent highHat,
+	                    DrumComponent highHat,
 	                    DrumComponent ride,
 	                    DrumComponent snare,
 	                    DrumComponent tom1,
