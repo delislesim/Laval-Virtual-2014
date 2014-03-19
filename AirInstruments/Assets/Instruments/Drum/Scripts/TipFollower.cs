@@ -67,6 +67,11 @@ public class TipFollower : MonoBehaviour {
 		}
 	}
 
+	public float GetSpeed()
+	{
+		return 	rigidbody.velocity.magnitude;
+	}
+
 	public GameObject GetAimedComponent()
 	{
 		return composanteVisee;
@@ -101,4 +106,5 @@ public class TipFollower : MonoBehaviour {
 
 	// Distance pour jouer un instrument du drum.
 	const float kDistancePourJouer = 4.0f * 0.1f;
+
 }

@@ -60,11 +60,6 @@ public class DrumComponent : MonoBehaviour, ComponentInterface {
 	{
 		nbCoupsDernierTemps = 0;
 	}
-	
-	// Update is called once per frame
-	void Update () {
-
-	}
 
 	void OnMouseDown()
 	{

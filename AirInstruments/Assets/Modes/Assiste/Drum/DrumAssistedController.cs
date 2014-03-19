@@ -32,7 +32,8 @@ public class DrumAssistedController : MonoBehaviour {
 	private float elapsedTime;
 	private const float S_DELAY = 0.1f;
 	private const float CHOICE_DELAY = 0.15f;
-	private const float MIN_DIST = 1.5f;
+	private const float MIN_DIST = 0.1f;
+	private const float MIN_SPEED = 1.0f;
 	private bool trackBplaying;
 	//private bool trackAplaying;
 	private bool track2Needed;
@@ -219,9 +220,9 @@ public class DrumAssistedController : MonoBehaviour {
 		}
 		closest=result;
 
-		//closest = tip.GetAimedComponent();
-		//float dist = Vector3.Distance(closest.transform.position, tip.transform.position);
-		return bestDist < MIN_DIST;
+		closest = tip.GetAimedComponent();
+		bestDist = Vector3.Distance(closest.transform.position, tip.transform.position);
+		return ( (bestDist < MIN_DIST) && (tip.GetSpeed() > MIN_SPEED)) ;
 
 	}
 
