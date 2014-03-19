@@ -19,18 +19,28 @@ public class IntelHandController : MonoBehaviour {
 
 	// Variables pour détecter si un snap est nécessaire
 	private Vector3[] positionPrecedenteDoigts = new Vector3[(int)KinectPowerInterop.HandJointIndex.NUM_JOINTS*2];
-	private const float timeDownMove = 0.15f;
-	private const float timeoutDownMove = 0.05f;
-	private float currentTimeDownMove = 0.0f;
-	private const float vitesseMinimale = -5.6f;
+	private const float timeDownMove = 0.06f;
+	private const float timeoutDownMove = 0.08f;
+	private const float timeoutUp = 0.25f;
+	private const float hauteurMaximale = 4.0f; // Relative aux touches blanches
+	private const float vitesseMinimale = -6.0f;
 	private List<DownMoveInfo> downMoveList = new List<DownMoveInfo>();
+
+	// Rayon des doigts.
+	private float kRayonDoigts;
+
+	// Hauteur des blanches.
+	private const float kHauteurBlanches = -2.8f;
 
 	private struct DownMoveInfo
 	{
 		public float elapsedTime;
-		public KinectPowerInterop.HandJointIndex index;
+		public KinectPowerInterop.HandJointIndex indexDoigt;
 		public float hauteurInitiale;
 		public float elapsedTimeout;
+
+		// Temps avec une vitesse vers le haut.
+		public float elapsedTimeUp; 
 	}
 
 	// Liste des boules rouges affichées dans la scene.
@@ -86,11 +96,7 @@ public class IntelHandController : MonoBehaviour {
 			KinectPowerInterop.HandJointIndex joint_index =
 				(KinectPowerInterop.HandJointIndex)(i % (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS);
 
-			if (joint_index == KinectPowerInterop.HandJointIndex.PINKY_TIP ||
-			    joint_index == KinectPowerInterop.HandJointIndex.RING_TIP ||
-			    joint_index == KinectPowerInterop.HandJointIndex.MIDDLE_TIP ||
-			    joint_index == KinectPowerInterop.HandJointIndex.INDEX_TIP ||
-			    joint_index == KinectPowerInterop.HandJointIndex.THUMB_TIP) {
+			if (EstBoutDoigt(joint_index)) {
 				createFingerSphere(Vector3.zero);
 			} else {
 				createHandJointSphere(Vector3.zero);
@@ -104,69 +110,109 @@ public class IntelHandController : MonoBehaviour {
 			cylindre.transform.localScale = cylindrePrefab.transform.localScale;
 			cylindres.Add (cylindre);
 		}
+
+		// Noter le rayon des doigts.
+		kRayonDoigts = spheres [(int)KinectPowerInterop.HandJointIndex.PINKY_TIP].transform.localScale.x;
+	}
+
+	void OnEnable () {
+		// Creer une liste avec des infos de mouvement pour chaque doigt pour l'assistance.
+		downMoveList.Clear ();
+		for (int i = 0; i < (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS * 2; ++i) {
+			DownMoveInfo info = new DownMoveInfo();
+			info.indexDoigt = (KinectPowerInterop.HandJointIndex)(i % (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS);
+			downMoveList.Add(info);
+		}
+	}
+
+	private bool EstBoutDoigt(KinectPowerInterop.HandJointIndex joint_index) {
+		return joint_index == KinectPowerInterop.HandJointIndex.PINKY_TIP ||
+			   joint_index == KinectPowerInterop.HandJointIndex.RING_TIP ||
+			   joint_index == KinectPowerInterop.HandJointIndex.MIDDLE_TIP ||
+			   joint_index == KinectPowerInterop.HandJointIndex.INDEX_TIP ||
+			   joint_index == KinectPowerInterop.HandJointIndex.THUMB_TIP;
 	}
 
 	private void DetecterVitesse()
 	{
+		// Calculer la vitesse de chaque articulation.
 		int i = 0;
 		Vector3[] vectVitesse = new Vector3[(int)KinectPowerInterop.HandJointIndex.NUM_JOINTS * 2];
-		foreach(Vector3 pos in positionPrecedenteDoigts)
+		foreach(Vector3 posPrecedente in positionPrecedenteDoigts)
 		{
-			if(pos != new Vector3(0,0,0))
-			{
-				// Calculer la vitesse magnifique++
-				vectVitesse[i] = (pos - TransformerPositionDoigt (hand_joints[i]))/Time.deltaTime;
-				positionPrecedenteDoigts[i] = TransformerPositionDoigt (hand_joints[i]);
+			Vector3 posCourante = TransformerPositionDoigt (hand_joints[i]);
+			if(posPrecedente != Vector3.zero) {
+				vectVitesse[i] = (posCourante - posPrecedente)/Time.deltaTime;
 
-				/*if(i == (int)KinectPowerInterop.HandJointIndex.INDEX_TIP)
-					Debug.Log (vectVitesse[i] + "\n");*/
+				if (vectVitesse[i].y > 0) {
+					DownMoveInfo info = downMoveList[i];
+					info.elapsedTimeUp += Time.deltaTime;
+					downMoveList[i] = info;
+				}
+
+				if ((downMoveList[i].elapsedTimeUp > timeoutUp || posCourante.y > downMoveList[i].hauteurInitiale) &&
+				    EstBoutDoigt(downMoveList[i].indexDoigt)) {
+					spheres[i].GetComponent<FingerSphere>().SetAllongementAssiste(false);
+				}
 			}
-			else
-				positionPrecedenteDoigts[i] = TransformerPositionDoigt (hand_joints[i]);
+			positionPrecedenteDoigts[i] = posCourante;
 			++i;
 		}
 
-		// Trouver les tip admissible a droite et a gauche
-		List<KinectPowerInterop.HandJointIndex> vitesseAdmissible = new List<KinectPowerInterop.HandJointIndex> ();
+		// Trouver les tips admissibles dans la main droite.
+		List<DownMoveInfo> vitesseAdmissible = new List<DownMoveInfo> ();
+		for(int j = (int)KinectPowerInterop.HandJointIndex.PINKY_TIP;
+		    j <= (int)KinectPowerInterop.HandJointIndex.THUMB_TIP;
+		    j += 3) {
+			DownMoveInfo curDownMove = downMoveList[j];
+			MettreAJourDownMoveInfo(curDownMove, j, vectVitesse);
+		}
 
-		for(int j = (int)KinectPowerInterop.HandJointIndex.PINKY_TIP; j <= (int)KinectPowerInterop.HandJointIndex.THUMB_TIP; j += 3)
+		// Trouver les tips admissibles dans la main gauche.
+		for(int j = (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS + (int)KinectPowerInterop.HandJointIndex.PINKY_TIP;
+		    j <= (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS + (int)KinectPowerInterop.HandJointIndex.THUMB_TIP;
+		    j += 3) {
+			DownMoveInfo curDownMove = downMoveList[j];
+			MettreAJourDownMoveInfo(curDownMove, j, vectVitesse);
+		}
+
+
+		// Afficher tous les doigts admissibles.
+		for (int index = 0; index < (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS * 2; ++index) {
+			DownMoveInfo info = downMoveList[index];
+			if (EstBoutDoigt(info.indexDoigt) && info.elapsedTime > timeDownMove) {
+				spheres[index].GetComponent<FingerSphere>().SetAllongementAssiste(true);
+			}
+		}
+	}
+
+	private void MettreAJourDownMoveInfo(DownMoveInfo curDownMove, int j, Vector3[] vectVitesse) {
+		if (!EstBoutDoigt(curDownMove.indexDoigt))
+			return;
+
+		// Si le doigt a une vitesse suffisante et est pres des blanches.
+		if(vectVitesse[j].y <= vitesseMinimale && DoigtApprocheBlanches(positionPrecedenteDoigts[j], hauteurMaximale))
 		{
-			if(vectVitesse[j].y <= vitesseMinimale)
-			{
-				if(downMoveList.Exists (x => x.index == (KinectPowerInterop.HandJointIndex) j))
-				{
-					DownMoveInfo curDownMove = downMoveList.Find (x => x.index == (KinectPowerInterop.HandJointIndex) j);
-					curDownMove.elapsedTime += Time.deltaTime;
-				}
-				else
-				{
-					DownMoveInfo newDownMove = new DownMoveInfo();
-					newDownMove.index = (KinectPowerInterop.HandJointIndex) j;
-					newDownMove.hauteurInitiale = hand_joints[j].y;
-					newDownMove.elapsedTime = 0.0f;
-					downMoveList.Add (newDownMove);
-				}
+			// Noter la hauteur initiale du doigt.
+			if (curDownMove.elapsedTime == 0) {
+				curDownMove.hauteurInitiale = positionPrecedenteDoigts[j].y;
 			}
 
-			else
-			{
-				if(downMoveList.Exists (x => x.index == (KinectPowerInterop.HandJointIndex) j))
-				{
-					DownMoveInfo curDownMove = downMoveList.Find (x => x.index == (KinectPowerInterop.HandJointIndex) j);
-					curDownMove.elapsedTimeout += Time.deltaTime;
-					if(curDownMove.elapsedTime >= timeoutDownMove)
-					{
-						downMoveList.Remove(curDownMove);
-					}
-				}
+			// Augmenter les timers disant que le doigt est admissible.
+			curDownMove.elapsedTime += Time.deltaTime;
+			curDownMove.elapsedTimeout = 0;
+			curDownMove.elapsedTimeUp = 0;
+		}
+		// Si le doigt n'a pas une vitesse suffisante ou est trop loin.
+		else
+		{
+			curDownMove.elapsedTimeout += Time.deltaTime;
+			if (curDownMove.elapsedTimeout >= timeoutDownMove) {
+				curDownMove.elapsedTime = 0;
 			}
 		}
 
-		foreach(KinectPowerInterop.HandJointIndex index in vitesseAdmissible)
-		{
-			Debug.Log (index + "\n");
-		}
-		
+		downMoveList [j] = curDownMove;
 	}
 
 	public Vector3 TransformerPositionDoigt(KinectPowerInterop.HandJointInfo handJointInfo) {
@@ -199,12 +245,9 @@ public class IntelHandController : MonoBehaviour {
 
 		DetecterVitesse ();
 
-		// Calculer les ajustements de hauteur.
-		float[] ajustementsHauteur = CalculerAjustementsHauteur ();
-
 		// Placer des spheres sur les articulations et bouts de doigts.
 		for (int i = 0; i < hand_joints.Length; ++i) {
-			PlacerSphere(i, ajustementsHauteur);
+			PlacerSphere(i);
 		}
 
 		// Placer les cylindres pour qu'ils relient les spheres.
@@ -350,7 +393,7 @@ public class IntelHandController : MonoBehaviour {
 		max = TransformerPositionDoigt (max);
 	}
 
-	private void PlacerSphere(int index, float[] ajustementsHauteur) {
+	private void PlacerSphere(int index) {
 		KinectPowerInterop.HandJointInfo jointInfo = hand_joints [index];
 
 		KinectPowerInterop.HandJointIndex jointIndex;
@@ -365,9 +408,6 @@ public class IntelHandController : MonoBehaviour {
 
 		// Appliquer de belles multiplications.
 		Vector3 targetPosition = TransformerPositionDoigt(jointInfo);
-
-		// Ajustement de hauteur.
-		targetPosition.y += ajustementsHauteur [indexMain];
 
 		// Appliquer les positions aux boules.
 		HandJointSphereI jointureSphereScript = ObtenirHandJointSphereScript (index);
@@ -501,41 +541,8 @@ public class IntelHandController : MonoBehaviour {
 		indexMain = index / (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS;
 	}
 
-	// "Snap" pour la hauteur des mains.
-	private float[] CalculerAjustementsHauteur() {
-		float[] ajustementsHauteur = {0, 0};
-
-		/*
-		for (int i = 0; i < 2; ++i) {
-			// Calculer la hauteur moyenne des bases de doigts.
-			float sommeHauteurs = 0.0f;
-			int numElements = 0;
-			for (int j = (int)KinectPowerInterop.HandJointIndex.RING_BASE;
-			     j <= (int)KinectPowerInterop.HandJointIndex.INDEX_BASE;
-			     j += 3) {
-				int indexDeBase = (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS*i + j;
-				sommeHauteurs += TransformerPositionDoigt(hand_joints[indexDeBase]).y;
-				++numElements;
-			}
-			float hauteurMoyenne = sommeHauteurs / 3.0f;
-			hauteursMoyennes[i] = hauteurMoyenne;
-			if (numElements != 3) {
-				Debug.LogError("Le nombre d'elements pour la hauteur moyenne des jointures n'est pas 3.");
-			}
-
-			if (hauteurMoyenne > kHauteurCibleMain &&
-			    hauteurMoyenne < kHauteurMaxSnap) {
-				// Snapper a la hauteur cible.
-				ajustementsHauteur[i] = kHauteurCibleMain - hauteurMoyenne;
-			} else if (hauteurMoyenne < kHauteurMinSnap) {
-				// Snapper a la hauteur minimale.
-				ajustementsHauteur[i] = kHauteurMinSnap - hauteurMoyenne;
-				Debug.Log("min");
-			}
-		}
-		*/
-
-		return ajustementsHauteur;
+	private bool DoigtApprocheBlanches(Vector3 position, float tolerance) {
+		return position.y < (kHauteurBlanches + kRayonDoigts + tolerance);
 	}
 
 	// Crée une boule rouge représentant un bout de doigt et l'ajoute

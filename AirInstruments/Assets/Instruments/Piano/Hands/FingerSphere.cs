@@ -32,6 +32,8 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 				Collider collider = hitColliders[i];
 				PianoNote note = collider.GetComponent<PianoNote>();
 				if (note != null) {
+					bool peutJouerCetteNote = true;
+
 					// Empecher de jouer les mauvaises notes.
 					if (AssistedModeControllerPiano.EstActive() &&
 					    note.ObtenirStatut() != PartitionPiano.StatutNote.Joueur &&
@@ -53,6 +55,7 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 							SetTargetPosition(transform.parent.InverseTransformPoint(targetPosition), valid);
 						}
 
+						peutJouerCetteNote = false;
 					} 
 
 					if (note.ToucherAvecSphere(this, estDescenduSousBlanches)) {
@@ -61,13 +64,34 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 							noteJouee = note;
 						}
 					}
+
+					// Si on a un allongement et que la note n'est pas a joue, desactiver l'allongement.
+					if (allongement != 0 && !peutJouerCetteNote) {
+						estAssisteAllongement = false;
+					}
+
+					// Animer l'augmentation de l'allongement.
+					if (estAssisteAllongement && peutJouerCetteNote && !note.noire) {
+						allongement = Lerp.LerpFloat(allongement, kAllongementMax, kAllongementParSeconde * Time.deltaTime); 
+					}
 				}
 			}
+		}
+
+		// Animer la diminution de l'allongement.
+		if (!estAssisteAllongement) {
+			allongement = Lerp.LerpFloat(allongement, 0, kRaccourcissementParSeconde * Time.deltaTime);
 		}
 	}
 
 	void OnEnable() {
 		noteJouee = null;
+		estAssisteAllongement = false;
+		allongement = 0;
+	}
+
+	public void SetAllongementAssiste(bool estAssisteAllongement) {
+		this.estAssisteAllongement = estAssisteAllongement;
 	}
 
 	public void SetTargetPosition(Vector3 targetPosition, bool valid) {
@@ -131,6 +155,23 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 		} else {
 			kalman.SetForce(kForcesKalmanDefaut);
 		}
+
+		// Appliquer l'allongement assiste.
+		if (allongement != 0) {
+			// Ne pas permettre a l'allongement de faire trop descendre le bras.
+			float yBasAllonge = yBas - allongement;
+			if (yBasAllonge < kHauteurJouerBlanches) {
+				allongement += (yBasAllonge - kHauteurJouerBlanches);
+				if (allongement < 0) {
+					allongement = 0;
+				}
+			}
+
+			// Appliquer l'allongement.
+			Vector3 positionWorld = transform.position;
+			positionWorld.y -= allongement;
+			transform.position = positionWorld;
+		}
 	}
 
 	private bool EstSurNoires() {
@@ -177,17 +218,38 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 	// blanches sans aller au-dessus des notes noires depuis.
 	private bool estDescenduSousBlanches = false;
 
+	// Allongement assiste des doigts par seconde.
+	private const float kAllongementParSeconde = 4.0f;
+
+	// Diminution de l'allongement des doigts par seconde.
+	private const float kRaccourcissementParSeconde = 2.0f;
+
+	// Allongement maximal possible pour les doigts.
+	private const float kAllongementMax = 0.65f;
+
 	// Hauteur des notes blanches.
 	private const float kHauteurBlanches = 2.171061f;
 
+	// Hauteur pour jouer les notes blanches.
+	private const float kHauteurJouerBlanches = 2.08f;
+
 	// Hauteur des notes noires.
 	private const float kHauteurNoires = 2.33302f;
+
+	// Hauteur des notes blanches en coordonnees locales.
+	private const float kHauteurBlanchesLocal = -2.8f;
 
 	// Coordonnee en z du bout des notes noires.
 	private const float kZNoires = -18.19202f;
 
 	// Coordonnee en z du bout des notes blanches.
 	private const float kZBlanches = -18.84687f;
+
+	// Indique si le doigt est en train de s'allonger pour assister le jouer a toucher la note.
+	private bool estAssisteAllongement = false;
+
+	// Allongement courant du doigt
+	private float allongement = 0;
 
 	// Gerer les donnees invalides.
 	private bool valid = false;
