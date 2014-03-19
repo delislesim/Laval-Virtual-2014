@@ -116,6 +116,7 @@ public class GuidageTutorial : MonoBehaviour {
 	}
 
 	public void AfficherEtape(EtapeTutorial etape) {
+
 		texte.text = etape.ObtenirTexte ();
 		if(positionCible == Position.HAUT)
 			background.texture = backgroundBeginningTop;
