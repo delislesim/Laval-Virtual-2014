@@ -47,9 +47,9 @@ public class SpolightFou : MonoBehaviour {
 
 		// Animer l'intensité selon que les spots sont activés ou désactivés.
 		float newIntensity = light.intensity;
-		if (active) {
+		if (estActive) {
 			newIntensity += kIntensity * Time.deltaTime;
-		} else if (!active) {
+		} else if (!estActive) {
 			newIntensity -= kIntensity * Time.deltaTime;
 		}
 		if (newIntensity > kIntensity) {
@@ -68,14 +68,14 @@ public class SpolightFou : MonoBehaviour {
 	}
 
 	public static void SetActive(bool estActive) {
-		active = estActive;
+		SpolightFou.estActive = estActive;
 	}
 
 	// Intensité.
 	private static float kIntensity;
 
 	// Indique si les spots fous sont activés.
-	private static bool active;
+	private static bool estActive;
 
 	// Couleurs possibles.
 	private List<Color> kCouleursPossibles = new List<Color> ();

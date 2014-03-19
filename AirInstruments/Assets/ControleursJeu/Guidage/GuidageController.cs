@@ -21,8 +21,6 @@ public class GuidageController : MonoBehaviour {
 	public float rectWidth;
 	public float rectHeight;
 
-	private float textureOffset = 12f;//2.5f;
-
 	private Rect rectangleMenu;
 	private Rect rectangleGuitareDrum;
 	private Rect rectanglePiano;

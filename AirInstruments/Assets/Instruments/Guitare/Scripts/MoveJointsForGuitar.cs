@@ -52,21 +52,8 @@ public class MoveJointsForGuitar : MonoBehaviour {
 	private const float DIST_MAX_KINECT = 10.0f; //2m
 	private const float DIST_MIN_KINECT = 2.0f; //dist min...
 
-	// Layer d'affichage prioritaire.
-	private int kLayerPrioritaire;
-
-	// Layer d'affichage prioritaire extra.
-	private int kLayerPrioritaireExtra;
-	
-	// Layer d'affichage par défaut.
-	private int kLayerDefault;
-
 	// Use this for initialization
 	void Start () {
-		kLayerPrioritaire = LayerMask.NameToLayer ("AffichagePrioritaireExtra");
-		kLayerPrioritaireExtra = LayerMask.NameToLayer ("AffichagePrioritaireExtra");
-		kLayerDefault = LayerMask.NameToLayer ("Default");
-
 		joints = new GameObject[(int)Skeleton.Joint.Count] {
 			Hip_Center, Spine, Shoulder_Center, Head,
 			Shoulder_Left, Elbow_Left, Wrist_Left, Hand_Left,
@@ -101,10 +88,8 @@ public class MoveJointsForGuitar : MonoBehaviour {
 
 		// Mettre le bon layer a la guitare et a sa ligne verte.
 		if (GuitareController.JoueurEstVisible ()) {
-			guitare.layer = kLayerPrioritaire;
-			ligneVerte.layer = kLayerPrioritaire;
+			ligneVerte.SetActive (true);
 		} else {
-			guitare.layer = kLayerDefault;
 			ligneVerte.SetActive (false);
 		}
 	}
@@ -179,13 +164,6 @@ public class MoveJointsForGuitar : MonoBehaviour {
 						joints[i].transform.localRotation = player.GetFaceRotation();
 
 					joints[i].renderer.enabled = true;
-
-					// Mettre sur le bon layer.
-					if (GuitareController.JoueurEstVisible() && EstIndexBras(i)) {
-						joints[i].layer = kLayerPrioritaireExtra;
-					} else {
-						joints[i].layer = kLayerDefault;
-					}
 
 				}
 				//If not tracked, hide!

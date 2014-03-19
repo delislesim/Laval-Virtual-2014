@@ -29,13 +29,9 @@ public class SkeletonDrawer : MonoBehaviour {
 	// Layer d'affichage prioritaire.
 	private int kLayerPrioritaire;
 
-	// Layer d'affichage par défaut.
-	private int kLayerDefault;
-
 	// Use this for initialization
 	void Start () {
 		kLayerPrioritaire = LayerMask.NameToLayer ("AffichagePrioritaireExtra");
-		kLayerDefault = LayerMask.NameToLayer ("Default");
 
 		// Creer les cylindres.
 		for (int i = 0; i < NB_CYLINDRES; ++i) {
@@ -87,11 +83,7 @@ public class SkeletonDrawer : MonoBehaviour {
 				cylindres[boneIdx].SetActive(true);
 
 				if (estGuitare) {
-					if (GuitareController.JoueurEstVisible()) {
-						cylindres[boneIdx].layer = kLayerPrioritaire;
-					} else {
-						cylindres[boneIdx].layer = kLayerDefault;
-					}
+					cylindres[boneIdx].layer = kLayerPrioritaire;
 				}
 			} else {
 				cylindres[boneIdx].SetActive(false);
@@ -110,11 +102,7 @@ public class SkeletonDrawer : MonoBehaviour {
 				cylindres[boneIdx].SetActive(true);
 
 				if (estGuitare) {
-					if (GuitareController.JoueurEstVisible()) {
-						cylindres[boneIdx].layer = kLayerPrioritaire;
-					} else {
-						cylindres[boneIdx].layer = kLayerDefault;
-					}
+					cylindres[boneIdx].layer = kLayerPrioritaire;
 				}
 			} else {
 				cylindres[boneIdx].SetActive(false);
