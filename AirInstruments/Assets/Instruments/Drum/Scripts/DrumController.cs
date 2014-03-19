@@ -78,7 +78,7 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 		// S'assurer que Move Joints est active.
 		MoveJoints moveJoints = MoveJoints.ObtenirInstance ();
 		if (moveJoints != null) {
-			moveJoints.gameObject.SetActive(false);
+			moveJoints.gameObject.SetActive(true);
 		}
 	}
 	

@@ -19,6 +19,9 @@ public class GameState : MonoBehaviour {
 	// Controleur de la camera.
 	public CameraController cameraController;
 
+	// Assistance.
+	public GameObject assistance;
+
 	// Retourne l'unique instance de la classe GameState.
 	public static GameState ObtenirInstance() {
 		return instance;
@@ -91,6 +94,7 @@ public class GameState : MonoBehaviour {
 		if (currentState == State.ChooseInstrument) {
 
 			cameraController.AccederEtat(previousState, State.ChooseInstrument);
+			assistance.SetActive (true);
 			choixInstrumentControleur.Prepare();
 
 		} else if (currentState == State.Piano) {
@@ -144,6 +148,11 @@ public class GameState : MonoBehaviour {
 			guitareController.gameObject.SetActive (true);
 			guitareController.AnimationTerminee();
 			
+		}
+
+		// Desactiver l'assistance pour tous les etats sauf le choix d'instrument.
+		if (currentState != State.ChooseInstrument) {
+			assistance.SetActive (false);
 		}
 
 		transitionTerminee = true;
