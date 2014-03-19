@@ -33,7 +33,7 @@ public class BaguetteDrum : MonoBehaviour {
 		                                                           main.transform.position,
 		                                                           kVitesseBaguette * Time.deltaTime);*/
 		Vector3 deplacement = main.transform.position - boutBaguetteMain.transform.position;
-		if (deplacement.magnitude >= 0.1f) {
+		if (deplacement.magnitude >= 0.40f) {
 			transform.position = transform.position + deplacement;
 		}
 	}
