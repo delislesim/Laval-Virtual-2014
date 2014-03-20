@@ -17,7 +17,7 @@ public class CubesTombantsGuitare : MonoBehaviour {
 		ViderCubes ();
 
 		for (int i = 0; i < partition.Count; ++i) {
-			AjouterCube(partition[i].time);
+			AjouterCube(partition[i].time, partition[i].positionManche);
 		}
 	}
 
@@ -47,13 +47,20 @@ public class CubesTombantsGuitare : MonoBehaviour {
 		}
 	}
 
-	private void AjouterCube(float temps) {
+	private void AjouterCube(float temps, PartitionGuitar.PositionManche positionManche) {
 		GameObject cubeTombant = (GameObject)Instantiate (cubeTombantPrefab);
 		cubeTombant.transform.parent = this.transform;
-		
-		cubeTombant.transform.localPosition = new Vector3 (temps * kEspaceEntreCubes, 0, 0);
+
+		Vector3 localPosition = new Vector3 (temps * kEspaceEntreCubes, 0, 0);
 		cubeTombant.transform.localRotation = Quaternion.identity;
-		cubeTombant.transform.localScale = Vector3.one;
+		cubeTombant.transform.localScale = new Vector3 (1.0f, 0.5f, 1.0f);
+
+		if (positionManche == PartitionGuitar.PositionManche.LOIN) {
+			localPosition.y = -0.25f;
+		} else {
+			localPosition.y = 0.25f;
+		}
+		cubeTombant.transform.localPosition = localPosition;
 		
 		cubes.Enqueue (cubeTombant);
 	}

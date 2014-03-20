@@ -160,7 +160,7 @@ public class PartitionGuitar {
 					return false;
 
 				// Ajouter au tableau de prochaines notes.
-				partition.Add (new Playable(duree, notToTone[val], style, octave));
+				partition.Add (new Playable(duree, notToTone[val], style, octave, PositionManche.LOIN));
 				//Debug.Log ("Found note : " + val);               
 				return true;
 			}
@@ -168,19 +168,32 @@ public class PartitionGuitar {
 		return false;
 	}
 
+	// Position a laquelle la note doit etre jouee sur le manche
+	// de la guitare.
+	public enum PositionManche {
+		LOIN,
+		PRES
+	}
+
 	public struct Playable{
 		public float time;
 		public GuitarPlayer.Tone note;
 		public GuitarPlayer.Style style;
 		public int octave;
+		public PositionManche positionManche;
 
 		// Constructor:
-		public Playable(float duree, GuitarPlayer.Tone tone, GuitarPlayer.Style style, int octave) 
+		public Playable(float duree,
+		                GuitarPlayer.Tone tone,
+		                GuitarPlayer.Style style,
+		                int octave,
+		                PositionManche positionManche) 
 		{
 			this.time = duree;
 			this.note = tone;
 			this.style = style;
 			this.octave = octave;
+			this.positionManche = positionManche;
 		}
 	}
 
