@@ -30,7 +30,7 @@ public class PartitionGuitar {
 	public void RemplirPartition(List<Playable> partition) {
 
 		string ligne;
-		while ((ligne = streamReader.ReadLine()) != null) {
+		while ((ligne = streamReader.ReadLine()) != null && partition.Count < 4) {
 			int pos = 0;
 
 			// Lire les notes.
@@ -46,7 +46,7 @@ public class PartitionGuitar {
 		                           0,
 		                           PositionManche.LOIN,
 		                           Solo.DEBUT));
-		partition.Add(new Playable(tempsDerniereNote + 10.0f,
+		partition.Add(new Playable(tempsDerniereNote + 20.0f,
 		                           GuitarPlayer.Tone.A,
 		                           GuitarPlayer.Style.CHORD,
 		                           0,
