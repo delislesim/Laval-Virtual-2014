@@ -49,11 +49,15 @@ public class GuidageTutorial : MonoBehaviour {
 				EstEnTrainEntrer = false;
 			}
 			if (positionCible == Position.HAUT) {
-				float position = spring(kPositionCacherHaut, kPositionHaut, proportion);
-				DefinirPositionReelle(position);
+				float positionContenu = spring(kPositionCacherHaut, kPositionHaut, proportion);
+				DefinirPositionReelle(positionContenu);
+				float positionBackground = easeOutSine(kPositionCacherHaut, kPositionHaut, proportion);
+				DefinirPositionReelleFond(positionBackground);
 			} else {
-				float position = spring(kPositionCacherBas, kPositionBas, proportion);
-				DefinirPositionReelle(position);
+				float positionContenu = spring(kPositionCacherBas, kPositionBas, proportion);
+				DefinirPositionReelle(positionContenu);
+				float positionBackground = easeOutSine(kPositionCacherBas, kPositionBas, proportion);
+				DefinirPositionReelleFond(positionBackground);
 			}
 		} else if(EstEnTrainDeMasquer) {
 			if (proportion > 1.0f) {
@@ -63,11 +67,15 @@ public class GuidageTutorial : MonoBehaviour {
 			}
 
 			if (positionCible == Position.HAUT) {
-				float position = spring(kPositionHaut, kPositionCacherHaut, proportion);
-				DefinirPositionReelle(position);
+				float positionContenu = spring(kPositionHaut, kPositionCacherHaut, proportion);
+				DefinirPositionReelle(positionContenu);
+				float positionBackground = easeOutSine(kPositionHaut, kPositionCacherHaut, proportion);
+				DefinirPositionReelleFond(positionBackground);
 			} else {
-				float position = spring(kPositionBas, kPositionCacherBas, proportion);
-				DefinirPositionReelle(position);
+				float positionContenu = spring(kPositionBas, kPositionCacherBas, proportion);
+				DefinirPositionReelle(positionContenu);
+				float positionBackground = easeOutSine(kPositionBas, kPositionCacherBas, proportion);
+				DefinirPositionReelleFond(positionBackground);
 			}
 		}
 	}
@@ -82,7 +90,8 @@ public class GuidageTutorial : MonoBehaviour {
 		this.positionCible = positionCible;
 	}
 
-	private void DefinirPositionReelle(float positionRelle) {
+	// Positionnement du background.
+	private void DefinirPositionReelleFond(float positionRelle) {
 		Vector2 positionTransformee = TransformerCoordonnees (new Vector2(0, positionRelle));
 		Vector2 tailleTransformee = TransformerCoordonnees (tailleBackground);
 		Rect pixelInset = background.pixelInset;
@@ -91,6 +100,12 @@ public class GuidageTutorial : MonoBehaviour {
 		pixelInset.width = tailleTransformee.x;
 		pixelInset.height = tailleTransformee.y;
 		background.pixelInset = pixelInset;
+	}
+
+	// Positionnement du pictogramme et du texte.
+	private void DefinirPositionReelle(float positionRelle) {
+		Vector2 positionTransformee = TransformerCoordonnees (new Vector2(0, positionRelle));
+		Vector2 tailleTransformee = TransformerCoordonnees (tailleBackground);
 		
 		Vector2 positionTexteTransformee = positionTransformee + TransformerCoordonnees (positionTexte);
 		texte.pixelOffset = positionTexteTransformee;
@@ -166,6 +181,11 @@ public class GuidageTutorial : MonoBehaviour {
 		return start + (end - start) * value;
 	}
 
+	private float easeOutSine(float start, float end, float value){
+		end -= start;
+		return end * Mathf.Sin(value / 1 * (Mathf.PI / 2)) + start;
+	}
+
 	// Indique si le guidage a ete demarre une premiere fois.
 	private bool initialized = false;
 
@@ -191,7 +211,7 @@ public class GuidageTutorial : MonoBehaviour {
 	private bool EstEnTrainEntrer = false;
 
 	// Duree d'une animation.
-	private const float kTempsAnimation = 1.0f;
+	private const float kTempsAnimation = 0.5f;
 
 	// Temps écoulé depuis le début de l'animation
 	private float tempsEcoule = 0;
