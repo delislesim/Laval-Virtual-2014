@@ -12,6 +12,12 @@ public class GuitarPlayer : MonoBehaviour {
 	public Transform LeftHandTransform;
 	public AssistedModeControllerGuitar AssistedCtrl;
 
+	// Halos inquant sur quelle partie du manche on se trouve, pour le mode assiste.
+	public List<GameObject> halosAssiste;
+
+	// Halos indiquant sur quelle partie du manche on se trouve, pour le mode libre.
+	public List<GameObject> halosLibre;
+
 	public enum Tone : int
 	{
 		E = 0, F, Gb, G, Ab, A, Bb, B, C, Db, D, Eb
@@ -95,7 +101,6 @@ public class GuitarPlayer : MonoBehaviour {
 			int note = (int)AssistedCtrl.getCurrentTone();
 			int octave = AssistedCtrl.getCurrentOctave();
 			int idx = 0;
-			level = level / 2; //Max level = 2, should be 0 or 1
 			//Debug.Log ("Octave : " + octave);
 			if(style == Style.NOTE){
 				switch(level){
@@ -155,6 +160,39 @@ public class GuitarPlayer : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		// Animer les halos indiquant sur quelle partie du manche se trouve la main.
+		int level = SetPitchLevel ();
+		if (AssistedModeControllerGuitar.EstActive ()) {
+			for (int i = 0; i < halosLibre.Count; ++i) {
+				AnimerTransparent(halosLibre[i], false);
+			}
+			for (int i = 0; i < halosAssiste.Count; ++i) {
+				AnimerTransparent(halosAssiste[i], level == i);
+			}
+		} else {
+			for (int i = 0; i < halosLibre.Count; ++i) {
+				AnimerTransparent(halosLibre[i], level == i);
+			}
+			for (int i = 0; i < halosAssiste.Count; ++i) {
+				AnimerTransparent(halosAssiste[i], false);
+			}
+		}
+	}
+
+	// Animer les halos inquant quelle note le guitariste joue.
+	void AnimerTransparent(GameObject transparent, bool allume) {
+		Color32 color = transparent.renderer.material.color;
+		Color32 nextColor;
+		if (allume) {
+			transparent.SetActive(true);
+			nextColor = Color.Lerp(color, Color.white, Time.deltaTime * 6.0f);
+		} else {
+			nextColor = Color.Lerp(color, Color.black, Time.deltaTime * 6.0f);
+			if (nextColor == Color.black) {
+				transparent.SetActive (false);
+			}
+		}
+		transparent.renderer.material.color = nextColor;
 	}
 
 	/// <summary>
@@ -175,7 +213,12 @@ public class GuitarPlayer : MonoBehaviour {
 			niveauAigue = 2;
 		else if(3*LONGUEUR_MANCHE > dist && dist >= LONGUEUR_MANCHE/10)
 			niveauAigue = 3;
-		//Debug.Log ("Pitch Level : " + niveauAigue );
+
+		if (AssistedModeControllerGuitar.EstActive()) {
+			// Seulement 2 niveaux dans le mode assiste.
+			niveauAigue = niveauAigue / 2; //Max level = 2, should be 0 or 1
+		}
+
 		return niveauAigue;
 	}
 

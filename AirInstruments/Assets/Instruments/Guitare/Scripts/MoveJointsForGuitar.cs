@@ -86,7 +86,7 @@ public class MoveJointsForGuitar : MonoBehaviour {
 			handFollower.SignalerNouvellePosition();
 		}
 
-		// Mettre le bon layer a la guitare et a sa ligne verte.
+		// Mettre le bon layer a la ligne verte.
 		if (GuitareController.JoueurEstVisible ()) {
 			ligneVerte.SetActive (true);
 		} else {
