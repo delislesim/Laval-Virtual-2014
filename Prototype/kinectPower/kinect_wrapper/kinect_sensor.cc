@@ -272,27 +272,25 @@ bool KinectSensor::PollNextSkeletonFrame(KinectSensorData* data) {
   DWORD track_ids[kNumTrackedSkeletons];
   ZeroMemory(track_ids, sizeof(track_ids));
 
-  for (int i = 0; i < kNumTrackedSkeletons; ++i) {
-    for (int j = 0; j < NUI_SKELETON_COUNT; ++j) {
-      if (frame->SkeletonData[j].eTrackingState != NUI_SKELETON_NOT_TRACKED) {
-        DWORD track_id = frame->SkeletonData[j].dwTrackingID;
-        if (track_id == skeleton_sticky_ids_[i]) {
-          track_ids[i] = track_id;
-          break;
-        }
+  for (int j = 0; j < NUI_SKELETON_COUNT; ++j) {
+    if (frame->SkeletonData[j].eTrackingState != NUI_SKELETON_NOT_TRACKED) {
+      DWORD track_id = frame->SkeletonData[j].dwTrackingID;
+      if (track_id == skeleton_sticky_ids_[0]) {
+        track_ids[0] = track_id;
+        break;
       }
     }
   }
 
   // Find new skeletons.
   FindNewSkeletons(track_ids, frame);
-  if (!track_ids[0] && !track_ids[1] && num_skeletons_to_avoid_ != 0) {
+  if (!track_ids[0] && num_skeletons_to_avoid_ != 0) {
     num_skeletons_to_avoid_ = 0;
     FindNewSkeletons(track_ids, frame);
   }
 
   skeleton_sticky_ids_[0] = track_ids[0];
-  skeleton_sticky_ids_[1] = track_ids[1];
+  skeleton_sticky_ids_[1] = 0;
 
   skeleton_frame.SetTrackedSkeletons(track_ids[0], track_ids[1]);
   data->InsertSkeletonFrame(skeleton_frame);
@@ -314,11 +312,13 @@ bool KinectSensor::PollNextSkeletonFrame(KinectSensorData* data) {
 }
 
 void KinectSensor::AvoidCurrentSkeleton() {
+  /*
   if (skeleton_sticky_ids_[0] == 0) {
     skeleton_sticky_ids_[0] = skeleton_sticky_ids_[1];
     skeleton_sticky_ids_[1] = 0;
     return;
   }
+  */
 
   if (num_skeletons_to_avoid_ == NUI_SKELETON_COUNT) {
     num_skeletons_to_avoid_ = 0;
@@ -332,10 +332,49 @@ void KinectSensor::AvoidCurrentSkeleton() {
 }
 
 void KinectSensor::FindNewSkeletons(DWORD* track_ids, NUI_SKELETON_FRAME* frame) {
-  for (int i = 0; i < NUI_SKELETON_COUNT; i++) {
-    if (track_ids[0] && track_ids[1])
-      break;
+  if (track_ids[0])
+    return;
 
+  const float xCible = 0.18f;
+  const float toleranceX = 0.4f;
+
+  // Prendre en note les x des squelettes.
+  std::vector<float> centres;
+  for (int i = 0; i < NUI_SKELETON_COUNT; i++) {
+    DWORD track_id = frame->SkeletonData[i].dwTrackingID;
+    float x = frame->SkeletonData[i].Position.x;
+
+    // Ne pas selectionner le squelette s'il n'est pas tracked ou qu'il est trop loin.
+    if (frame->SkeletonData[i].eTrackingState == NUI_SKELETON_NOT_TRACKED ||
+        frame->SkeletonData[i].Position.z > kDistanceMaxToTrackSkeleton) {
+      centres.push_back(1000.0f);
+      continue;
+    }
+
+    // Ne pas selectionner le squelette s'il fait partie de ceux a eviter.
+    bool ok = true;
+    for (int j = 0; j < num_skeletons_to_avoid_; ++j) {
+      if (track_id == skeletons_to_avoid_[j]) {
+        ok = false;
+      }
+    }
+    if (!ok) {
+      centres.push_back(1000.0f);
+      continue;
+    }
+
+    // Le squelette est un candidat potentiel.
+    float distance = abs(x - xCible);
+
+
+    centres.push_back(distance);
+  }
+  
+  // Trier les distances 
+  std::sort(centres.begin(), centres.end());
+
+  // Choisir le meilleur squelette.
+  for (int i = 0; i < NUI_SKELETON_COUNT; i++) {
     if (frame->SkeletonData[i].eTrackingState != NUI_SKELETON_NOT_TRACKED &&
         frame->SkeletonData[i].Position.z < kDistanceMaxToTrackSkeleton) {
       DWORD track_id = frame->SkeletonData[i].dwTrackingID;
@@ -350,10 +389,15 @@ void KinectSensor::FindNewSkeletons(DWORD* track_ids, NUI_SKELETON_FRAME* frame)
       if (!ok)
         continue;
 
-      if (!track_ids[0] && track_id != track_ids[1])
+      // Calculer la distance pour voir s'il s'agit de la meilleure distance.
+      float x = frame->SkeletonData[i].Position.x;
+      float distance = abs(x - xCible);
+
+      // S'il s'agit de la meilleure distance, on choisit le squelette.
+      if (distance == centres[0] && distance <= toleranceX) {
         track_ids[0] = track_id;
-      else if (!track_ids[1] && track_id != track_ids[0])
-        track_ids[1] = track_id;
+        break;
+      }
     }
   }
 }

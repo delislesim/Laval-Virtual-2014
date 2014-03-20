@@ -97,6 +97,8 @@ public class KinectPower : MonoBehaviour {
 					DrawSkeleton(streamTexture, first_skeleton);
 				}
 
+				Vector3 hipPosition;
+				first_skeleton.GetJointPosition(Skeleton.Joint.HipCenter, out hipPosition);
 			}
 		}
 	}
@@ -182,6 +184,9 @@ public class KinectPower : MonoBehaviour {
 	// draws a line in a texture
 	private void DrawLine(Texture2D a_Texture, int x1, int y1, int x2, int y2, Color a_Color)
 	{
+		x1 = kStreamWidth - 1 - x1;
+		x2 = kStreamWidth - 1 - x2;
+
 		int width = a_Texture.width;
 		int height = a_Texture.height;
 		
