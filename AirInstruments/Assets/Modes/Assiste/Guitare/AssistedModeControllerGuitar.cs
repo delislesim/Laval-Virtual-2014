@@ -72,6 +72,7 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 		currentTone = partition[currentPartitionIndex].note;
 		currentStyle = partition[currentPartitionIndex].style;
 		currentOctave = partition[currentPartitionIndex].octave;
+		currentSolo = partition [currentPartitionIndex].solo == PartitionGuitar.Solo.DEBUT;
 
 		if (partition[currentPartitionIndex].time > 0.15f) {
 			handFollower.DefinirTempsProchaineNote(partition[currentPartitionIndex].time);
@@ -99,6 +100,10 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 			tempsEcoule < partition [partition.Count - 1].time + 1.0f; // Attendre 1 seconde apres la fin de la musique.
 	}
 
+	public static bool EstSolo() {
+		return EstActive() && currentSolo;
+	}
+
 	void Update () {
 		if (!EstActive())
 			return;
@@ -115,6 +120,14 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 				currentTone = partition[currentPartitionIndex].note;
 				currentStyle = partition[currentPartitionIndex].style;
 				currentOctave = partition[currentPartitionIndex].octave;
+
+				// Activer / desactiver le solo.
+				PartitionGuitar.Solo solo = partition[currentPartitionIndex].solo;
+				if (solo == PartitionGuitar.Solo.DEBUT) {
+					currentSolo = true;
+				} else if (solo == PartitionGuitar.Solo.FIN) {
+					currentSolo = false;
+				}
 
 				float tempsNoteCourante = partition[currentPartitionIndex].time;
 				float tempsNotePrecedente = partition[currentPartitionIndex - 1].time;
@@ -143,6 +156,7 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 	//private float tempsNotes; // Temps qui augmente avec les duree des notes. (par step)
 	private int currentPartitionIndex;
 	private int currentOctave;
+	private static bool currentSolo;
 
 	private GuitarPlayer.Tone currentTone;
 	private GuitarPlayer.Style currentStyle;

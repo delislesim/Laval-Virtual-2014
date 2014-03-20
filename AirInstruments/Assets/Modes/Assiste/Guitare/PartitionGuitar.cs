@@ -37,6 +37,21 @@ public class PartitionGuitar {
 			while (ReadNoteDePartition(ligne, ref pos, partition)) {}
 
 		}
+
+		// TODO TEMPORAIRE: Ajout d'un solo a la fin de la partition.
+		float tempsDerniereNote = partition [partition.Count - 1].time;
+		partition.Add(new Playable(tempsDerniereNote + 1.0f,
+		                           GuitarPlayer.Tone.A,
+		                           GuitarPlayer.Style.CHORD,
+		                           0,
+		                           PositionManche.LOIN,
+		                           Solo.DEBUT));
+		partition.Add(new Playable(tempsDerniereNote + 10.0f,
+		                           GuitarPlayer.Tone.A,
+		                           GuitarPlayer.Style.CHORD,
+		                           0,
+		                           PositionManche.LOIN,
+		                           Solo.FIN));
 	}
 
 	private float ReadNumber(string ligne, ref int pos) {
@@ -118,9 +133,9 @@ public class PartitionGuitar {
 			{
 
 				// Lire la duree.
-				float duree = ReadNumber (ligne, ref pos);
-				if (duree < 0)
-					duree = dureeParDefaut;
+				float time = ReadNumber (ligne, ref pos);
+				if (time < 0)
+					time = dureeParDefaut;
 
 				// Lire la note. val = Tone {} ou [] = Style
 				string val = "";
@@ -160,7 +175,12 @@ public class PartitionGuitar {
 					return false;
 
 				// Ajouter au tableau de prochaines notes.
-				partition.Add (new Playable(duree, notToTone[val], style, octave, PositionManche.LOIN));
+				partition.Add (new Playable(time,
+				                            notToTone[val],
+				                            style,
+				                            octave,
+				                            PositionManche.LOIN,
+				                            Solo.NON));
 				//Debug.Log ("Found note : " + val);               
 				return true;
 			}
@@ -175,6 +195,12 @@ public class PartitionGuitar {
 		PRES
 	}
 
+	public enum Solo {
+		NON,
+		DEBUT,
+		FIN
+	}
+
 	public struct Playable{
 		public float time;
 		public GuitarPlayer.Tone note;
@@ -182,18 +208,23 @@ public class PartitionGuitar {
 		public int octave;
 		public PositionManche positionManche;
 
+		// Permet d'indiquer si cette note est un debut ou une fin de solo.
+		public Solo solo;
+
 		// Constructor:
-		public Playable(float duree,
+		public Playable(float time,
 		                GuitarPlayer.Tone tone,
 		                GuitarPlayer.Style style,
 		                int octave,
-		                PositionManche positionManche) 
+		                PositionManche positionManche,
+		                Solo solo) 
 		{
-			this.time = duree;
+			this.time = time;
 			this.note = tone;
 			this.style = style;
 			this.octave = octave;
 			this.positionManche = positionManche;
+			this.solo = solo;
 		}
 	}
 
