@@ -105,7 +105,7 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 	}
 
 	void Update () {
-		if (!EstActive())
+		if (partition == null || tempsEcoule > partition [partition.Count - 1].time + 6.0f)
 			return;
 		
 		// Temps actuel, en secondes.
