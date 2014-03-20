@@ -127,6 +127,9 @@ public class ChoixInstrumentController : MonoBehaviour {
 		pointeur.gameObject.SetActive (true);
 		*/
 
+		// Affichage des squelettes.
+		KinectPower.SetAffichageSqueletteActive (true);
+
 		// Jouer la voix donnant les instructions.
 		audio.Play ();
 

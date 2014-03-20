@@ -25,14 +25,28 @@ public class KinectPower : MonoBehaviour {
 	public ReplayMode replay = ReplayMode.NO_REPLAY;
 	public string replayFilename = "replay.boubou";
 
+	// Indique si le squelette principal doit etre affiche.
+	public static void SetAffichageSqueletteActive(bool active) {
+		affichageSqueletteActive = active;
+	}
+
+	// Indique si le squelette principal doit etre affiche.
+	private static bool affichageSqueletteActive = false;
+
 	// Use this for initialization
 	void Start () {
 		KinectPowerInterop.Initialize(false /* pas de near mode */,
 		                              replay != ReplayMode.REPLAY);
 
     	streamTexture = new Texture2D(kStreamWidth, kStreamHeight);
-    	streamRect = new Rect(Screen.width, Screen.height - streamTexture.height,
-                                -streamTexture.width/2, streamTexture.height/2);
+
+		float largeur = Screen.width / 12.0f;
+		float hauteur = largeur * 480.0f / 640.0f;
+
+    	streamRect = new Rect(Screen.width/2 - largeur/2,
+		                      hauteur / 4.0f,
+                              largeur,
+		                      hauteur);
 
 		if (replay == ReplayMode.RECORD) {
 			KinectPowerInterop.RecordSensor(0, replayFilename);
@@ -52,6 +66,7 @@ public class KinectPower : MonoBehaviour {
 			UnityEngine.Debug.Log("avoid current skeleton");
 		}
 
+		/*
 		if (showDepthImage) {
 		    KinectPowerInterop.GetDepthImage(streamBuffer, (uint)streamBuffer.Length);
 		    
@@ -65,19 +80,23 @@ public class KinectPower : MonoBehaviour {
 			streamTexture.SetPixels32(streamColors);
 			streamTexture.Apply();
 		}
+		*/
 
-		if (showSkeletons) {
-			if (!showDepthImage && !showColorImage) {
-				streamTexture.SetPixels32(streamColors);
-			}
+		if (showSkeletons || affichageSqueletteActive) {
+			timerSquelettes += Time.deltaTime;
+			float periodeSquelette = 1.0f / (float)kNumSquelettesParSeconde;
+			if (timerSquelettes >= periodeSquelette) {
+				timerSquelettes = 0;
 
-			Skeleton first_skeleton = new Skeleton(0);
-			if (first_skeleton.Exists()) {
-				DrawSkeleton(streamTexture, first_skeleton);
-			}
-			Skeleton second_skeleton = new Skeleton(1);
-			if (second_skeleton.Exists()) {
-				DrawSkeleton(streamTexture, second_skeleton);
+				if (!showDepthImage && !showColorImage) {
+					streamTexture.SetPixels32(streamColors);
+				}
+
+				Skeleton first_skeleton = new Skeleton(0);
+				if (first_skeleton.Exists()) {
+					DrawSkeleton(streamTexture, first_skeleton);
+				}
+
 			}
 		}
 	}
@@ -107,7 +126,7 @@ public class KinectPower : MonoBehaviour {
 
 	void OnGUI()
 	{
-		if (showDepthImage || showColorImage || showSkeletons)
+		if (showDepthImage || showColorImage || showSkeletons || affichageSqueletteActive)
 			GUI.DrawTexture(streamRect, streamTexture);
 	}
 
@@ -132,7 +151,7 @@ public class KinectPower : MonoBehaviour {
 		int width = aTexture.width;
 		int height = aTexture.height;
 
-		Color color = skeleton.GetID () == 0 ? Color.yellow : Color.red;
+		Color color = new Color32 (153, 215, 254, 255);
 
 		for(int i = 0; i < jointsCount; i++)
 		{
@@ -237,7 +256,13 @@ public class KinectPower : MonoBehaviour {
 	}
 
 	private bool initialized = false;
-	
+
+	// Nombre de rafraichissements du squelette par seconde.
+	private const int kNumSquelettesParSeconde = 15;
+
+	// Timer pour les squelettes par seconde.
+	private float timerSquelettes = 0;
+
 	// Depth and color stream.
 	private Rect streamRect;
 	private Texture2D streamTexture;

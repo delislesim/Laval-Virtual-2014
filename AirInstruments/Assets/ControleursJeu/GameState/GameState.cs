@@ -65,6 +65,8 @@ public class GameState : MonoBehaviour {
 			return;
 		}
 
+		KinectPower.SetAffichageSqueletteActive (false);
+
 		transitionTerminee = false;
 		previousState = currentState;
 
