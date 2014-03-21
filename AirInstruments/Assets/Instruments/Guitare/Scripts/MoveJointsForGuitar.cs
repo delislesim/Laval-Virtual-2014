@@ -45,7 +45,7 @@ public class MoveJointsForGuitar : MonoBehaviour {
 	private Quaternion[] current_rotations;
 	private Quaternion[] last_rotations;
 	private const float STRUMMING_HAND_SPEED = 2.0f;
-	private Vector3 HIDING_POS = new Vector3(100, 100, 100);
+	public static Vector3 HIDING_POS = new Vector3(100, 100, 100);
 	private const float PLAYER_HIGHT = 5.0f;
 	private const float DELTA_CHECK_TIME = 5.0f;
 	private float accumulated_time;

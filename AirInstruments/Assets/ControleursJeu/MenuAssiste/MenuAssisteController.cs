@@ -16,6 +16,10 @@ public class MenuAssisteController : MonoBehaviour {
 		return instance;
 	}
 
+	public bool EstVisible() {
+		return gameObject.activeSelf;
+	}
+
 	public void Afficher() {
 		numBoutonsDesactives = 0;
 		estEnTrainDeCacher = false;

@@ -57,6 +57,8 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 
 		MenuAssisteController.ObtenirInstance ().Cacher ();
 		Tutorial.ObtenirInstance ().gameObject.SetActive (false);
+
+		CameraSolo.ObtenirInstance ().ReinitialiserCamera ();
 	}
 
 	public void Update() {
@@ -277,6 +279,10 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 		return joueurVisible && !menuModeAssisteActif && !menuChoixGammeActif;
 	}
 
+	public static bool EstEnTrainDeQuitter() {
+		return estEnTrainDeQuitter;
+	}
+
 	// Tutorial.
 	private TutorialGuitare tutorial;
 
@@ -293,7 +299,7 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 	private static bool joueurVisible = false;
 
 	// Indique si on est en train de quitter la scene.
-	private bool estEnTrainDeQuitter = false;
+	private static bool estEnTrainDeQuitter = false;
 
 	// Indique si le menu du mode assiste est affiche.
 	private static bool menuModeAssisteActif = false;
