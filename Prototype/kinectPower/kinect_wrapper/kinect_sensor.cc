@@ -461,14 +461,13 @@ bool KinectSensor::MapSkeletonPointToDepthPoint(Vector4 skeleton_point,
 
 bool KinectSensor::MapSkeletonPointToColorPoint(Vector4 skeleton_point,
                                                 cv::Vec2i* color_point) {
-  NUI_DEPTH_IMAGE_POINT depth_image_point;
-  HRESULT res = coordinate_mapper_->MapSkeletonPointToDepthPoint(
-    &skeleton_point, kDepthImageResolution, &depth_image_point);
+  NUI_COLOR_IMAGE_POINT color_image_point;
+  HRESULT res = coordinate_mapper_->MapSkeletonPointToColorPoint(
+    &skeleton_point, kColorImageType, kColorImageResolution, &color_image_point);
   if (FAILED(res))
     return false;
 
-  *depth_point = cv::Vec2i(depth_image_point.x, depth_image_point.y);
-  *depth = depth_image_point.depth;
+  *color_point = cv::Vec2i(color_image_point.x, color_image_point.y);
 
   return true;
 }

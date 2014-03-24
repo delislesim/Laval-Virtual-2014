@@ -32,6 +32,7 @@ public class BaguetteDrum : MonoBehaviour {
 		Vector3 nouvellePositionBoutBaguette = Vector3.MoveTowards (boutBaguetteMain.transform.position,
 		                                                           main.transform.position,
 		                                                           kVitesseBaguette * Time.deltaTime);*/
+		renderer.enabled = main.renderer.enabled;
 		Vector3 deplacement = main.transform.position - boutBaguetteMain.transform.position;
 		if (deplacement.magnitude >= 0.40f) {
 			transform.position = transform.position + deplacement;

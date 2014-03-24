@@ -82,6 +82,11 @@ public class GestureRecognition : MonoBehaviour {
 		return bloque;
 	}
 
+	public void RemoveGesture(GestureId gestureId)
+	{
+		gestureList.RemoveAll (x => x.GestureId_ == gestureId);
+	}
+
 	private Skeleton skeleton_ = new Skeleton(0);
 
 	private List<Gesture> gestureList = new List<Gesture>();

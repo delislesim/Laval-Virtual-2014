@@ -51,7 +51,6 @@ public class DrumDecoration : MonoBehaviour {
 
 		// Faire l'animation.
 		if (actionCourante == ActionCourante.AFFICHER) {
-			Debug.Log(proportion);
 			transform.position = new Vector3(easeOutCubic(positionCachee.x, positionInitiale.x, proportion),
 			                                 easeOutCubic(positionCachee.y, positionInitiale.y, proportion),
 			                                 easeOutCubic(positionCachee.z, positionInitiale.z, proportion));
