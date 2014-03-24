@@ -37,36 +37,6 @@ public class PartitionGuitar {
 			while (ReadNoteDePartition(ligne, ref pos, partition)) {}
 
 		}
-
-		// TODO TEMPORAIRE: Ajout d'un solo a la fin de la partition.
-		float tempsDerniereNote = partition [partition.Count - 1].time;
-		partition.Add(new Playable(tempsDerniereNote + 1.0f,
-		                           GuitarPlayer.Tone.A,
-		                           GuitarPlayer.Style.CHORD,
-		                           0,
-		                           PositionManche.LOIN,
-		                           Solo.DEBUT));
-
-		// Solo ajoute artificiellement.
-		float tempsSolo = tempsDerniereNote + 1.0f;
-		for (int i = 0; i < 100; ++i) {
-			tempsSolo += 0.5f;
-
-			partition.Add(new Playable(tempsSolo,
-			                           partition[i].note,
-			                           partition[i].style,
-			                           partition[i].octave,
-			                           PositionManche.PRES,
-			                           Solo.NON));
-		}
-
-		tempsSolo += 1.0f;
-		partition.Add(new Playable(tempsSolo,
-		                           GuitarPlayer.Tone.A,
-		                           GuitarPlayer.Style.CHORD,
-		                           0,
-		                           PositionManche.LOIN,
-		                           Solo.FIN));
 	}
 
 	private float ReadNumber(string ligne, ref int pos) {
@@ -156,6 +126,7 @@ public class PartitionGuitar {
 				string val = "";
 				int octave = 0;
 				bool hasSeenNoteBeginning = false;
+				Solo solo = Solo.NON;
 				GuitarPlayer.Style style = GuitarPlayer.Style.NOTE;
 				for (int i = pos; i < ligne.Length; ++i) {
 					Char caractere = ligne[i];
@@ -166,7 +137,7 @@ public class PartitionGuitar {
 					            caractere=='F' ||caractere=='G'  || caractere == '#') && hasSeenNoteBeginning ) {
 						val += caractere;
 						pos = i + 1;
-					}else if ((caractere=='0' || caractere=='1' ||caractere=='2') && hasSeenNoteBeginning ) {
+					}else if ((caractere=='0' || caractere=='1' ||caractere=='2' || caractere=='3') && hasSeenNoteBeginning ) {
 						float numeric_val;
 						string oc = "";
 						oc += caractere;
@@ -181,6 +152,20 @@ public class PartitionGuitar {
 						hasSeenNoteBeginning = true;
 						style = GuitarPlayer.Style.CHORD;
 						pos = i + 1;
+					}else if (caractere == '*') {
+						hasSeenNoteBeginning = true;
+						val="B";
+						octave = 1;
+						solo = Solo.DEBUT;
+						style = GuitarPlayer.Style.CHORD;
+						break;
+					}else if (caractere == '_') {
+						hasSeenNoteBeginning = true;
+						val="E";
+						octave = 0;
+						solo = Solo.FIN;
+						style = GuitarPlayer.Style.CHORD;
+						break;
 					} else {
 						pos= i+1;
 					}
@@ -195,7 +180,7 @@ public class PartitionGuitar {
 				                            style,
 				                            octave,
 				                            PositionManche.LOIN,
-				                            Solo.NON));
+				                            solo));
 				//Debug.Log ("Found note : " + val);               
 				return true;
 			}
