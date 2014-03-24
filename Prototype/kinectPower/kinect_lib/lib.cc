@@ -187,7 +187,7 @@ bool GetJointsPositionDepth(int skeleton_id, int* joint_positions) {
   return true;
 }
 
-bool GetHeadPositionDepth(int skeleton_id, int* joint_position) {
+bool GetHeadPositionColor(int skeleton_id, int* coords) {
   KinectWrapper* wrapper = KinectWrapper::instance();
 
   const KinectSkeletonFrame* skeleton_frame =
@@ -201,7 +201,18 @@ bool GetHeadPositionDepth(int skeleton_id, int* joint_position) {
   if (sensor == NULL)
     return false;
 
+  Vector4 pos_skeleton;
+  KinectSkeleton::JointStatus status = KinectSkeleton::NOT_TRACKED;
+  skeleton.GetJointPositionRaw(KinectSkeleton::Head, &pos_skeleton, &status);
 
+  cv::Vec2i pos_color(0, 0);
+  if (status != KinectSkeleton::NOT_TRACKED)
+    sensor->MapSkeletonPointToColorPoint(pos_skeleton, &pos_color);
+
+  coords[0] = pos_color.val[0];
+  coords[1] = pos_color.val[1];
+
+  return true;
 }
 
 bool AvoidCurrentSkeleton() {

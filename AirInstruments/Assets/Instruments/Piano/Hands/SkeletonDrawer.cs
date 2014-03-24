@@ -82,9 +82,11 @@ public class SkeletonDrawer : MonoBehaviour {
 				                                left_arm_spheres[i].transform.position);
 				cylindres[boneIdx].SetActive(true);
 
+				/*
 				if (estGuitare) {
 					cylindres[boneIdx].layer = kLayerPrioritaire;
 				}
+				*/
 			} else {
 				cylindres[boneIdx].SetActive(false);
 			}

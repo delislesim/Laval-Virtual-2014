@@ -40,6 +40,9 @@ public class KinectPowerInterop
 	[DllImport(@"kinect_lib.dll", EntryPoint = "AvoidCurrentSkeleton", CallingConvention = CallingConvention.Cdecl)]
 	public static extern bool AvoidCurrentSkeleton();
 
+	[DllImport(@"kinect_lib.dll", EntryPoint = "GetHeadPositionColor", CallingConvention = CallingConvention.Cdecl)]
+	public static extern bool GetHeadPositionColor(int skeleton_id, int[] coords);
+
 	// Kinect SDK constants.
 	public const int NUI_SKELETON_POSITION_COUNT = 20;
 
