@@ -27,6 +27,12 @@ public class PianoArrow : MonoBehaviour {
 		// Desactiver le guidage et laisser le controleur du piano le
 		// reactiver pour la prochaine frame si necessaire.
 		afficherGuidage = false;
+
+		// Reinitialiser le compteur pour afficher l'axe y.
+		if (!aDemandeY) {
+			compteurY = 0;
+		}
+		aDemandeY = false;
 	}
 
 	// Activer le guidage. Le parametre axe est 0 pour x, 1 pour y, 2 pour z.
@@ -37,6 +43,16 @@ public class PianoArrow : MonoBehaviour {
 		// cette frame ou que le guidage etait present a la frame precedente.
 		if (afficherGuidage && axe != axeDernierGuidage)
 			return;
+
+		// Ne pas afficher les fleches de l'axe y tout de suite.
+		if (axe == 1) {
+			compteurY += Time.deltaTime;
+			aDemandeY = true;
+
+			if (compteurY < kDelaiY)
+				return;
+		}
+
 
 		// Position du centre de la main.
 		Vector3 centreMain = (minMain + maxMain) / 2.0f;
@@ -59,7 +75,7 @@ public class PianoArrow : MonoBehaviour {
 				targetRotation.z = 90;
 			} else {
 				targetRotation.z = 270;
-			}
+				}
 		} else if (axe == 2) {
 			targetPosition.y = maxMain.y + 2.0f;
 			targetPosition.z -= 2.0f;
@@ -83,6 +99,14 @@ public class PianoArrow : MonoBehaviour {
 		afficherGuidage = true;
 	}
 
+	void OnEnable() {
+		axeGuidageCourant = -1;
+		axeDernierGuidage = -1;
+		afficherGuidage = false;
+		compteurY = 0;
+		aDemandeY = false;
+	}
+
 	// Axe du guidage courant.
 	private int axeGuidageCourant = -1;
 
@@ -91,5 +115,14 @@ public class PianoArrow : MonoBehaviour {
 
 	// Indique si la fleche doit etre affichee.
 	private bool afficherGuidage = false;
+
+	// Compteur pour afficher le guidage sur l'axe y.
+	private float compteurY = 0;
+
+	// Temps avant d'afficher le guidage sur l'axe y.
+	private const float kDelaiY = 0.75f;
+
+	// Indique si on a demande d'afficher le guidage y a la derniere frame.
+	private bool aDemandeY = false;
 
 }
