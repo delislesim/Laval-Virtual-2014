@@ -9,7 +9,7 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 	public AudioClip clipBoubou;
 
 	private string fichierLonelyBoy = ".\\Assets\\Modes\\Assiste\\Guitare\\Chansons\\Lonely Boy Audacity.aup";
-	private string fichierTNT = ".\\Assets\\Modes\\Assiste\\Guitare\\Chansons\\TNTForGuitarSOLO.aup";
+	private string fichierTNT = ".\\Assets\\Modes\\Assiste\\Guitare\\Chansons\\TNTForGuitar.aup";
 
 	// Cubes tombants.
 	public CubesTombantsGuitare cubesTombants;
