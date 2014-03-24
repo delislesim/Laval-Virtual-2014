@@ -12,7 +12,7 @@ public interface ComponentInterface
 	void ResetCoupsDernierTemps();
 
 	// Indique que le composant doit etre joue.
-	void DoitEtreJoue();
+	void DoitEtreJoue(bool materielBleu);
 
 	// Indique si le composant a ete joue depuis la derniere 
 	// fois qu'on a demande qu'il soit joue.

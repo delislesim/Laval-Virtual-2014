@@ -102,9 +102,11 @@ public class HighHatComponent : MonoBehaviour, ComponentInterface {
 	}
 
 	// Indique que le composant doit etre joue.
-	public void DoitEtreJoue() {
+	public void DoitEtreJoue(bool materielBleu) {
 		aEteJoue = false;
-		gameObjectVisible.renderer.material = materielDoitEtreJoue;
+		if (materielBleu) {
+			gameObjectVisible.renderer.material = materielDoitEtreJoue;
+		}
 	}
 	
 	// Indique si le composant a ete joue depuis la derniere 

@@ -64,7 +64,7 @@ public class DrumEtapeTambours : EtapeTutorial {
 				return true;
 			} else {
 				// Jouer le prochain composant.
-				components [prochainComposant].DoitEtreJoue();
+				components [prochainComposant].DoitEtreJoue(true);
 			}
 		}
 

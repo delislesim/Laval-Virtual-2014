@@ -7,6 +7,9 @@ public class DrumEtapeMitrailler : EtapeTutorial {
 	// Liste de composants a faire apparaitre un a la fois.
 	private List<DrumDecoration> decoration = new List<DrumDecoration>();
 
+	// Liste de tambours a frapper.
+	private List<ComponentInterface> components = new List<ComponentInterface>();
+
 	public DrumEtapeMitrailler(AudioClip son,
 	                           DrumComponent crash,
 	                           DrumComponent highHat,
@@ -27,13 +30,20 @@ public class DrumEtapeMitrailler : EtapeTutorial {
 
 		decoration.Add (snareDecoration);
 		decoration.Add (rideDecoration);
-
 		decoration.Add (crashDecoration);
 		decoration.Add (highHatDecoration);
 		decoration.Add (tom1Decoration);
 		decoration.Add (tom2Decoration);
 		decoration.Add (tomBigDecoration);
 		decoration.Add (bassDecoration);
+
+		components.Add (snare);
+		components.Add (ride);
+		components.Add (crash);
+		components.Add (highHat);
+		components.Add (tom1);
+		components.Add (tom2);
+		components.Add (tomBig);
 	}
 	
 	// Retourne le texte d'instruction qui doit etre affiche lors de
@@ -61,10 +71,14 @@ public class DrumEtapeMitrailler : EtapeTutorial {
 		}
 
 		decoration [0].Afficher ();
+		components [0].DoitEtreJoue (false);
 	}
 	
 	// Indique si l'etape a ete completee avec success par le joueur.
 	public bool EstCompletee() {
+		if (!components[0].AEteJoue())
+			return false;
+
 		timer += Time.deltaTime;
 		if (timer > kTempsIndividuel) {
 			decoration [1].Afficher ();
