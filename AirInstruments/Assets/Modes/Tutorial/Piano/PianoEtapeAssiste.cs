@@ -14,7 +14,10 @@ public class PianoEtapeAssiste : EtapeTutorial {
 	// Retourne le texte d'instruction qui doit etre affiche lors de
 	// l'execution de cette etape du tutorial.
 	public string ObtenirTexte() {
-		return "Continuez d'appuyer sur les notes bleues pour jouer un air connu.";
+		if(!Langue.isEnglish)
+			return "Continuez d'appuyer sur les notes bleues pour jouer un air connu.";
+		else
+			return "Keep on pressing the blue keys in order to play a popular melody.";
 	}
 	
 	// Retourne la voix lisant l'instruction.

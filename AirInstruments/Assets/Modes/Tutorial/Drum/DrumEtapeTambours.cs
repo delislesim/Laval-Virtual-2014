@@ -34,7 +34,10 @@ public class DrumEtapeTambours : EtapeTutorial {
 	// Retourne le texte d'instruction qui doit etre affiche lors de
 	// l'execution de cette etape du tutorial.
 	public string ObtenirTexte() {
-		return "Jouez les tambours et cymbales qui deviennent bleus.";
+		if(!Langue.isEnglish)
+			return "Jouez les tambours et cymbales qui deviennent bleus.";
+		else
+			return "Play the drums and cymbals when they become blue.";
 	}
 	
 	// Retourne la voix lisant l'instruction.

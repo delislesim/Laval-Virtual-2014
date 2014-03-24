@@ -14,7 +14,10 @@ public class PianoEtapeGamme : EtapeTutorial {
 	// Retourne le texte d'instruction qui doit etre affiche lors de
 	// l'execution de cette etape du tutorial.
 	public string ObtenirTexte() {
-		return "Appuyez sur les notes bleues.";
+		if(!Langue.isEnglish)
+			return "Appuyez sur les notes bleues.";
+		else
+			return "Press the blue keys.";
 	}
 	
 	// Retourne la voix lisant l'instruction.

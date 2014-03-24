@@ -12,7 +12,10 @@ public class PianoEtapeCapteur : EtapeTutorial {
 	// Retourne le texte d'instruction qui doit etre affiche lors de
 	// l'execution de cette etape du tutorial.
 	public string ObtenirTexte() {
-		return "Placez vos mains au-dessus du capteur.";
+		if(!Langue.isEnglish)
+			return "Placez vos mains au-dessus du capteur.";
+		else
+			return "Place your hands over the sensor.";
 	}
 	
 	// Retourne la voix lisant l'instruction.

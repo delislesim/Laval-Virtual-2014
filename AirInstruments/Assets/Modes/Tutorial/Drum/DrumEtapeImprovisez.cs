@@ -10,7 +10,10 @@ public class DrumEtapeImprovisez : EtapeTutorial {
 	// Retourne le texte d'instruction qui doit etre affiche lors de
 	// l'execution de cette etape du tutorial.
 	public string ObtenirTexte() {
-		return "Improvisez vos propres rythmes.";
+		if(!Langue.isEnglish)
+			return "Improvisez vos propres rythmes.";
+		else
+			return "Improvise your own beats.";
 	}
 	
 	// Retourne la voix lisant l'instruction.

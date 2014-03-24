@@ -12,7 +12,10 @@ public class GuitareEtapeCordes : EtapeTutorial {
 	// Retourne le texte d'instruction qui doit etre affiche lors de
 	// l'execution de cette etape du tutorial.
 	public string ObtenirTexte() {
-		return "Faites de grands mouvements avec la main droite\npour jouer des notes.";
+		if(!Langue.isEnglish)
+			return "Faites de grands mouvements avec la main droite\npour jouer des notes.";
+		else
+			return "Make ample vertical gestures with your right hand in order to play notes.";
 	}
 	
 	// Retourne la voix lisant l'instruction.

@@ -12,7 +12,10 @@ public class GuitareEtapeChangerNote : EtapeTutorial {
 	// Retourne le texte d'instruction qui doit etre affiche lors de
 	// l'execution de cette etape du tutorial.
 	public string ObtenirTexte() {
-		return "Déplacez votre main sur le manche de\nla guitare pour changer la note.";
+		if(!Langue.isEnglish)
+			return "Déplacez votre main sur le manche de\nla guitare pour changer la note.";
+		else
+			return "Move your hand over over the fretboard to change the played note.";
 	}
 	
 	// Retourne la voix lisant l'instruction.

@@ -49,7 +49,10 @@ public class DrumEtapeMitrailler : EtapeTutorial {
 	// Retourne le texte d'instruction qui doit etre affiche lors de
 	// l'execution de cette etape du tutorial.
 	public string ObtenirTexte() {
-		return "Faites des roulements rapides.";
+		if(!Langue.isEnglish)
+			return "Faites des roulements rapides.";
+		else
+			return "Do some drum rolls.";
 	}
 	
 	// Retourne la voix lisant l'instruction.
