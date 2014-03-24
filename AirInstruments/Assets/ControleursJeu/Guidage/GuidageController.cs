@@ -115,7 +115,7 @@ public class GuidageController : MonoBehaviour {
 					GUI.BeginGroup (rectangleGuitareDrum);
 					GUI.DrawTexture (new Rect (0, 0, rectWidth, rectHeight * proportionPicto), menu, ScaleMode.ScaleToFit);
 					if(!pasChargement)		
-						GUI.DrawTexture(new Rect (0, 0, rectWidth, rectHeight * proportionPicto), chargement[indexChargementAnimation], ScaleMode.ScaleToFit);
+						GUI.DrawTexture(new Rect (0, -6, rectWidth, rectHeight * proportionPicto *1.2f), chargement[indexChargementAnimation], ScaleMode.ScaleToFit);
 					GUI.Label (new Rect (0, rectHeight * proportionPicto, rectWidth, rectHeight * (1 - proportionPicto)), "Menu");
 					GUI.EndGroup ();
 					break;
@@ -129,7 +129,7 @@ public class GuidageController : MonoBehaviour {
 					GUI.BeginGroup (rectanglePiano);
 					GUI.DrawTexture (new Rect (0, 0, rectWidth, rectHeight * proportionPicto), menu, ScaleMode.ScaleToFit);
 					if(!pasChargement)		
-						GUI.DrawTexture(new Rect (0, 0, rectWidth, rectHeight * proportionPicto), chargement[indexChargementAnimation], ScaleMode.ScaleToFit);
+						GUI.DrawTexture(new Rect (0, -6, rectWidth, rectHeight * proportionPicto), chargement[indexChargementAnimation], ScaleMode.ScaleToFit);
 					GUI.Label (new Rect (0, rectHeight * proportionPicto, rectWidth, rectHeight * (1 - proportionPicto)), "Menu");
 					GUI.EndGroup ();
 					break;

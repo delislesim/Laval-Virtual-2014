@@ -30,9 +30,9 @@ public class CubesTombantsGuitare : MonoBehaviour {
 				AjouterSolo(tempsDebutSolo, tempsFinSolo);
 			} else {
 				// Ne pas afficher de cubes dans le solo.
-				if (!estSolo) {
+				//if (!estSolo) {
 					AjouterCube(partition[i].time, partition[i].positionManche);
-				}
+				//}
 			}
 		}
 	}

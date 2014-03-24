@@ -11,7 +11,7 @@ public class GestureDrum : Gesture {
 	private float[] previousHandsPosition_;
 
 	private const float gestureTimeout_ = 0.6f;
-	private const float gestureTime_ = 1.5f;
+	private const float gestureTime_ = 1.2f;
 
 	private const float minHandDepth_ = 0.12f;
 	private const float minHandsSpeed_ = 0.13f;
@@ -105,6 +105,12 @@ public class GestureDrum : Gesture {
 		if(!speedHighEnough || !isInLimits || !handsFarEnough)
 		{
 			elapsedTimeTimeout_ += Time.deltaTime;
+
+			if(elapsedTimeTimeout_ >= gestureTimeout_)
+			{
+				elapsedTimeGesture_ = 0;
+				gestureActivated_ = false;
+			}
 			return false;
 		}
 		// Else tick gesture time and reset failure timeout
@@ -113,23 +119,14 @@ public class GestureDrum : Gesture {
 			elapsedTimeGesture_ += Time.deltaTime;
 			elapsedTimeTimeout_ = 0;
 		}
-
-		if(elapsedTimeTimeout_ >= gestureTimeout_)
+	
+		if(elapsedTimeGesture_ >= gestureTime_)
 		{
+			//Debug.Log("VOICI LE SAUVEUR");
 			elapsedTimeGesture_ = 0;
+			elapsedTimeTimeout_ = 0;
 			gestureActivated_ = false;
-			return false;
-		}
-		else 
-		{
-			if(elapsedTimeGesture_ >= gestureTime_)
-			{
-				//Debug.Log("VOICI LE SAUVEUR");
-				elapsedTimeGesture_ = 0;
-				elapsedTimeTimeout_ = 0;
-				gestureActivated_ = false;
-				return true;
-			}
+			return true;
 		}
 
 

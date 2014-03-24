@@ -9,7 +9,7 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 	public AudioClip clipBoubou;
 
 	private string fichierLonelyBoy = ".\\Assets\\Modes\\Assiste\\Guitare\\Chansons\\Lonely Boy Audacity.aup";
-	private string fichierTNT = ".\\Assets\\Modes\\Assiste\\Guitare\\Chansons\\TNT.aup";
+	private string fichierTNT = ".\\Assets\\Modes\\Assiste\\Guitare\\Chansons\\TNTForGuitarSOLO.aup";
 
 	// Cubes tombants.
 	public CubesTombantsGuitare cubesTombants;
@@ -97,7 +97,7 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 
 	public static bool EstActive() {
 		return partition != null &&
-			tempsEcoule < partition [partition.Count - 1].time + 1.0f; // Attendre 1 seconde apres la fin de la musique.
+			tempsEcoule < partition [partition.Count - 1].time + 5.0f; // Attendre 1 seconde apres la fin de la musique.
 	}
 
 	public static bool EstSolo() {
