@@ -21,6 +21,7 @@ public class MenuAssisteController : MonoBehaviour {
 	}
 
 	public void Afficher() {
+		GestureRecognition.ObtenirInstance().RemoveGesture(GestureId.GESTURE_MENU);
 		numBoutonsDesactives = 0;
 		estEnTrainDeCacher = false;
 		gameObject.SetActive (true);
@@ -30,6 +31,7 @@ public class MenuAssisteController : MonoBehaviour {
 	}
 
 	public void Cacher() {
+		GestureRecognition.ObtenirInstance ().AddGesture (new GestureMenu ());
 		numBoutonsDesactives = 0;
 		estEnTrainDeCacher = true;
 		for (int i = 0; i < boutons.Count; ++i) {

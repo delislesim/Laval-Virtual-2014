@@ -6,7 +6,7 @@ public class GestureMenu : Gesture {
 
 	private const float distanceBetweenHands_ = 0.18f;
 	private const float handsToHead_ = -0.10f;
-	private const float gestureTime_ = 1.2f;
+	private const float gestureTime_ = 2.0f;
 	private float elapsedTime_ = 0;
 
 	public GestureMenu()

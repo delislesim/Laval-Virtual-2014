@@ -115,7 +115,7 @@ public class GesturePiano : Gesture {
 
 	// Constants
 	private const float LATERAL_MOVEMENT = 0.3f;
-	private const float gestureTime_ = 2.0f;
+	private const float gestureTime_ = 2.5f;
 	private const uint MOVES_NUMBER = 3;
 	private const float minHandDepth_ = 0.18f;
 

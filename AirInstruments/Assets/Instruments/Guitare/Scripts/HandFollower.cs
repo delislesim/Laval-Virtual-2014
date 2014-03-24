@@ -86,11 +86,11 @@ public class HandFollower : MonoBehaviour {
 					} else {
 						if (tempsDepuisDerniereNoteAutomatique < kTempsRejouerApresAutomatique) {
 							tempsDepuisDerniereNoteAutomatique = 1000.0f;
-							Debug.Log("bloque - prochaine note: " + tempsProchaineNote);
+//							Debug.Log("bloque - prochaine note: " + tempsProchaineNote);
 						} else {
 							PlayNote ();
 							aJoueMalDepuisDerniereFois = true;
-							Debug.Log("en trop - prochaine note: " + tempsProchaineNote);
+//							Debug.Log("en trop - prochaine note: " + tempsProchaineNote);
 						}
 					}
 				}
@@ -150,13 +150,13 @@ public class HandFollower : MonoBehaviour {
 
 			if (!aJoueBienDepuisDerniereFois) {
 				tempsDepuisDerniereNoteAutomatique = 0;
-				Debug.Log("auto-play proximite");
+//				Debug.Log("auto-play proximite");
 			} else {
 				tempsDepuisDerniereNoteAutomatique = 0;
-				Debug.Log("auto-play avance");
+//				Debug.Log("auto-play avance");
 			}
 		} else {
-			Debug.Log("miss - posCourante:" + posCourante + "  vitesse: " + vitesse);
+//			Debug.Log("miss - posCourante:" + posCourante + "  vitesse: " + vitesse);
 			tempsDepuisDerniereNoteAutomatique = 1000.0f;
 		}
 		aJoueMalDepuisDerniereFois = false;
