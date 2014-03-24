@@ -187,6 +187,23 @@ bool GetJointsPositionDepth(int skeleton_id, int* joint_positions) {
   return true;
 }
 
+bool GetHeadPositionDepth(int skeleton_id, int* joint_position) {
+  KinectWrapper* wrapper = KinectWrapper::instance();
+
+  const KinectSkeletonFrame* skeleton_frame =
+    wrapper->GetSensorData(0)->GetSkeletonFrame();
+
+  KinectSkeleton skeleton;
+  if (!skeleton_frame->GetTrackedSkeleton(skeleton_id, &skeleton))
+    return false;
+
+  KinectSensor* sensor = wrapper->GetSensorByIndex(0);
+  if (sensor == NULL)
+    return false;
+
+
+}
+
 bool AvoidCurrentSkeleton() {
   KinectWrapper* wrapper = KinectWrapper::instance();
   KinectSensor* sensor = wrapper->GetSensorByIndex(0);

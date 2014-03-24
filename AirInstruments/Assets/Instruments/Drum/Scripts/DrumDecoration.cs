@@ -52,13 +52,13 @@ public class DrumDecoration : MonoBehaviour {
 		// Faire l'animation.
 		if (actionCourante == ActionCourante.AFFICHER) {
 			Debug.Log(proportion);
-			transform.position = new Vector3(spring(positionCachee.x, positionInitiale.x, proportion),
-			                                 spring(positionCachee.y, positionInitiale.y, proportion),
-			                                 spring(positionCachee.z, positionInitiale.z, proportion));
+			transform.position = new Vector3(easeOutCubic(positionCachee.x, positionInitiale.x, proportion),
+			                                 easeOutCubic(positionCachee.y, positionInitiale.y, proportion),
+			                                 easeOutCubic(positionCachee.z, positionInitiale.z, proportion));
 		} else if (actionCourante == ActionCourante.CACHER) {
-			transform.position = new Vector3(spring(positionInitiale.x, positionCachee.x, proportion),
-			                                 spring(positionInitiale.y, positionCachee.y, proportion),
-			                                 spring(positionInitiale.z, positionCachee.z, proportion));
+			transform.position = new Vector3(easeInCubic(positionInitiale.x, positionCachee.x, proportion),
+			                                 easeInCubic(positionInitiale.y, positionCachee.y, proportion),
+			                                 easeInCubic(positionInitiale.z, positionCachee.z, proportion));
 		}
 
 		// Quand l'animation est terminee...
@@ -88,6 +88,17 @@ public class DrumDecoration : MonoBehaviour {
 
 		compteur = 0;
 		actionCourante = ActionCourante.CACHER;
+	}
+
+	private float easeInCubic(float start, float end, float value){
+		end -= start;
+		return end * value * value * value + start;
+	}
+	
+	private float easeOutCubic(float start, float end, float value){
+		value--;
+		end -= start;
+		return end * (value * value * value + 1) + start;
 	}
 
 	/* GFX47 MOD START */

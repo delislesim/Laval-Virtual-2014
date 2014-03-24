@@ -88,6 +88,9 @@ class KinectSensor {
   bool MapSkeletonPointToDepthPoint(Vector4 skeleton_point,
                                     cv::Vec2i* depth_point,
                                     int* depth);
+  bool MapSkeletonPointToColorPoint(Vector4 skeleton_point,
+                                    cv::Vec2i* color_point);
+
   bool MapDepthPointToColorPoint(NUI_DEPTH_IMAGE_POINT& depth_point,
                                  NUI_COLOR_IMAGE_POINT* color_point);
 
