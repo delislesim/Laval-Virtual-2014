@@ -22,8 +22,8 @@ public class IntelHandController : MonoBehaviour {
 	private const float timeDownMove = 0.06f;
 	private const float timeoutDownMove = 0.08f;
 	private const float timeoutUp = 0.25f;
-	private const float hauteurMaximale = 4.0f; // Relative aux touches blanches
-	private const float vitesseMinimale = -6.0f;
+	private const float hauteurMaximale = 3.0f; // Relative aux touches blanches
+	private const float vitesseMinimale = -10.0f;
 	private List<DownMoveInfo> downMoveList = new List<DownMoveInfo>();
 
 	// Rayon des doigts.
