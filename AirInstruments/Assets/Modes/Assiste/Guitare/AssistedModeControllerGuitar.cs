@@ -114,12 +114,8 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 
 		if(currentPartitionIndex < partition.Count-1) {
 			if (tempsEcoule >= partition[currentPartitionIndex+1].time) {
-				Debug.Log("index note:" + currentPartitionIndex);
 
 				currentPartitionIndex ++;
-				currentTone = partition[currentPartitionIndex].note;
-				currentStyle = partition[currentPartitionIndex].style;
-				currentOctave = partition[currentPartitionIndex].octave;
 
 				// Activer / desactiver le solo.
 				PartitionGuitar.Solo solo = partition[currentPartitionIndex].solo;
@@ -127,12 +123,19 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 					currentSolo = true;
 				} else if (solo == PartitionGuitar.Solo.FIN) {
 					currentSolo = false;
+				} else {
+					// Note normale.
+					currentTone = partition[currentPartitionIndex].note;
+					currentStyle = partition[currentPartitionIndex].style;
+					currentOctave = partition[currentPartitionIndex].octave;
+
+					float tempsNoteCourante = partition[currentPartitionIndex].time;
+					float tempsNotePrecedente = partition[currentPartitionIndex - 1].time;
+					float tempsDepuisDerniereNote = tempsNoteCourante - tempsNotePrecedente;
+					handFollower.JouerNoteMaintenant(tempsDepuisDerniereNote);
 				}
 
-				float tempsNoteCourante = partition[currentPartitionIndex].time;
-				float tempsNotePrecedente = partition[currentPartitionIndex - 1].time;
-				handFollower.JouerNoteMaintenant(tempsNoteCourante - tempsNotePrecedente);
-
+				// Definir le temps de la prochaine note.
 				if (currentPartitionIndex + 1 < partition.Count) {
 					handFollower.DefinirTempsProchaineNote(partition[currentPartitionIndex + 1].time - tempsEcoule);
 				}

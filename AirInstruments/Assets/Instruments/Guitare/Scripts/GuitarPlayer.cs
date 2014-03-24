@@ -94,7 +94,7 @@ public class GuitarPlayer : MonoBehaviour {
 		if (level == -1)
 			return;
 
-		if(AssistedModeControllerGuitar.EstActive() && !AssistedModeControllerGuitar.EstSolo())
+		if(AssistedModeControllerGuitar.EstActive())
 		{
 			///get the note 
 			Style style = AssistedCtrl.getCurrentStyle();
@@ -130,10 +130,6 @@ public class GuitarPlayer : MonoBehaviour {
 		}
 		else //random
 		{
-			if (AssistedModeControllerGuitar.EstSolo()) {
-				Debug.Log("solo");
-			}
-
 			int maxIndex = HighVelocityPlayableNotes[level].Count;
 			//Debug.Log("Count : " + maxIndex);
 			
@@ -166,7 +162,7 @@ public class GuitarPlayer : MonoBehaviour {
 	void Update () {
 		// Animer les halos indiquant sur quelle partie du manche se trouve la main.
 		int level = SetPitchLevel ();
-		if (AssistedModeControllerGuitar.EstActive () && !AssistedModeControllerGuitar.EstSolo()) {
+		if (AssistedModeControllerGuitar.EstActive ()) {
 			for (int i = 0; i < halosLibre.Count; ++i) {
 				AnimerTransparent(halosLibre[i], false);
 			}
@@ -218,7 +214,7 @@ public class GuitarPlayer : MonoBehaviour {
 		else if(3*LONGUEUR_MANCHE > dist && dist >= LONGUEUR_MANCHE/10)
 			niveauAigue = 3;
 
-		if (AssistedModeControllerGuitar.EstActive() && !AssistedModeControllerGuitar.EstSolo()) {
+		if (AssistedModeControllerGuitar.EstActive()) {
 			// Seulement 2 niveaux dans le mode assiste.
 			niveauAigue = niveauAigue / 2; //Max level = 2, should be 0 or 1
 		}

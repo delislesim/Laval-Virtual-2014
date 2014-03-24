@@ -18,15 +18,21 @@ public class CubesTombantsGuitare : MonoBehaviour {
 		ViderCubes ();
 
 		float tempsDebutSolo = 0.0f;
+		bool estSolo = false;
 
 		for (int i = 0; i < partition.Count; ++i) {
 			if (partition[i].solo == PartitionGuitar.Solo.DEBUT) {
 				tempsDebutSolo = partition[i].time;
+				estSolo = true;
 			} else if (partition[i].solo == PartitionGuitar.Solo.FIN) {
 				float tempsFinSolo = partition[i].time;
+				estSolo = false;
 				AjouterSolo(tempsDebutSolo, tempsFinSolo);
 			} else {
-				AjouterCube(partition[i].time, partition[i].positionManche);
+				// Ne pas afficher de cubes dans le solo.
+				if (!estSolo) {
+					AjouterCube(partition[i].time, partition[i].positionManche);
+				}
 			}
 		}
 	}

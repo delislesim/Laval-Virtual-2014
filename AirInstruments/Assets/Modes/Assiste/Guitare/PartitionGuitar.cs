@@ -46,7 +46,22 @@ public class PartitionGuitar {
 		                           0,
 		                           PositionManche.LOIN,
 		                           Solo.DEBUT));
-		partition.Add(new Playable(tempsDerniereNote + 20.0f,
+
+		// Solo ajoute artificiellement.
+		float tempsSolo = tempsDerniereNote + 1.0f;
+		for (int i = 0; i < 100; ++i) {
+			tempsSolo += 0.5f;
+
+			partition.Add(new Playable(tempsSolo,
+			                           partition[i].note,
+			                           partition[i].style,
+			                           partition[i].octave,
+			                           PositionManche.PRES,
+			                           Solo.NON));
+		}
+
+		tempsSolo += 1.0f;
+		partition.Add(new Playable(tempsSolo,
 		                           GuitarPlayer.Tone.A,
 		                           GuitarPlayer.Style.CHORD,
 		                           0,
