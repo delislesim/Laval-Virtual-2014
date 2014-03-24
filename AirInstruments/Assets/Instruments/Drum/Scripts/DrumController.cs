@@ -45,6 +45,7 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 	public AudioClip sonPosition;
 	public AudioClip sonTambours;
 	public AudioClip sonImprovisez;
+	public AudioClip sonMitrailler;
 
 	public void Prepare() {
 		tutorialActif = false;
@@ -91,7 +92,8 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 		                             tomBigDecoration,
 		                             sonPosition,
 		                             sonTambours,
-		                             sonImprovisez);
+		                             sonImprovisez,
+		                             sonMitrailler);
 		tutorial.Demarrer ();
 		tutorialActif = true;
 

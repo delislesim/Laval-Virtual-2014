@@ -19,11 +19,11 @@ public class IntelHandController : MonoBehaviour {
 
 	// Variables pour détecter si un snap est nécessaire
 	private Vector3[] positionPrecedenteDoigts = new Vector3[(int)KinectPowerInterop.HandJointIndex.NUM_JOINTS*2];
-	private const float timeDownMove = 0.06f;
+	private const float timeDownMove = 0.12f;
 	private const float timeoutDownMove = 0.08f;
 	private const float timeoutUp = 0.25f;
-	private const float hauteurMaximale = 3.0f; // Relative aux touches blanches
-	private const float vitesseMinimale = -10.0f;
+	private const float hauteurMaximale = 2.0f; // Relative aux touches blanches
+	private const float vitesseMinimale = -15.0f;
 	private List<DownMoveInfo> downMoveList = new List<DownMoveInfo>();
 
 	// Rayon des doigts.

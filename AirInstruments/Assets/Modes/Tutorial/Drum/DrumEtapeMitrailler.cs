@@ -38,7 +38,7 @@ public class DrumEtapeMitrailler : EtapeTutorial {
 	// Retourne le texte d'instruction qui doit etre affiche lors de
 	// l'execution de cette etape du tutorial.
 	public string ObtenirTexte() {
-		return "Tapez rapidement sur le tambour qui se trouvent devant vous.";
+		return "Faites des roulements rapides.";
 	}
 	
 	// Retourne la voix lisant l'instruction.
