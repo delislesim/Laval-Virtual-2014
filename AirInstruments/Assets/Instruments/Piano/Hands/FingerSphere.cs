@@ -231,13 +231,10 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 	private const float kHauteurBlanches = 2.171061f;
 
 	// Hauteur pour jouer les notes blanches.
-	private const float kHauteurJouerBlanches = 2.08f;
+	private const float kHauteurJouerBlanches = 2.02f;
 
 	// Hauteur des notes noires.
 	private const float kHauteurNoires = 2.33302f;
-
-	// Hauteur des notes blanches en coordonnees locales.
-	private const float kHauteurBlanchesLocal = -2.8f;
 
 	// Coordonnee en z du bout des notes noires.
 	private const float kZNoires = -18.19202f;
