@@ -46,6 +46,7 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 	public AudioClip sonTambours;
 	public AudioClip sonImprovisez;
 	public AudioClip sonMitrailler;
+	public AudioClip sonMitraillerRide;
 
 	public void Prepare() {
 		tutorialActif = false;
@@ -61,6 +62,8 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 
 	// Methode appelee quand l'instrument "drum" est choisi.
 	void OnEnable() {
+		DrumAssistedController.DefinirInsance (assistedcontroller);
+
 		dude.gameObject.SetActive (true);
 
 		// Mettre la tete du drummer a la position de la camera.
@@ -93,7 +96,8 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 		                             sonPosition,
 		                             sonTambours,
 		                             sonImprovisez,
-		                             sonMitrailler);
+		                             sonMitrailler,
+		                             sonMitraillerRide);
 		tutorial.Demarrer ();
 		tutorialActif = true;
 

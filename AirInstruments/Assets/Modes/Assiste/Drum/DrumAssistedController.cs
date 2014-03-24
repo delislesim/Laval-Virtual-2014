@@ -4,9 +4,18 @@ using System.Collections.Generic;
 using System;
 
 public class DrumAssistedController : MonoBehaviour {
+
+	public static DrumAssistedController ObtenirInstance() {
+		return instance;
+	}
+	public static void DefinirInsance(DrumAssistedController inst) {
+		instance = inst;
+	}
+
+	private static DrumAssistedController instance;
+
 	public TipFollower tipRight;
 	public TipFollower tipLeft;
-
 
 	public DrumComponent[] DrumComponentObjects;
 	public enum DrumComponentIndexes : int{
@@ -43,14 +52,12 @@ public class DrumAssistedController : MonoBehaviour {
 	private int memLeft;
 	private int memRight;
 
-
-
-
 	// Indique si le mode assiste est active.
 	private static bool estActive;
 
 	// Use this for initialization
 	void Start () {
+		instance = this;
 
 		FillDictionary();
 		baseRythmA.clip = (AudioClip)Resources.Load("DrumTracks/BaseRythm");

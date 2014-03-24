@@ -23,7 +23,8 @@ public class TutorialDrum {
 	                    AudioClip sonPosition,
 	                    AudioClip sonTambours,
 	                    AudioClip sonImprovisez,
-	                    AudioClip sonMitrailler) {
+	                    AudioClip sonMitrailler,
+	                    AudioClip sonMitraillerRide) {
 		this.tutorial = Tutorial.ObtenirInstance ();
 		
 		// Creer les etapes du tutorial.
@@ -60,7 +61,23 @@ public class TutorialDrum {
 		                                               snareDecoration,
 		                                               tom1Decoration,
 		                                               tom2Decoration,
-		                                               tomBigDecoration));		
+		                                               tomBigDecoration));
+		tutorial.AjouterEtape (new DrumEtapeMitraillerRide(sonMitraillerRide,
+		                                                   crash,
+		                                                   highHat,
+		                                                   ride,
+		                                                   snare,
+		                                                   tom1,
+		                                                   tom2,
+		                                                   tomBig,
+		                                                   bassDecoration,
+		                                                   crashDecoration,
+		                                                   highHatDecoration,
+		                                                   rideDecoration,
+		                                                   snareDecoration,
+		                                                   tom1Decoration,
+		                                                   tom2Decoration,
+		                                                   tomBigDecoration));	
 		tutorial.AjouterEtape (new DrumEtapeImprovisez(sonImprovisez));
 	}
 	
