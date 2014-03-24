@@ -144,6 +144,9 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 			// Desactiver le son de la guitare.
 			// TODO
 
+			// Desactiver la camera solo.
+			CameraSolo.ObtenirInstance().ReinitialiserCamera();
+
 			// Changer un peu le FOV.
 			CameraController.ObtenirInstance().ForcerFieldOfView(70.2f);
 

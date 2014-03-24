@@ -11,16 +11,24 @@ public class DrumEtapeTambours : EtapeTutorial {
 	                         DrumComponent snare,
 	                         DrumComponent tom1,
 	                         DrumComponent tom2,
-	                         DrumComponent tomBig) {
+	                         DrumComponent tomBig,
+	                         DrumDecoration bassDecoration,
+	                         DrumDecoration crashDecoration,
+	                         DrumDecoration highHatDecoration,
+	                         DrumDecoration rideDecoration,
+	                         DrumDecoration snareDecoration,
+	                         DrumDecoration tom1Decoration,
+	                         DrumDecoration tom2Decoration,
+	                         DrumDecoration tomBigDecoration) {
 		this.son = son;
 
 		components.Add (tom1);
 		components.Add (tom2);
 		components.Add (highHat);
 		components.Add (ride);
-		components.Add (tomBig);
-		components.Add (crash);
-		components.Add (snare);
+		//components.Add (tomBig);
+		//components.Add (crash);
+		//components.Add (snare);
 	}
 	
 	// Retourne le texte d'instruction qui doit etre affiche lors de

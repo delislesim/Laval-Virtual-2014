@@ -27,6 +27,16 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 	public DrumComponent tom2;
 	public DrumComponent tomBig;
 
+	// Game object des composants du drum, incluant leur decoration.
+	public DrumDecoration bassDecoration;
+	public DrumDecoration crashDecoration;
+	public DrumDecoration highHatDecoration;
+	public DrumDecoration rideDecoration;
+	public DrumDecoration snareDecoration;
+	public DrumDecoration tom1Decoration;
+	public DrumDecoration tom2Decoration;
+	public DrumDecoration tomBigDecoration;
+
 	// Bouts des baguettes.
 	public GameObject tipLeft;
 	public GameObject tipRight;
@@ -37,10 +47,12 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 	public AudioClip sonImprovisez;
 
 	public void Prepare() {
+		tutorialActif = false;
 		KinectPowerInterop.SetKinectAngle (4);
 	}
 
 	public void PrepareToStop() {
+		tutorialActif = false;
 		gameObject.SetActive (false);
 		MenuAssisteController.ObtenirInstance ().Cacher ();
 		Tutorial.ObtenirInstance ().gameObject.SetActive (false);
@@ -69,6 +81,14 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 		                             tom1,
 		                             tom2,
 		                             tomBig,
+		                             bassDecoration,
+		                             crashDecoration,
+		                             highHatDecoration,
+		                             rideDecoration,
+		                             snareDecoration,
+		                             tom1Decoration,
+		                             tom2Decoration,
+		                             tomBigDecoration,
 		                             sonPosition,
 		                             sonTambours,
 		                             sonImprovisez);
@@ -190,6 +210,11 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 		return false;
 	}
 
+	// Indique si le tutorial est actif.
+	public static bool TutorialActif() {
+		return tutorialActif;
+	}
+
 	// Indique si le menu est presentement affiche.
 	private bool menuActif = false;
 
@@ -197,5 +222,5 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 	TutorialDrum tutorial;
 
 	// Indique que le tutorial est en cours.
-	bool tutorialActif = true;
+	static bool tutorialActif = false;
 }

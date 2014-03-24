@@ -12,6 +12,14 @@ public class TutorialDrum {
 	                    DrumComponent tom1,
 	                    DrumComponent tom2,
 	                    DrumComponent tomBig,
+	                    DrumDecoration bassDecoration,
+	                    DrumDecoration crashDecoration,
+                        DrumDecoration highHatDecoration,
+                        DrumDecoration rideDecoration,
+                        DrumDecoration snareDecoration,
+                        DrumDecoration tom1Decoration,
+                        DrumDecoration tom2Decoration,
+                        DrumDecoration tomBigDecoration,
 	                    AudioClip sonPosition,
 	                    AudioClip sonTambours,
 	                    AudioClip sonImprovisez) {
@@ -27,7 +35,31 @@ public class TutorialDrum {
 		                                             snare,
 		                                             tom1,
 		                                             tom2,
-		                                             tomBig));
+		                                             tomBig,
+		                                             bassDecoration,
+		                                             crashDecoration,
+		                                             highHatDecoration,
+		                                             rideDecoration,
+		                                             snareDecoration,
+		                                             tom1Decoration,
+		                                             tom2Decoration,
+		                                             tomBigDecoration));
+		tutorial.AjouterEtape (new DrumEtapeMitrailler(sonTambours,
+		                                               crash,
+		                                               highHat,
+		                                               ride,
+		                                               snare,
+		                                               tom1,
+		                                               tom2,
+		                                               tomBig,
+		                                               bassDecoration,
+		                                               crashDecoration,
+		                                               highHatDecoration,
+		                                               rideDecoration,
+		                                               snareDecoration,
+		                                               tom1Decoration,
+		                                               tom2Decoration,
+		                                               tomBigDecoration));		
 		tutorial.AjouterEtape (new DrumEtapeImprovisez(sonImprovisez));
 	}
 	
