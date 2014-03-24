@@ -143,7 +143,7 @@ public class MoveJoints : MonoBehaviour {
 		// Appliquer les positions aux articulations.
 		for(int i = 0; i < jointsCount; i++) {
 
-			if (joints[i] == null)  // TODO: Pourquoi ca arriverait? Aucune idée honnetement
+			if (joints[i] == null)  // TODO: Pourquoi ca arriverait? Aucune idée honnetement. Après réflexion, toujours aucune idée
 				continue;
 
 			if(i == (int)Skeleton.Joint.Head) {
