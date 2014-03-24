@@ -26,13 +26,14 @@ public class DrumEtapeMitrailler : EtapeTutorial {
 		this.son = son;
 
 		decoration.Add (snareDecoration);
-		decoration.Add (bassDecoration);
+		decoration.Add (rideDecoration);
+
 		decoration.Add (crashDecoration);
 		decoration.Add (highHatDecoration);
-		decoration.Add (rideDecoration);
 		decoration.Add (tom1Decoration);
 		decoration.Add (tom2Decoration);
 		decoration.Add (tomBigDecoration);
+		decoration.Add (bassDecoration);
 	}
 	
 	// Retourne le texte d'instruction qui doit etre affiche lors de
@@ -53,16 +54,22 @@ public class DrumEtapeMitrailler : EtapeTutorial {
 	
 	// Appeler lorsque cette etape du tutorial debute.
 	public void Demarrer() {
+		DrumAssistedController.ObtenirInstance ().gameObject.SetActive (true);
+
 		for (int i = 0; i < decoration.Count; ++i) {
 			decoration[i].Cacher();
 		}
+
 		decoration [0].Afficher ();
 	}
 	
 	// Indique si l'etape a ete completee avec success par le joueur.
 	public bool EstCompletee() {
-
-		
+		timer += Time.deltaTime;
+		if (timer > kTempsIndividuel) {
+			decoration [1].Afficher ();
+			return true;
+		}		
 		return false;
 	}
 	
@@ -74,5 +81,11 @@ public class DrumEtapeMitrailler : EtapeTutorial {
 
 	// Voix lisant l'instruction.
 	private AudioClip son;
+
+	// Timer pour afficher des composants.
+	private float timer = 0;
+
+	// Temps pendant lequel un composant est affiche individuellement.
+	private const float kTempsIndividuel = 4.0f;
 
 }
