@@ -33,4 +33,6 @@ public abstract class Gesture {
 			return gestureId_;
 		}
 	}
+
+	public abstract void Reset();
 };

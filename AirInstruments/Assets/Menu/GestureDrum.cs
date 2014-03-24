@@ -26,10 +26,15 @@ public class GestureDrum : Gesture {
 		gestureId_ = GestureId.GESTURE_DRUM;
 	}
 
+	public override void Reset() {
+		elapsedTimeGesture_ = 0;
+	}
+
 	public override bool trackGesture (Skeleton skeleton)
 	{		
 		if(!skeleton.Exists())
 		{
+			Reset();
 			return false;
 		}
 

@@ -13,12 +13,17 @@ public class GesturePiano : Gesture {
 		lastMoveHandXPosition_[1] = 0;
 		gestureId_ = GestureId.GESTURE_PIANO;
 	}
+
+	public override void Reset() {
+		elapsedTime_ = 0;
+	}
 	
 	public override bool trackGesture(Skeleton skeleton)
 	{
 		// Track the gesture
 		if(!skeleton.Exists())
 		{
+			Reset();
 			return false;
 		}
 		

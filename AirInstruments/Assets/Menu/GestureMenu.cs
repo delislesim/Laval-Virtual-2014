@@ -16,8 +16,18 @@ public class GestureMenu : Gesture {
 		gestureId_ = GestureId.GESTURE_MENU;
 	}
 
+	public override void Reset() {
+		elapsedTime_ = 0;
+	}
+
 	public override bool trackGesture (Skeleton skeleton)
 	{
+		if(!skeleton.Exists())
+		{
+			Reset();
+			return false;
+		}
+
 		Vector3 rightHandPos, leftHandPos, headPos;
 		Skeleton.JointStatus rightHandStatus, leftHandStatus, headStatus;
 

@@ -19,8 +19,18 @@ public class GestureGuitar : Gesture {
 		gestureId_ = GestureId.GESTURE_GUITAR;
 	}
 
+	public override void Reset() {
+		elapsedTime_ = 0;
+	}
+
 	public override bool trackGesture (Skeleton skeleton)
 	{
+		if(!skeleton.Exists())
+		{
+			Reset();
+			return false;
+		}
+
 		// Gather joint positions
 		Vector3 rightHandPos, leftHandPos, hipLeftPos;
 		Skeleton.JointStatus rightHandStatus, leftHandStatus, hipLeftStatus;

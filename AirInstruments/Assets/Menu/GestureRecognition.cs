@@ -44,17 +44,29 @@ public class GestureRecognition : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		skeleton_.ReloadSkeleton ();
-
+	void Update () {		
 		currentId = GestureId.NO_GESTURE;
-		// Poll gesture controller to see if a gesture has been detected
-		foreach(Gesture gesture in gestureList)
-		{
-		   if(gesture.trackGesture(skeleton_)) {
-				currentId = gesture.GestureId_;
-				Debug.Log ("Gesture: " + currentId);
+
+		if (!bloque) {
+			skeleton_.ReloadSkeleton ();
+
+			// Poll gesture controller to see if a gesture has been detected
+			foreach(Gesture gesture in gestureList)
+			{
+			   if(gesture.trackGesture(skeleton_)) {
+					currentId = gesture.GestureId_;
+					Debug.Log ("Gesture: " + currentId);
+				}
 			}
+		} else {
+			foreach(Gesture gesture in gestureList) {
+				gesture.Reset();
+			}
+		}
+
+		// Bloquer / debloquer quand la barre espace est enfoncee.
+		if (Input.GetKeyDown(KeyCode.Space)) {
+			bloque = !bloque;
 		}
 	}
 
@@ -66,11 +78,17 @@ public class GestureRecognition : MonoBehaviour {
 		gestureList.Clear ();
 	}
 
+	public static bool EstBloque() {
+		return bloque;
+	}
+
 	private Skeleton skeleton_ = new Skeleton(0);
 
 	private List<Gesture> gestureList = new List<Gesture>();
 
 	private GestureId currentId = GestureId.NO_GESTURE;
+
+	private static bool bloque = false;
 
 	private static GestureRecognition instance;
 

@@ -97,8 +97,15 @@ public class KinectPower : MonoBehaviour {
 					DrawSkeleton(streamTexture, first_skeleton);
 				}
 
-				Vector3 hipPosition;
-				first_skeleton.GetJointPosition(Skeleton.Joint.HipCenter, out hipPosition);
+				// Guidage pour savoir que les gestes sont bloques.
+				if (GestureRecognition.EstBloque()) {
+					for (int i = 480 - 30; i < 480 - 5; ++i) {
+						DrawLine(streamTexture, 320-12, i, 320+12, i, kColorBloque);
+					}
+				}
+
+				// Appliquer les changements a la texture.
+				streamTexture.Apply();
 			}
 		}
 	}
@@ -153,8 +160,6 @@ public class KinectPower : MonoBehaviour {
 		int width = aTexture.width;
 		int height = aTexture.height;
 
-		Color color = new Color32 (153, 215, 254, 255);
-
 		for(int i = 0; i < jointsCount; i++)
 		{
 			Skeleton.Joint joint = (Skeleton.Joint)i;
@@ -174,11 +179,9 @@ public class KinectPower : MonoBehaviour {
 				DrawLine(aTexture,
 				         (int)parent_joint_position.x, (int)parent_joint_position.y,
 				         (int)joint_position.x, (int)joint_position.y,
-				         color);
+				         kColor);
 			}
 		}
-		
-		aTexture.Apply();
 	}
 
 	// draws a line in a texture
@@ -275,4 +278,7 @@ public class KinectPower : MonoBehaviour {
 	private Color32[] streamColors = new Color32[kStreamWidth * kStreamHeight];
 	private const int kStreamWidth = 640;
 	private const int kStreamHeight = 480;
+
+	private Color kColor = new Color32 (153, 215, 254, 255);
+	private Color kColorBloque = new Color32 (235, 235, 235, 255);
 }
