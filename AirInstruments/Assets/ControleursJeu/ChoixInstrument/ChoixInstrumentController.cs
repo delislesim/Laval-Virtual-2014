@@ -74,7 +74,6 @@ public class ChoixInstrumentController : MonoBehaviour {
 			spotGuitare.SetTargetIntensity(completionGuitare == 0 ? 0 : 4.0f * (1.0f + completionGuitare), 6.0f);
 		}
 
-
 		// Aller a l'instrument dont le geste est complete.
 		GestureId gesture = gestureRecognition.GetCurrentGesture ();
 		switch (gesture) {

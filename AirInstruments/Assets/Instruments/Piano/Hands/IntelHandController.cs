@@ -152,6 +152,7 @@ public class IntelHandController : MonoBehaviour {
 
 				if ((downMoveList[i].elapsedTimeUp > timeoutUp || posCourante.y > downMoveList[i].hauteurInitiale) &&
 				    EstBoutDoigt(downMoveList[i].indexDoigt)) {
+					FingerSphere sphere = spheres[i].GetComponent<FingerSphere>();
 					spheres[i].GetComponent<FingerSphere>().SetAllongementAssiste(false);
 				}
 			}
@@ -176,14 +177,60 @@ public class IntelHandController : MonoBehaviour {
 			MettreAJourDownMoveInfo(curDownMove, j, vectVitesse);
 		}
 
-
+		List<DownMoveInfo> tipsAdmissible = new List<DownMoveInfo> ();
 		// Afficher tous les doigts admissibles.
 		for (int index = 0; index < (int)KinectPowerInterop.HandJointIndex.NUM_JOINTS * 2; ++index) {
 			DownMoveInfo info = downMoveList[index];
 			if (EstBoutDoigt(info.indexDoigt) && info.elapsedTime > timeDownMove) {
-				spheres[index].GetComponent<FingerSphere>().SetAllongementAssiste(true);
+				tipsAdmissible.Add(info);
+				//spheres[index].GetComponent<FingerSphere>().SetAllongementAssiste(true);
 			}
 		}
+
+		KinectPowerInterop.HandJointIndex bestCase = KinectPowerInterop.HandJointIndex.NO_JOINT;
+		float bestCasePercent = 0.0f;
+		// Filtrer la liste des tips admissible pour garder seulement le pouce et le plus bas doigt
+		for(int j= 0;j < tipsAdmissible.Count; j++) {
+			DownMoveInfo downMove = tipsAdmissible[j];
+			KinectPowerInterop.HandJointIndex curIndex = downMove.indexDoigt;
+			if(curIndex == KinectPowerInterop.HandJointIndex.THUMB_TIP)
+				continue;
+			if(bestCase == KinectPowerInterop.HandJointIndex.NO_JOINT)
+			{
+				bestCase = downMove.indexDoigt;
+				continue;
+			}
+
+			int intIndex = (int) curIndex;
+			Vector3 posTip = TransformerPositionDoigt(hand_joints[intIndex]);
+			Vector3 posMid = TransformerPositionDoigt(hand_joints[intIndex-1]);
+			Vector3 posBase = TransformerPositionDoigt(hand_joints[intIndex-2]);
+			float totalFingerLength = Vector3.Distance(posTip, posMid) + Vector3.Distance(posMid, posBase);
+
+			float fingerVerticalLength = posTip.y - posBase.y;
+
+			if(fingerVerticalLength > 0)
+				tipsAdmissible.Remove(downMove);
+			else
+			{
+				if(fingerVerticalLength / totalFingerLength > bestCasePercent)
+				{
+					bestCase = downMove.indexDoigt;
+					bestCasePercent = fingerVerticalLength / totalFingerLength;
+				}
+				else
+				{
+					tipsAdmissible.Remove (downMove);
+				}
+			}
+		}
+
+		// Do the magic
+		foreach(DownMoveInfo tip in tipsAdmissible) {
+			//Debug.Log(tip.indexDoigt);
+			spheres[(int)tip.indexDoigt].GetComponent<FingerSphere>().SetAllongementAssiste(true);
+		}
+		//Debug.Log("");
 	}
 
 	private void MettreAJourDownMoveInfo(DownMoveInfo curDownMove, int j, Vector3[] vectVitesse) {
