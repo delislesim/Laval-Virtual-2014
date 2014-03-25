@@ -50,7 +50,10 @@ public class DrumEtapeMitraillerRide : EtapeTutorial {
 	// Retourne le texte d'instruction qui doit etre affiche lors de
 	// l'execution de cette etape du tutorial.
 	public string ObtenirTexte() {
-		return "Jouez les 2 instruments en même temps.";
+		if(!Langue.isEnglish)
+			return "Jouez les 2 instruments en même temps.";
+		else
+			return "Play both drums at the same time.";
 	}
 	
 	// Retourne la voix lisant l'instruction.
@@ -59,8 +62,8 @@ public class DrumEtapeMitraillerRide : EtapeTutorial {
 	}
 	
 	// Retourne le nom de l'animation a jouer.
-	public string ObtenirAnimation() {
-		return "piano-etape-assiste.png";
+	public Texture[] ObtenirAnimation() {
+		return null;
 	}
 	
 	// Appeler lorsque cette etape du tutorial debute.

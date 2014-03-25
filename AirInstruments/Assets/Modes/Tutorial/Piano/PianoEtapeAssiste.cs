@@ -14,7 +14,10 @@ public class PianoEtapeAssiste : EtapeTutorial {
 	// Retourne le texte d'instruction qui doit etre affiche lors de
 	// l'execution de cette etape du tutorial.
 	public string ObtenirTexte() {
-		return "Continuez d'appuyer sur les notes bleues pour jouer un air connu.";
+		if(!Langue.isEnglish)
+			return "Continuez d'appuyer sur les notes bleues pour jouer un air connu.";
+		else
+			return "Keep on pressing the blue keys in order to play a popular melody.";
 	}
 	
 	// Retourne la voix lisant l'instruction.
@@ -23,8 +26,8 @@ public class PianoEtapeAssiste : EtapeTutorial {
 	}
 	
 	// Retourne le nom de l'animation a jouer.
-	public string ObtenirAnimation() {
-		return "piano-etape-assiste.png";
+	public Texture[] ObtenirAnimation() {
+		return null;
 	}
 	
 	// Appeler lorsque cette etape du tutorial debute.

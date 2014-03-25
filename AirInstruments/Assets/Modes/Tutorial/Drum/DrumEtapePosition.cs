@@ -14,7 +14,10 @@ public class DrumEtapePosition : EtapeTutorial {
 	// Retourne le texte d'instruction qui doit etre affiche lors de
 	// l'execution de cette etape du tutorial.
 	public string ObtenirTexte() {
-		return "Positionnez le bout de vos baguettes au-dessus de la batterie.";
+		if(!Langue.isEnglish)
+			return "Positionnez le bout de vos baguettes au-dessus de la batterie.";
+		else
+			return "Position the tip of your drumsticks over the drum set.";
 	}
 	
 	// Retourne la voix lisant l'instruction.
@@ -23,8 +26,8 @@ public class DrumEtapePosition : EtapeTutorial {
 	}
 	
 	// Retourne le nom de l'animation a jouer.
-	public string ObtenirAnimation() {
-		return "piano-etape-assiste.png";
+	public Texture[] ObtenirAnimation() {
+		return null;
 	}
 	
 	// Appeler lorsque cette etape du tutorial debute.

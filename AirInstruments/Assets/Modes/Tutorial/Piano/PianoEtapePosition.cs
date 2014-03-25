@@ -12,7 +12,10 @@ public class PianoEtapePosition : EtapeTutorial {
 	// Retourne le texte d'instruction qui doit etre affiche lors de
 	// l'execution de cette etape du tutorial.
 	public string ObtenirTexte() {
-		return "Suivez les fleches pour approcher vos mains du piano.";
+		if(!Langue.isEnglish)
+			return "Suivez les fleches pour approcher vos mains du piano.";
+		else
+			return "Follow the arrows to place your hands close to the piano.";
 	}
 	
 	// Retourne la voix lisant l'instruction.
@@ -21,8 +24,8 @@ public class PianoEtapePosition : EtapeTutorial {
 	}
 	
 	// Retourne le nom de l'animation a jouer.
-	public string ObtenirAnimation() {
-		return "piano-etape-position.png";
+	public Texture[] ObtenirAnimation() {
+		return null;
 	}
 	
 	// Appeler lorsque cette etape du tutorial debute.

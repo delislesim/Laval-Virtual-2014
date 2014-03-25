@@ -12,7 +12,10 @@ public class GuitareEtapeCordes : EtapeTutorial {
 	// Retourne le texte d'instruction qui doit etre affiche lors de
 	// l'execution de cette etape du tutorial.
 	public string ObtenirTexte() {
-		return "Faites de grands mouvements avec la main droite\npour jouer des notes.";
+		if(!Langue.isEnglish)
+			return "Faites de grands mouvements avec la main droite\npour jouer des notes.";
+		else
+			return "Make ample vertical gestures with your right hand in order to play notes.";
 	}
 	
 	// Retourne la voix lisant l'instruction.
@@ -21,8 +24,13 @@ public class GuitareEtapeCordes : EtapeTutorial {
 	}
 	
 	// Retourne le nom de l'animation a jouer.
-	public string ObtenirAnimation() {
-		return "";
+	public Texture[] ObtenirAnimation() {
+		Texture[] textureMainDroite = new Texture[5];
+		for (int i = 0; i < textureMainDroite.Length; i++) {
+						int index = i + 1;
+						textureMainDroite [i] = (Texture)Resources.Load ("TutorielGuitare/BrasDroit/" + index);
+				}
+		return textureMainDroite;
 	}
 	
 	// Appeler lorsque cette etape du tutorial debute.
