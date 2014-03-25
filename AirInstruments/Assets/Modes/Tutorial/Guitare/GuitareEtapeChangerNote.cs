@@ -24,8 +24,13 @@ public class GuitareEtapeChangerNote : EtapeTutorial {
 	}
 	
 	// Retourne le nom de l'animation a jouer.
-	public string ObtenirAnimation() {
-		return "";
+	public Texture[] ObtenirAnimation() {
+		Texture[] textureChangerNote = new Texture[3];
+		for (int i = 0; i < textureChangerNote.Length; i++) {
+			int index = i + 1;
+			textureChangerNote [i] = (Texture)Resources.Load ("TutorielGuitare/ChangerNote/" + index);
+		}
+		return textureChangerNote;
 	}
 	
 	// Appeler lorsque cette etape du tutorial debute.

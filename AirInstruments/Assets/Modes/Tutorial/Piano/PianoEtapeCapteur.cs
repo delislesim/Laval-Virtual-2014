@@ -24,8 +24,13 @@ public class PianoEtapeCapteur : EtapeTutorial {
 	}
 	
 	// Retourne le nom de l'animation a jouer.
-	public string ObtenirAnimation() {
-		return "piano-etape-capteur.png";
+	public Texture[] ObtenirAnimation() {
+		Texture[] textureCapteur = new Texture[1];
+		for (int i = 0; i < textureCapteur.Length; i++) {
+			int index = i + 1;
+			textureCapteur [i] = (Texture)Resources.Load ("TutorielPiano/" + index);
+		}
+		return textureCapteur;
 	}
 	
 	// Appeler lorsque cette etape du tutorial debute.

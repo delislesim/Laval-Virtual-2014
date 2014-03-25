@@ -24,8 +24,13 @@ public class GuitareEtapeCordes : EtapeTutorial {
 	}
 	
 	// Retourne le nom de l'animation a jouer.
-	public string ObtenirAnimation() {
-		return "";
+	public Texture[] ObtenirAnimation() {
+		Texture[] textureMainDroite = new Texture[5];
+		for (int i = 0; i < textureMainDroite.Length; i++) {
+						int index = i + 1;
+						textureMainDroite [i] = (Texture)Resources.Load ("TutorielGuitare/BrasDroit/" + index);
+				}
+		return textureMainDroite;
 	}
 	
 	// Appeler lorsque cette etape du tutorial debute.
