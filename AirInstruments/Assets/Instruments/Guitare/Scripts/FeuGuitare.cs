@@ -1,14 +1,34 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class FeuGuitare : MonoBehaviour {
 
-	public ParticleSystem murDeFeu;
 	public GameObject lanceFlammes;
+
+	public List<ParticleSystem> thrower;
+	public List<ParticleSystem> smoke;
+	public List<ParticleSystem> thrower_child;
+	public List<ParticleSystem> sparks;
 
 	// Use this for initialization
 	void Start () {
-	
+		SetEmit (false);
+	}
+
+	void SetEmit(bool emit) {
+		for (int i = 0; i < thrower.Count; ++i) {
+			thrower[i].enableEmission = emit;
+		}
+		for (int i = 0; i < smoke.Count; ++i) {
+			smoke[i].enableEmission = emit;
+		}
+		for (int i = 0; i < thrower_child.Count; ++i) {
+			thrower_child[i].enableEmission = emit;
+		}
+		for (int i = 0; i < sparks.Count; ++i) {
+			sparks[i].enableEmission = emit;
+		}
 	}
 	
 	// Update is called once per frame
@@ -19,64 +39,37 @@ public class FeuGuitare : MonoBehaviour {
 				action = ActionCourante.MONTER;
 				timer = 0;
 
-				//murDeFeu.gameObject.SetActive(true);
 				lanceFlammes.SetActive(true);
+				SetEmit(true);
 			}
 		} else {
 			if (action != ActionCourante.DESCENDRE && lanceFlammes.activeSelf) {
 				action = ActionCourante.DESCENDRE;
 				timer = 0;
+
+				SetEmit(false);
 			}
 		}
 
 		// Afficher le feu.
 		if (action == ActionCourante.MONTER) {
 			timer += Time.deltaTime;
-			float proportion = timer / kTempsAnimation;
-			if (proportion > 1.0f)
-				proportion = 1.0f;
-			float y = easeOutQuad(kYCache, kYVisible, proportion);
-			Vector3 position = transform.localPosition;
-			position.y = y;
-
-			if (proportion == 1.0f) {
+			if (timer >= kTempsAnimationEntree) {
 				action = ActionCourante.RIEN;
-				position.y = kYVisible;
+				//SetEmit(false);
+				//lanceFlammes.SetActive(false);
 			}
-
-			transform.localPosition = position;
-
 		}
 		// Masquer le feu.
 		else if (action == ActionCourante.DESCENDRE) {
 			timer += Time.deltaTime;
-			float proportion = timer / kTempsAnimation;
-			if (proportion > 1.0f)
-				proportion = 1.0f;
-			float y = easeInQuad(kYVisible, kYCache, proportion);
-			Vector3 position = transform.localPosition;
-			position.y = y;
-
-			if (proportion == 1.0f) {
+			if (timer >= kTempsAnimationSortie) {
 				action = ActionCourante.RIEN;
-				position.y = kYCache;
-				murDeFeu.gameObject.SetActive(false);
+				//SetEmit(false);
 				lanceFlammes.SetActive(false);
 			}
-
-			transform.localPosition = position;
 		}
 
-	}
-
-	private float easeInQuad(float start, float end, float value){
-		end -= start;
-		return end * value * value + start;
-	}
-	
-	private float easeOutQuad(float start, float end, float value){
-		end -= start;
-		return -end * value * (value - 2) + start;
 	}
 
 	enum ActionCourante {
@@ -95,6 +88,9 @@ public class FeuGuitare : MonoBehaviour {
 	// Timer pour l'animation courante.
 	private float timer = 0;
 
-	// Temps d'une animation.
-	private const float kTempsAnimation = 2.0f;
+	// Temps d'une animation d'entree.
+	private const float kTempsAnimationEntree = 1.0f;
+
+	// Temps d'une animation de sortie.
+	private const float kTempsAnimationSortie = 6.0f;
 }
