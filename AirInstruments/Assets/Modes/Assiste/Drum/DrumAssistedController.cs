@@ -17,6 +17,8 @@ public class DrumAssistedController : MonoBehaviour {
 	public TipFollower tipRight;
 	public TipFollower tipLeft;
 
+	public FeuDrum feuDrum;
+
 	public DrumComponent[] DrumComponentObjects;
 	public enum DrumComponentIndexes : int{
 		BIGTOM = 0,
@@ -161,6 +163,11 @@ public class DrumAssistedController : MonoBehaviour {
 				int nbCoups = Mathf.Min(closestFromLeft.GetCoupsDernierTemps()  + bonusForBothHands , TracksCollection[closestFromLeft].Count-1);
 				idxCoups = nbCoups;
 
+				// Feu.
+				if (nbCoups == TracksCollection[closestFromLeft].Count-1) {
+					feuDrum.Burst();
+				}
+
 				//Choisir track a, b, .... Les chances réduisent linéairement
 				List<int> idxList = new List<int>();
 				for(int i = 0 ; i < TracksCollection[closestFromLeft][idxCoups].Count ; i++){
@@ -195,6 +202,11 @@ public class DrumAssistedController : MonoBehaviour {
 			
 			int nbCoups = Mathf.Min(closestFromRight.GetCoupsDernierTemps() + bonusForBothHands, TracksCollection[closestFromRight].Count-1);
 			idxCoups = nbCoups;
+
+			// Feu.
+			if (nbCoups == TracksCollection[closestFromRight].Count-1) {
+				feuDrum.Burst();
+			}
 
 			List<int> idxList = new List<int>();
 			for(int i = 0 ; i < TracksCollection[closestFromRight][idxCoups].Count ; i++){
