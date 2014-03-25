@@ -19,7 +19,7 @@ public class FeuGuitare : MonoBehaviour {
 				action = ActionCourante.MONTER;
 				timer = 0;
 
-				murDeFeu.gameObject.SetActive(true);
+				//murDeFeu.gameObject.SetActive(true);
 				lanceFlammes.SetActive(true);
 			}
 		} else {
