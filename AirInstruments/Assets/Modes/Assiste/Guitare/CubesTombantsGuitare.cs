@@ -76,7 +76,7 @@ public class CubesTombantsGuitare : MonoBehaviour {
 			Destroy(cube);
 		}
 		for (int i = 0; i < solos.Count; ++i) {
-			Destroy(solos[i]);
+			Destroy(solos[i].gameObject);
 		}
 		solos.Clear ();
 	}

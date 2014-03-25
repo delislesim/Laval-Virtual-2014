@@ -11,7 +11,7 @@ public interface EtapeTutorial {
 	AudioClip ObtenirAudio();
 
 	// Retourne le nom de l'animation a jouer.
-	string ObtenirAnimation();
+	Texture[] ObtenirAnimation();
 
 	// Appeler lorsque cette etape du tutorial debute.
 	void Demarrer();

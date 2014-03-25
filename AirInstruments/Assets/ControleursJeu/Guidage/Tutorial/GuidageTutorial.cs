@@ -9,6 +9,7 @@ public class GuidageTutorial : MonoBehaviour {
 
 	// GameObject affichant le pictogramme.
 	public GUITexture pictogramme;
+	private Texture[] texturePictogramme;
 
 	// GameObject affichant le background du guidage.
 	public GUITexture background;
@@ -42,6 +43,19 @@ public class GuidageTutorial : MonoBehaviour {
 	void Update () {
 		tempsEcoule += Time.deltaTime;
 		float proportion = tempsEcoule / kTempsAnimation;
+
+		if (texturePictogramme == null) {
+				pictogramme.texture = null;
+		} else {
+				// Timer pour l'animation des pictogrammes
+				tempsPictogramme += Time.deltaTime;
+				int indexAnimation = (int)(tempsPictogramme * (texturePictogramme.Length / 0.5f));
+				if (indexAnimation >= texturePictogramme.Length) {
+					tempsPictogramme = 0;
+					indexAnimation = 0;
+				}
+				pictogramme.texture = texturePictogramme [indexAnimation];
+		}
 
 		if(EstEnTrainEntrer) {
 			if (proportion > 1.0f) {
@@ -131,8 +145,9 @@ public class GuidageTutorial : MonoBehaviour {
 	}
 
 	public void AfficherEtape(EtapeTutorial etape) {
-
+		tempsPictogramme = 0;
 		texte.text = etape.ObtenirTexte ();
+		texturePictogramme = etape.ObtenirAnimation ();
 		if(positionCible == Position.HAUT)
 			background.texture = backgroundBeginningTop;
 		else
@@ -215,6 +230,8 @@ public class GuidageTutorial : MonoBehaviour {
 
 	// Temps écoulé depuis le début de l'animation
 	private float tempsEcoule = 0;
+
+	private float tempsPictogramme = 0;
 
 	// Position cible du guidage.
 	private Position positionCible;

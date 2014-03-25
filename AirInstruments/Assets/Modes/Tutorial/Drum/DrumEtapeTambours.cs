@@ -34,7 +34,10 @@ public class DrumEtapeTambours : EtapeTutorial {
 	// Retourne le texte d'instruction qui doit etre affiche lors de
 	// l'execution de cette etape du tutorial.
 	public string ObtenirTexte() {
-		return "Jouez les tambours et cymbales qui deviennent bleus.";
+		if(!Langue.isEnglish)
+			return "Jouez les tambours et cymbales qui deviennent bleus.";
+		else
+			return "Play the drums and cymbals when they become blue.";
 	}
 	
 	// Retourne la voix lisant l'instruction.
@@ -43,8 +46,8 @@ public class DrumEtapeTambours : EtapeTutorial {
 	}
 	
 	// Retourne le nom de l'animation a jouer.
-	public string ObtenirAnimation() {
-		return "piano-etape-assiste.png";
+	public Texture[] ObtenirAnimation() {
+		return null;
 	}
 	
 	// Appeler lorsque cette etape du tutorial debute.
@@ -64,7 +67,7 @@ public class DrumEtapeTambours : EtapeTutorial {
 				return true;
 			} else {
 				// Jouer le prochain composant.
-				components [prochainComposant].DoitEtreJoue();
+				components [prochainComposant].DoitEtreJoue(true);
 			}
 		}
 
