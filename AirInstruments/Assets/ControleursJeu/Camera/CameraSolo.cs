@@ -145,7 +145,7 @@ public class CameraSolo : MonoBehaviour {
 	private Vector3 kDistanceMin = new Vector3(-2.0f, -1.0f, 2.5f);
 
 	// Distances maximales par rapport aux hanches.
-	private Vector3 kDistanceMax = new Vector3(2.0f, 3.0f, 6.0f);
+	private Vector3 kDistanceMax = new Vector3(2.0f, 0.0f, 6.0f);
 
 	// Variations possibles pour le haut.
 	private Vector3 kToleranceHaut = new Vector3(0.1f, 0.1f, 0.1f);
