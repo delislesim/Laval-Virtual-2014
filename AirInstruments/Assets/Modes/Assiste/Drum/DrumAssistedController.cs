@@ -165,7 +165,7 @@ public class DrumAssistedController : MonoBehaviour {
 
 				// Feu.
 				if (nbCoups >= TracksCollection[closestFromLeft].Count-1 && nbCoups >= 6) {
-					feuDrum.Burst();
+					//feuDrum.Burst();
 				}
 
 				//Choisir track a, b, .... Les chances réduisent linéairement
@@ -205,7 +205,7 @@ public class DrumAssistedController : MonoBehaviour {
 
 			// Feu.
 			if (nbCoups >= TracksCollection[closestFromRight].Count-1 && nbCoups >= 6) {
-				feuDrum.Burst();
+				//feuDrum.Burst();
 			}
 
 			List<int> idxList = new List<int>();
