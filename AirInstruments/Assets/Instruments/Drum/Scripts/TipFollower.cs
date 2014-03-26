@@ -5,6 +5,7 @@ public class TipFollower : MonoBehaviour {
 
 	// Objet que le tip doit suivre.
 	public GameObject objectToFollow;
+	public DrumComponent Crash;
 
 	// Use this for initialization
 	void Start () {
@@ -54,7 +55,7 @@ public class TipFollower : MonoBehaviour {
 				distanceReelle = 0;
 
 			if (componentInterface != dernierDrumComponent && distanceReelle < kDistancePourJouer) {
-				if(DrumAssistedController.EstActive() && dernierLongMemory != componentInterface)
+				if(DrumAssistedController.EstActive() && dernierLongMemory != componentInterface && componentInterface != Crash)
 				{
 					if(componentInterface !=null)
 					{
