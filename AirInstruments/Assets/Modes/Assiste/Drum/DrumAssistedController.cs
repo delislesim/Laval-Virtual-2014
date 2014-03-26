@@ -359,7 +359,7 @@ public class DrumAssistedController : MonoBehaviour {
 		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/Tom2/4a"));
 		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/Tom2/4b"));
 		ProbLists[4].Add ((AudioClip)Resources.Load("DrumTracks/Tom2/6a"));
-		ProbLists[4].Add ((AudioClip)Resources.Load("DrumTracks/Tom2/6b"));
+		ProbLists[5].Add ((AudioClip)Resources.Load("DrumTracks/Tom2/8a"));
 		for(int i = 0 ; i < 5 ; i++)
 		{
 			ComponentList.Add (new List<AudioClip>(ProbLists[i]));
