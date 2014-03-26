@@ -55,7 +55,11 @@ public class TipFollower : MonoBehaviour {
 				distanceReelle = 0;
 
 			if (componentInterface != dernierDrumComponent && distanceReelle < kDistancePourJouer) {
-				if(DrumAssistedController.EstActive() && dernierLongMemory != componentInterface && componentInterface != Crash)
+				if(componentInterface == Crash)
+				{
+					componentInterface.PlaySoundWhenAssisted();
+				}
+				else if(DrumAssistedController.EstActive() && dernierLongMemory != componentInterface)
 				{
 					if(componentInterface !=null)
 					{
