@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class DrumEtapeImprovisez : EtapeTutorial {
 	
@@ -51,5 +52,5 @@ public class DrumEtapeImprovisez : EtapeTutorial {
 
 	// Voix lisant l'instruction en anglais.
 	private AudioClip sonAnglais;
-	
+
 }
