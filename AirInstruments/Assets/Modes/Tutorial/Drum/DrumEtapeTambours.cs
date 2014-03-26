@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class DrumEtapeTambours : EtapeTutorial {
 	
 	public DrumEtapeTambours(AudioClip son,
+	                         AudioClip sonAnglais,
 	                         DrumComponent crash,
 	                         DrumComponent highHat,
 	                         DrumComponent ride,
@@ -21,6 +22,7 @@ public class DrumEtapeTambours : EtapeTutorial {
 	                         DrumDecoration tom2Decoration,
 	                         DrumDecoration tomBigDecoration) {
 		this.son = son;
+		this.sonAnglais = sonAnglais;
 
 		components.Add (tom1);
 		components.Add (tom2);
@@ -42,7 +44,10 @@ public class DrumEtapeTambours : EtapeTutorial {
 	
 	// Retourne la voix lisant l'instruction.
 	public AudioClip ObtenirAudio() {
-		return son;
+		if (Langue.isEnglish)
+			return sonAnglais;
+		else
+			return son;
 	}
 	
 	// Retourne le nom de l'animation a jouer.
@@ -85,6 +90,9 @@ public class DrumEtapeTambours : EtapeTutorial {
 	
 	// Voix lisant l'instruction.
 	private AudioClip son;
+
+	// Voix lisant l'instruction en anglais.
+	private AudioClip sonAnglais;
 
 	// Liste de tambours a frapper.
 	private List<ComponentInterface> components = new List<ComponentInterface>();

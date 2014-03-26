@@ -164,7 +164,7 @@ public class DrumAssistedController : MonoBehaviour {
 				idxCoups = nbCoups;
 
 				// Feu.
-				if (nbCoups == TracksCollection[closestFromLeft].Count-1 && nbCoups >= 6) {
+				if (nbCoups >= TracksCollection[closestFromLeft].Count-1 && nbCoups >= 6) {
 					feuDrum.Burst();
 				}
 
@@ -204,7 +204,7 @@ public class DrumAssistedController : MonoBehaviour {
 			idxCoups = nbCoups;
 
 			// Feu.
-			if (nbCoups == TracksCollection[closestFromRight].Count-1 && nbCoups >= 6) {
+			if (nbCoups >= TracksCollection[closestFromRight].Count-1 && nbCoups >= 6) {
 				feuDrum.Burst();
 			}
 

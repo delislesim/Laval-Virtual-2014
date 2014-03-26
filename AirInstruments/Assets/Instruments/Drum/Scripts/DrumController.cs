@@ -48,6 +48,13 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 	public AudioClip sonMitrailler;
 	public AudioClip sonMitraillerRide;
 
+	// Clips audio du tutorial en anglais.
+	public AudioClip sonAnglaisPosition;
+	public AudioClip sonAnglaisTambours;
+	public AudioClip sonAnglaisImprovisez;
+	public AudioClip sonAnglaisMitrailler;
+	public AudioClip sonAnglaisMitraillerRide;
+
 	public void Prepare() {
 		tutorialActif = false;
 		KinectPowerInterop.SetKinectAngle (4);
@@ -97,7 +104,12 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 		                             sonTambours,
 		                             sonImprovisez,
 		                             sonMitrailler,
-		                             sonMitraillerRide);
+		                             sonMitraillerRide,
+		                             sonAnglaisPosition,
+		                             sonAnglaisTambours,
+		                             sonAnglaisImprovisez,
+		                             sonAnglaisMitrailler,
+		                             sonAnglaisMitraillerRide);
 		tutorial.Demarrer ();
 		tutorialActif = true;
 

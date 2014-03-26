@@ -4,8 +4,10 @@ using KinectHelpers;
 
 public class GuitareEtapeChangerNote : EtapeTutorial {
 	
-	public GuitareEtapeChangerNote(AudioClip son, HandFollower handFollower) {
+	public GuitareEtapeChangerNote(AudioClip son, AudioClip sonAnglais, HandFollower handFollower) {
 		this.son = son;
+		this.sonAnglais = sonAnglais;
+
 		this.handFollower = handFollower;
 	}
 	
@@ -15,12 +17,15 @@ public class GuitareEtapeChangerNote : EtapeTutorial {
 		if(!Langue.isEnglish)
 			return "Déplacez votre main sur le manche de\nla guitare pour changer la note.";
 		else
-			return "Move your hand over over the fretboard to change the played note.";
+			return "Move your hand over the fretboard to change the played note.";
 	}
 	
 	// Retourne la voix lisant l'instruction.
 	public AudioClip ObtenirAudio() {
-		return son;
+		if (Langue.isEnglish)
+			return sonAnglais;
+		else
+			return son;
 	}
 	
 	// Retourne le nom de l'animation a jouer.
@@ -52,6 +57,9 @@ public class GuitareEtapeChangerNote : EtapeTutorial {
 	
 	// Voix lisant l'instruction.
 	private AudioClip son;
+
+	// Voix lisant l'instruction en anglais.
+	private AudioClip sonAnglais;
 
 	// Timer.
 	private float timer = 0;

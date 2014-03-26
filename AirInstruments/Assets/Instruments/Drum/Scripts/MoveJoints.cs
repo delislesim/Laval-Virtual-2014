@@ -26,7 +26,9 @@ public class MoveJoints : MonoBehaviour {
 	public GameObject Foot_Right;
 
 	public DrumComponent Bass_Kick; 
-	public HighHatComponent High_Hat;
+
+	// Script qui affiche les cylindres.
+	public SkeletonDrawer drawer;
 
 	//Private
 	private Skeleton m_player_one;
@@ -95,6 +97,7 @@ public class MoveJoints : MonoBehaviour {
 
 		if (m_player_one.IsDifferent()) {
 			moveJoints (m_player_one);
+			drawer.PlacerCylindres();
 		}
 	}
 

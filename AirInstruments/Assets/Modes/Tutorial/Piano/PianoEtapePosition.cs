@@ -4,8 +4,11 @@ using System.Collections;
 public class PianoEtapePosition : EtapeTutorial {
 
 	public PianoEtapePosition(AudioClip son,
+	                          AudioClip sonAnglais,
 	                          IntelHandController handController) {
 		this.son = son;
+		this.sonAnglais = sonAnglais;
+
 		this.handController = handController;
 	}
 
@@ -15,12 +18,15 @@ public class PianoEtapePosition : EtapeTutorial {
 		if(!Langue.isEnglish)
 			return "Suivez les fleches pour approcher vos mains du piano.";
 		else
-			return "Follow the arrows to place your hands close to the piano.";
+			return "Follow the arrows to place your hands correctly.";
 	}
 	
 	// Retourne la voix lisant l'instruction.
 	public AudioClip ObtenirAudio() {
-		return son;
+		if (Langue.isEnglish)
+			return sonAnglais;
+		else
+			return son;
 	}
 	
 	// Retourne le nom de l'animation a jouer.
@@ -46,6 +52,9 @@ public class PianoEtapePosition : EtapeTutorial {
 
 	// Voix lisant l'instruction.
 	private AudioClip son;
+
+	// Voix lisant l'instruction en anglais.
+	private AudioClip sonAnglais;
 
 	// Controleur de mains, permettant de savoir si l'etape est completee.
 	private IntelHandController handController;

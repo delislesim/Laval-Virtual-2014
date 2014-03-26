@@ -21,6 +21,12 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 	public AudioClip sonGamme;
 	public AudioClip sonAssiste;
 
+	// Sons du tutorial en anglais.
+	public AudioClip sonAnglaisCapteur;
+	public AudioClip sonAnglaisPosition;
+	public AudioClip sonAnglaisGamme;
+	public AudioClip sonAnglaisAssiste;
+
 	public void Prepare() {
 		KinectPowerInterop.SetKinectAngle (15);
 		spotlightPiano.SetTargetIntensity (kSpotlightIntensityPlaying, 1.0f);
@@ -46,7 +52,11 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 		                              sonCapteur,
 		                              sonPosition,
 		                              sonGamme,
-		                              sonAssiste);
+		                              sonAssiste,
+		                              sonAnglaisCapteur,
+		                              sonAnglaisPosition,
+		                              sonAnglaisGamme,
+		                              sonAnglaisAssiste);
 		tutorial.Demarrer ();
 		tutorialActif = true;
 	}

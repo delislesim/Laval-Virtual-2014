@@ -4,8 +4,9 @@ using KinectHelpers;
 
 public class GuitareEtapeLeverBras : EtapeTutorial {
 	
-	public GuitareEtapeLeverBras(AudioClip son) {
+	public GuitareEtapeLeverBras(AudioClip son, AudioClip sonAnglais) {
 		this.son = son;
+		this.sonAnglais = sonAnglais;
 	}
 	
 	// Retourne le texte d'instruction qui doit etre affiche lors de
@@ -19,7 +20,10 @@ public class GuitareEtapeLeverBras : EtapeTutorial {
 	
 	// Retourne la voix lisant l'instruction.
 	public AudioClip ObtenirAudio() {
-		return son;
+		if (Langue.isEnglish)
+			return sonAnglais;
+		else
+			return son;
 	}
 	
 	// Retourne le nom de l'animation a jouer.
@@ -74,6 +78,9 @@ public class GuitareEtapeLeverBras : EtapeTutorial {
 	
 	// Voix lisant l'instruction.
 	private AudioClip son;
+
+	// Voix lisant l'instruction en anglais.
+	private AudioClip sonAnglais;
 	
 	// Squelette.
 	private Skeleton skeleton = new Skeleton(0);

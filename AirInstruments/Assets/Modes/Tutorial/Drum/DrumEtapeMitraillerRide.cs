@@ -11,6 +11,7 @@ public class DrumEtapeMitraillerRide : EtapeTutorial {
 	private List<ComponentInterface> components = new List<ComponentInterface>();
 
 	public DrumEtapeMitraillerRide(AudioClip son,
+	                               AudioClip sonAnglais,
 	                               DrumComponent crash,
 	                               DrumComponent highHat,
 	                               DrumComponent ride,
@@ -27,6 +28,7 @@ public class DrumEtapeMitraillerRide : EtapeTutorial {
 	                               DrumDecoration tom2Decoration,
 	                               DrumDecoration tomBigDecoration) {
 		this.son = son;
+		this.sonAnglais = sonAnglais;
 		
 		decoration.Add (snareDecoration);
 		decoration.Add (rideDecoration);
@@ -53,12 +55,15 @@ public class DrumEtapeMitraillerRide : EtapeTutorial {
 		if(!Langue.isEnglish)
 			return "Jouez les 2 instruments en même temps.";
 		else
-			return "Play both drums at the same time.";
+			return "Play both instruments at the same time.";
 	}
 	
 	// Retourne la voix lisant l'instruction.
 	public AudioClip ObtenirAudio() {
-		return son;
+		if (Langue.isEnglish)
+			return sonAnglais;
+		else
+			return son;
 	}
 	
 	// Retourne le nom de l'animation a jouer.
@@ -94,6 +99,9 @@ public class DrumEtapeMitraillerRide : EtapeTutorial {
 	
 	// Voix lisant l'instruction.
 	private AudioClip son;
+
+	// Voix lisant l'instruction en anglais.
+	private AudioClip sonAnglais;
 	
 	// Timer pour afficher des composants.
 	private float timer = 0;

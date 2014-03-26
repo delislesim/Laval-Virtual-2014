@@ -4,9 +4,12 @@ using System.Collections;
 public class PianoEtapeAssiste : EtapeTutorial {
 	
 	public PianoEtapeAssiste(AudioClip son,
+	                         AudioClip sonAnglais,
 	                         IntelHandController handController,
 	                         AssistedModeControllerPiano assistedModeController) {
 		this.son = son;
+		this.sonAnglais = sonAnglais;
+
 		this.handController = handController;
 		this.assistedModeController = assistedModeController;
 	}
@@ -17,12 +20,15 @@ public class PianoEtapeAssiste : EtapeTutorial {
 		if(!Langue.isEnglish)
 			return "Continuez d'appuyer sur les notes bleues pour jouer un air connu.";
 		else
-			return "Keep on pressing the blue keys in order to play a popular melody.";
+			return "Keep on pressing the blue keys in order\nto play a popular song.";
 	}
 	
 	// Retourne la voix lisant l'instruction.
 	public AudioClip ObtenirAudio() {
-		return son;
+		if (Langue.isEnglish)
+			return sonAnglais;
+		else
+			return son;
 	}
 	
 	// Retourne le nom de l'animation a jouer.
@@ -49,6 +55,9 @@ public class PianoEtapeAssiste : EtapeTutorial {
 
 	// Voix lisant l'instruction.
 	private AudioClip son;
+
+	// Voix lisant l'instruction en anglais.
+	private AudioClip sonAnglais;
 	
 	// Controleur de mains, permettant de savoir si l'etape est completee.
 	private IntelHandController handController;

@@ -24,13 +24,19 @@ public class TutorialDrum {
 	                    AudioClip sonTambours,
 	                    AudioClip sonImprovisez,
 	                    AudioClip sonMitrailler,
-	                    AudioClip sonMitraillerRide) {
+	                    AudioClip sonMitraillerRide,
+	                    AudioClip sonAnglaisPosition,
+	                    AudioClip sonAnglaisTambours,
+	                    AudioClip sonAnglaisImprovisez,
+	                    AudioClip sonAnglaisMitrailler,
+	                    AudioClip sonAnglaisMitraillerRide) {
 		this.tutorial = Tutorial.ObtenirInstance ();
 		
 		// Creer les etapes du tutorial.
 		tutorial.ReinitialiserEtapes ();
-		tutorial.AjouterEtape (new DrumEtapePosition(sonPosition, tipLeft, tipRight));
+		tutorial.AjouterEtape (new DrumEtapePosition(sonPosition, sonAnglaisPosition, tipLeft, tipRight));
 		tutorial.AjouterEtape (new DrumEtapeTambours(sonTambours,
+		                                             sonAnglaisTambours,
 		                                             crash,
 		                                             highHat,
 		                                             ride,
@@ -47,6 +53,7 @@ public class TutorialDrum {
 		                                             tom2Decoration,
 		                                             tomBigDecoration));
 		tutorial.AjouterEtape (new DrumEtapeMitrailler(sonMitrailler,
+		                                               sonAnglaisMitrailler,
 		                                               crash,
 		                                               highHat,
 		                                               ride,
@@ -63,6 +70,7 @@ public class TutorialDrum {
 		                                               tom2Decoration,
 		                                               tomBigDecoration));
 		tutorial.AjouterEtape (new DrumEtapeMitraillerRide(sonMitraillerRide,
+		                                                   sonAnglaisMitraillerRide,
 		                                                   crash,
 		                                                   highHat,
 		                                                   ride,
@@ -78,7 +86,7 @@ public class TutorialDrum {
 		                                                   tom1Decoration,
 		                                                   tom2Decoration,
 		                                                   tomBigDecoration));	
-		tutorial.AjouterEtape (new DrumEtapeImprovisez(sonImprovisez));
+		tutorial.AjouterEtape (new DrumEtapeImprovisez(sonImprovisez, sonAnglaisImprovisez));
 	}
 	
 	public void Demarrer() {

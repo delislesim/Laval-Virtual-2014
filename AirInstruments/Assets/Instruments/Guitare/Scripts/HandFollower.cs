@@ -4,7 +4,6 @@ using System.Collections;
 public class HandFollower : MonoBehaviour {
 
 	// Objet que le tip doit suivre.
-	public GameObject objectToFollow;
 	public ColliderManager guitarCollider;
 	public GuitarPlayer guitarPlayer;
 
@@ -45,11 +44,7 @@ public class HandFollower : MonoBehaviour {
 
 
 		// --- Gerer les sons de guitare. ---
-		lastPosition = transform.position;
-		
-		// Suivre l'objet auquel on a été assigné.
-		transform.position = objectToFollow.transform.position;
-		
+
 		// Si on a joue une note recemment, s'assurer qu'on s'en eloigne avant de le rejouer.
 		float distance = guitarCollider.DistanceToPoint(transform.position);
 		if (Mathf.Abs(distance) > kDistancePourRejouer) {
@@ -96,6 +91,9 @@ public class HandFollower : MonoBehaviour {
 				}
 			}
 		}
+
+		// Sauvegarder la derniere position.
+		lastPosition = transform.position;
 	}
 
 	void PlayNote() {

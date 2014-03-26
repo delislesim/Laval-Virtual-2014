@@ -52,6 +52,9 @@ public class MoveJointsForGuitar : MonoBehaviour {
 	private const float DIST_MAX_KINECT = 10.0f; //2m
 	private const float DIST_MIN_KINECT = 2.0f; //dist min...
 
+	// Script qui affiche les cylindres.
+	public SkeletonDrawer drawer;
+
 	// Use this for initialization
 	void Start () {
 		joints = new GameObject[(int)Skeleton.Joint.Count] {
@@ -84,6 +87,7 @@ public class MoveJointsForGuitar : MonoBehaviour {
 		if (m_player_one.IsDifferent() && SkeletonIsTrackedAndValid(m_player_one)) {
 			moveJoints (m_player_one);
 			handFollower.SignalerNouvellePosition();
+			drawer.PlacerCylindres();
 		}
 
 		// Mettre le bon layer a la ligne verte.

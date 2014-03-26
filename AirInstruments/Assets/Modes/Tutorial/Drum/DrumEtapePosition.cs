@@ -4,9 +4,12 @@ using System.Collections;
 public class DrumEtapePosition : EtapeTutorial {
 	
 	public DrumEtapePosition(AudioClip son,
+	                         AudioClip sonAnglais,
 	                         GameObject tipLeft,
 	                         GameObject tipRight) {
 		this.son = son;
+		this.sonAnglais = sonAnglais;
+
 		this.tipLeft = tipLeft;
 		this.tipRight = tipRight;
 	}
@@ -17,12 +20,15 @@ public class DrumEtapePosition : EtapeTutorial {
 		if(!Langue.isEnglish)
 			return "Positionnez le bout de vos baguettes au-dessus de la batterie.";
 		else
-			return "Position the tip of your drumsticks over the drum set.";
+			return "Position your drumsticks over the drum set.";
 	}
 	
 	// Retourne la voix lisant l'instruction.
 	public AudioClip ObtenirAudio() {
-		return son;
+		if (Langue.isEnglish)
+			return sonAnglais;
+		else
+			return son;
 	}
 	
 	// Retourne le nom de l'animation a jouer.
@@ -55,6 +61,9 @@ public class DrumEtapePosition : EtapeTutorial {
 	
 	// Voix lisant l'instruction.
 	private AudioClip son;
+
+	// Voix lisant l'instruction en anglais.
+	private AudioClip sonAnglais;
 	
 	// Tip left.
 	private GameObject tipLeft;

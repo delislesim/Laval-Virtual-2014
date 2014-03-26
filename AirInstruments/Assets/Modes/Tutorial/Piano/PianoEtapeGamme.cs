@@ -4,9 +4,12 @@ using System.Collections;
 public class PianoEtapeGamme : EtapeTutorial {
 
 	public PianoEtapeGamme(AudioClip son,
+	                       AudioClip sonAnglais,
 	                       IntelHandController handController,
 	                       AssistedModeControllerPiano assistedModeController) {
 		this.son = son;
+		this.sonAnglais = sonAnglais;
+
 		this.handController = handController;
 		this.assistedModeController = assistedModeController;
 	}
@@ -22,7 +25,10 @@ public class PianoEtapeGamme : EtapeTutorial {
 	
 	// Retourne la voix lisant l'instruction.
 	public AudioClip ObtenirAudio() {
-		return son;
+		if (Langue.isEnglish)
+			return sonAnglais;
+		else
+			return son;
 	}
 	
 	// Retourne le nom de l'animation a jouer.
@@ -48,6 +54,9 @@ public class PianoEtapeGamme : EtapeTutorial {
 
 	// Voix lisant l'instruction.
 	private AudioClip son;
+
+	// Voix lisant l'instruction en anglais.
+	private AudioClip sonAnglais;
 
 	// Controleur de mains, permettant de savoir si l'etape est completee.
 	private IntelHandController handController;

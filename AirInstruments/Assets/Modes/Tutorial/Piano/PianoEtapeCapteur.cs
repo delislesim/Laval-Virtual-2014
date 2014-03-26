@@ -4,8 +4,11 @@ using System.Collections;
 public class PianoEtapeCapteur : EtapeTutorial {
 
 	public PianoEtapeCapteur(AudioClip son,
+	                         AudioClip sonAnglais,
 	                         IntelHandController handController) {
 		this.son = son;
+		this.sonAnglais = sonAnglais;
+
 		this.handController = handController;
 	}
 
@@ -20,7 +23,10 @@ public class PianoEtapeCapteur : EtapeTutorial {
 	
 	// Retourne la voix lisant l'instruction.
 	public AudioClip ObtenirAudio() {
-		return son;
+		if (Langue.isEnglish)
+			return sonAnglais;
+		else
+			return son;
 	}
 	
 	// Retourne le nom de l'animation a jouer.
@@ -51,6 +57,9 @@ public class PianoEtapeCapteur : EtapeTutorial {
 
 	// Voix lisant l'instruction.
 	private AudioClip son;
+
+	// Voix lisant l'instruction en anglais.
+	private AudioClip sonAnglais;
 
 	// Controleur de mains, permettant de savoir si l'etape est completee.
 	private IntelHandController handController;

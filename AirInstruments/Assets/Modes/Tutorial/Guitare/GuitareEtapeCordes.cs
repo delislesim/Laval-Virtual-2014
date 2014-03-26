@@ -4,8 +4,10 @@ using KinectHelpers;
 
 public class GuitareEtapeCordes : EtapeTutorial {
 	
-	public GuitareEtapeCordes(AudioClip son, HandFollower handFollower) {
+	public GuitareEtapeCordes(AudioClip son, AudioClip sonAnglais, HandFollower handFollower) {
 		this.son = son;
+		this.sonAnglais = sonAnglais;
+
 		this.handFollower = handFollower;
 	}
 	
@@ -15,12 +17,15 @@ public class GuitareEtapeCordes : EtapeTutorial {
 		if(!Langue.isEnglish)
 			return "Faites de grands mouvements avec la main droite\npour jouer des notes.";
 		else
-			return "Make ample vertical gestures with your right hand in order to play notes.";
+			return "Make ample vertical gestures with your right hand\nin order to play notes.";
 	}
 	
 	// Retourne la voix lisant l'instruction.
 	public AudioClip ObtenirAudio() {
-		return son;
+		if (Langue.isEnglish)
+			return sonAnglais;
+		else
+			return son;
 	}
 	
 	// Retourne le nom de l'animation a jouer.
@@ -51,6 +56,9 @@ public class GuitareEtapeCordes : EtapeTutorial {
 	
 	// Voix lisant l'instruction.
 	private AudioClip son;
+
+	// Voix lisant l'instruction en anglais.
+	private AudioClip sonAnglais;
 
 	// Squelette.
 	private Skeleton skeleton = new Skeleton(0);

@@ -4,8 +4,10 @@ using KinectHelpers;
 
 public class GuitareEtapeAssiste : EtapeTutorial {
 	
-	public GuitareEtapeAssiste(AudioClip son, AssistedModeControllerGuitar assistedModeController) {
+	public GuitareEtapeAssiste(AudioClip son, AudioClip sonAnglais, AssistedModeControllerGuitar assistedModeController) {
 		this.son = son;
+		this.sonAnglais = sonAnglais;
+
 		this.assistedModeController = assistedModeController;
 	}
 	
@@ -20,7 +22,10 @@ public class GuitareEtapeAssiste : EtapeTutorial {
 	
 	// Retourne la voix lisant l'instruction.
 	public AudioClip ObtenirAudio() {
-		return son;
+		if (Langue.isEnglish)
+			return sonAnglais;
+		else
+			return son;
 	}
 	
 	// Retourne le nom de l'animation a jouer.
@@ -47,6 +52,9 @@ public class GuitareEtapeAssiste : EtapeTutorial {
 	
 	// Voix lisant l'instruction.
 	private AudioClip son;
+
+	// Voix lisant l'instruction en anglais.
+	private AudioClip sonAnglais;
 	
 	// Mode assiste.
 	private AssistedModeControllerGuitar assistedModeController;

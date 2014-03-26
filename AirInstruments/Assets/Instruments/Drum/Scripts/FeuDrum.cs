@@ -41,7 +41,7 @@ public class FeuDrum : MonoBehaviour {
 	}
 
 	void SetActive(bool active) {
-		wall.gameObject.SetActive (active);
+		//wall.gameObject.SetActive (active);
 		smoke.gameObject.SetActive (active);
 		small.gameObject.SetActive (active);
 		sparks.gameObject.SetActive (active);
