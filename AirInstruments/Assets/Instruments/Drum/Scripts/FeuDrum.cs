@@ -21,6 +21,10 @@ public class FeuDrum : MonoBehaviour {
 		COUNT
 	}
 
+	public static void BurstCrash() {
+		burstCrash = true;
+	}
+
 	// Envoyer une shot de feu.
 	public void Burst(TypeEmission typeEmission) {
 		switch (typeEmission) {
@@ -60,6 +64,11 @@ public class FeuDrum : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (burstCrash) {
+			Burst(TypeEmission.CRASH);
+			burstCrash = false;
+		}
+
 		if (particle_list == null)
 			return;
 
@@ -69,7 +78,7 @@ public class FeuDrum : MonoBehaviour {
 				SetEmettre(false, particle_list[i]);
 				SetActive(false, particle_list[i]);
 				compteurs[i] = 0;
-			} else if (compteurs[i] >= kTempsArreterEmettre) {
+			} else if (compteurs[i] >= kTempsArreterEmettre[i]) {
 				SetEmettre(false, particle_list[i]);
 			}
 		}
@@ -87,12 +96,15 @@ public class FeuDrum : MonoBehaviour {
 		}
 	}
 
-	// Temps pour arreter d'emettre.
-	private const float kTempsArreterEmettre = 1.25f;
+	// Temps pour arreter d'emettre pour chaque compteur.
+	private float[] kTempsArreterEmettre = {2.0f, 0.3f, 1.0f, 1.0f};
 
 	// Temps pour desactiver le feu.
 	private const float kTempsDesactiver = 7.0f;
 
 	// Compteurs pour fermer les bursts.
 	private float[] compteurs = new float[(int)TypeEmission.COUNT];
+
+	// Mettre un burst sur le crash.
+	private static bool burstCrash = false;
 }
