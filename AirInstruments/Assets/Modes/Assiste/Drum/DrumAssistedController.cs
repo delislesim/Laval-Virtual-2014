@@ -40,6 +40,9 @@ public class DrumAssistedController : MonoBehaviour {
 
 	private Dictionary<DrumComponent, List<List<AudioClip>>> TracksCollection = new Dictionary<DrumComponent, List<List<AudioClip>>>();
 
+	// Indique si on a eu 5 au dernier coup.
+	private int[] aEu5DernierCoup = new int[2];
+
 	private float elapsedTime;
 	private const float S_DELAY = 0.1f;
 	private const float MIN_DIST = 2.5f;
@@ -66,6 +69,9 @@ public class DrumAssistedController : MonoBehaviour {
 		baseRythmB.clip = (AudioClip)Resources.Load("DrumTracks/BaseRythm");
 		//track1_A.clip = TracksCollection[DrumComponentObjects[(int)DrumComponentIndexes.HIHAT]][1][2];
 		SAMPLE_TIME = baseRythmA.clip.length;
+
+		for (int i = 0; i < aEu5DernierCoup.Length; ++i)
+			aEu5DernierCoup[i] = 0;
 	}
 
 	void OnEnable(){
@@ -137,12 +143,12 @@ public class DrumAssistedController : MonoBehaviour {
 		}
 	}
 
-	void BurstFire(DrumComponent component, int nbCoups, int nbCoupsRequis) {
+	void BurstFire(DrumComponent component, int nbCoups, int aEu5) {
 		if (nbCoups >= 5 && component == DrumComponentObjects[(int)DrumComponentIndexes.TOM1]) {
 			feuDrum.Burst(FeuDrum.TypeEmission.TOM2);
 		} else if (nbCoups >= 5 && component == DrumComponentObjects[(int)DrumComponentIndexes.TOM2]) {
 			feuDrum.Burst(FeuDrum.TypeEmission.TOM1);
-		} else if (nbCoups >= 6) {
+		} else if (nbCoups >= 6 || (nbCoups >= 5 && aEu5 >= 2)) {
 			feuDrum.Burst(FeuDrum.TypeEmission.DERRIERE);
 		}
 	}
@@ -176,7 +182,11 @@ public class DrumAssistedController : MonoBehaviour {
 
 				// Feu.
 				if (closestFromRight != null)
-					BurstFire(closestFromLeft, nbCoupsReel, TracksCollection[closestFromLeft].Count-1);
+					BurstFire(closestFromLeft, nbCoupsReel, aEu5DernierCoup[0]);
+				if (nbCoupsReel >= 5)
+					aEu5DernierCoup[0]++;
+				else
+					aEu5DernierCoup[0] = 0;
 
 				//Choisir track a, b, .... Les chances réduisent linéairement
 				List<int> idxList = new List<int>();
@@ -216,8 +226,12 @@ public class DrumAssistedController : MonoBehaviour {
 
 			// Feu.
 			if (closestFromLeft != null)
-				BurstFire(closestFromLeft, nbCoupsReel, TracksCollection[closestFromLeft].Count-1);
-
+				BurstFire(closestFromLeft, nbCoupsReel, aEu5DernierCoup[1]);
+			if (nbCoupsReel >= 5)
+				aEu5DernierCoup[1]++;
+			else
+				aEu5DernierCoup[1] = 0;
+			
 			List<int> idxList = new List<int>();
 			for(int i = 0 ; i < TracksCollection[closestFromRight][idxCoups].Count ; i++){
 				for(int j = 0 ; j < TracksCollection[closestFromRight][idxCoups].Count - i ; j++){

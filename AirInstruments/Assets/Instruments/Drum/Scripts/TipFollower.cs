@@ -58,6 +58,7 @@ public class TipFollower : MonoBehaviour {
 				if(componentInterface == Crash)
 				{
 					componentInterface.PlaySoundWhenAssisted();
+					FeuDrum.BurstCrash();
 				}
 				else if(DrumAssistedController.EstActive() && dernierLongMemory != componentInterface)
 				{
