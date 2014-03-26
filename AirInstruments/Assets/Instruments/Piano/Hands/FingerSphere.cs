@@ -66,7 +66,7 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 					}
 
 					// Si on a un allongement et que la note n'est pas a joue, desactiver l'allongement.
-					if (allongement != 0 && !peutJouerCetteNote) {
+					if (!peutJouerCetteNote || !AssistedModeControllerPiano.EstActive()) {
 						estAssisteAllongement = false;
 					}
 
