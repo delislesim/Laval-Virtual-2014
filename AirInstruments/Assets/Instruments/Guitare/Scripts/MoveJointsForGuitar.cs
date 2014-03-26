@@ -78,7 +78,7 @@ public class MoveJointsForGuitar : MonoBehaviour {
 
 	void OnEnable () {
 		kalmanMainGauche = new Kalman (15.0f);
-		kalmanMainDroite = new Kalman (15.0f);
+		kalmanMainDroite = new Kalman (5.0f);
 	}
 	
 	// Update is called once per frame
