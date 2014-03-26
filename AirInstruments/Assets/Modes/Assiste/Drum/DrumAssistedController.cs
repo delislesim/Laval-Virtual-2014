@@ -137,6 +137,16 @@ public class DrumAssistedController : MonoBehaviour {
 		}
 	}
 
+	void BurstFire(DrumComponent component, int nbCoups, int nbCoupsRequis) {
+		if (nbCoups >= 5 && component == DrumComponentObjects[(int)DrumComponentIndexes.TOM1]) {
+			feuDrum.Burst(FeuDrum.TypeEmission.TOM2);
+		} else if (nbCoups >= 5 && component == DrumComponentObjects[(int)DrumComponentIndexes.TOM2]) {
+			feuDrum.Burst(FeuDrum.TypeEmission.TOM1);
+		} else if (nbCoups >= 6) {
+			feuDrum.Burst(FeuDrum.TypeEmission.DERRIERE);
+		}
+	}
+
 	void MakeTrackChoices()
 	{
 		DrumComponent closestFromLeft;
@@ -160,13 +170,13 @@ public class DrumAssistedController : MonoBehaviour {
 			memLeft = 0;
 			try {
 				//nombre de coups a jouer
-				int nbCoups = Mathf.Min(closestFromLeft.GetCoupsDernierTemps()  + bonusForBothHands , TracksCollection[closestFromLeft].Count-1);
+				int nbCoupsReel = closestFromLeft.GetCoupsDernierTemps()  + bonusForBothHands;
+				int nbCoups = Mathf.Min(nbCoupsReel, TracksCollection[closestFromLeft].Count-1);
 				idxCoups = nbCoups;
 
 				// Feu.
-				if (nbCoups >= TracksCollection[closestFromLeft].Count-1 && nbCoups >= 6) {
-					//feuDrum.Burst();
-				}
+				if (closestFromRight != null)
+					BurstFire(closestFromLeft, nbCoupsReel, TracksCollection[closestFromLeft].Count-1);
 
 				//Choisir track a, b, .... Les chances réduisent linéairement
 				List<int> idxList = new List<int>();
@@ -199,14 +209,14 @@ public class DrumAssistedController : MonoBehaviour {
 		if(track2Needed) //RIGHT HAND
 		{
 			memRight = 0;
-			
-			int nbCoups = Mathf.Min(closestFromRight.GetCoupsDernierTemps() + bonusForBothHands, TracksCollection[closestFromRight].Count-1);
+
+			int nbCoupsReel = closestFromRight.GetCoupsDernierTemps() + bonusForBothHands;
+			int nbCoups = Mathf.Min(nbCoupsReel, TracksCollection[closestFromRight].Count-1);
 			idxCoups = nbCoups;
 
 			// Feu.
-			if (nbCoups >= TracksCollection[closestFromRight].Count-1 && nbCoups >= 6) {
-				//feuDrum.Burst();
-			}
+			if (closestFromLeft != null)
+				BurstFire(closestFromLeft, nbCoupsReel, TracksCollection[closestFromLeft].Count-1);
 
 			List<int> idxList = new List<int>();
 			for(int i = 0 ; i < TracksCollection[closestFromRight][idxCoups].Count ; i++){
@@ -349,7 +359,7 @@ public class DrumAssistedController : MonoBehaviour {
 		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/Tom2/4a"));
 		ProbLists[3].Add ((AudioClip)Resources.Load("DrumTracks/Tom2/4b"));
 		ProbLists[4].Add ((AudioClip)Resources.Load("DrumTracks/Tom2/6a"));
-		ProbLists[4].Add ((AudioClip)Resources.Load("DrumTracks/Tom2/6b"));
+		ProbLists[5].Add ((AudioClip)Resources.Load("DrumTracks/Tom2/8a"));
 		for(int i = 0 ; i < 5 ; i++)
 		{
 			ComponentList.Add (new List<AudioClip>(ProbLists[i]));

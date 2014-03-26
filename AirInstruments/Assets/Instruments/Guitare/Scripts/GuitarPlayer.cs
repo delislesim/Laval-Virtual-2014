@@ -11,7 +11,9 @@ public class GuitarPlayer : MonoBehaviour {
 	public Transform HipTransform;
 	public Transform LeftHandTransform;
 	public AssistedModeControllerGuitar AssistedCtrl;
-
+	public AudioSource audio1;
+	public AudioSource audio2; //audio qui joue une note de plus pour faire un accord
+	public AudioSource audio3;
 	// Halos inquant sur quelle partie du manche on se trouve, pour le mode assiste.
 	public List<GameObject> halosAssiste;
 
@@ -75,8 +77,8 @@ public class GuitarPlayer : MonoBehaviour {
 
 		if(HighVelocityNotes.Length != 0)
 		{
-			audio.clip = HighVelocityNotes[dummy_counter % HighVelocityNotes.Length];
-			audio.Play();
+			audio1.clip = HighVelocityNotes[dummy_counter % HighVelocityNotes.Length];
+			audio1.Play();
 			dummy_counter ++;
 		}
 		else
@@ -115,7 +117,7 @@ public class GuitarPlayer : MonoBehaviour {
 				//		idx = idx-12;
 				//	break;
 				//}
-				audio.clip = HighVelocityNotes[idx];
+				audio1.clip = HighVelocityNotes[idx];
 
 			}
 			else if(style == Style.CHORD){
@@ -124,7 +126,11 @@ public class GuitarPlayer : MonoBehaviour {
 				else
 					idx = note+12;
 				idx = idx%18;
-				audio.clip = PowerChords[idx];
+				audio1.clip = HighVelocityNotes[idx];
+				//audio2.clip = HighVelocityNotes[idx+7];
+				//audio3.clip = HighVelocityNotes[idx+12];
+				//audio3.Play();
+				//audio2.Play ();
 			}
 
 		}
@@ -138,16 +144,18 @@ public class GuitarPlayer : MonoBehaviour {
 			//dummy_counter ++;
 			//Debug.Log("Index : " + idx);
 			
-			audio.clip = HighVelocityPlayableNotes[level][idx];
-			//Debug.Log ("Note name : " + audio.clip.name);
+			audio1.clip = HighVelocityPlayableNotes[level][idx];
+			//Debug.Log ("Note name : " + audio1.clip.name);
 
 		}
 
-		audio.Play();
+		audio1.Play();
 	}
 
 	public void SetPitch(int pitch) {
-		audio.pitch = 1.0f * Mathf.Pow(1.05946f, pitch);
+		audio1.pitch = 1.0f * Mathf.Pow(1.05946f, pitch);
+		//audio2.pitch = 1.0f * Mathf.Pow(1.05946f, pitch);
+		//audio3.pitch = 1.0f * Mathf.Pow(1.05946f, pitch);
 	}
 
 	// Use this for initialization

@@ -88,7 +88,7 @@ public class FeuDrum : MonoBehaviour {
 	}
 
 	// Temps pour arreter d'emettre.
-	private const float kTempsArreterEmettre = 0.75f;
+	private const float kTempsArreterEmettre = 1.25f;
 
 	// Temps pour desactiver le feu.
 	private const float kTempsDesactiver = 7.0f;
