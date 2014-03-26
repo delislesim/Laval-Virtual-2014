@@ -33,4 +33,6 @@ kinect_power.v12.suo
 Prototype/kinectPower/sample/bin/
 Prototype/kinectPower/Debug/
 Prototype/kinectPower/Release
+# Executable unity
 AirInstruments/AirInstruments.exe
+AirInstruments/AirInstruments_Data
