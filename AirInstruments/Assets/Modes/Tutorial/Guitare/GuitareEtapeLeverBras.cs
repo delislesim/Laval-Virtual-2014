@@ -65,7 +65,7 @@ public class GuitareEtapeLeverBras : EtapeTutorial {
 
 		// On veut avoir une demi-longueur de bras vers la gauche.
 		float differenceX = positionEpaule.x - positionMain.x;
-		bool ok = differenceX > longueurBras / 2.0f;
+		bool ok = differenceX > longueurBras / 2.5f;
 
 		return ok;
 	}

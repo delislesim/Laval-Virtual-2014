@@ -51,15 +51,6 @@ public class HandFollower : MonoBehaviour {
 			collisionReady = true;
 		}
 
-		// Compter les mouvements amples.
-		if (distance > kDistanceAmple && !dernierAuDessus) {
-			++numMouvementsAmples;
-			dernierAuDessus = true;
-		} else if (distance < kDistanceAmple && dernierAuDessus) {
-			++numMouvementsAmples;
-			dernierAuDessus = false;
-		}
-
 		// Timers.
 		tempsDepuisDerniereNoteAutomatique += Time.deltaTime;
 
@@ -106,6 +97,7 @@ public class HandFollower : MonoBehaviour {
 		greenLight.renderer.material.color = Color.white;
 		greenLight.SetActive (true);
 		tempsDepuisDerniereNote = 0;
+		numMouvementsAmples++;
 	}
 
 	void OnEnable() {
@@ -197,9 +189,6 @@ public class HandFollower : MonoBehaviour {
 
 	// Compteur de mouvements amples.
 	int numMouvementsAmples = 0;
-
-	// Distance dont il faut s'eloigner de la guitare pour que le mouvement soit ample.
-	const float kDistanceAmple = 1.0f;
 
 	// Indique si le dernier mouvement ample etait au-dessus ou en-dessous de la guitare.
 	bool dernierAuDessus = false;
