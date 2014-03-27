@@ -57,6 +57,9 @@ public class MoveJointsForGuitar : MonoBehaviour {
 	private const float DIST_MAX_KINECT = 10.0f; //2m
 	private const float DIST_MIN_KINECT = 2.0f; //dist min...
 
+	// Position du centre de la guitare.
+	private static Vector3 positionGuitare;
+
 	// Script qui affiche les cylindres.
 	public SkeletonDrawer drawer;
 
@@ -83,7 +86,9 @@ public class MoveJointsForGuitar : MonoBehaviour {
 
 	void OnEnable () {
 		kalmanMainGauche = new Kalman (15.0f);
-		kalmanMainDroite = new Kalman (5.0f);
+		kalmanMainDroite = new Kalman (7.0f);
+
+		proportionColonneGuitare = 0.5f;
 	}
 	
 	// Update is called once per frame
@@ -100,6 +105,13 @@ public class MoveJointsForGuitar : MonoBehaviour {
 			ligneVerte.SetActive (true);
 		} else {
 			ligneVerte.SetActive (false);
+		}
+
+		// Monter / descendre la guitare.
+		if (Input.GetButtonDown ("MonterGuitare")) {
+			proportionColonneGuitare += 0.75f;
+		} else if (Input.GetButtonDown ("DescendreGuitare")) {
+			proportionColonneGuitare -= 0.75f;
 		}
 	}
 
@@ -132,25 +144,12 @@ public class MoveJointsForGuitar : MonoBehaviour {
 			{
 				Vector3 posJoint;
 				Skeleton.JointStatus jointStatus = player.GetJointPosition((Skeleton.Joint)i, out posJoint);
-				if(jointStatus != Skeleton.JointStatus.NotTracked && isReliable)
+				if(jointStatus != Skeleton.JointStatus.NotTracked && isReliable &&
+				   !(i == (int)Skeleton.Joint.HandTipLeft ||
+				     i == (int)Skeleton.Joint.HandTipRight ||
+				     i == (int)Skeleton.Joint.ThumbLeft ||
+				     i == (int)Skeleton.Joint.ThumbRight))
 				{
-					/*
-					// Ajustement de la position des mains -> c'est seulement un prolongement des bras.
-					if (i == (int)Skeleton.Joint.HandLeft) {
-						Vector3 positionCoude;
-						player.GetJointPosition(Skeleton.Joint.ElbowLeft, out positionCoude);
-						Vector3 positionPoignet;
-						player.GetJointPosition(Skeleton.Joint.WristLeft, out positionPoignet);
-						posJoint = PositionMainAjustee(positionCoude, positionPoignet);
-					} else if (i == (int)Skeleton.Joint.HandRight) {
-						Vector3 positionCoude;
-						player.GetJointPosition(Skeleton.Joint.ElbowRight, out positionCoude);
-						Vector3 positionPoignet;
-						player.GetJointPosition(Skeleton.Joint.WristRight, out positionPoignet);
-						posJoint = PositionMainAjustee(positionCoude, positionPoignet);
-					}
-					*/
-
 					// Appliquer un filtre de Kalman au mains.
 					if (i == (int)Skeleton.Joint.HandLeft) {
 						Vector3 positionPoignet;
@@ -201,23 +200,29 @@ public class MoveJointsForGuitar : MonoBehaviour {
 		return posPoignet + new Vector3(newPosRelative.x, newPosRelative.y, newPosRelative.z);
 	}
 
+	public static Vector3 GetPositionGuitare() {
+		return positionGuitare;
+	}
+
 	void manageMouvementsAndSounds(Vector3[] currentPos, Vector3[] pastPos)
 	{
 		Vector3 hipPos = current_positions[(int)Skeleton.Joint.HipCenter];
+		Vector3 spineMid = current_positions[(int)Skeleton.Joint.SpineMid];
 		Vector3 lHandPos = current_positions[(int)Skeleton.Joint.HandLeft];
 
 		// Tricher en montant le hip pos un peu.
-		hipPos += new Vector3 (0.0f, 0.02f, 0.0f);
+		Vector3 hipVersSpineMid = spineMid - hipPos;
+		positionGuitare = hipPos + hipVersSpineMid * proportionColonneGuitare;
 
 		//Guit position
-		GuitarContainer.position = hipPos;
+		GuitarContainer.position = positionGuitare;
 
 		//Guit rotation
-		Vector3 hipPosXZ = new Vector3(hipPos.x, 0, hipPos.z);
+		Vector3 hipPosXZ = new Vector3(positionGuitare.x, 0, positionGuitare.z);
 		Vector3 lHandPosXZ = new Vector3(lHandPos.x, 0, lHandPos.z);
 		float AngleRotY = Vector3.Angle(new Vector3(0,0,1), lHandPosXZ-hipPosXZ);
 
-		Vector3 hipPosXY = new Vector3(hipPos.x, hipPos.y, 0);
+		Vector3 hipPosXY = new Vector3(positionGuitare.x, positionGuitare.y, 0);
 		Vector3 lHandPosXY = new Vector3(lHandPos.x, lHandPos.y, 0);
 		float AngleRotZ = Vector3.Angle(new Vector3(0,1,0), hipPosXY-lHandPosXY);
 
@@ -239,5 +244,8 @@ public class MoveJointsForGuitar : MonoBehaviour {
 
 	// Kalman pour la main droite (position relative au poignet).
 	private Kalman kalmanMainDroite;
+
+	// Proportion de la colonne ou mettre la guitare.
+	private float proportionColonneGuitare = 0.0f;
 
 }

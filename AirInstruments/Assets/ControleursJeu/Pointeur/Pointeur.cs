@@ -145,8 +145,6 @@ public class Pointeur : MonoBehaviour {
 		handPosition.x = handPositionSmooth.x;
 		handPosition.y = handPositionSmooth.y;
 
-		Log.Debug ("position: " + handPosition.x + ", " + handPosition.y);
-
 		// Verifier si on clique sur une cible.
 		float pressExtent = (avancement - kDistanceActive) * 15.0f;
 

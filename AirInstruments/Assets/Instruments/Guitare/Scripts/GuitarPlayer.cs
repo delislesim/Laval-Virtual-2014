@@ -8,7 +8,6 @@ public class GuitarPlayer : MonoBehaviour {
 	public AudioClip[] LowVelocityNotes;
 	public AudioClip[] MedVelocityNotes;
 	public AudioClip[] PowerChords;
-	public Transform HipTransform;
 	public Transform LeftHandTransform;
 	public AssistedModeControllerGuitar AssistedCtrl;
 	public AudioSource audio1;
@@ -210,7 +209,8 @@ public class GuitarPlayer : MonoBehaviour {
 	int SetPitchLevel()
 	{
 		//Distance main gauche - hip center
-		float dist = Vector3.Distance(HipTransform.position, LeftHandTransform.position);
+		float dist = Vector3.Distance(MoveJointsForGuitar.GetPositionGuitare(),
+		                              LeftHandTransform.position);
 		int niveauAigue = -1 ; //Plus grave
 
 		if (dist > LONGUEUR_MANCHE)

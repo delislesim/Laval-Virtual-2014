@@ -6,12 +6,6 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 	// Wrapper de tout ce qui doit etre active pour la guitare.
 	public GameObject guitareWrapper;
 
-	// joints unity
-	public Joints jointsObject;
-
-	//Objet de guitare
-	public Transform GuitarContainer;
-
 	// Giga spot a allumer pour switcher la guitare.
 	public Light gigaSpotGuitare;
 

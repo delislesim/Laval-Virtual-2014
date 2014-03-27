@@ -51,8 +51,8 @@ public class GameState : MonoBehaviour {
 			AccederEtat (State.Guitar);
 			return;
 		} else if (Input.GetKey (KeyCode.Escape)) {
-				Application.Quit ();
-				return;
+			Application.Quit ();
+			return;
 		}
 
 		// La guitare a besoin de continuer a animer son spot apres la

@@ -66,12 +66,12 @@ public class HandFollower : MonoBehaviour {
 			                     guitarPlayerLayer)) {
 				if (hitInfo.collider.gameObject.tag == "GuitarPlayer"){
 					if (AssistedModeControllerGuitar.EstActive() &&
-					    tempsProchaineNote < 0.25f) {
+					    tempsProchaineNote < 0.30f) {
 						// Ne pas jouer la note tout de suite.
 						aJoueBienDepuisDerniereFois = true;
 					} else {
 						if (tempsDepuisDerniereNoteAutomatique < kTempsRejouerApresAutomatique) {
-							tempsDepuisDerniereNoteAutomatique = 1000.0f;
+							//tempsDepuisDerniereNoteAutomatique = 1000.0f;
 //							Debug.Log("bloque - prochaine note: " + tempsProchaineNote);
 						} else {
 							PlayNote ();
@@ -137,14 +137,7 @@ public class HandFollower : MonoBehaviour {
 		    (Mathf.Abs(posCourante) < 1.15f && vitesse > 0.01f) ||
 		     aJoueBienDepuisDerniereFois) {
 			PlayNote();
-
-			if (!aJoueBienDepuisDerniereFois) {
-				tempsDepuisDerniereNoteAutomatique = 0;
-//				Debug.Log("auto-play proximite");
-			} else {
-				tempsDepuisDerniereNoteAutomatique = 0;
-//				Debug.Log("auto-play avance");
-			}
+			tempsDepuisDerniereNoteAutomatique = 0.0f;
 		} else {
 //			Debug.Log("miss - posCourante:" + posCourante + "  vitesse: " + vitesse);
 			tempsDepuisDerniereNoteAutomatique = 1000.0f;
@@ -209,7 +202,7 @@ public class HandFollower : MonoBehaviour {
 	float kTempsPlusFacile = 0.45f;
 
 	// Temps pour rejouer une note apres une note automatique.
-	float kTempsRejouerApresAutomatique = 0.5f;
+	float kTempsRejouerApresAutomatique = 0.75f;
 
 	// Temps avant de jouer la prochaine note.
 	float tempsProchaineNote = 0;

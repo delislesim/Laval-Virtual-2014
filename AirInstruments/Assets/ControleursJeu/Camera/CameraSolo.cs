@@ -84,7 +84,7 @@ public class CameraSolo : MonoBehaviour {
 		// Regarder vers le joueur.
 		Quaternion targetRotation = kRotationBaseCamera;
 		if (estSolo && hipCenter.position != MoveJointsForGuitar.HIDING_POS) {
-			Vector3 direction = hipCenter.position + new Vector3(0, 1.0f, 0) - mainCamera.transform.position;
+			Vector3 direction = hipCenter.position + new Vector3(0, 2.0f, 0) - mainCamera.transform.position;
 			targetRotation.SetLookRotation(direction, cibleOrientation);
 		}
 		mainCamera.transform.rotation = Quaternion.RotateTowards (mainCamera.transform.rotation,

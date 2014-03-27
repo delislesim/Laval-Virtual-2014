@@ -46,12 +46,6 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 	public GameObject leftHand;
 	public GameObject rightHand;
 
-	// Planes empechant les mains d'aller trop bas.
-	public List<GameObject> planesCollisions;
-
-	// Indique si les planes de collisions sont actifs.
-	private bool planesCollisionsActifs = false;
-
 	// Clips audio du tutorial.
 	public AudioClip sonPosition;
 	public AudioClip sonTambours;
