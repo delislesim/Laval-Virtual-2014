@@ -9,13 +9,9 @@ int main() {
     float positions[25 * 3];
     float orientations[25 * 4];
     int32_t tracking_state[25];
-    int32_t is_new = false;
+    int32_t is_new = 0;
 
     if (GetJoints(positions, orientations, tracking_state, &is_new) && is_new) {
-      for (int i = 0; i < 25; ++i) {
-        std::cout << i << ": " << tracking_state[i] << std::endl;
-      }
-
       std::cout << positions[3 * 3 + 0] << ", " << positions[3 * 3 + 1] << ", " << positions[3 * 3 + 2] << std::endl;
     } else {
       //std::cout << "no" << std::endl;

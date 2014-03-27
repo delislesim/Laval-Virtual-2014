@@ -16,8 +16,6 @@ public class KinectPower : MonoBehaviour {
 	// Show the skeleton stream.
 	public bool showSkeletons;
 
-	private System.IO.StreamWriter file;
-
 	// Indique si le squelette principal doit etre affiche.
 	public static void SetAffichageSqueletteActive(bool active) {
 		affichageSqueletteActive = active;
@@ -28,8 +26,7 @@ public class KinectPower : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		file = new System.IO.StreamWriter("c:\\temp\\test.txt");
-		file.WriteLine ("Debut du fichier");
+		Log.Open ();
 
 		try {
 		KinectPowerInterop.Initialize();
@@ -106,7 +103,7 @@ public class KinectPower : MonoBehaviour {
 	}
 
 	void OnDestroy () {
-		file.Close ();
+		Log.Close ();
 
 		if (initialized) {
 			KinectPowerInterop.Shutdown ();

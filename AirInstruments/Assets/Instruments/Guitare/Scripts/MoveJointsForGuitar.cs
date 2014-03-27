@@ -4,9 +4,9 @@ using KinectHelpers;
 
 public class MoveJointsForGuitar : MonoBehaviour {
 	//Public
-	public GameObject Hip_Center;
-	public GameObject Spine;
-	public GameObject Shoulder_Center;
+	public GameObject Spine_Base;
+	public GameObject Spine_Mid;
+	public GameObject Neck;
 	public GameObject Head;
 	public GameObject Shoulder_Left;
 	public GameObject Elbow_Left;
@@ -24,6 +24,11 @@ public class MoveJointsForGuitar : MonoBehaviour {
 	public GameObject Knee_Right;
 	public GameObject Ankle_Right;
 	public GameObject Foot_Right;
+	public GameObject Spine_Shoulder;
+	public GameObject Hand_Tip_Left;
+	public GameObject Thumb_Left;
+	public GameObject Hand_Tip_Right;
+	public GameObject Thumb_Right;
 
 	// Hand follower.
 	public HandFollower handFollower;
@@ -57,15 +62,13 @@ public class MoveJointsForGuitar : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		/*
 		joints = new GameObject[(int)Skeleton.Joint.Count] {
-			Hip_Center, Spine, Shoulder_Center, Head,
-			Shoulder_Left, Elbow_Left, Wrist_Left, Hand_Left,
-			Shoulder_Right, Elbow_Right, Wrist_Right, Hand_Right,
-			Hip_Left, Knee_Left, Ankle_Left, Foot_Left,
-			Hip_Right, Knee_Right, Ankle_Right, Foot_Right
+			Spine_Base, Spine_Mid, Neck, Head, Shoulder_Left, Elbow_Left,
+			Wrist_Left, Hand_Left, Shoulder_Right, Elbow_Right, Wrist_Right,
+			Hand_Right, Hip_Left, Knee_Left, Ankle_Left, Foot_Left, Hip_Right,
+			Knee_Right, Ankle_Right, Foot_Right, Spine_Shoulder, Hand_Tip_Left,
+			Thumb_Left, Hand_Tip_Right, Thumb_Right
 		};
-		*/
 
 		last_positions = new Vector3[(int)Skeleton.Joint.Count];
 		current_positions = new Vector3[(int)Skeleton.Joint.Count];

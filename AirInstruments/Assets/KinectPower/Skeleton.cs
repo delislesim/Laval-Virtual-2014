@@ -74,16 +74,8 @@ namespace KinectHelpers
       position = new Vector3(joint_positions_depth[3 * (int)joint + 0],
                              joint_positions_depth[3 * (int)joint + 1],
                              0);
-      return FloatStatusToEnum(joint_status[(int)joint]);
+      return (JointStatus)joint_status[(int)joint];
     }
-
-	private JointStatus FloatStatusToEnum(float status) {
-		if (status == 2.0f)
-				return JointStatus.Tracked;
-		if (status == 1.0f)
-				return JointStatus.Inferred;
-		return JointStatus.NotTracked;
-	}
 
 	public static Joint GetSkeletonJointParent(Joint joint)
 	{
@@ -145,8 +137,9 @@ namespace KinectHelpers
 	}
 
 	private void LoadSkeleton() {
-		if (Time.time == timeLastReload)
+		if (Time.time == timeLastReload) {
 			return;
+		}
 
 		// Allouer la memoire.
 		if (timeLastReload == 0) {
@@ -157,13 +150,14 @@ namespace KinectHelpers
 		
 		// Demander les infos du squelette a la DLL.
 		skeleton_exists = KinectPowerInterop.GetJoints(joint_positions, joint_orientations, joint_status, is_new);
-		is_different = is_new[0] == 1;
+		is_different = (is_new[0] == 1);
 
 		// Noter le temps du dernier chargement.
 		timeLastReload = Time.time;
 	}
 
 	public bool IsDifferent() {
+		LoadSkeleton ();
 		return is_different;
 	}
 
