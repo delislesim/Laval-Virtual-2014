@@ -4,6 +4,7 @@
 
 namespace kinect_wrapper {
 
+  /*
 const short kPlayerIndexBitmask = 7;
 const short kPlayerIndexBitmaskWidth = 3;
 
@@ -17,5 +18,6 @@ const size_t kKinectColorHeight = 480;
 const unsigned int kNumSkeletons = 6;
 
 const float kDistanceMaxToTrackSkeleton = 2.25f;
+*/
 
 }  // namespace kinect_wrapper

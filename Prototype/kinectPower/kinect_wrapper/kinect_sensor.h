@@ -7,151 +7,92 @@
 #include "base/scoped_handle.h"
 #include "kinect_wrapper/constants.h"
 #include "kinect_wrapper/kinect_include.h"
-
-namespace kinect_interaction {
-class InteractionClientBase;
-}
+#include "kinect_wrapper/kinect_skeleton.h"
 
 namespace kinect_wrapper {  
 
 namespace {
-
-  const NUI_IMAGE_TYPE kColorImageType = NUI_IMAGE_TYPE_COLOR;
-  const NUI_IMAGE_TYPE kDepthImageType = NUI_IMAGE_TYPE_DEPTH_AND_PLAYER_INDEX;
-  const NUI_IMAGE_RESOLUTION kDepthImageResolution = NUI_IMAGE_RESOLUTION_640x480;
-  const NUI_IMAGE_RESOLUTION kColorImageResolution = NUI_IMAGE_RESOLUTION_640x480;
-
 }  // namespace
 
-class KinectSensorData;
-
+// Represente le capteur Kinect. Est un singleton.
 class KinectSensor {
  public:
-  KinectSensor(INuiSensor* native_sensor,
-               NUI_IMAGE_TYPE color_stream_type = kColorImageType,
-               NUI_IMAGE_TYPE depth_stream_type = kDepthImageType);
-  ~KinectSensor();
+  static KinectSensor* Instance() {
+    if (instance_ == NULL) {
+      instance_ = new KinectSensor();
+    }
+    return instance_;
+  }
 
+  // Demarrer le thread qui capture les donnees.
+  void StartSensorThread();
+
+  // Fermer le thread de capture de donnees.
   void Shutdown();
 
-  void SetNearModeEnabled(bool near_mode_enabled);
-
-  // Angle de la Kinect.
-  void SetAngle(int angle);
-  int GetAngle();
-
-  // Depth stream.
-  bool OpenDepthStream();
-  bool PollNextDepthFrame(KinectSensorData* data);
-  HANDLE GetDepthFrameReadyEvent() const {
-    return depth_frame_ready_event_;
-  }
-  size_t depth_stream_width() const {
-    return depth_stream_width_;
-  }
-  size_t depth_stream_height() const {
-    return depth_stream_height_;
+  // Obtenir le squelette le plus recent.
+  KinectSkeleton* GetLastBody() {
+    return &bodies_[last_body_index_];
   }
 
-  // Color stream.
-  bool OpenColorStream();
-  bool PollNextColorFrame(KinectSensorData* data);
-  HANDLE GetColorFrameReadyEvent() const {
-    return color_frame_ready_event_;
+  ICoordinateMapper* GetCoordinateMapper() {
+    return m_pCoordinateMapper;
   }
-  size_t color_stream_width() const {
-    return color_stream_width_;
-  }
-  size_t color_stream_height() const {
-    return color_stream_height_;
-  }
-
-  // Skeleton stream.
-  bool OpenSkeletonStream();
-  bool PollNextSkeletonFrame(KinectSensorData* data);
-  HANDLE GetSkeletonFrameReadyEvent() const {
-    return skeleton_frame_ready_event_;
-  }
-
-  void AvoidCurrentSkeleton();
-
-  // Interaction stream.
-  bool OpenInteractionStream(
-      kinect_interaction::InteractionClientBase* interaction_client);
-  bool PollNextInteractionFrame(KinectSensorData* data);
-  HANDLE GetInteractionFrameReadyEvent() const {
-    return interaction_frame_ready_event_;
-  }
-  void CloseInteractionStream();
-
-  // Coordinate mapper.
-  bool MapSkeletonPointToDepthPoint(Vector4 skeleton_point,
-                                    cv::Vec2i* depth_point,
-                                    int* depth);
-  bool MapSkeletonPointToColorPoint(Vector4 skeleton_point,
-                                    cv::Vec2i* color_point);
-
-  bool MapDepthPointToColorPoint(NUI_DEPTH_IMAGE_POINT& depth_point,
-                                 NUI_COLOR_IMAGE_POINT* color_point);
-
-  bool MapColorFrameToDepthFrame(NUI_DEPTH_IMAGE_PIXEL* depth_pixels,
-                                 NUI_DEPTH_IMAGE_POINT* depth_points);
-
-  // Color and depth stream types
-  NUI_IMAGE_TYPE color_stream_type() const { return color_stream_type_; }
-  void color_stream_type(NUI_IMAGE_TYPE val) { color_stream_type_ = val; }
-
-  NUI_IMAGE_TYPE depth_stream_type() const { return depth_stream_type_; }
-  void depth_stream_type(NUI_IMAGE_TYPE val) { depth_stream_type_ = val; }
-
 
  private:
-  INuiSensor* native_sensor_;
+  // Constructeur et destructeur prives.
+  KinectSensor();
+  ~KinectSensor();
 
-  bool near_mode_enabled_;
+  /// <summary>
+  /// Initializes the default Kinect sensor
+  /// </summary>
+  /// <returns>S_OK on success, otherwise failure code</returns>
+  HRESULT InitializeDefaultSensor();
 
-  static DWORD AngleThread(KinectSensor* sensor);
+  // Fonction du thread qui capture les donnees.
+  static DWORD KinectSensor::SensorThread(KinectSensor* sensor);
 
-  // Skeleton stream.
-  void FindNewSkeletons(DWORD* track_ids, NUI_SKELETON_FRAME* frame);
+  // Va chercher les squelettes recus de la Kinect.
+  void ReceiveBodies();
 
-  // Depth stream.
-  bool depth_stream_opened_;
-  HANDLE depth_frame_ready_event_;
-  HANDLE depth_stream_handle_;
-  size_t depth_stream_width_;
-  size_t depth_stream_height_;
-  NUI_IMAGE_TYPE depth_stream_type_;
+  // Enregistre les squelettes fournis en parametre.
+  void ProcessBodies(INT64 nTime, int nBodyCount, IBody** ppBodies);
 
-  // Color stream.
-  bool color_stream_opened_;
-  HANDLE color_frame_ready_event_;
-  HANDLE color_stream_handle_;
-  size_t color_stream_width_;
-  size_t color_stream_height_;
-  NUI_IMAGE_TYPE color_stream_type_;
+  // Choisit le squelette le plus prometteur, si aucun squelette n'est
+  // presentement choisi.
+  bool ChooseBody(INT64 nTime, int nBodyCount, IBody** ppBodies);
 
-  // Skeleton stream.
-  bool skeleton_seated_enabled_;
-  bool skeleton_near_enabled_;  
-  bool skeleton_stream_opened_;
-  HANDLE skeleton_frame_ready_event_;
-  DWORD skeleton_sticky_ids_[kNumTrackedSkeletons];
-  int skeletons_to_avoid_[NUI_SKELETON_COUNT];
-  int num_skeletons_to_avoid_;
+  // Indique si le squelette dont l'index est passe en parametre est valide.
+  bool IsTracked(int index, int nBodyCount, IBody** ppBodies);
 
-  // Interaction stream.
-  bool interaction_stream_opened_;
-  INuiInteractionStream* interaction_stream_;
-  HANDLE interaction_frame_ready_event_;
+  // Unique instance de cette classe.
+  static KinectSensor* instance_;
 
-  // Thread et event pour definir l'angle de la Kinect.
-  base::ScopedHandle angle_thread_;
-  base::ScopedHandle angle_event_;
-  int target_angle_;
+  // Thread de capture de donnees.
+  base::ScopedHandle thread_handle_;
 
-  // Coordinate mapper.
-  INuiCoordinateMapper* coordinate_mapper_;
+  // Evenement de fermeture du thread de capture de donnees.
+  base::ScopedHandle close_event_;
+
+  // Evenement d'arrive de nouvelle frame.
+  WAITABLE_HANDLE new_frame_event_;
+
+  // Current Kinect
+  IKinectSensor*          m_pKinectSensor;
+  ICoordinateMapper*      m_pCoordinateMapper;
+
+  // Body reader
+  IBodyFrameReader*       m_pBodyFrameReader;
+
+  // Index du squelette qui nous interesse. -1 si aucun squelette n'est choisi.
+  int tracked_body_;
+
+  // Index du dernier squelette enregistre.
+  int last_body_index_;
+
+  // Squelettes enregistres.
+  KinectSkeleton bodies_[kNumSavedBodies];
 
   DISALLOW_COPY_AND_ASSIGN(KinectSensor);
 };

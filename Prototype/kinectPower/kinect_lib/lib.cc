@@ -5,253 +5,91 @@
 
 #include "base/logging.h"
 #include "creative/creative_wrapper.h"
-#include "kinect_interaction/interaction_client_menu.h"
-#include "kinect_interaction/interaction_frame.h"
-#include "kinect_face_tracker/face_tracker.h"
 #include "kinect_wrapper/constants.h"
 #include "kinect_wrapper/kinect_sensor.h"
-#include "kinect_wrapper/kinect_skeleton.h"
-#include "kinect_wrapper/kinect_skeleton_frame.h"
-#include "kinect_wrapper/kinect_wrapper.h"
-#include "kinect_wrapper/utility.h"
 
 using namespace kinect_wrapper;
 
-namespace {
-
-//static kinect_face_tracker::FaceTracker the_face_tracker;
-
-}  // namespace
-
-bool Initialize(bool near_mode, bool with_sensor_thread) {
-  KinectWrapper::Release();
-
-  KinectWrapper* wrapper = KinectWrapper::instance();
-  wrapper->Initialize();
-  //wrapper->AddObserver(0, &the_face_tracker);
-
-  if (with_sensor_thread) {
-    // Check that the expected sensors are connected.
-    if (wrapper->GetSensorCount() != 1)
-      return false;
-
-    //the_face_tracker.initializeTracker();
-
-    // Initialize sensor 0.
-    wrapper->GetSensorByIndex(0)->SetNearModeEnabled(near_mode);
-    wrapper->GetSensorByIndex(0)->OpenDepthStream();
-    wrapper->GetSensorByIndex(0)->OpenColorStream();
-    wrapper->GetSensorByIndex(0)->OpenSkeletonStream();
-    wrapper->GetSensorByIndex(0)->OpenInteractionStream(
-        kinect_interaction::InteractionClientMenu::instance());
-    wrapper->StartSensorThread(0);
-  }
+bool Initialize() {
+  KinectSensor* sensor = KinectSensor::Instance();
+  sensor->StartSensorThread();
   return true;
 }
 
 bool Shutdown() {
-  KinectWrapper* wrapper = KinectWrapper::instance();
-  wrapper->Shutdown();
+  KinectSensor* sensor = KinectSensor::Instance();
+  sensor->Shutdown();
   return true;
 }
 
-bool RecordSensor(int sensor_index, const char* filename) {
-  KinectWrapper* wrapper = KinectWrapper::instance();
-  return wrapper->RecordSensor(sensor_index, filename);
-}
+bool GetJoints(float* positions, float* orientations, int* tracking_state, int* is_new) {
+  KinectSensor* sensor = KinectSensor::Instance();
+  KinectSkeleton* body = sensor->GetLastBody();
 
-bool StartPlaySensor(int sensor_index, const char* filename) {
-  KinectWrapper* wrapper = KinectWrapper::instance();
-  return wrapper->StartPlaySensor(sensor_index, filename);
-}
-
-bool PlayNextFrame(int sensor_index) {
-  KinectWrapper* wrapper = KinectWrapper::instance();
-  return wrapper->PlayNextFrame(sensor_index);
-}
-
-bool GetDepthImage(unsigned char* pixels, unsigned int pixels_size) {
-  const int kMinDepth = 690;
-  const int kColorDepth = 700;
-  const int kMaxDepth = 3500;
-   
-  KinectWrapper* wrapper = KinectWrapper::instance();
-
-  // Get the raw data from the Kinect.
-  cv::Mat mat;
-  if (!wrapper->GetSensorData(0)->QueryDepth(&mat))
+  if (!body->tracked)
     return false;
 
-  NiceImageFromDepthMat(mat, kMaxDepth, kMinDepth, kColorDepth,
-                        pixels, pixels_size);
-
-  return true;
-}
-
-bool GetColorImage(unsigned char* pixels, unsigned int pixels_size) {
-  KinectWrapper* wrapper = KinectWrapper::instance();
-
-  // Get the raw data from the Kinect.
-  cv::Mat mat;
-  if (!wrapper->GetSensorData(0)->QueryColor(&mat))
-    return false;
-
-  assert(pixels_size == mat.total() * mat.elemSize());
-
-  memcpy_s(pixels, pixels_size, mat.ptr(), mat.total() * mat.elemSize());
-  for (size_t i = 3; i < pixels_size; i += 4)
-    pixels[i] = 255;
-
-  return true;
-}
-
-bool GetJointsPosition(int skeleton_id, float* joint_positions,
-                       unsigned char* joint_status) {
-  KinectWrapper* wrapper = KinectWrapper::instance();
-
-  const KinectSkeletonFrame* skeleton_frame =
-      wrapper->GetSensorData(0)->GetSkeletonFrame();
- 
-  KinectSkeleton skeleton;
-  if (!skeleton_frame->GetTrackedSkeleton(skeleton_id, &skeleton))
-    return false;
-
-  for (int joint_index = 0;
-       joint_index < KinectSkeleton::JointCount; ++joint_index) {
-    cv::Vec3f pos;
-    KinectSkeleton::JointIndex joint =
-        static_cast<KinectSkeleton::JointIndex>(joint_index);
-
-    KinectSkeleton::JointStatus status = KinectSkeleton::NOT_TRACKED;
-    skeleton.GetJointPosition(joint, &pos, &status);
-
-    joint_status[joint_index] = static_cast<unsigned char>(status);
-
-    joint_positions[joint_index*3 + 0] = pos[0];
-    joint_positions[joint_index*3 + 1] = pos[1];
-    joint_positions[joint_index*3 + 2] = pos[2];
+  int index = 0;
+  for (int i = 0; i < 25; ++i) {
+    positions[index++] = body->positions[i].val[0];
+    positions[index++] = body->positions[i].val[1];
+    positions[index++] = body->positions[i].val[2];
   }
 
-  return true;
-}
-
-bool GetBonesOrientation(int skeleton_id,
-                         NUI_SKELETON_BONE_ORIENTATION* bone_orientations) {
-  KinectWrapper* wrapper = KinectWrapper::instance();
-
-  const KinectSkeletonFrame* skeleton_frame =
-      wrapper->GetSensorData(0)->GetSkeletonFrame();
-
-  KinectSkeleton skeleton;
-  if (!skeleton_frame->GetTrackedSkeleton(skeleton_id, &skeleton))
-    return false;
-
-  skeleton.CalculateBoneOrientations(bone_orientations);
-  return true;
-}
-
-bool GetJointsPositionDepth(int skeleton_id, int* joint_positions) {
-  KinectWrapper* wrapper = KinectWrapper::instance();
-
-  const KinectSkeletonFrame* skeleton_frame =
-      wrapper->GetSensorData(0)->GetSkeletonFrame();
-
-  KinectSkeleton skeleton;
-  if (!skeleton_frame->GetTrackedSkeleton(skeleton_id, &skeleton))
-    return false;
-
-  KinectSensor* sensor = wrapper->GetSensorByIndex(0);
-  if (sensor == NULL)
-    return false;
-
-  for (int joint_index = 0;
-    joint_index < KinectSkeleton::JointCount; ++joint_index) {
-    Vector4 pos_skeleton;
-    KinectSkeleton::JointIndex joint =
-        static_cast<KinectSkeleton::JointIndex>(joint_index);
-
-    KinectSkeleton::JointStatus status = KinectSkeleton::NOT_TRACKED;
-    skeleton.GetJointPositionRaw(joint, &pos_skeleton, &status);
-
-    cv::Vec2i pos_depth(0, 0);
-    int depth = 0;
-
-    if (status != KinectSkeleton::NOT_TRACKED)
-      sensor->MapSkeletonPointToDepthPoint(pos_skeleton, &pos_depth, &depth);
-
-    joint_positions[joint_index * 3 + 0] = pos_depth.val[0];
-    joint_positions[joint_index * 3 + 1] = pos_depth.val[1];
-    joint_positions[joint_index * 3 + 2] = depth;
+  index = 0;
+  for (int i = 0; i < 25; ++i) {
+    orientations[index++] = body->orientations[i].val[0];
+    orientations[index++] = body->orientations[i].val[1];
+    orientations[index++] = body->orientations[i].val[2];
+    orientations[index++] = body->orientations[i].val[3];
   }
 
+  for (int i = 0; i < 25; ++i) {
+    tracking_state[i] = static_cast<int>(body->tracking_state[i]);
+  }
+
+  *is_new = !body->polled;
+  body->polled = true;
+
   return true;
 }
 
-bool GetHeadPositionColor(int skeleton_id, int* coords) {
-  KinectWrapper* wrapper = KinectWrapper::instance();
+bool GetJointsPositionDepth(int* joint_positions) {
+  KinectSensor* sensor = KinectSensor::Instance();
+  KinectSkeleton* body = sensor->GetLastBody();
 
-  const KinectSkeletonFrame* skeleton_frame =
-    wrapper->GetSensorData(0)->GetSkeletonFrame();
-
-  KinectSkeleton skeleton;
-  if (!skeleton_frame->GetTrackedSkeleton(skeleton_id, &skeleton))
+  if (!body->tracked)
     return false;
 
-  KinectSensor* sensor = wrapper->GetSensorByIndex(0);
-  if (sensor == NULL)
-    return false;
+  ICoordinateMapper* mapper = sensor->GetCoordinateMapper();
 
-  Vector4 pos_skeleton;
-  KinectSkeleton::JointStatus status = KinectSkeleton::NOT_TRACKED;
-  skeleton.GetJointPositionRaw(KinectSkeleton::Head, &pos_skeleton, &status);
+  int index = 0;
+  for (int i = 0; i < 25; ++i) {
+    CameraSpacePoint cameraSpacePoint;
+    cameraSpacePoint.X = body->positions[i].val[0];
+    cameraSpacePoint.Y = body->positions[i].val[1];
+    cameraSpacePoint.Z = body->positions[i].val[2];
 
-  cv::Vec2i pos_color(0, 0);
-  if (status != KinectSkeleton::NOT_TRACKED)
-    sensor->MapSkeletonPointToColorPoint(pos_skeleton, &pos_color);
+    DepthSpacePoint depthPoint = { 0 };
+    mapper->MapCameraPointToDepthSpace(cameraSpacePoint, &depthPoint);
 
-  coords[0] = pos_color.val[0];
-  coords[1] = pos_color.val[1];
+    joint_positions[index++] = depthPoint.X;
+    joint_positions[index++] = depthPoint.Y;
+  }
 
   return true;
 }
 
 bool AvoidCurrentSkeleton() {
+  /*
   KinectWrapper* wrapper = KinectWrapper::instance();
   KinectSensor* sensor = wrapper->GetSensorByIndex(0);
   if (sensor == NULL)
     return false;
 
   sensor->AvoidCurrentSkeleton();
-  return true;
-}
-
-bool GetHandsInteraction(int skeleton_id, NUI_HANDPOINTER_INFO* hands) {
-  assert(hands);
-
-  KinectWrapper* wrapper = KinectWrapper::instance();
-
-  const kinect_interaction::InteractionFrame* interaction_frame =
-      wrapper->GetSensorData(0)->GetInteractionFrame();
-
-  return interaction_frame->GetHands(skeleton_id,
-                                     &hands[0], &hands[1]);
-}
-
-bool GetFaceRotation(float* face_rotation) {
-	assert(face_rotation);
- /*
-	if (the_face_tracker.isTracking()) {
-		cv::Vec3f rotation = the_face_tracker.FaceRotation();
-		face_rotation[0] = rotation[0];
-		face_rotation[1] = rotation[1];
-		face_rotation[2] = rotation[2];
-		return true;
-	}
-	else {
-		return false;
-	}
   */
-  return false;
+  return true;
 }
 
 #ifdef USE_INTEL_CAMERA
@@ -275,28 +113,3 @@ bool SetHandMeasurements(float width, float height) {
 }
 
 #endif
-
-bool GetGestureStatus(int* gestureID)
-{
-  gestureID[0] = kinect_wrapper::KinectWrapper::instance()->GetGestureControllerInstance()->GetGestureStatus();
-  return true;
-}
-
-int GetKinectAngle() {
-  KinectWrapper* wrapper = KinectWrapper::instance();
-  KinectSensor* sensor = wrapper->GetSensorByIndex(0);
-  if (sensor == NULL)
-    return 0;
-
-  return sensor->GetAngle();
-}
-
-bool SetKinectAngle(int angle) {
-  KinectWrapper* wrapper = KinectWrapper::instance();
-  KinectSensor* sensor = wrapper->GetSensorByIndex(0);
-  if (sensor == NULL)
-    return 0;
-
-  sensor->SetAngle(angle);
-  return true;
-}

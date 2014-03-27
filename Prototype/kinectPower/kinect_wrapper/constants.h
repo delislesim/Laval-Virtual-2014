@@ -2,6 +2,9 @@
 
 namespace kinect_wrapper {
 
+#define kNumSavedBodies 20
+
+  /*
 #define kMaxNumSensors (6)
 
 extern const short kPlayerIndexBitmask;
@@ -18,5 +21,6 @@ extern const unsigned int kNumSkeletons;
 #define kNumTrackedSkeletons (2)
 
 extern const float kDistanceMaxToTrackSkeleton;
+*/
 
 }  // namespace kinect_wrapper

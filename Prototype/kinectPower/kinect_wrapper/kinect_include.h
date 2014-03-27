@@ -6,6 +6,4 @@
 //#include <ShellAPI.h>
 #include <Shlobj.h>
 
-#include <NuiApi.h>
-#include <KinectInteraction.h>
-#include <FaceTrackLib.h>
+#include <Kinect.h>

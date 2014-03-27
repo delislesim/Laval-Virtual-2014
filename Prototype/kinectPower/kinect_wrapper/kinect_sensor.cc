@@ -4,540 +4,239 @@
 
 #include "base/logging.h"
 #include "base/timer.h"
-#include "kinect_interaction/interaction_client_base.h"
 #include "kinect_wrapper/constants.h"
-#include "kinect_wrapper/kinect_sensor_data.h"
 #include "kinect_wrapper/utility.h"
 
 namespace kinect_wrapper {
 
-KinectSensor::KinectSensor(INuiSensor* native_sensor, NUI_IMAGE_TYPE color_stream_type, NUI_IMAGE_TYPE depth_stream_type)
-    : native_sensor_(native_sensor),
-      near_mode_enabled_(false),
-      depth_stream_opened_(false),
-      depth_frame_ready_event_(INVALID_HANDLE_VALUE),
-      depth_stream_handle_(INVALID_HANDLE_VALUE),
-      depth_stream_width_(0),
-      depth_stream_height_(0),
-      color_stream_opened_(false),
-      color_frame_ready_event_(INVALID_HANDLE_VALUE),
-      color_stream_handle_(INVALID_HANDLE_VALUE),
-      color_stream_width_(0),
-      color_stream_height_(0),
-      skeleton_seated_enabled_(false),
-      skeleton_stream_opened_(false),
-      skeleton_frame_ready_event_(INVALID_HANDLE_VALUE),
-      interaction_stream_opened_(false),
-      interaction_stream_(NULL),
-      interaction_frame_ready_event_(INVALID_HANDLE_VALUE),
-      depth_stream_type_(depth_stream_type),
-      color_stream_type_(color_stream_type),
-      angle_thread_(INVALID_HANDLE_VALUE),
-      angle_event_(INVALID_HANDLE_VALUE),
-      target_angle_(0),
-      num_skeletons_to_avoid_(0) {
-  depth_frame_ready_event_ = ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
-  color_frame_ready_event_ = ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
-  skeleton_frame_ready_event_ = ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
-  interaction_frame_ready_event_ =
-      ::CreateEventW(nullptr, TRUE, FALSE, nullptr);
+KinectSensor* KinectSensor::instance_ = NULL;
 
-  skeleton_sticky_ids_[0] = 0;
-  skeleton_sticky_ids_[1] = 0;
-
-  for (int i = 0; i < NUI_SKELETON_COUNT; ++i) {
-    skeletons_to_avoid_[i] = 0;
-  }
-
-  native_sensor_->NuiGetCoordinateMapper(&coordinate_mapper_);
-
-  // Creer le thread et l'event pour definir l'angle de la Kinect.
-  angle_event_.Set(::CreateEventW(nullptr, TRUE, FALSE, nullptr));
-  angle_thread_.Set(::CreateThread(
-      nullptr, 0, (LPTHREAD_START_ROUTINE)KinectSensor::AngleThread, this,
-      0, nullptr));
+// Constructeur.
+KinectSensor::KinectSensor() :
+    m_pKinectSensor(NULL),
+    m_pCoordinateMapper(NULL),
+    m_pBodyFrameReader(NULL),
+    tracked_body_(-1),
+    last_body_index_(1) {
 }
 
-void KinectSensor::SetNearModeEnabled(bool near_mode_enabled) {
-  near_mode_enabled_ = near_mode_enabled;
-}
-
-void KinectSensor::SetAngle(int angle) {
-  if (angle > 27)
-    angle = 27;
-  else if (angle < -27)
-    angle = -27;
-
-  target_angle_ = angle;
-  ::SetEvent(angle_event_.get());
-}
-
-int KinectSensor::GetAngle() {
-  LONG angle = 0;
-  native_sensor_->NuiCameraElevationGetAngle(&angle);
-  return angle;
-}
-
-bool KinectSensor::OpenDepthStream() {
-  if (depth_stream_opened_)
-    return true;
-
-  HRESULT res = native_sensor_->NuiImageStreamOpen(
-      depth_stream_type_, kDepthImageResolution, 0, 2, depth_frame_ready_event_,
-      &depth_stream_handle_);
-
-  if (FAILED(res))
-    return false;
-
-  res = native_sensor_->NuiImageStreamSetImageFrameFlags(
-      &depth_stream_handle_,
-      near_mode_enabled_ ? NUI_IMAGE_STREAM_FLAG_ENABLE_NEAR_MODE : 0);
-  
-  if (FAILED(res)) {
-    // TODO(fdoray): Release the depth stream?
-    depth_stream_handle_ = INVALID_HANDLE_VALUE;
-    return false;
-  }
-
-  DWORD width = 0;
-  DWORD height = 0;
-  ::NuiImageResolutionToSize(kDepthImageResolution, width, height);
-  depth_stream_width_ = width;
-  depth_stream_height_ = height;
-
-  depth_stream_opened_ = true;
-  return true;
-}
-
-bool KinectSensor::PollNextDepthFrame(KinectSensorData* data) {
-  assert(data);
-  assert(depth_stream_opened_);
-  assert(depth_stream_handle_ != INVALID_HANDLE_VALUE);
-
-  if (WaitForSingleObject(depth_frame_ready_event_, 0) != WAIT_OBJECT_0)
-    return false;
-
-  bool res = true;
-
-  NUI_IMAGE_FRAME image_frame;
-  HRESULT hr = native_sensor_->NuiImageStreamGetNextFrame(
-      depth_stream_handle_, 0, &image_frame);
-  if (FAILED(hr)) {
-    res = false;
-    goto ReleaseFrame;
-  }
-
-  BOOL near_mode;
-  INuiFrameTexture* texture = NULL;
-
-  hr = native_sensor_->NuiImageFrameGetDepthImagePixelFrameTexture(
-      depth_stream_handle_, &image_frame, &near_mode, &texture);
-  if (FAILED(hr))
-    goto ReleaseFrame;
-
-  NUI_LOCKED_RECT locked_rect;
-
-  // Lock the frame data so the Kinect knows not to modify it while we're
-  // reading it.
-  texture->LockRect(0, &locked_rect, NULL, 0);
-
-  if (locked_rect.Pitch == 0) {
-    res = false;
-    goto ReleaseFrame;
-  }
-
-  /*
-  const NUI_DEPTH_IMAGE_PIXEL* start =
-      reinterpret_cast<const NUI_DEPTH_IMAGE_PIXEL*>(locked_rect.pBits);
-  data->InsertDepthFrame(start, depth_stream_width_ * depth_stream_height_);
-  */
-
-  if (interaction_stream_opened_) {
-    // Provide the data to the interaction stream.
-    HRESULT res = interaction_stream_->ProcessDepth(locked_rect.size,
-                                      locked_rect.pBits,
-                                      image_frame.liTimeStamp);
-  }
-
-  image_frame.pFrameTexture->UnlockRect(0);
-
-ReleaseFrame:
-  native_sensor_->NuiImageStreamReleaseFrame(depth_stream_handle_, &image_frame);
-  return res;
-}
-
-bool KinectSensor::OpenColorStream() {
-  if (color_stream_opened_)
-    return true;
-
-  HRESULT res = native_sensor_->NuiImageStreamOpen(
-    color_stream_type_, kColorImageResolution, 0, 2, color_frame_ready_event_,
-    &color_stream_handle_);
-
-  if (FAILED(res))
-    return false;
-
-  DWORD width = 0;
-  DWORD height = 0;
-  ::NuiImageResolutionToSize(kColorImageResolution, width, height);
-  color_stream_width_ = width;
-  color_stream_height_ = height;
-
-  color_stream_opened_ = true;
-  return true;
-}
-
-bool KinectSensor::PollNextColorFrame(KinectSensorData* data) {
-  assert(data);
-  assert(color_stream_opened_);
-  assert(color_stream_handle_ != INVALID_HANDLE_VALUE);
-
-  if (WaitForSingleObject(color_frame_ready_event_, 0) != WAIT_OBJECT_0)
-    return false;
-
-  bool res = true;
-
-  NUI_IMAGE_FRAME image_frame;
-
-  HRESULT hr = native_sensor_->NuiImageStreamGetNextFrame(
-    color_stream_handle_, 0, &image_frame);
-  if (FAILED(hr)) {
-    res = false;
-    goto ReleaseFrame;
-  }
-
-  INuiFrameTexture* texture = image_frame.pFrameTexture;
-  NUI_LOCKED_RECT locked_rect;
-
-  // Lock the frame data so the Kinect knows not to modify it while we're
-  // reading it.
-  texture->LockRect(0, &locked_rect, NULL, 0);
-
-  if (locked_rect.Pitch == 0) {
-    res = false;
-    goto ReleaseFrame;
-  }
-
-  data->InsertColorFrame(
-      reinterpret_cast<const char*>(locked_rect.pBits),
-      locked_rect.size);
-
-  image_frame.pFrameTexture->UnlockRect(0);
-
-ReleaseFrame:
-  native_sensor_->NuiImageStreamReleaseFrame(color_stream_handle_, &image_frame);
-  return res;
-}
-
-bool KinectSensor::OpenSkeletonStream() {
-  if (skeleton_stream_opened_)
-    return true;
-
-  DWORD flags = (
-      (skeleton_seated_enabled_ ?
-           NUI_SKELETON_TRACKING_FLAG_ENABLE_SEATED_SUPPORT : 0) |
-      (near_mode_enabled_ ?
-           NUI_SKELETON_TRACKING_FLAG_ENABLE_IN_NEAR_RANGE : 0)
-  );
-
-  HRESULT res = native_sensor_->NuiSkeletonTrackingEnable(
-      skeleton_frame_ready_event_, flags);
-
-  if (FAILED(res))
-    return false;
-
-  skeleton_stream_opened_ = true;
-  return true;
-}
-
-bool KinectSensor::PollNextSkeletonFrame(KinectSensorData* data) {
-  assert(data);
-  //assert(skeleton_stream_opened_);
-
-  if (WaitForSingleObject(skeleton_frame_ready_event_, 0) != WAIT_OBJECT_0)
-    return false;
-
-  KinectSkeletonFrame skeleton_frame;
-  NUI_SKELETON_FRAME* frame = skeleton_frame.GetSkeletonFramePtr();
-
-  HRESULT res = native_sensor_->NuiSkeletonGetNextFrame(0, frame);
-
-  if (FAILED(res))
-    return false;
-
-  // Smooth out the skeleton data.
-  native_sensor_->NuiTransformSmooth(frame, nullptr);
-
-  // Try to always track the same skeletons.
-  DWORD track_ids[kNumTrackedSkeletons];
-  ZeroMemory(track_ids, sizeof(track_ids));
-
-  for (int j = 0; j < NUI_SKELETON_COUNT; ++j) {
-    if (frame->SkeletonData[j].eTrackingState != NUI_SKELETON_NOT_TRACKED) {
-      DWORD track_id = frame->SkeletonData[j].dwTrackingID;
-      if (track_id == skeleton_sticky_ids_[0]) {
-        track_ids[0] = track_id;
-        break;
-      }
-    }
-  }
-
-  // Find new skeletons.
-  FindNewSkeletons(track_ids, frame);
-  if (!track_ids[0] && num_skeletons_to_avoid_ != 0) {
-    num_skeletons_to_avoid_ = 0;
-    FindNewSkeletons(track_ids, frame);
-  }
-
-  skeleton_sticky_ids_[0] = track_ids[0];
-  skeleton_sticky_ids_[1] = 0;
-
-  skeleton_frame.SetTrackedSkeletons(track_ids[0], track_ids[1]);
-  data->InsertSkeletonFrame(skeleton_frame);
-
-  native_sensor_->NuiSkeletonSetTrackedSkeletons(track_ids);
-
-  if (interaction_stream_opened_) {
-    // Provide the data to the interaction stream.
-    Vector4 gravity = { 0 };
-    native_sensor_->NuiAccelerometerGetCurrentReading(&gravity);
-    HRESULT res = interaction_stream_->ProcessSkeleton(kNumSkeletons, frame->SkeletonData,
-                                                       &gravity, frame->liTimeStamp);
-
-    data->GetInteractionFrame()->SetTrackedSkeletons(track_ids[0],
-                                                     track_ids[1]);
-  }
-
-  return true;
-}
-
-void KinectSensor::AvoidCurrentSkeleton() {
-  /*
-  if (skeleton_sticky_ids_[0] == 0) {
-    skeleton_sticky_ids_[0] = skeleton_sticky_ids_[1];
-    skeleton_sticky_ids_[1] = 0;
-    return;
-  }
-  */
-
-  if (num_skeletons_to_avoid_ == NUI_SKELETON_COUNT) {
-    num_skeletons_to_avoid_ = 0;
-  }
-
-  skeletons_to_avoid_[num_skeletons_to_avoid_] = skeleton_sticky_ids_[0];
-  ++num_skeletons_to_avoid_;
-
-  skeleton_sticky_ids_[0] = 0;
-  skeleton_sticky_ids_[1] = 0;
-}
-
-void KinectSensor::FindNewSkeletons(DWORD* track_ids, NUI_SKELETON_FRAME* frame) {
-  if (track_ids[0])
-    return;
-
-  const float xCible = 0.18f;
-  const float toleranceX = 0.4f;
-
-  // Prendre en note les x des squelettes.
-  std::vector<float> centres;
-  for (int i = 0; i < NUI_SKELETON_COUNT; i++) {
-    DWORD track_id = frame->SkeletonData[i].dwTrackingID;
-    float x = frame->SkeletonData[i].Position.x;
-
-    // Ne pas selectionner le squelette s'il n'est pas tracked ou qu'il est trop loin.
-    if (frame->SkeletonData[i].eTrackingState == NUI_SKELETON_NOT_TRACKED ||
-        frame->SkeletonData[i].Position.z > kDistanceMaxToTrackSkeleton) {
-      centres.push_back(1000.0f);
-      continue;
-    }
-
-    // Ne pas selectionner le squelette s'il fait partie de ceux a eviter.
-    bool ok = true;
-    for (int j = 0; j < num_skeletons_to_avoid_; ++j) {
-      if (track_id == skeletons_to_avoid_[j]) {
-        ok = false;
-      }
-    }
-    if (!ok) {
-      centres.push_back(1000.0f);
-      continue;
-    }
-
-    // Le squelette est un candidat potentiel.
-    float distance = abs(x - xCible);
-
-
-    centres.push_back(distance);
-  }
-  
-  // Trier les distances 
-  std::sort(centres.begin(), centres.end());
-
-  // Choisir le meilleur squelette.
-  for (int i = 0; i < NUI_SKELETON_COUNT; i++) {
-    if (frame->SkeletonData[i].eTrackingState != NUI_SKELETON_NOT_TRACKED &&
-        frame->SkeletonData[i].Position.z < kDistanceMaxToTrackSkeleton) {
-      DWORD track_id = frame->SkeletonData[i].dwTrackingID;
-
-      // Ne pas selectionner le squelette s'il fait partie de ceux a eviter.
-      bool ok = true;
-      for (int j = 0; j < num_skeletons_to_avoid_; ++j) {
-        if (track_id == skeletons_to_avoid_[j]) {
-          ok = false;
-        }
-      }
-      if (!ok)
-        continue;
-
-      // Calculer la distance pour voir s'il s'agit de la meilleure distance.
-      float x = frame->SkeletonData[i].Position.x;
-      float distance = abs(x - xCible);
-
-      // S'il s'agit de la meilleure distance, on choisit le squelette.
-      if (distance == centres[0] && distance <= toleranceX) {
-        track_ids[0] = track_id;
-        break;
-      }
-    }
-  }
-}
-
-bool KinectSensor::OpenInteractionStream(
-    kinect_interaction::InteractionClientBase* interaction_client) {
-  assert(interaction_client);
-
-  if (interaction_stream_opened_)
-    return true;
-
-  HRESULT hr = ::NuiCreateInteractionStream(native_sensor_,
-                                            interaction_client,
-                                            &interaction_stream_);
-  if (FAILED(hr))
-    return false;
-
-  hr = interaction_stream_->Enable(interaction_frame_ready_event_);
-
-  if (FAILED(hr)) {
-    SafeRelease(interaction_stream_);
-    return false;
-  }
-
-  interaction_stream_opened_ = true;
-
-  return true;
-}
-
-bool KinectSensor::PollNextInteractionFrame(KinectSensorData* data) {
-  assert(data);
-  assert(interaction_stream_opened_);
-
-  if (WaitForSingleObject(interaction_frame_ready_event_, 0) != WAIT_OBJECT_0)
-    return false;
-
-  NUI_INTERACTION_FRAME interaction_frame;
-  ::ZeroMemory(&interaction_frame, sizeof(interaction_frame));
-  HRESULT hr = interaction_stream_->GetNextFrame(0, &interaction_frame);
-  if (FAILED(hr))
-    return false;
-
-  data->InsertInteractionFrame(interaction_frame);
-  return true;
-}
-
-bool KinectSensor::MapSkeletonPointToDepthPoint(Vector4 skeleton_point,
-                                                cv::Vec2i* depth_point,
-                                                int* depth) {
-  NUI_DEPTH_IMAGE_POINT depth_image_point;
-  HRESULT res = coordinate_mapper_->MapSkeletonPointToDepthPoint(
-      &skeleton_point, kDepthImageResolution, &depth_image_point);
-  if (FAILED(res))
-    return false;
-
-  *depth_point = cv::Vec2i(depth_image_point.x, depth_image_point.y);
-  *depth = depth_image_point.depth;
-
-  return true;
-}
-
-bool KinectSensor::MapSkeletonPointToColorPoint(Vector4 skeleton_point,
-                                                cv::Vec2i* color_point) {
-  NUI_COLOR_IMAGE_POINT color_image_point;
-  HRESULT res = coordinate_mapper_->MapSkeletonPointToColorPoint(
-    &skeleton_point, kColorImageType, kColorImageResolution, &color_image_point);
-  if (FAILED(res))
-    return false;
-
-  *color_point = cv::Vec2i(color_image_point.x, color_image_point.y);
-
-  return true;
-}
-
-bool KinectSensor::MapDepthPointToColorPoint(NUI_DEPTH_IMAGE_POINT& depth_point,
-                                             NUI_COLOR_IMAGE_POINT* color_point) {
-  HRESULT res = coordinate_mapper_->MapDepthPointToColorPoint(kDepthImageResolution,
-                                                              &depth_point,
-                                                              kColorImageType,
-                                                              kColorImageResolution,
-                                                              color_point);
-  return SUCCEEDED(res);
-}
-
-bool KinectSensor::MapColorFrameToDepthFrame(NUI_DEPTH_IMAGE_PIXEL* depth_pixels,
-                                             NUI_DEPTH_IMAGE_POINT* depth_points) {
-  HRESULT res = coordinate_mapper_->MapColorFrameToDepthFrame(kColorImageType,
-                                                              kColorImageResolution,
-                                                              kDepthImageResolution,
-                                                              kKinectDepthWidth * kKinectDepthHeight,
-                                                              depth_pixels,
-                                                              kKinectDepthWidth * kKinectDepthHeight,
-                                                              depth_points);
-  return SUCCEEDED(res);
-}
-
-void KinectSensor::CloseInteractionStream() {
-  if (!interaction_stream_opened_)
-    return;
-
-  interaction_stream_->Disable();
-  SafeRelease(interaction_stream_);
-}
-
+// Destructeur.
 KinectSensor::~KinectSensor() {
-  // TODO(fdoray): Release the depth stream?
-  native_sensor_->NuiShutdown();
-  SafeRelease(native_sensor_);
-
-  ::CloseHandle(depth_frame_ready_event_);
-  ::CloseHandle(color_frame_ready_event_);
-  ::CloseHandle(skeleton_frame_ready_event_);
-  ::CloseHandle(interaction_frame_ready_event_);
-
-  assert(angle_event_.get() == INVALID_HANDLE_VALUE);
-  assert(angle_thread_.get() == INVALID_HANDLE_VALUE);
+  Shutdown();
 }
 
+// Demarrer le thread qui capture les donnees.
+void KinectSensor::StartSensorThread() {
+  Shutdown();
+
+  // Creer un evement permettant de fermer le thread.
+  close_event_.Set(CreateEventW(nullptr, TRUE, FALSE, nullptr));
+
+  // Initialiser la Kinect.
+  InitializeDefaultSensor();
+
+  // Creer le thread.
+  thread_handle_.Set(CreateThread(nullptr, 0,
+                                  (LPTHREAD_START_ROUTINE)KinectSensor::SensorThread,
+                                  this, 0, nullptr));
+}
+
+// Fermer le thread de capture de donnees.
 void KinectSensor::Shutdown() {
-  // Fermer le thread servant a definir l'angle.
-  target_angle_ = -999;
-  ::SetEvent(angle_event_.get());
-  ::WaitForSingleObject(angle_thread_.get(), INFINITE);
+  if (thread_handle_.get() == INVALID_HANDLE_VALUE)
+    return;
 
-  angle_event_.Close();
-  angle_thread_.Close();
+  // Envoyer un evenement pour demander au thread de se fermer.
+  ::SetEvent(close_event_.get());
+
+  // Attendre que le thread se ferme.
+  ::WaitForSingleObject(thread_handle_.get(), INFINITE);
+
+  // Fermer le thread et son evenement de fermeture.
+  thread_handle_.Close();
+  close_event_.Close();
+
+  // Se desinscrire de l'evenement de nouveaux squelettes.
+  IBodyFrameSource* pBodyFrameSource = NULL;
+  HRESULT hr = m_pKinectSensor->get_BodyFrameSource(&pBodyFrameSource);
+  if (SUCCEEDED(hr)) {
+    hr = pBodyFrameSource->UnsubscribeFrameCaptured(new_frame_event_);
+  }
+  SafeRelease(pBodyFrameSource);
+
+  // Fermer ce qui a trait a la Kinect.
+  SafeRelease(m_pBodyFrameReader);
+  SafeRelease(m_pCoordinateMapper);
+  if (m_pKinectSensor) {
+    m_pKinectSensor->Close();
+  }
+  SafeRelease(m_pKinectSensor);
+
+  // On ne track plus de squelette.
+  tracked_body_ = -1;
+  last_body_index_ = 1;
+  for (int i = 0; i < kNumSavedBodies; ++i) {
+    bodies_[i].tracked = false;
+  }
 }
 
-DWORD KinectSensor::AngleThread(KinectSensor* sensor) {
+/// <summary>
+/// Initializes the default Kinect sensor
+/// </summary>
+/// <returns>indicates success or failure</returns>
+HRESULT KinectSensor::InitializeDefaultSensor() {
+  HRESULT hr;
+
+  hr = GetDefaultKinectSensor(&m_pKinectSensor);
+  if (FAILED(hr)) {
+    return hr;
+  }
+
+  if (m_pKinectSensor) {
+    // Initialize the Kinect and get coordinate mapper and the body reader
+    IBodyFrameSource* pBodyFrameSource = NULL;
+
+    hr = m_pKinectSensor->Open();
+
+    if (SUCCEEDED(hr)) {
+      hr = m_pKinectSensor->get_CoordinateMapper(&m_pCoordinateMapper);
+    }
+
+    if (SUCCEEDED(hr)) {
+      hr = m_pKinectSensor->get_BodyFrameSource(&pBodyFrameSource);
+    }
+
+    if (SUCCEEDED(hr)) {
+      hr = pBodyFrameSource->OpenReader(&m_pBodyFrameReader);
+    }
+
+    if (SUCCEEDED(hr)) {
+      hr = pBodyFrameSource->SubscribeFrameCaptured(&new_frame_event_);
+    }
+
+    SafeRelease(pBodyFrameSource);
+  }
+
+  if (!m_pKinectSensor || FAILED(hr)) {
+    return E_FAIL;
+  }
+
+  return hr;
+}
+
+void KinectSensor::ReceiveBodies() {
+  IBodyFrame* pBodyFrame = NULL;
+
+  HRESULT hr = m_pBodyFrameReader->AcquireLatestFrame(&pBodyFrame);
+
+  if (SUCCEEDED(hr)) {
+    INT64 nTime = 0;
+
+    hr = pBodyFrame->get_RelativeTime(&nTime);
+
+    IBody* ppBodies[BODY_COUNT] = { 0 };
+
+    if (SUCCEEDED(hr)) {
+      hr = pBodyFrame->GetAndRefreshBodyData(_countof(ppBodies), ppBodies);
+    }
+
+    if (SUCCEEDED(hr)) {
+      ProcessBodies(nTime, BODY_COUNT, ppBodies);
+    }
+
+    for (int i = 0; i < _countof(ppBodies); ++i) {
+      SafeRelease(ppBodies[i]);
+    }
+  }
+
+  SafeRelease(pBodyFrame);
+}
+
+void KinectSensor::ProcessBodies(INT64 nTime, int nBodyCount, IBody** ppBodies) {
+  int next_body_index = (last_body_index_ + 1) % kNumSavedBodies;
+
+  // Choisir le squelette le plus prometteur.
+  if (!ChooseBody(nTime, nBodyCount, ppBodies)) {
+    bodies_[next_body_index].tracked = false;
+    bodies_[next_body_index].polled = false;
+    last_body_index_ = next_body_index;
+    return;
+  }
+
+  // Enregistrer les parametres du squelette le plus prometteur.
+  IBody* pBody = ppBodies[tracked_body_];
+  Joint joints[JointType_Count];
+  JointOrientation joint_orientations[JointType_Count];
+  HRESULT hr = pBody->GetJoints(_countof(joints), joints);
+  if (SUCCEEDED(hr)) {
+    pBody->GetJointOrientations(_countof(joint_orientations), joint_orientations);
+  }
+  if (!SUCCEEDED(hr)) {
+    return;
+  }
+
+  for (int i = 0; i < JointType_Count; ++i) {
+    bodies_[next_body_index].positions[i] = cv::Vec3f(joints[i].Position.X,
+                                                      joints[i].Position.Y,
+                                                      joints[i].Position.Z);
+    bodies_[next_body_index].orientations[i] = cv::Vec4f(joint_orientations[i].Orientation.x,
+                                                         joint_orientations[i].Orientation.y,
+                                                         joint_orientations[i].Orientation.z,
+                                                         joint_orientations[i].Orientation.w);
+    bodies_[next_body_index].tracking_state[i] = joints[i].TrackingState;
+  }
+  
+  bodies_[next_body_index].tracked = true;
+  bodies_[next_body_index].polled = false;
+
+  last_body_index_ = next_body_index;
+}
+
+bool KinectSensor::ChooseBody(INT64 nTime, int nBodyCount, IBody** ppBodies) {
+  if (tracked_body_ != -1 && IsTracked(tracked_body_, nBodyCount, ppBodies)) {
+    return true;
+  }
+
+  // On choisit juste le premier squelette pour l'instant.
+  // TODO(fdoray)
+  for (int i = 0; i < nBodyCount; ++i) {
+    if (IsTracked(i, nBodyCount, ppBodies)) {
+      tracked_body_ = i;
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool KinectSensor::IsTracked(int index, int nBodyCount, IBody** ppBodies) {
+  if (ppBodies[index] == NULL)
+    return false;
+
+  BOOLEAN bTracked = false;
+  HRESULT hr = ppBodies[index]->get_IsTracked(&bTracked);
+  return SUCCEEDED(hr) && bTracked;
+}
+
+DWORD KinectSensor::SensorThread(KinectSensor* sensor) {
+  assert(sensor != NULL);
+  
+  // Obtenir le handle qui dit quand une frame est prete.
+  HANDLE events[] = {
+    sensor->close_event_.get(),
+    reinterpret_cast<HANDLE>(sensor->new_frame_event_)
+  };
+  DWORD nb_events = ARRAYSIZE(events);
+
   for (;;) {
-    DWORD ret = ::WaitForSingleObject(sensor->angle_event_.get(), INFINITE);
+    DWORD ret = ::WaitForMultipleObjects(nb_events, events,
+                                         FALSE, INFINITE);
 
-    if (ret != WAIT_OBJECT_0)  // Thread close event.
-      break;
-    
-    if (sensor->target_angle_ == -999)
+    if (ret == WAIT_OBJECT_0)  // Thread close event.
       break;
 
-    // Definir l'angle de la Kinect.
-    sensor->native_sensor_->NuiCameraElevationSetAngle(sensor->target_angle_);
+    // On a recu des squelettes!
+    sensor->ReceiveBodies();
   }
 
   return 1;
