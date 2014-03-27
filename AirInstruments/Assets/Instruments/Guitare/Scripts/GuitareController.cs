@@ -49,7 +49,6 @@ public class GuitareController : MonoBehaviour, InstrumentControllerInterface {
 	public AudioClip sonAnglaisAssiste;
 
 	public void Prepare() {
-		KinectPowerInterop.SetKinectAngle (10);
 		tempsPreparation = 0;
 		aFaitSwitch = false;
 		estEnTrainDeQuitter = false;

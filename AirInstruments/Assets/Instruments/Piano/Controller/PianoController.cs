@@ -28,7 +28,6 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 	public AudioClip sonAnglaisAssiste;
 
 	public void Prepare() {
-		KinectPowerInterop.SetKinectAngle (15);
 		spotlightPiano.SetTargetIntensity (kSpotlightIntensityPlaying, 1.0f);
 
 		// Fermer les spots multicolores.

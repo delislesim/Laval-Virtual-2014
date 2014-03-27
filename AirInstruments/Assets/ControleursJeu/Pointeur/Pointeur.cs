@@ -63,6 +63,7 @@ public class Pointeur : MonoBehaviour {
 	}
 
 	void Update () {
+		/*
 		KinectPowerInterop.NuiHandPointerInfo[] hands = new KinectPowerInterop.NuiHandPointerInfo[2];
 
 		float pressExtent = 0;
@@ -122,6 +123,8 @@ public class Pointeur : MonoBehaviour {
 				}
 			}
 		}
+		*/
+		// TODO: Faire marcher le pointeur avec la Kinect 2.
 	}
 
 	bool EstPresDeCible(Target target) {

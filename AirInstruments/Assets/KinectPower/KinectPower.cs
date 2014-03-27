@@ -35,8 +35,11 @@ public class KinectPower : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		KinectPowerInterop.Initialize(false /* pas de near mode */,
-		                              replay != ReplayMode.REPLAY);
+		try {
+		KinectPowerInterop.Initialize();
+		} catch (Exception) {
+			UnityEngine.Debug.Log("Desole, l'editeur Unity n'est pas assez cool pour la Kinect 2.");
+		}
 
     	streamTexture = new Texture2D(kStreamWidth, kStreamHeight);
 
@@ -47,20 +50,10 @@ public class KinectPower : MonoBehaviour {
 		                      hauteur / 4.0f,
                               largeur,
 		                      hauteur);
-
-		if (replay == ReplayMode.RECORD) {
-			KinectPowerInterop.RecordSensor(0, replayFilename);
-		} else if (replay == ReplayMode.REPLAY) {
-			KinectPowerInterop.StartPlaySensor(0, replayFilename);
-		}
 		initialized = true;
 	}
 
 	void Update () {
-		if (replay == ReplayMode.REPLAY) {
-			KinectPowerInterop.PlayNextFrame(0);
-		}
-
 		if (Input.GetButtonDown("SwitchSkeleton")) {
 			KinectPowerInterop.AvoidCurrentSkeleton();
 			UnityEngine.Debug.Log("avoid current skeleton");

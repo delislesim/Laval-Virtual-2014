@@ -68,7 +68,6 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 
 	public void Prepare() {
 		tutorialActif = false;
-		KinectPowerInterop.SetKinectAngle (4);
 
 		// Desactiver les planes de collisions.
 		SetPlanesCollisionsActive (false);

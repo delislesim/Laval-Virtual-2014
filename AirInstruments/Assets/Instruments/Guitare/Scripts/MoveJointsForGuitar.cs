@@ -57,6 +57,7 @@ public class MoveJointsForGuitar : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		/*
 		joints = new GameObject[(int)Skeleton.Joint.Count] {
 			Hip_Center, Spine, Shoulder_Center, Head,
 			Shoulder_Left, Elbow_Left, Wrist_Left, Hand_Left,
@@ -64,6 +65,7 @@ public class MoveJointsForGuitar : MonoBehaviour {
 			Hip_Left, Knee_Left, Ankle_Left, Foot_Left,
 			Hip_Right, Knee_Right, Ankle_Right, Foot_Right
 		};
+		*/
 
 		last_positions = new Vector3[(int)Skeleton.Joint.Count];
 		current_positions = new Vector3[(int)Skeleton.Joint.Count];
@@ -161,11 +163,6 @@ public class MoveJointsForGuitar : MonoBehaviour {
 					joints[i].transform.position = 
 						new Vector3(posJoint.x*PLAYER_HIGHT, posJoint.y*PLAYER_HIGHT+2.5f, -posJoint.z*PLAYER_HIGHT)
 							+ kDeplacementJoueur;
-
-					// // ROTATIONS
-					//Apply head rotation
-					if(i == (int)Skeleton.Joint.Head)
-						joints[i].transform.localRotation = player.GetFaceRotation();
 
 					joints[i].renderer.enabled = true;
 

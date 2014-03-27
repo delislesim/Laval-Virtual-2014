@@ -9,33 +9,36 @@ namespace KinectHelpers
 
     public Skeleton(int skeleton_id)
     {
-      this.skeleton_id = skeleton_id;
-			is_face_tracking = false;
     }
 
     public enum Joint : int
     {
-      HipCenter = 0,
-      Spine,
-      ShoulderCenter,
-      Head,
-      ShoulderLeft,
-      ElbowLeft,
-      WristLeft,
-      HandLeft,
-      ShoulderRight,
-      ElbowRight,
-      WristRight,
-      HandRight,
-      HipLeft,
-      KneeLeft,
-      AnkleLeft,
-      FootLeft,
-      HipRight,
-      KneeRight,
-      AnkleRight,
-      FootRight,
-      Count
+		HipCenter = 0,
+		SpineMid = 1,
+		Neck = 2,
+		Head = 3,
+		ShoulderLeft = 4,
+		ElbowLeft = 5,
+		WristLeft = 6,
+		HandLeft = 7,
+		ShoulderRight = 8,
+		ElbowRight = 9,
+		WristRight = 10,
+		HandRight = 11,
+		HipLeft = 12,
+		KneeLeft = 13,
+		AnkleLeft = 14,
+		FootLeft = 15,
+		HipRight = 16,
+		KneeRight = 17,
+		AnkleRight = 18,
+		FootRight = 19,
+		ShoulderCenter = 20,
+		HandTipLeft = 21,
+		ThumbLeft = 22,
+		HandTipRight = 23,
+		ThumbRight = 24,
+		Count = (ThumbRight+1)
     }
 
     public enum JointStatus : byte
@@ -51,6 +54,10 @@ namespace KinectHelpers
       return skeleton_exists;
     }
 
+	public void ReloadSkeleton() {
+		// Ne fait rien. Relique de la Kinect UN.
+	}
+
     public JointStatus GetJointPosition(Joint joint, out Vector3 position)
     {
       LoadSkeleton();
@@ -65,7 +72,7 @@ namespace KinectHelpers
       LoadSkeletonDepth();
       position = new Vector3(joint_positions_depth[3 * (int)joint + 0],
                              joint_positions_depth[3 * (int)joint + 1],
-                             joint_positions_depth[3 * (int)joint + 2]);
+                             0);
       return joint_status[(int)joint];
     }
 
@@ -73,113 +80,79 @@ namespace KinectHelpers
 	{
 		switch(joint)
 		{
-		case Joint.HipCenter:
-			return Joint.HipCenter;
-		case Joint.Spine:
-			return Joint.HipCenter;
-		case Joint.ShoulderCenter:
-			return Joint.Spine;
-		case Joint.Head:
-			return Joint.ShoulderCenter;
-		case Joint.ShoulderLeft:
-			return Joint.ShoulderCenter;
-		case Joint.ElbowLeft:
-			return Joint.ShoulderLeft;
-		case Joint.WristLeft:
-			return Joint.ElbowLeft;
-		case Joint.HandLeft:
-			return Joint.WristLeft;
-		case Joint.ShoulderRight:
-			return Joint.ShoulderCenter;
-		case Joint.ElbowRight:
-			return Joint.ShoulderRight;
-		case Joint.WristRight:
-			return Joint.ElbowRight;
-		case Joint.HandRight:
-			return Joint.WristRight;
-		case Joint.HipLeft:
-			return Joint.HipCenter;
-		case Joint.KneeLeft:
-			return Joint.HipLeft;
-		case Joint.AnkleLeft:
-			return Joint.KneeLeft;
-		case Joint.FootLeft:
-			return Joint.AnkleLeft;
-		case Joint.HipRight:
-			return Joint.HipCenter;
-		case Joint.KneeRight:
-			return Joint.HipRight;
-		case Joint.AnkleRight:
-			return Joint.KneeRight;
-		case Joint.FootRight:
-			return Joint.AnkleRight;
+			case Joint.HipCenter:
+				return Joint.HipCenter;
+			case Joint.SpineMid:
+				return Joint.HipCenter;
+			case Joint.Neck:
+				return Joint.ShoulderCenter;
+			case Joint.Head:
+				return Joint.Neck;
+			case Joint.ShoulderLeft:
+				return Joint.ShoulderCenter;
+			case Joint.ElbowLeft:
+				return Joint.ShoulderLeft;
+			case Joint.WristLeft:
+				return Joint.ElbowLeft;
+			case Joint.HandLeft:
+				return Joint.WristLeft;
+			case Joint.ShoulderRight:
+				return Joint.ShoulderCenter;
+			case Joint.ElbowRight:
+				return Joint.ShoulderRight;
+			case Joint.WristRight:
+				return Joint.ElbowRight;
+			case Joint.HandRight:
+				return Joint.WristRight;
+			case Joint.HipLeft:
+				return Joint.HipCenter;
+			case Joint.KneeLeft:
+				return Joint.HipLeft;
+			case Joint.AnkleLeft:
+				return Joint.KneeLeft;
+			case Joint.FootLeft:
+				return Joint.AnkleLeft;
+			case Joint.HipRight:
+				return Joint.HipCenter;
+			case Joint.KneeRight:
+				return Joint.HipRight;
+			case Joint.AnkleRight:
+				return Joint.KneeRight;
+			case Joint.FootRight:
+				return Joint.AnkleRight;
+			case Joint.ShoulderCenter:
+				return Joint.SpineMid;
+			case Joint.HandTipLeft:
+				return Joint.HandLeft;
+			case Joint.ThumbLeft:
+				return Joint.HandLeft;
+			case Joint.HandTipRight:
+				return Joint.HandRight;
+			case Joint.ThumbRight:
+				return Joint.HandTipRight;
 		}
 		
 		return Joint.HipCenter;
 	}
 
-	public Quaternion GetFaceRotation()
-	{
-			float[] faceRotationXYZ = new float[3];
-			is_face_tracking = KinectPowerInterop.GetFaceRotation (faceRotationXYZ);
-			Quaternion rotation = Quaternion.Euler (faceRotationXYZ [0], faceRotationXYZ [1], faceRotationXYZ [2]);
-			return rotation;
-	}
-
-	public bool GetFaceTrackingStatus()
-	{
-		return is_face_tracking;
-	}
-
-	public Quaternion GetBoneOrientation(Joint joint)
-	{
-		LoadSkeleton ();
-		Quaternion rotation = bone_orientations [(int)joint].absoluteRotation.rotationQuaternion;
-		Vector3 eulerAngles = rotation.eulerAngles;
-		Quaternion fixedRot = Quaternion.Euler (eulerAngles.x, -eulerAngles.y + 180, -eulerAngles.z);
-		return fixedRot;
-	}
-	
-	public void ReloadSkeleton() {
-		skeleton_loaded = false;
-		joint_positions_depth = null;
-
-		// Se rappeler des dernieres positions pour voir s'il y a un changement.
-		previous_joint_positions = joint_positions;
-
-		LoadSkeleton ();
-	}
-
 	private void LoadSkeleton() {
-		if (skeleton_loaded)
+		if (Time.time == timeLastReload)
 			return;
-		
-		joint_positions = new float[3 * (int)Joint.Count];
-		joint_status = new JointStatus[(int)Joint.Count];
-		bone_orientations = new KinectPowerInterop.NuiSkeletonBoneOrientation[(int)Joint.Count];
-		
-		skeleton_exists = KinectPowerInterop.GetJointsPosition(
-			skeleton_id,
-			joint_positions,
-			joint_status);
-		
-		if(skeleton_exists)
-			KinectPowerInterop.GetBonesOrientation(skeleton_id, bone_orientations);
-		
-		skeleton_loaded = true;
 
-		// Determiner si le squelette est different de la derniere fois.
-		is_different = false;
-		if (previous_joint_positions == null) {
-			is_different = true;
-		} else {
-			for (int i = 0; i < joint_positions.Length; ++i) {
-				if (joint_positions[i] != previous_joint_positions[i]) {
-					is_different = true;
-					break;
-				}
-			}
+		// Allouer la memoire.
+		if (timeLastReload == 0) {
+			joint_positions = new float[3 * (int)Joint.Count];
+			joint_orientations = new float[4 * (int)Joint.Count];
+			joint_status = new JointStatus[(int)Joint.Count];
 		}
+		
+		// Demander les infos du squelette a la DLL.
+		int[] is_new = new int[1];
+		skeleton_exists = KinectPowerInterop.GetJoints(joint_positions, joint_orientations, joint_status, is_new);
+		is_different = is_new[0] == 1;
+
+		// Noter le temps du dernier chargement.
+		timeLastReload = Time.time;
 	}
 
 	public bool IsDifferent() {
@@ -188,39 +161,37 @@ namespace KinectHelpers
 
     public void LoadSkeletonDepth()
     {
-      LoadSkeleton();
-      if (joint_positions_depth == null)
+      if (timeLastReloadDepth != Time.time)
       {
-        joint_positions_depth = new int[3 * (int)Joint.Count];
-        KinectPowerInterop.GetJointsPositionDepth(skeleton_id, joint_positions_depth);
+		if (timeLastReloadDepth == 0) {
+			joint_positions_depth = new int[3 * (int)Joint.Count];
+		}
+        KinectPowerInterop.GetJointsPositionDepth(joint_positions_depth);
       }
     }
 
-	public int GetID() {
-		return skeleton_id;
-	}
-
 	public bool IsSkeletonReliable()
 	{
+		// TODO: Arranger cette fonction pour Kinect 2.
+		return true;
+
+			/*
 		int test = Array.FindAll (joint_status, x => x == JointStatus.Inferred || x == JointStatus.NotTracked).Length;	
 		if(Array.FindAll(joint_status, x => x == JointStatus.Inferred || x == JointStatus.NotTracked).Length >= 12)
 			return false;
 		else
 			return true;
+			*/
 	}
 
-    private int skeleton_id;
+	private static float timeLastReload = 0.0f;
+	private static float timeLastReloadDepth = 0.0f;
 
-    private bool skeleton_loaded;
-    private bool skeleton_exists;
-    private float[] joint_positions;
-	private KinectPowerInterop.NuiSkeletonBoneOrientation[] bone_orientations;
-    private int[] joint_positions_depth;
-    private JointStatus[] joint_status;
-	private bool is_face_tracking;
-
-	private float[] previous_joint_positions;
-
-	private bool is_different = false;
+    private static bool skeleton_exists;
+    private static float[] joint_positions;
+	private static float[] joint_orientations;
+    private static int[] joint_positions_depth;
+    private static JointStatus[] joint_status;
+	private static bool is_different = false;
   }
 }

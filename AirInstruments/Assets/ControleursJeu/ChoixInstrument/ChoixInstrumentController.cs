@@ -17,8 +17,6 @@ public class ChoixInstrumentController : MonoBehaviour {
 
 	// Appele avant d'entrer dans le mode de choix d'instrument.
 	public void Prepare() {
-		KinectPowerInterop.SetKinectAngle (15);
-
 		// Allumer les spots multicolores.
 		SpolightFou.SetActive (true);
 	}

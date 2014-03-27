@@ -38,65 +38,9 @@ public class DrumHand : MonoBehaviour {
 		transform.rotation = rotationInitiale;
 	}
 
-	public void MettreAJour(Vector3 position, Vector3 rotation) {
+	public void MettreAJour(Vector3 position) {
 		MettreAJourPosition (position);
-		MettreAJourRotation (rotation);
-	}
-
-	private void MettreAJourRotation(Vector3 rotation) {
-		return;
-		/*
-		Vector4 previousRotation = kalman.GetFilteredVector ();
-		// x, y, z
-		for (int i = 0; i < 3; ++i) {
-			float diffRotationDepasseHaut = Mathf.Abs(rotation[i] + 360 - previousRotation[i]);
-			float diffRotationDepasseBas = Mathf.Abs(rotation[i] - 360 - previousRotation[i]);
-			float diffRotation = Math.Abs(rotation[i] - previousRotation[i]);
-
-			if (diffRotationDepasseBas < diffRotation && diffRotationDepasseBas < diffRotationDepasseHaut) {
-				rotation[i] -= 360;
-			} else if (diffRotationDepasseHaut < diffRotation && diffRotationDepasseHaut < diffRotationDepasseBas) {
-				rotation[i] += 360;
-			}
-		}
-
-		//if (rotation.z < 10 || rotation.z > 70) {
-		//	rotation = anglesCorrects;
-		//}
-
-		Vector4 smoothedRotation = kalman.Update (new Vector4(rotation.x, rotation.y, rotation.z, 0));
-		for (int i = 0; i < 3; ++i) {
-			while (smoothedRotation[i] > 360) {
-				smoothedRotation[i] -= 360;
-			}
-			while (smoothedRotation[i] < 0) {
-				smoothedRotation[i] += 360;
-			}
-
-
-			float max = anglesCorrects[i] + kAnglesCorrectsTolerance[i];
-			float min = anglesCorrects[i] - kAnglesCorrectsTolerance[i];
-			if (smoothedRotation[i] > max || smoothedRotation[i] <  min) {
-				float diffMax = DifferenceAngle(smoothedRotation[i], max);
-				float diffMin = DifferenceAngle(smoothedRotation[i], min);
-				if (diffMax < diffMin) {
-					smoothedRotation[i] = max;
-				}
-				else {
-					smoothedRotation[i] = min;
-				}
-			}
-
-		}
-
-		Quaternion smoothedRotationQuaternion = Quaternion.Euler (new Vector3 (smoothedRotation.x,
-		                                                                       smoothedRotation.y,
-		                                                                       smoothedRotation.z));
-		//transform.localRotation = Quaternion.identity;
-		//smoothedRotationQuaternion;
-		kalman.SetInitialObservation (smoothedRotation);
-		
-		*/
+		//MettreAJourRotation (rotation);
 	}
 
 	float DifferenceAngle(float angle, float target) {

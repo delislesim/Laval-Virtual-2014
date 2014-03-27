@@ -3,10 +3,9 @@ using System.Collections;
 using KinectHelpers;
 
 public class MoveJoints : MonoBehaviour {
-	//Public
 	public GameObject Hip_Center;
-	public GameObject Spine;
-	public GameObject Shoulder_Center;
+	public GameObject Spine_Mid;
+	public GameObject Neck;
 	public GameObject Head;
 	public GameObject Shoulder_Left;
 	public GameObject Elbow_Left;
@@ -24,6 +23,11 @@ public class MoveJoints : MonoBehaviour {
 	public GameObject Knee_Right;
 	public GameObject Ankle_Right;
 	public GameObject Foot_Right;
+	public GameObject Spine_Shoulder;
+	public GameObject Hand_Tip_Left;
+	public GameObject Thumb_Left;
+	public GameObject Hand_Tip_Right;
+	public GameObject Thumb_Right;
 
 	public DrumComponent Bass_Kick; 
 
@@ -65,12 +69,12 @@ public class MoveJoints : MonoBehaviour {
 	void Start () {
 		instance = this;
 
-		joints = new GameObject[(int)Skeleton.Joint.Count] {
-			Hip_Center, Spine, Shoulder_Center, Head,
-			Shoulder_Left, Elbow_Left, Wrist_Left, Hand_Left,
-			Shoulder_Right, Elbow_Right, Wrist_Right, Hand_Right,
-			Hip_Left, Knee_Left, Ankle_Left, Foot_Left,
-			Hip_Right, Knee_Right, Ankle_Right, Foot_Right
+		joints = new GameObject[] {
+			Hip_Center, Spine_Mid, Neck, Head, Shoulder_Left, Elbow_Left,
+			Wrist_Left, Hand_Left, Shoulder_Right, Elbow_Right, Wrist_Right,
+			Hand_Right, Hip_Left, Knee_Left, Ankle_Left, Foot_Left, Hip_Right,
+			Knee_Right, Ankle_Right, Foot_Right, Spine_Shoulder, Hand_Tip_Left,
+			Thumb_Left, Hand_Tip_Right, Thumb_Right
 		};
 
 		last_positions = new Vector3[(int)Skeleton.Joint.Count];
@@ -169,8 +173,7 @@ public class MoveJoints : MonoBehaviour {
 				if (i == (int)Skeleton.Joint.HandRight || i == (int)Skeleton.Joint.HandLeft) {
 					if (current_positions[i] != HIDING_POS) {
 						DrumHand drumHand = joints [i].GetComponent<DrumHand>();
-						drumHand.MettreAJour(current_positions[i],
-						                     player.GetBoneOrientation ((Skeleton.Joint)i).eulerAngles);
+						drumHand.MettreAJour(current_positions[i]);
 					}
 				} else {
 					joints[i].transform.position = current_positions[i];
