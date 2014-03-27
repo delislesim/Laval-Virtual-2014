@@ -53,7 +53,6 @@ public class MoveJointsForGuitar : MonoBehaviour {
 	public static Vector3 HIDING_POS = new Vector3(100, 100, 100);
 	private const float PLAYER_HIGHT = 5.0f;
 	private const float DELTA_CHECK_TIME = 5.0f;
-	private float accumulated_time;
 	private const float DIST_MAX_KINECT = 10.0f; //2m
 	private const float DIST_MIN_KINECT = 2.0f; //dist min...
 
@@ -73,12 +72,16 @@ public class MoveJointsForGuitar : MonoBehaviour {
 			Thumb_Left, Hand_Tip_Right, Thumb_Right
 		};
 
+		// Initialement, tous les joints sont invalides.
+		for (int i = 0; i < joints.Length; ++i) {
+			joints[i].renderer.enabled = false;
+		}
+
 		last_positions = new Vector3[(int)Skeleton.Joint.Count];
 		current_positions = new Vector3[(int)Skeleton.Joint.Count];
 
 		last_rotations = new Quaternion[(int)Skeleton.Joint.Count];
 		current_rotations = new Quaternion[(int)Skeleton.Joint.Count];
-		accumulated_time = 0.0f;
 
 		// Se "connecter" au squelette 0.
 		m_player_one = new Skeleton(0);
@@ -94,7 +97,7 @@ public class MoveJointsForGuitar : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		m_player_one.ReloadSkeleton ();
-		if (m_player_one.IsDifferent() && SkeletonIsTrackedAndValid(m_player_one)) {
+		if (m_player_one.IsDifferent()) {
 			moveJoints (m_player_one);
 			handFollower.SignalerNouvellePosition();
 			drawer.PlacerCylindres();
@@ -113,18 +116,6 @@ public class MoveJointsForGuitar : MonoBehaviour {
 		} else if (Input.GetButtonDown ("DescendreGuitare")) {
 			proportionColonneGuitare -= 0.75f;
 		}
-	}
-
-	bool SkeletonIsTrackedAndValid(Skeleton player)
-	{
-		accumulated_time += Time.deltaTime;
-		if(accumulated_time > DELTA_CHECK_TIME)
-		{
-			//Check if hip joint is at reasonable distance from kinect (drum)
-
-			//Check if dist hip to head is reasonable (no mini ghost) skeleton
-		}
-		return true;
 	}
 
 	void moveJoints(Skeleton player)
