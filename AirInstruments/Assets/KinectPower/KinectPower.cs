@@ -16,14 +16,7 @@ public class KinectPower : MonoBehaviour {
 	// Show the skeleton stream.
 	public bool showSkeletons;
 
-	// Replay mode.
-	public enum ReplayMode {
-		NO_REPLAY,
-		RECORD,
-		REPLAY
-	}
-	public ReplayMode replay = ReplayMode.NO_REPLAY;
-	public string replayFilename = "replay.boubou";
+	private System.IO.StreamWriter file;
 
 	// Indique si le squelette principal doit etre affiche.
 	public static void SetAffichageSqueletteActive(bool active) {
@@ -35,6 +28,9 @@ public class KinectPower : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		file = new System.IO.StreamWriter("c:\\temp\\test.txt");
+		file.WriteLine ("Debut du fichier");
+
 		try {
 		KinectPowerInterop.Initialize();
 		} catch (Exception) {
@@ -44,7 +40,7 @@ public class KinectPower : MonoBehaviour {
     	streamTexture = new Texture2D(kStreamWidth, kStreamHeight);
 
 		float largeur = Screen.width / 12.0f;
-		float hauteur = largeur * 480.0f / 640.0f;
+		float hauteur = largeur * 424.0f / 512.0f;
 
     	streamRect = new Rect(Screen.width/2 - largeur/2,
 		                      hauteur / 4.0f,
@@ -103,29 +99,6 @@ public class KinectPower : MonoBehaviour {
 		}
 	}
 
-	void BytesToColors(byte[] bytes, Color32[] colors) {
-		for (int i = 0; i < colors.Length; ++i) {
-			int redIndex = i*4 + 2;
-			int greenIndex = i*4 + 1;
-			int blueIndex = i*4 + 0;
-			int alphaIndex = i*4 + 3;
-
-			int dst_index = ReverseIndex(i);
-			colors[dst_index] = new Color32(bytes[redIndex],
-			                                bytes[greenIndex],
-			                                bytes[blueIndex],
-			                                bytes[alphaIndex]);
-		}
-	}
-
-	private int ReverseIndex(int src_index) {
-		int row = src_index / kStreamWidth;
-		int col = src_index % kStreamWidth;
-
-		return (kStreamHeight - row - 1) * kStreamWidth +
-			   (kStreamWidth - col - 1);
-	}
-
 	void OnGUI()
 	{
 		if (showDepthImage || showColorImage || showSkeletons || affichageSqueletteActive)
@@ -133,6 +106,8 @@ public class KinectPower : MonoBehaviour {
 	}
 
 	void OnDestroy () {
+		file.Close ();
+
 		if (initialized) {
 			KinectPowerInterop.Shutdown ();
 			initialized = false;
@@ -160,15 +135,19 @@ public class KinectPower : MonoBehaviour {
 
 			Vector3 joint_position;
 			Vector3 parent_joint_position;
-			
+
 			if(skeleton.GetJointPositionDepth(joint, out joint_position) != Skeleton.JointStatus.NotTracked &&
 			   skeleton.GetJointPositionDepth(parent_joint, out parent_joint_position) != Skeleton.JointStatus.NotTracked)
 			{
+				// Inverser y.
 				parent_joint_position.y = height - parent_joint_position.y - 1;
 				joint_position.y = height - joint_position.y - 1;
+
+				// Inverser x.
 				parent_joint_position.x = width - parent_joint_position.x - 1;
 				joint_position.x = width - joint_position.x - 1;
 
+				// Tracer une ligne sur le membre.
 				DrawLine(aTexture,
 				         (int)parent_joint_position.x, (int)parent_joint_position.y,
 				         (int)joint_position.x, (int)joint_position.y,
@@ -185,7 +164,26 @@ public class KinectPower : MonoBehaviour {
 
 		int width = a_Texture.width;
 		int height = a_Texture.height;
-		
+
+		if (x1 < 0)
+			x1 = 0;
+		if (x1 > kStreamWidth - 1)
+			x1 = kStreamWidth - 1;
+		if (x2 < 0)
+			x2 = 0;
+		if (x2 > kStreamWidth - 1)
+			x2 = kStreamWidth - 1;
+
+		if (y1 < 0)
+			y1 = 0;
+		if (y1 > kStreamHeight - 1)
+			y1 = kStreamHeight - 1;
+
+		if (y2 < 0)
+			y2 = 0;
+		if (y2 > kStreamHeight - 1)
+			y2 = kStreamHeight - 1;
+
 		int dy = y2 - y1;
 		int dx = x2 - x1;
 		
@@ -269,8 +267,8 @@ public class KinectPower : MonoBehaviour {
 	private Texture2D streamTexture;
 	private byte[] streamBuffer = new byte[kStreamWidth * kStreamHeight * 4];
 	private Color32[] streamColors = new Color32[kStreamWidth * kStreamHeight];
-	private const int kStreamWidth = 640;
-	private const int kStreamHeight = 480;
+	private const int kStreamWidth = 512;
+	private const int kStreamHeight = 424;
 
 	private Color kColor = new Color32 (153, 215, 254, 255);
 	private Color kColorBloque = new Color32 (235, 235, 235, 255);

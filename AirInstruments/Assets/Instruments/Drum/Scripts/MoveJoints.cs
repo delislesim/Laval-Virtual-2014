@@ -203,7 +203,7 @@ public class MoveJoints : MonoBehaviour {
 		*/
 
 		// Le centre des épaules doit etre pret de la position fixee.
-		Vector3 positionCentreEpaules = current_positions [(int)Skeleton.Joint.ShoulderCenter];
+		Vector3 positionCentreEpaules = current_positions [(int)Skeleton.Joint.Neck];
 		if (positionCentreEpaules == HIDING_POS)
 			return;
 

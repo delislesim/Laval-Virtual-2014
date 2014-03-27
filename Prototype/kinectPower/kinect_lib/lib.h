@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #ifdef USE_INTEL_CAMERA
 #include "hsklu.h"
 #endif
@@ -12,10 +14,10 @@ extern "C" bool __declspec(dllexport)
 Shutdown();
 
 extern "C" bool __declspec(dllexport)
-GetJoints(float* positions, float* orientations, int* tracking_state, int* is_new);
+GetJoints(float* positions, float* orientations, int32_t* tracking_state, int32_t* is_new);
 
 extern "C" bool __declspec(dllexport)
-GetJointsPositionDepth(int* joint_positions);
+GetJointsPositionDepth(float* joint_positions);
 
 extern "C" bool __declspec(dllexport)
 AvoidCurrentSkeleton();

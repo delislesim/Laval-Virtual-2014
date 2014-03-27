@@ -22,7 +22,7 @@ bool Shutdown() {
   return true;
 }
 
-bool GetJoints(float* positions, float* orientations, int* tracking_state, int* is_new) {
+bool GetJoints(float* positions, float* orientations, int32_t* tracking_state, int32_t* is_new) {
   KinectSensor* sensor = KinectSensor::Instance();
   KinectSkeleton* body = sensor->GetLastBody();
 
@@ -45,16 +45,16 @@ bool GetJoints(float* positions, float* orientations, int* tracking_state, int* 
   }
 
   for (int i = 0; i < 25; ++i) {
-    tracking_state[i] = static_cast<int>(body->tracking_state[i]);
+    tracking_state[i] = static_cast<int32_t>(body->tracking_state[i]);
   }
 
-  *is_new = !body->polled;
+  *is_new = body->polled ? 0 : 1;
   body->polled = true;
 
   return true;
 }
 
-bool GetJointsPositionDepth(int* joint_positions) {
+bool GetJointsPositionDepth(float* joint_positions) {
   KinectSensor* sensor = KinectSensor::Instance();
   KinectSkeleton* body = sensor->GetLastBody();
 
@@ -75,6 +75,7 @@ bool GetJointsPositionDepth(int* joint_positions) {
 
     joint_positions[index++] = depthPoint.X;
     joint_positions[index++] = depthPoint.Y;
+    joint_positions[index++] = 0;
   }
 
   return true;

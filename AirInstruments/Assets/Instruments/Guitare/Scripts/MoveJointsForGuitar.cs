@@ -222,18 +222,6 @@ public class MoveJointsForGuitar : MonoBehaviour {
 		GuitarContainer.rotation = GuitarRotation;
 	}
 
-	private bool EstIndexBras(int i) {
-		return i == (int)Skeleton.Joint.ElbowLeft ||
-				i == (int)Skeleton.Joint.ElbowRight ||
-				i == (int)Skeleton.Joint.ShoulderLeft ||
-				i == (int)Skeleton.Joint.ShoulderRight ||
-				i == (int)Skeleton.Joint.ShoulderCenter ||
-				i == (int)Skeleton.Joint.WristLeft ||
-				i == (int)Skeleton.Joint.WristRight ||
-				i == (int)Skeleton.Joint.HandLeft ||
-				i == (int)Skeleton.Joint.HandRight;
-	}
-
 	// --- Constantes ---
 
 	// Deplacement du joueur par rapport au centre de la scene.

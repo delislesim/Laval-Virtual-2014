@@ -183,7 +183,7 @@ void KinectSensor::ProcessBodies(INT64 nTime, int nBodyCount, IBody** ppBodies) 
                                                          joint_orientations[i].Orientation.y,
                                                          joint_orientations[i].Orientation.z,
                                                          joint_orientations[i].Orientation.w);
-    bodies_[next_body_index].tracking_state[i] = joints[i].TrackingState;
+    bodies_[next_body_index].tracking_state[i] = TrackingState_Tracked; //joints[i].TrackingState;
   }
   
   bodies_[next_body_index].tracked = true;

@@ -33,7 +33,7 @@ namespace KinectHelpers
 		KneeRight = 17,
 		AnkleRight = 18,
 		FootRight = 19,
-		ShoulderCenter = 20,
+		SpineShoulder = 20,
 		HandTipLeft = 21,
 		ThumbLeft = 22,
 		HandTipRight = 23,
@@ -43,9 +43,9 @@ namespace KinectHelpers
 
     public enum JointStatus : byte
     {
-      Tracked = 0,
-      Inferred = 1,
-      NotTracked = 2
+	  NotTracked = 0,
+	  Inferred = 1,
+      Tracked = 2
     }
 
     public bool Exists()
@@ -64,17 +64,26 @@ namespace KinectHelpers
       position = new Vector3(joint_positions[3 * (int)joint + 0],
                              joint_positions[3 * (int)joint + 1],
                              joint_positions[3 * (int)joint + 2]);
-      return joint_status[(int)joint];
+      return (JointStatus)joint_status[(int)joint];
     }
 
     public JointStatus GetJointPositionDepth(Joint joint, out Vector3 position)
     {
+	  LoadSkeleton();
       LoadSkeletonDepth();
       position = new Vector3(joint_positions_depth[3 * (int)joint + 0],
                              joint_positions_depth[3 * (int)joint + 1],
                              0);
-      return joint_status[(int)joint];
+      return FloatStatusToEnum(joint_status[(int)joint]);
     }
+
+	private JointStatus FloatStatusToEnum(float status) {
+		if (status == 2.0f)
+				return JointStatus.Tracked;
+		if (status == 1.0f)
+				return JointStatus.Inferred;
+		return JointStatus.NotTracked;
+	}
 
 	public static Joint GetSkeletonJointParent(Joint joint)
 	{
@@ -85,11 +94,11 @@ namespace KinectHelpers
 			case Joint.SpineMid:
 				return Joint.HipCenter;
 			case Joint.Neck:
-				return Joint.ShoulderCenter;
+				return Joint.SpineShoulder;
 			case Joint.Head:
 				return Joint.Neck;
 			case Joint.ShoulderLeft:
-				return Joint.ShoulderCenter;
+				return Joint.SpineShoulder;
 			case Joint.ElbowLeft:
 				return Joint.ShoulderLeft;
 			case Joint.WristLeft:
@@ -97,7 +106,7 @@ namespace KinectHelpers
 			case Joint.HandLeft:
 				return Joint.WristLeft;
 			case Joint.ShoulderRight:
-				return Joint.ShoulderCenter;
+				return Joint.SpineShoulder;
 			case Joint.ElbowRight:
 				return Joint.ShoulderRight;
 			case Joint.WristRight:
@@ -120,7 +129,7 @@ namespace KinectHelpers
 				return Joint.KneeRight;
 			case Joint.FootRight:
 				return Joint.AnkleRight;
-			case Joint.ShoulderCenter:
+			case Joint.SpineShoulder:
 				return Joint.SpineMid;
 			case Joint.HandTipLeft:
 				return Joint.HandLeft;
@@ -143,11 +152,10 @@ namespace KinectHelpers
 		if (timeLastReload == 0) {
 			joint_positions = new float[3 * (int)Joint.Count];
 			joint_orientations = new float[4 * (int)Joint.Count];
-			joint_status = new JointStatus[(int)Joint.Count];
+			joint_status = new int[(int)Joint.Count];
 		}
 		
 		// Demander les infos du squelette a la DLL.
-		int[] is_new = new int[1];
 		skeleton_exists = KinectPowerInterop.GetJoints(joint_positions, joint_orientations, joint_status, is_new);
 		is_different = is_new[0] == 1;
 
@@ -164,7 +172,7 @@ namespace KinectHelpers
       if (timeLastReloadDepth != Time.time)
       {
 		if (timeLastReloadDepth == 0) {
-			joint_positions_depth = new int[3 * (int)Joint.Count];
+			joint_positions_depth = new float[3 * (int)Joint.Count];
 		}
         KinectPowerInterop.GetJointsPositionDepth(joint_positions_depth);
       }
@@ -188,10 +196,11 @@ namespace KinectHelpers
 	private static float timeLastReloadDepth = 0.0f;
 
     private static bool skeleton_exists;
+	private static int[] is_new = new int[1];
     private static float[] joint_positions;
 	private static float[] joint_orientations;
-    private static int[] joint_positions_depth;
-    private static JointStatus[] joint_status;
+    private static float[] joint_positions_depth;
+    private static int[] joint_status;
 	private static bool is_different = false;
   }
 }

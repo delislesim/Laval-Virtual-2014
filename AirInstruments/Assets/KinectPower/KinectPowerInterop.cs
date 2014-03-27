@@ -21,7 +21,7 @@ public class KinectPowerInterop
 	public static extern bool AvoidCurrentSkeleton();
 
 	// Wrapper around the Kinect SDK functions.
-	public static bool GetJoints(float[] positions, float[] orientations, KinectHelpers.Skeleton.JointStatus[] joint_status, int[] is_new)
+	public static bool GetJoints(float[] positions, float[] orientations, int[] joint_status, int[] is_new)
 	{
 		try {
 			System.Diagnostics.Debug.Assert(positions.Length == (int)KinectHelpers.Skeleton.Joint.Count * 3);
@@ -34,7 +34,7 @@ public class KinectPowerInterop
 		return false;
 	}
 
-	public static bool GetJointsPositionDepth(int[] joint_positions) {
+	public static bool GetJointsPositionDepth(float[] joint_positions) {
 		try {
 			System.Diagnostics.Debug.Assert(joint_positions.Length == (int)KinectHelpers.Skeleton.Joint.Count * 2);
 			return GetJointsPositionDepthInternal(joint_positions);
@@ -45,10 +45,10 @@ public class KinectPowerInterop
 
 	// Direct access to the Kinect SDK functions.
 	[DllImport(@"kinect_lib.dll", EntryPoint = "GetJoints", CallingConvention = CallingConvention.Cdecl)]
-	private static extern bool GetJointsInternal(float[] positions, float[] orientations, KinectHelpers.Skeleton.JointStatus[] joint_status, int[] is_new);
+	private static extern bool GetJointsInternal(float[] positions, float[] orientations, int[] joint_status, int[] is_new);
 
 	[DllImport(@"kinect_lib.dll", EntryPoint = "GetJointsPositionDepth", CallingConvention = CallingConvention.Cdecl)]
-	private static extern bool GetJointsPositionDepthInternal(int[] joint_positions);
+	private static extern bool GetJointsPositionDepthInternal(float[] joint_positions);
 
 	public enum NuiSkeletonPositionTrackingState
 	{
