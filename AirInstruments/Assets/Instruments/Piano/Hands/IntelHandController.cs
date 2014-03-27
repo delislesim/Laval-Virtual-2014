@@ -330,6 +330,13 @@ public class IntelHandController : MonoBehaviour {
 		}
 	}
 
+	// Placer les cylindres.
+	public void PlacerCylindres() {
+		for (int i = 0; i < cylindres.Count; ++i) {
+			PlacerCylindre(i);
+		}
+	}
+
 	// Indique si les 2 mains sont suffisamment pres du capteur pour qu'on
 	// puisse dire leur position avec certitude. Aussi, il faut que les
 	// mains aient la bonne orientation.
@@ -601,6 +608,7 @@ public class IntelHandController : MonoBehaviour {
 		spheres.Add (fingerSphere);
 		fingerSphere.transform.parent = this.transform;
 		fingerSphere.transform.localScale = fingerSpherePrefab.transform.localScale;
+		fingerSphere.GetComponent<FingerSphere> ().FournirHandController (this);
 		return fingerSphere;
 	}
 

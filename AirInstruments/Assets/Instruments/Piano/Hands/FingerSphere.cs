@@ -6,12 +6,18 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 	// Projecteur générant l'ombre du doigt.
 	public GameObject projector;
 
+	private IntelHandController handController;
+
 	// Use this for initialization
 	void Start () {
 		Vector3 worldScale = VectorConversions.CalculerWorldScale (transform);
 		rayon = worldScale.x / 2.0f;
 
 		kalman.SetForce (kForcesKalmanDefaut);
+	}
+
+	public void FournirHandController(IntelHandController handController) {
+		this.handController = handController;
 	}
 
 	// Update is called once per frame
@@ -172,6 +178,9 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 			positionWorld.y -= allongement;
 			transform.position = positionWorld;
 		}
+
+		// Replacer le cylindre.
+		handController.PlacerCylindres ();
 	}
 
 	private bool EstSurNoires() {
