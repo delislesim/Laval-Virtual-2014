@@ -87,29 +87,29 @@ public class MenuAssisteController : MonoBehaviour {
 		// Mettre les bonnes cibles pour le pointeur.
 		pointeur.RemoveAllTargets ();
 		if (!boutons[0].GetComponent<BoutonMusique> ().EstDesactive()) {
-			pointeur.AddTarget (0, new Vector2 (0, 0.1f), new Vector2 (0.35f, 0.5f));
+			pointeur.AddTarget (0, new Vector2 (19.0f/68.0f, 20.0f/38.0f), new Vector2 (7.0f/68.0f, 14.0f/38.0f));
 			pointeur.SetBoutonRetourPresent (true);
 		} else {
 			pointeur.SetBoutonRetourPresent (false);
 		}
 
 		if (!boutons[1].GetComponent<BoutonMusique> ().EstDesactive())
-			pointeur.AddTarget (1, new Vector2 (1.35f, -0.4f), new Vector2 (0.5f, 0.35f));
+			pointeur.AddTarget (1, new Vector2 (44.0f/68.0f, 0.13f), new Vector2 (14.0f/68.0f, 7.0f/38.0f));
 		
 		if (!boutons[2].GetComponent<BoutonMusique> ().EstDesactive())
-			pointeur.AddTarget (2, new Vector2 (1.35f, 0.5f), new Vector2 (0.5f, 0.35f));
+			pointeur.AddTarget (2, new Vector2 (44.0f/68.0f, 0.55f), new Vector2 (14.0f/68.0f, 7.0f/38.0f));
 
 		if (!boutons[3].GetComponent<BoutonMusique> ().EstDesactive())
-			pointeur.AddTarget (3, new Vector2 (0.9f,  0.5f), new Vector2 (0.35f, 0.35f));
+			pointeur.AddTarget (3, new Vector2 (37.0f/68.0f, 0.55f), new Vector2 (7.0f/68.0f, 7.0f/38.0f));
 
 		if (!boutons[4].GetComponent<BoutonMusique> ().EstDesactive())
-			pointeur.AddTarget (4, new Vector2 (1.8f,  0.5f), new Vector2 (0.35f, 0.35f));
+			pointeur.AddTarget (4, new Vector2 (51.0f/68.0f, 0.55f), new Vector2 (7.0f/68.0f, 7.0f/38.0f));
 
 		if (!boutons[5].GetComponent<BoutonMusique> ().EstDesactive())
-			pointeur.AddTarget (5, new Vector2 (0.9f, -0.4f), new Vector2 (0.35f, 0.35f));
+			pointeur.AddTarget (5, new Vector2 (37.0f/68.0f, 0.13f), new Vector2 (7.0f/68.0f, 7.0f/38.0f));
 		
 		if (!boutons[6].GetComponent<BoutonMusique> ().EstDesactive())
-			pointeur.AddTarget (6, new Vector2 (1.8f, -0.4f), new Vector2 (0.35f, 0.35f));
+			pointeur.AddTarget (6, new Vector2 (51.0f/68.0f, 0.13f), new Vector2 (7.0f/68.0f, 7.0f/38.0f));
 
 		// Activer le pointeur.
 		pointeur.gameObject.SetActive (true);

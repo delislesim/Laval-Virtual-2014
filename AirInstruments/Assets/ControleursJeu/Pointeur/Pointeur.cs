@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using KinectHelpers;
 
 public class Pointeur : MonoBehaviour {
 
@@ -63,34 +64,91 @@ public class Pointeur : MonoBehaviour {
 	}
 
 	void Update () {
-		/*
-		KinectPowerInterop.NuiHandPointerInfo[] hands = new KinectPowerInterop.NuiHandPointerInfo[2];
+		if (!skeleton.IsDifferent())
+			return;
+		
+		Vector3 positionShoulders;
+		Skeleton.JointStatus status = skeleton.GetJointPosition (Skeleton.Joint.SpineShoulder, out positionShoulders);
 
-		float pressExtent = 0;
-
-		// Positionner la main.
-		if (KinectPowerInterop.GetHandsInteraction (0, hands)) {
-			if ((hands[0].State & KinectPowerInterop.NuiHandPointerStatePrimaryForUser) != 0) {
-				handPosition.x = hands[0].X;
-				handPosition.y = hands[0].Y;
-				pressExtent = hands[0].PressExtent;
-				handIsActive = true;
-			} else if ((hands[1].State & KinectPowerInterop.NuiHandPointerStatePrimaryForUser) != 0) {
-				handPosition.x = hands[1].X;
-				handPosition.y = hands[1].Y;
-				pressExtent = hands[1].PressExtent;
-				handIsActive = true;
-			} else {
-				handIsActive = false;
-			}
-		} else {
-			handIsActive = false;
-		}
-
-		if (!handIsActive)
+		if (status == Skeleton.JointStatus.NotTracked)
 			return;
 
-		handPosition.y += decalageVertical;
+		Vector3 positionHandLeft;
+		skeleton.GetJointPosition (Skeleton.Joint.HandLeft, out positionHandLeft);
+		Vector3 positionHandRight;
+		skeleton.GetJointPosition (Skeleton.Joint.HandRight, out positionHandRight);
+
+		float avancementMainGauche = positionShoulders.z - positionHandLeft.z;
+		float avancementMainDroite = positionShoulders.z - positionHandRight.z;
+
+		// Si la main actuelle a trop reculee, on ne la considere plus active.
+		if (mainActive == MainActive.GAUCHE && avancementMainGauche > kDistanceActive)
+			mainActive = MainActive.AUCUNE;
+		if (mainActive == MainActive.DROITE && avancementMainDroite > kDistanceActive)
+			mainActive = MainActive.AUCUNE;
+
+		// Si aucune main n'est active, on doit en choisir une.
+		if (mainActive == MainActive.AUCUNE) {
+			if (avancementMainGauche > avancementMainDroite) {
+				if (avancementMainGauche > kDistanceActive) {
+					mainActive = MainActive.GAUCHE;
+				}
+			} else {
+				if (avancementMainDroite > kDistanceActive) {
+					mainActive = MainActive.DROITE;
+				}
+			}
+		}
+
+		// S'il n'y a toujours aucune main active, on abandonne.
+		if (mainActive == MainActive.AUCUNE)
+			return;
+
+		// Determiner la position de la main active.
+		Vector2 positionMain;
+		Vector2 positionCentre;
+		float avancement;
+
+		if (mainActive == MainActive.GAUCHE) {
+			Vector3 positionMainDepth;
+			skeleton.GetJointPositionDepth(Skeleton.Joint.HandLeft, out positionMainDepth);
+			Vector3 positionEpaule;
+			skeleton.GetJointPositionDepth(Skeleton.Joint.ShoulderLeft, out positionEpaule);
+
+			positionMain.x = positionMainDepth.x;
+			positionMain.y = positionMainDepth.y;
+
+			positionCentre.x = positionEpaule.x - kDistanceHorizontalCentre;
+			positionCentre.y = positionEpaule.y;
+
+			avancement = avancementMainGauche;
+		} else {
+			Vector3 positionMainDepth;
+			skeleton.GetJointPositionDepth(Skeleton.Joint.HandRight, out positionMainDepth);
+			Vector3 positionEpaule;
+			skeleton.GetJointPositionDepth(Skeleton.Joint.ShoulderRight, out positionEpaule);
+			
+			positionMain.x = positionMainDepth.x;
+			positionMain.y = positionMainDepth.y;
+			
+			positionCentre.x = positionEpaule.x + kDistanceHorizontalCentre;
+			positionCentre.y = positionEpaule.y;
+
+			avancement = avancementMainDroite;
+		}
+
+		// Position du pointeur.
+		Vector2 coinHautGauche = positionCentre - new Vector2 (kLargeur / 2.0f, kHauteur / 2.0f);
+		Vector2 positionAbsolue = positionMain - coinHautGauche;
+		Vector4 handPositionTmp = new Vector4 (positionAbsolue.x / kLargeur, positionAbsolue.y / kHauteur, 0, 0);
+		Vector4 handPositionSmooth = kalman.Update (handPositionTmp);
+		handPosition.x = handPositionSmooth.x;
+		handPosition.y = handPositionSmooth.y;
+
+		Log.Debug ("position: " + handPosition.x + ", " + handPosition.y);
+
+		// Verifier si on clique sur une cible.
+		float pressExtent = (avancement - kDistanceActive) * 15.0f;
 
 		// Si la main est deja sur une cible, augmenter son compteur.
 		if (indexCibleActuelle != kIndexCibleInvalide) {
@@ -104,8 +162,8 @@ public class Pointeur : MonoBehaviour {
 			}
 
 			// Augmenter le compteur de la cible.
-			if (pressExtent > 0) {
-				tempsCibleActuelle += Time.deltaTime * 2.5f;
+			if (pressExtent > 1.0f) {
+				tempsCibleActuelle += Time.deltaTime * pressExtent;
 			} else {
 				tempsCibleActuelle += Time.deltaTime;
 			}
@@ -123,8 +181,6 @@ public class Pointeur : MonoBehaviour {
 				}
 			}
 		}
-		*/
-		// TODO: Faire marcher le pointeur avec la Kinect 2.
 	}
 
 	bool EstPresDeCible(Target target) {
@@ -137,16 +193,19 @@ public class Pointeur : MonoBehaviour {
 	}
 	
 	void OnGUI () {
-		if (handIsActive) {
+		if (mainActive != MainActive.AUCUNE) {
 			// S'assurer qu'on est en avant de tout.
 			// (Petite valeur = plus vers l'avant)
-			GUI.depth = 0; 
+			GUI.depth = 0;
 
 			// Dessiner la main.
-			GUI.DrawTexture (new Rect ((handPosition.x * 250 + 300) * Screen.width / 1080,
-			                           (handPosition.y * 350 + 300) * Screen.height / 768,
-			                           70 * Screen.width / 1080,
-			                           70 * Screen.height / 768),
+			float largeur = 70 * Screen.width / 1080;
+			float hauteur = 70 * Screen.height / 768;
+
+			GUI.DrawTexture (new Rect (handPosition.x * Screen.width - largeur,
+			                           handPosition.y * Screen.height + hauteur,
+			                           largeur,
+			                           hauteur),
 			                 imagesMain[indexImageMain]);
 		}
 	}
@@ -165,6 +224,29 @@ public class Pointeur : MonoBehaviour {
 	// Unique instance du pointeur dans le jeu.
 	private static Pointeur instance;
 
+	// Squelette.
+	private Skeleton skeleton = new Skeleton(0);
+
+	// Distance pour qu'une main soit consideree active.
+	private const float kDistanceActive = 0.25f;
+
+	// Distance horizontale entre l'epaule et le "centre de l'ecran".
+	private const float kDistanceHorizontalCentre = 0f;
+
+	// Largeur pouvant etre parcourue par une main.
+	private const float kLargeur = 160f;
+
+	// Hauteur pouvant etre parcourue par une main.
+	private const float kHauteur = 90f;
+
+	// Indique quelle main est active.
+	enum MainActive {
+		GAUCHE,
+		DROITE,
+		AUCUNE
+	}
+	private MainActive mainActive = MainActive.AUCUNE;
+
 	// Indique si le bouton de retour au menu est affiche a l'ecran.
 	private bool boutonRetourPresent = false;
 
@@ -180,9 +262,6 @@ public class Pointeur : MonoBehaviour {
 	// Liste de cibles sur lesquelles la main peut "cliquer".
 	private List<Target> targets = new List<Target> ();
 
-	// Indique s'il y a une main active pour le squelette principale.
-	private bool handIsActive = false;
-
 	// Position de la main.
 	private Vector2 handPosition = new Vector2();
 
@@ -190,8 +269,11 @@ public class Pointeur : MonoBehaviour {
 	private const int kIndexCibleInvalide = -1;
 
 	// Temps nécessaire pour qu'une cible soit considérée choisie.
-	private const float kTempsCibleChoisie = 3.0f;
+	private const float kTempsCibleChoisie = 2.0f;
 
 	// Decalage vertical.
 	private float decalageVertical = 0;
+
+	// Kalman pour le pointeur.
+	private Kalman kalman = new Kalman (5.0f);
 }
