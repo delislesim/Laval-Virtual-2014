@@ -126,11 +126,11 @@ namespace KinectHelpers
 			case Joint.HandTipLeft:
 				return Joint.HandLeft;
 			case Joint.ThumbLeft:
-				return Joint.HandLeft;
+				return Joint.WristLeft;
 			case Joint.HandTipRight:
 				return Joint.HandRight;
 			case Joint.ThumbRight:
-				return Joint.HandTipRight;
+				return Joint.WristRight;
 		}
 		
 		return Joint.HipCenter;
@@ -174,16 +174,10 @@ namespace KinectHelpers
 
 	public bool IsSkeletonReliable()
 	{
-		// TODO: Arranger cette fonction pour Kinect 2.
-		return true;
-
-			/*
-		int test = Array.FindAll (joint_status, x => x == JointStatus.Inferred || x == JointStatus.NotTracked).Length;	
-		if(Array.FindAll(joint_status, x => x == JointStatus.Inferred || x == JointStatus.NotTracked).Length >= 12)
+		if(Array.FindAll(joint_status, x => x == (int)JointStatus.Inferred || x == (int)JointStatus.NotTracked).Length >= 12)
 			return false;
 		else
 			return true;
-			*/
 	}
 
 	private static float timeLastReload = 0.0f;

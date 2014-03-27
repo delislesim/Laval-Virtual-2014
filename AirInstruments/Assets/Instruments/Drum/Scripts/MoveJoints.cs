@@ -3,7 +3,7 @@ using System.Collections;
 using KinectHelpers;
 
 public class MoveJoints : MonoBehaviour {
-	public GameObject Hip_Center;
+	public GameObject Spine_Base;
 	public GameObject Spine_Mid;
 	public GameObject Neck;
 	public GameObject Head;
@@ -70,7 +70,7 @@ public class MoveJoints : MonoBehaviour {
 		instance = this;
 
 		joints = new GameObject[] {
-			Hip_Center, Spine_Mid, Neck, Head, Shoulder_Left, Elbow_Left,
+			Spine_Base, Spine_Mid, Neck, Head, Shoulder_Left, Elbow_Left,
 			Wrist_Left, Hand_Left, Shoulder_Right, Elbow_Right, Wrist_Right,
 			Hand_Right, Hip_Left, Knee_Left, Ankle_Left, Foot_Left, Hip_Right,
 			Knee_Right, Ankle_Right, Foot_Right, Spine_Shoulder, Hand_Tip_Left,
@@ -93,6 +93,12 @@ public class MoveJoints : MonoBehaviour {
 
 		// Charger le squelette.
 		m_player_one = new Skeleton(0);
+
+		// Valeurs initiales pour les filtres de Kalman.
+		kalman_hand_left.SetInitialObservation (Vector4.zero);
+		kalman_hand_right.SetInitialObservation (Vector4.zero);
+		kalman_thumb_left.SetInitialObservation (Vector4.zero);
+		kalman_thumb_right.SetInitialObservation (Vector4.zero);
 	}
 	
 	// Update is called once per frame
@@ -103,19 +109,6 @@ public class MoveJoints : MonoBehaviour {
 			moveJoints (m_player_one);
 			drawer.PlacerCylindres();
 		}
-	}
-
-	bool SkeletonIsTrackedAndValid()
-	{
-		float distHipHead = Vector3.Distance(current_positions[(int)Skeleton.Joint.HipCenter],
-		                                     current_positions[(int)Skeleton.Joint.Head]);
-
-		//Check if hip joint is at reasonable distance from kinect (drum)
-		//Check if dist hip to head is reasonable (no mini ghost) skeleton
-		return current_positions[(int)Skeleton.Joint.HipCenter].z < -7
-			&& current_positions[(int)Skeleton.Joint.HipCenter].z > -11
-			&& distHipHead > 1.8
-			&& distHipHead < 5;
 	}
 
 	void moveJoints(Skeleton player)
@@ -138,9 +131,6 @@ public class MoveJoints : MonoBehaviour {
 				current_positions[i] = HIDING_POS;
 			}
 		}
-
-		// Determiner si le squelette est valide.
-		bool skeletonValid = SkeletonIsTrackedAndValid ();
 
 		// Fixer la position du squelette.
 		FixerSquelette ();
@@ -170,6 +160,24 @@ public class MoveJoints : MonoBehaviour {
 				                                                   targetPosition,
 				                                                   kDeplacementMaxTete * Time.deltaTime);
 			} else {
+				if (i == (int)Skeleton.Joint.HandTipLeft) {
+					current_positions[i] = KalmanRelatif(current_positions[(int)Skeleton.Joint.HandTipLeft],
+					                                     current_positions[(int)Skeleton.Joint.HandLeft],
+					                                     kalman_hand_left);
+				} else if (i == (int)Skeleton.Joint.HandTipRight) {
+					current_positions[i] = KalmanRelatif(current_positions[(int)Skeleton.Joint.HandTipRight],
+					                                     current_positions[(int)Skeleton.Joint.HandRight],
+					                                     kalman_hand_right);
+				} else if (i == (int)Skeleton.Joint.ThumbLeft) {
+					current_positions[i] = KalmanRelatif(current_positions[(int)Skeleton.Joint.ThumbLeft],
+					                                     current_positions[(int)Skeleton.Joint.WristLeft],
+					                                     kalman_thumb_left);
+				} else if (i == (int)Skeleton.Joint.ThumbRight) {
+					current_positions[i] = KalmanRelatif(current_positions[(int)Skeleton.Joint.ThumbRight],
+					                                     current_positions[(int)Skeleton.Joint.WristRight],
+					                                     kalman_thumb_right);
+				}
+
 				if (i == (int)Skeleton.Joint.HandRight || i == (int)Skeleton.Joint.HandLeft) {
 					if (current_positions[i] != HIDING_POS) {
 						DrumHand drumHand = joints [i].GetComponent<DrumHand>();
@@ -179,7 +187,11 @@ public class MoveJoints : MonoBehaviour {
 					joints[i].transform.position = current_positions[i];
 				}
 
-				if (current_positions[i] == HIDING_POS || !IsReliable || i == (int) Skeleton.Joint.WristLeft  || i == (int) Skeleton.Joint.WristRight) {
+				if (current_positions[i] == HIDING_POS || !IsReliable ||
+				    i == (int)Skeleton.Joint.HandTipLeft ||
+				    i == (int)Skeleton.Joint.HandTipRight ||
+				    i == (int)Skeleton.Joint.ThumbLeft ||
+				    i == (int)Skeleton.Joint.ThumbRight) {
 					joints[i].renderer.enabled = false;
 				} else {
 					joints[i].renderer.enabled = true;
@@ -190,6 +202,22 @@ public class MoveJoints : MonoBehaviour {
 			current_positions[i] = joints[i].transform.position;
 			current_rotations[i] = joints[i].transform.localRotation;
 		}
+
+		// Rotation des mains.
+		joints[(int)Skeleton.Joint.HandLeft].transform.rotation =
+			VectorConversions.RotationDroite(current_positions[(int)Skeleton.Joint.WristLeft],
+		                                     current_positions[(int)Skeleton.Joint.HandTipLeft]);
+		joints[(int)Skeleton.Joint.HandRight].transform.rotation =
+			VectorConversions.RotationDroite(current_positions[(int)Skeleton.Joint.WristRight],
+			                                 current_positions[(int)Skeleton.Joint.HandTipRight]);
+	}
+
+	Vector3 KalmanRelatif(Vector3 joint, Vector3 parent, Kalman kalman) {
+		Vector3 difference = joint - parent;
+		Vector4 smoothed_difference = kalman.Update (new Vector4 (difference.x, difference.y, difference.z, 0));
+		return parent + new Vector3 (smoothed_difference.x,
+		                             smoothed_difference.y,
+		                             smoothed_difference.z);
 	}
 
 	void FixerSquelette() {
@@ -243,6 +271,22 @@ public class MoveJoints : MonoBehaviour {
 
 	// Tolérance pour la position cible des épaules.
 	private Vector3 kToleranceCibleEpaules = new Vector3 (0.2f, 0.001f, 0.1f);
+
+	// Force des filtres de Kalman.
+	private const float kKalmanForce = 5.0f;
+
+	// Kalman pour le pouce gauche par rapport au poignet.
+	private Kalman kalman_thumb_left = new Kalman(kKalmanForce);
+
+	// Kalman pour le pouce droit par rapport au poignet.
+	private Kalman kalman_thumb_right = new Kalman(kKalmanForce);
+
+	// Kalman pour les doigts gauche par rapport a la main.
+	private Kalman kalman_hand_left = new Kalman(kKalmanForce);
+
+	// Kalman pour les doigts droits par rapport a la main.
+	private Kalman kalman_hand_right = new Kalman(kKalmanForce);
+
 
 }
 

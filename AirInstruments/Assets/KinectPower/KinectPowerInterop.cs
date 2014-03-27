@@ -6,7 +6,7 @@ using System;
 public class KinectPowerInterop
 {
 	// Constante indiquant si on est dans la version Kinect DEUX.
-	public static bool IsKinect2 = false;
+	public static bool IsKinect2 = true;
 
 	// Constante indiquant si on est dans la version Kinect UN.
 	public static bool IsKinect1 = !IsKinect2;

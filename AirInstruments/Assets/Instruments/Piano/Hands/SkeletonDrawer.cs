@@ -92,11 +92,13 @@ public class SkeletonDrawer : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		/*
 		if (KinectPowerInterop.IsKinect1) {
 			// Rotation des mains.
 			joints[(int)Skeleton.Joint.HandLeft].transform.rotation = cylindres[5].transform.rotation;
 			joints[(int)Skeleton.Joint.HandRight].transform.rotation = cylindres[5].transform.rotation;
 		}
+		*/
 	}
 
 	public void PlacerCylindres()

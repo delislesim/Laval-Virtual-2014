@@ -12,5 +12,11 @@ public class VectorConversions
 		}
 		return worldScale;
 	}
+
+	public static Quaternion RotationDroite(Vector3 extA, Vector3 extB) {
+		Vector3 direction = extB - extA;
+		Quaternion rotation = Quaternion.FromToRotation (Vector3.up, direction);
+		return rotation;
+	}
 }
 
