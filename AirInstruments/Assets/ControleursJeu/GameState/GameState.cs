@@ -68,6 +68,11 @@ public class GameState : MonoBehaviour {
 			return;
 		}
 
+		// Empecher les changements d'etat invalides.
+		if ((currentState == State.Drum || currentState == State.Guitar || currentState == State.Piano) && state != State.ChooseInstrument) {
+			return;
+		}
+
 		KinectPower.SetAffichageSqueletteActive (false);
 
 		transitionTerminee = false;
