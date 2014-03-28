@@ -46,6 +46,10 @@ public class BaguetteDrum : MonoBehaviour {
 		}
 	}
 
+	void Update() {
+		renderer.enabled = main.renderer.enabled;
+	}
+
 	private const float kVitesseBaguette = 0.1f;
 
 	// Position initiale.
