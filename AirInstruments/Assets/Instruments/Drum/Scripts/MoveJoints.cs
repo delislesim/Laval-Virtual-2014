@@ -102,7 +102,7 @@ public class MoveJoints : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void FixedUpdate () {
+	void Update () {
 		m_player_one.ReloadSkeleton ();
 
 		if (m_player_one.IsDifferent()) {
