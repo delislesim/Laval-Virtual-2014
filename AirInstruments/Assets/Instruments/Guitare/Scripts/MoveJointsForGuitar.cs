@@ -112,9 +112,9 @@ public class MoveJointsForGuitar : MonoBehaviour {
 
 		// Monter / descendre la guitare.
 		if (Input.GetButtonDown ("MonterGuitare")) {
-			proportionColonneGuitare += 0.75f;
+			proportionColonneGuitare += 0.04f;
 		} else if (Input.GetButtonDown ("DescendreGuitare")) {
-			proportionColonneGuitare -= 0.75f;
+			proportionColonneGuitare -= 0.04f;
 		}
 	}
 
