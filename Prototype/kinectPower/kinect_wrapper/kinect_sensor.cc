@@ -80,6 +80,13 @@ void KinectSensor::Shutdown() {
   }
 }
 
+void KinectSensor::AvoidCurrentBody() {
+  if (tracked_body_ != -1) {
+    tracking_id_to_avoid_.push_back(tracked_body_);
+    tracked_body_ = -1;
+  }
+}
+
 /// <summary>
 /// Initializes the default Kinect sensor
 /// </summary>
@@ -156,7 +163,10 @@ void KinectSensor::ProcessBodies(INT64 nTime, int nBodyCount, IBody** ppBodies) 
   int next_body_index = (last_body_index_ + 1) % kNumSavedBodies;
 
   // Choisir le squelette le plus prometteur.
-  if (!ChooseBody(nTime, nBodyCount, ppBodies)) {
+  int tracked_body_index = GetTrackedBodyIndex(nBodyCount, ppBodies);
+  int body_index = ChooseBody(tracked_body_index, nBodyCount, ppBodies);
+
+  if (body_index == -1) {
     bodies_[next_body_index].tracked = false;
     bodies_[next_body_index].polled = false;
     last_body_index_ = next_body_index;
@@ -164,7 +174,7 @@ void KinectSensor::ProcessBodies(INT64 nTime, int nBodyCount, IBody** ppBodies) 
   }
 
   // Enregistrer les parametres du squelette le plus prometteur.
-  IBody* pBody = ppBodies[tracked_body_];
+  IBody* pBody = ppBodies[body_index];
   Joint joints[JointType_Count];
   JointOrientation joint_orientations[JointType_Count];
   HRESULT hr = pBody->GetJoints(_countof(joints), joints);
@@ -192,30 +202,95 @@ void KinectSensor::ProcessBodies(INT64 nTime, int nBodyCount, IBody** ppBodies) 
   last_body_index_ = next_body_index;
 }
 
-bool KinectSensor::ChooseBody(INT64 nTime, int nBodyCount, IBody** ppBodies) {
-  if (tracked_body_ != -1 && IsTracked(tracked_body_, nBodyCount, ppBodies)) {
-    return true;
+struct PotentialBody {
+  UINT64 tracking_id;
+  float x_diff;
+  int index;
+
+  bool operator<(const PotentialBody& other) const {
+    return x_diff < other.x_diff;
+  }
+};
+
+int KinectSensor::ChooseBody(int tracked_index, int nBodyCount, IBody** ppBodies) {
+  if (IsTracked(tracked_index, nBodyCount, ppBodies)) {
+    return tracked_index;
   }
 
-  // On choisit juste le premier squelette pour l'instant.
-  // TODO(fdoray)
+  // Constantes pour choisir le meilleur squelette.
+  const float kDistanceMaxToTrackSkeleton = 2.25f;
+  const float kXCible = 0.18f;
+  const float kToleranceX = 0.4f;
+
+  // Tableau pour accueillir des positions.
+  Joint joints[JointType_Count];
+
+  // Vecteur de squelettes suffisamment pres.
+  std::vector<PotentialBody> potential_bodies;
+
+  // Choisir des squelettes suffisamment près.
   for (int i = 0; i < nBodyCount; ++i) {
     if (IsTracked(i, nBodyCount, ppBodies)) {
-      tracked_body_ = i;
-      return true;
+      IBody* pBody = ppBodies[i];
+      HRESULT hr = pBody->GetJoints(_countof(joints), joints);
+      if (SUCCEEDED(hr)) {
+        if (joints[JointType_SpineBase].Position.Z <= kDistanceMaxToTrackSkeleton) {
+          PotentialBody potential_body;
+          pBody->get_TrackingId(&potential_body.tracking_id);
+          potential_body.x_diff = abs(joints[JointType_SpineBase].Position.X - kXCible);
+          potential_body.index = i;
+
+          // Verifier qu'on est pas dans la liste de tracking id a eviter.
+          bool ok = true;
+          for (int j = 0; j < tracking_id_to_avoid_.size(); ++j) {
+            if  (potential_body.tracking_id == tracking_id_to_avoid_[j]) {
+              ok = false;
+              break;
+            }
+          }
+
+          if (ok && potential_body.x_diff < kToleranceX)
+            potential_bodies.push_back(potential_body);
+        }
+      }
     }
   }
 
-  return false;
+  // Classer les squelettes trouves.
+  std::sort(potential_bodies.begin(), potential_bodies.end());
+
+  // Choisir le meilleur squelette.
+  if (potential_bodies.size() > 0) {
+    tracked_body_ = potential_bodies[0].tracking_id;
+    return potential_bodies[0].index;
+  }
+
+  // On n'a toujours rien trouve... vider la liste de squelettes a eviter et reessayer.
+  if (tracking_id_to_avoid_.empty())
+    return -1;
+  tracking_id_to_avoid_.clear();
+  return  ChooseBody(-1, nBodyCount, ppBodies);
 }
 
 bool KinectSensor::IsTracked(int index, int nBodyCount, IBody** ppBodies) {
-  if (ppBodies[index] == NULL)
+  if (index == -1 || ppBodies[index] == NULL)
     return false;
 
   BOOLEAN bTracked = false;
   HRESULT hr = ppBodies[index]->get_IsTracked(&bTracked);
   return SUCCEEDED(hr) && bTracked;
+}
+
+int KinectSensor::GetTrackedBodyIndex(int nBodyCount, IBody** ppBodies) {
+  for (int i = 0; i < nBodyCount; ++i) {
+    if (ppBodies[i] != NULL) {
+      UINT64 tracking_id = 0;
+      ppBodies[i]->get_TrackingId(&tracking_id);
+      if (tracking_id == tracked_body_)
+        return i;
+    }
+  }
+  return -1;
 }
 
 DWORD KinectSensor::SensorThread(KinectSensor* sensor) {

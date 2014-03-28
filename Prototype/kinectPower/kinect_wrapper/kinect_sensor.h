@@ -35,6 +35,9 @@ class KinectSensor {
     return &bodies_[last_body_index_];
   }
 
+  // Eviter le squelette courant.
+  void AvoidCurrentBody();
+
   ICoordinateMapper* GetCoordinateMapper() {
     return m_pCoordinateMapper;
   }
@@ -61,10 +64,13 @@ class KinectSensor {
 
   // Choisit le squelette le plus prometteur, si aucun squelette n'est
   // presentement choisi.
-  bool ChooseBody(INT64 nTime, int nBodyCount, IBody** ppBodies);
+  int ChooseBody(int tracked_index, int nBodyCount, IBody** ppBodies);
 
   // Indique si le squelette dont l'index est passe en parametre est valide.
   bool IsTracked(int index, int nBodyCount, IBody** ppBodies);
+
+  // Obtient l'index du squelette tracked.
+  int GetTrackedBodyIndex(int nBodyCount, IBody** ppBodies);
 
   // Unique instance de cette classe.
   static KinectSensor* instance_;
@@ -86,10 +92,13 @@ class KinectSensor {
   IBodyFrameReader*       m_pBodyFrameReader;
 
   // Index du squelette qui nous interesse. -1 si aucun squelette n'est choisi.
-  int tracked_body_;
+  UINT64 tracked_body_;
 
   // Index du dernier squelette enregistre.
   int last_body_index_;
+
+  // Liste de tracking id a eviter.
+  std::vector<UINT64> tracking_id_to_avoid_;
 
   // Squelettes enregistres.
   KinectSkeleton bodies_[kNumSavedBodies];

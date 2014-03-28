@@ -82,14 +82,8 @@ bool GetJointsPositionDepth(float* joint_positions) {
 }
 
 bool AvoidCurrentSkeleton() {
-  /*
-  KinectWrapper* wrapper = KinectWrapper::instance();
-  KinectSensor* sensor = wrapper->GetSensorByIndex(0);
-  if (sensor == NULL)
-    return false;
-
-  sensor->AvoidCurrentSkeleton();
-  */
+  KinectSensor* sensor = KinectSensor::Instance();
+  sensor->AvoidCurrentBody();
   return true;
 }
 
