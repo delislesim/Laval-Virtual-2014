@@ -87,7 +87,7 @@ public class MenuAssisteController : MonoBehaviour {
 		// Mettre les bonnes cibles pour le pointeur.
 		pointeur.RemoveAllTargets ();
 		if (!boutons[0].GetComponent<BoutonMusique> ().EstDesactive()) {
-			pointeur.AddTarget (0, new Vector2 (19.0f/68.0f, 20.0f/38.0f), new Vector2 (7.0f/68.0f, 14.0f/38.0f));
+			pointeur.AddTarget (0, new Vector2 (19.0f/68.0f, 0.34f), new Vector2 (7.0f/68.0f, 14.0f/38.0f));
 			pointeur.SetBoutonRetourPresent (true);
 		} else {
 			pointeur.SetBoutonRetourPresent (false);
