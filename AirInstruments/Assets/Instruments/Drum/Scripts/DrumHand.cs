@@ -18,11 +18,9 @@ public class DrumHand : MonoBehaviour {
 		rotationInitiale = transform.rotation;
 
 		// Ignore les collisions entre les elements d'une meme main.
-		/*
 		Physics.IgnoreCollision (collider, baguette);
 		Physics.IgnoreCollision (collider, autreBaguette);
 		Physics.IgnoreCollision (collider, autreMain);
-		*/
 	}
 
 	void OnDisable () {
@@ -38,8 +36,6 @@ public class DrumHand : MonoBehaviour {
 	}
 
 	private void MettreAJourPosition(Vector3 position) {
-		transform.position = position;
-		/*
 		Vector3 motion = position - transform.position;
 
 		CharacterController characterController = GetComponent<CharacterController> ();
@@ -52,7 +48,6 @@ public class DrumHand : MonoBehaviour {
 				transform.position = position;
 			}
 		}
-		*/
 	}
 
 	// Distance maximale pour une teleportation.

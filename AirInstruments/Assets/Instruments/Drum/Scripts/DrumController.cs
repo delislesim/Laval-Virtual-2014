@@ -46,6 +46,12 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 	public GameObject leftHand;
 	public GameObject rightHand;
 
+	// Planes empechant les mains d'aller trop bas.
+	public GameObject[] planesCollisions;
+
+	// Indique si les planes de collisions sont actifs.
+	private bool planesCollisionsActifs = false;
+
 	// Clips audio du tutorial.
 	public AudioClip sonPosition;
 	public AudioClip sonTambours;
@@ -64,19 +70,15 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 		tutorialActif = false;
 
 		// Desactiver les planes de collisions.
-		//SetPlanesCollisionsActive (false);
+		SetPlanesCollisionsActive (false);
 	}
 
-	/*
 	private void SetPlanesCollisionsActive(bool active) {
-		active = false; // TEMPORAIRE TODO
-
-		for (int i = 0; i < planesCollisions.Count; ++i) {
+		for (int i = 0; i < planesCollisions.Length; ++i) {
 			planesCollisions[i].SetActive(active);
 		}
 		planesCollisionsActifs = active;
 	}
-	*/
 
 	public void PrepareToStop() {
 		tutorialActif = false;
@@ -146,14 +148,12 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 	
 	// Methode appelee a chaque frame quand le drum est l'instrument courant.
 	void Update () {
-		/*
 		// Activer les planes de collisions quand les mains sont assez hautes.
 		const float kHauteurMainsMinimale = 0.77f;
 		if (leftHand.transform.position.y > kHauteurMainsMinimale &&
 		    rightHand.transform.position.y > kHauteurMainsMinimale) {
 			SetPlanesCollisionsActive(true);
 		}
-		*/
 
 		// Gerer la fin du tutorial.
 		if (tutorialActif && tutorial.EstComplete ()) {

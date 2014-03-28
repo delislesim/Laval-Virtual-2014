@@ -80,11 +80,25 @@ public class GuidageController : MonoBehaviour {
 	void Update () {
 		timer += Time.deltaTime;
 		timer = timer % kTempsAnimation;
+
+		sumDeltaTime += 1.0f / Time.deltaTime;
+		++compteurDeltaTime;
+		if (compteurDeltaTime == 10) {
+			fps = sumDeltaTime / 10.0f;
+			compteurDeltaTime = 0;
+			sumDeltaTime = 0;
+		}
+
 	}
+	private float sumDeltaTime = 0;
+	private int compteurDeltaTime = 0;
+	private float fps = 0;
 
 	// Update is called once per frame
 	void OnGUI () {
 		GUI.skin = skinGuidage;
+
+		GUI.Label (new Rect (50, 50, 1000, 300), "FPS: " + fps);
 
 		float completionPiano = gestureRecognition.GetGestureCompletion (GestureId.GESTURE_PIANO);
 		float completionDrum = gestureRecognition.GetGestureCompletion (GestureId.GESTURE_DRUM);

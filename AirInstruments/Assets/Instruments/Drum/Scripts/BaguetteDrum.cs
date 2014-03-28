@@ -9,13 +9,20 @@ public class BaguetteDrum : MonoBehaviour {
 	// Bout de la baguette suppose etre dans la main.
 	public GameObject boutBaguetteMain;
 
+	// Extremite de la baguette.
+	public GameObject tip;
+
 	public Collider autreBaguette;
+
+	private int layerMask;
 
 	void Start () {
 		positionInitiale = transform.position;
 		rotationInitiale = transform.rotation;
 
 		Physics.IgnoreCollision (collider, autreBaguette);
+
+		layerMask = LayerMask.NameToLayer ("Cylinder") | LayerMask.NameToLayer ("DrumComponent");
 	}
 
 	void OnDisable () {
@@ -27,19 +34,19 @@ public class BaguetteDrum : MonoBehaviour {
 
 	// Update is called once per frame
 	void FixedUpdate () {
-		// Bouger la baguette pour que son bout soit au centre de la main.
-		/*
-		Vector3 nouvellePositionBoutBaguette = Vector3.MoveTowards (boutBaguetteMain.transform.position,
-		                                                           main.transform.position,
-		                                                           kVitesseBaguette * Time.deltaTime);*/
-		renderer.enabled = main.renderer.enabled;
+		float maximum = 0;
+		Vector3 direction = main.transform.position - tip.transform.position;
+		if (Physics.Raycast (tip.transform.position, direction.normalized, direction.magnitude, layerMask)) {
+			maximum = 0.4f;
+		}
+
 		Vector3 deplacement = main.transform.position - boutBaguetteMain.transform.position;
-		if (deplacement.magnitude >= 0.35f) {
+		if (deplacement.magnitude > maximum) {
 			transform.position = transform.position + deplacement;
 		}
 	}
 
-	private const float kVitesseBaguette = 0.25f;
+	private const float kVitesseBaguette = 0.1f;
 
 	// Position initiale.
 	private Vector3 positionInitiale;
