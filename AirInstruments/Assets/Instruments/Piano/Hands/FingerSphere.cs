@@ -122,7 +122,7 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 			Vector3 positionDoigt = transform.localPosition;
 
 			// Centrer le doigt sur le centre de la note.
-			if (Mathf.Abs(positionNote.x - targetPosition.x) < 1.25f) {
+			if (Mathf.Abs(positionNote.x - targetPosition.x) < 0.95f) {
 				targetPosition.x = positionNote.x;
 			}
 		}

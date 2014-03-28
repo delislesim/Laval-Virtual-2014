@@ -91,6 +91,21 @@ public class PianoArrow : MonoBehaviour {
 			Debug.Log("Axe invalide dans PianoArrow.");
 		}
 
+		if (targetPosition.x < kLimitesMin.x)
+			targetPosition.x = kLimitesMin.x;
+		if (targetPosition.x > kLimitesMax.x)
+			targetPosition.x = kLimitesMax.x;
+
+		if (targetPosition.y < kLimitesMin.y)
+			targetPosition.y = kLimitesMin.y;
+		if (targetPosition.y > kLimitesMax.y)
+			targetPosition.y = kLimitesMax.y;
+
+		if (targetPosition.z < kLimitesMin.z)
+			targetPosition.z = kLimitesMin.z;
+		if (targetPosition.z > kLimitesMax.z)
+			targetPosition.z = kLimitesMax.z;
+
 		// Placer la fleche au bon endroit.
 		transform.localPosition = targetPosition;
 		transform.localEulerAngles = targetRotation;
@@ -124,5 +139,9 @@ public class PianoArrow : MonoBehaviour {
 
 	// Indique si on a demande d'afficher le guidage y a la derniere frame.
 	private bool aDemandeY = false;
+
+	// Limites pour les positions des fleches.
+	private Vector3 kLimitesMin = new Vector3 (-9.5f, -1.5f, -5.35f);
+	private Vector3 kLimitesMax = new Vector3 (9.0f, 7.0f, -3.0f);
 
 }

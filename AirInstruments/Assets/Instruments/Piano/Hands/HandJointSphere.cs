@@ -47,4 +47,5 @@ public class HandJointSphere : MonoBehaviour, HandJointSphereI
 	private bool valid = false;
 	private int compteurInvalide = 0;
 	private const int compteurInvalideMax = 10;
+
 }
