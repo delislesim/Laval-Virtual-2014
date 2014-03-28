@@ -59,8 +59,8 @@ public class IntelHandController : MonoBehaviour {
 	private const int nombreCylindres = nombreCylindresParDoigt * 2;
 
 	// Tailles de mains.
-	private float[] kLargeur = {0.06f, 0.07f, 0.08f, 0.095f};
-	private float[] kHauteur = {0.14f, 0.15f, 0.19f, 0.21f};
+	private float[] kLargeur = {0.05f, 0.06f, 0.065f,  0.07f, 0.077f, 0.084f};
+	private float[] kHauteur = {0.11f, 0.14f, 0.1477f, 0.15f, 0.175f, 0.19f};
 	private int kIndexTailleDefaut = 2;
 
 	// Index des mains.
@@ -113,6 +113,12 @@ public class IntelHandController : MonoBehaviour {
 
 		// Noter le rayon des doigts.
 		kRayonDoigts = spheres [(int)KinectPowerInterop.HandJointIndex.PINKY_TIP].transform.localScale.x;
+	}
+
+	void OnDisable() {
+		// Remettre la taille de mains par defaut.
+		KinectPowerInterop.SetHandMeasurements (kLargeur [kIndexTailleDefaut],
+		                                        kHauteur [kIndexTailleDefaut]);
 	}
 
 	void OnEnable () {
@@ -285,6 +291,10 @@ public class IntelHandController : MonoBehaviour {
 			KinectPowerInterop.SetHandMeasurements (kLargeur [2], kHauteur [2]);
 		} else if (Input.GetButtonDown ("TailleMain4")) {
 			KinectPowerInterop.SetHandMeasurements (kLargeur [3], kHauteur [3]);
+		} else if (Input.GetButtonDown ("TailleMain5")) {
+			KinectPowerInterop.SetHandMeasurements (kLargeur [4], kHauteur [4]);
+		} else if (Input.GetButtonDown ("TailleMain6")) {
+			KinectPowerInterop.SetHandMeasurements (kLargeur [5], kHauteur [5]);
 		}
 
 		// Mettre a jour la position des boules rouge en fonction des donnees de la caméra Creative.
