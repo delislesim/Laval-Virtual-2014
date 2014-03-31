@@ -54,12 +54,12 @@ public class GestureGuitar : Gesture {
 		//Debug.Log ((leftHandPos [0] - hipLeftPos [0]) + "\n");
 
 		if (handsNotTooFar && leftHandFarEnough) {
-			elapsedTime_ += Time.deltaTime;
+			elapsedTime_ += GestureRecognition.deltaTime;
 			elapsedTimeout_ = 0;
 		}
 		else
 		{
-			elapsedTimeout_ += Time.deltaTime;
+			elapsedTimeout_ += GestureRecognition.deltaTime;
 		}
 
 		if(elapsedTimeout_ >= gestureTimeout_)

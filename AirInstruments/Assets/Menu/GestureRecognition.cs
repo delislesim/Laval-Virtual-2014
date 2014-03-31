@@ -14,6 +14,8 @@ public enum GestureId
 
 public class GestureRecognition : MonoBehaviour {
 
+	public const float deltaTime = 1.0f / 30.0f;
+
 	public GestureRecognition() {
 		// Conserver une reference a l'instance unique de reconnaisseur
 		// de gestes.
@@ -50,12 +52,15 @@ public class GestureRecognition : MonoBehaviour {
 		if (!bloque) {
 			skeleton_.ReloadSkeleton ();
 
-			// Poll gesture controller to see if a gesture has been detected
-			foreach(Gesture gesture in gestureList)
+			if(skeleton_.IsDifferent())
 			{
-			   if(gesture.trackGesture(skeleton_)) {
-					currentId = gesture.GestureId_;
-					Debug.Log ("Gesture: " + currentId);
+				// Poll gesture controller to see if a gesture has been detected
+				foreach(Gesture gesture in gestureList)
+				{
+				   if(gesture.trackGesture(skeleton_)) {
+						currentId = gesture.GestureId_;
+						Debug.Log ("Gesture: " + currentId);
+					}
 				}
 			}
 		} else {
