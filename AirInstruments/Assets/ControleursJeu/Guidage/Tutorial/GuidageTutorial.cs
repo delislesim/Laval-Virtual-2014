@@ -63,11 +63,20 @@ public class GuidageTutorial : MonoBehaviour {
 				EstEnTrainEntrer = false;
 			}
 			if (positionCible == Position.HAUT) {
+				Vector2 tailleTransformee = TransformerCoordonneesTaille (tailleBackground);
+				kPositionCacherHaut = Screen.height;
+				kPositionHaut = Screen.height - tailleTransformee.y;
+
+
 				float positionContenu = spring(kPositionCacherHaut, kPositionHaut, proportion);
 				DefinirPositionReelle(positionContenu);
 				float positionBackground = easeOutSine(kPositionCacherHaut, kPositionHaut, proportion);
 				DefinirPositionReelleFond(positionBackground);
 			} else {
+				Vector2 tailleTransformee = TransformerCoordonneesTaille (tailleBackground);
+				kPositionCacherBas = -tailleTransformee.y;
+				kPositionBas = 0;
+
 				float positionContenu = spring(kPositionCacherBas, kPositionBas, proportion);
 				DefinirPositionReelle(positionContenu);
 				float positionBackground = easeOutSine(kPositionCacherBas, kPositionBas, proportion);
@@ -81,11 +90,19 @@ public class GuidageTutorial : MonoBehaviour {
 			}
 
 			if (positionCible == Position.HAUT) {
+				Vector2 tailleTransformee = TransformerCoordonneesTaille (tailleBackground);
+				kPositionCacherHaut = Screen.height;
+				kPositionHaut = Screen.height - tailleTransformee.y;
+
 				float positionContenu = spring(kPositionHaut, kPositionCacherHaut, proportion);
 				DefinirPositionReelle(positionContenu);
 				float positionBackground = easeOutSine(kPositionHaut, kPositionCacherHaut, proportion);
 				DefinirPositionReelleFond(positionBackground);
 			} else {
+				Vector2 tailleTransformee = TransformerCoordonneesTaille (tailleBackground);
+				kPositionCacherBas = -tailleTransformee.y;
+				kPositionBas = 0;
+
 				float positionContenu = spring(kPositionBas, kPositionCacherBas, proportion);
 				DefinirPositionReelle(positionContenu);
 				float positionBackground = easeOutSine(kPositionBas, kPositionCacherBas, proportion);
@@ -106,8 +123,10 @@ public class GuidageTutorial : MonoBehaviour {
 
 	// Positionnement du background.
 	private void DefinirPositionReelleFond(float positionRelle) {
-		Vector2 positionTransformee = TransformerCoordonnees (new Vector2(0, positionRelle));
-		Vector2 tailleTransformee = TransformerCoordonnees (tailleBackground);
+		Vector2 positionTransformee = TransformerCoordonneesPosition (new Vector2(0, positionRelle));
+		Vector2 tailleTransformee = TransformerCoordonneesTaille (tailleBackground);
+		positionTransformee.y = positionRelle;
+
 		Rect pixelInset = background.pixelInset;
 		pixelInset.x = positionTransformee.x;
 		pixelInset.y = positionTransformee.y;
@@ -118,10 +137,11 @@ public class GuidageTutorial : MonoBehaviour {
 
 	// Positionnement du pictogramme et du texte.
 	private void DefinirPositionReelle(float positionRelle) {
-		Vector2 positionTransformee = TransformerCoordonnees (new Vector2(0, positionRelle));
-		Vector2 tailleTransformee = TransformerCoordonnees (tailleBackground);
+		Vector2 positionTransformee = TransformerCoordonneesPosition (new Vector2(0, positionRelle));
+		Vector2 tailleTransformee = TransformerCoordonneesTaille (tailleBackground);
+		positionTransformee.y = positionRelle;
 		
-		Vector2 positionTexteTransformee = positionTransformee + TransformerCoordonnees (positionTexte);
+		Vector2 positionTexteTransformee = positionTransformee + TransformerCoordonneesPosition (positionTexte);
 		texte.pixelOffset = positionTexteTransformee;
 		
 		int tailleTexteTransformee = (int) (tailleTexte * ((float)Screen.width) / 1755f);
@@ -129,19 +149,24 @@ public class GuidageTutorial : MonoBehaviour {
 
 		Rect pixelInsetPictogramme = pictogramme.pixelInset;
 
-		Vector2 positionPictogrammeTransformee = positionTransformee + TransformerCoordonnees (positionPictogramme);
+		Vector2 positionPictogrammeTransformee = positionTransformee + TransformerCoordonneesPosition (positionPictogramme);
 		pixelInsetPictogramme.x = positionPictogrammeTransformee.x;
 		pixelInsetPictogramme.y = positionPictogrammeTransformee.y;
 
-		Vector2 taillePictogrammeTransformee = TransformerCoordonnees (taillePictogramme);
+		Vector2 taillePictogrammeTransformee = TransformerCoordonneesTaille (taillePictogramme);
 		pixelInsetPictogramme.width = taillePictogrammeTransformee.x;
 		pixelInsetPictogramme.height = taillePictogrammeTransformee.y;
 
 		pictogramme.pixelInset = pixelInsetPictogramme;
 	}
 
-	private Vector2 TransformerCoordonnees(Vector2 coord) {
+	private Vector2 TransformerCoordonneesTaille(Vector2 coord) {
 		return coord * ((float)Screen.width) / 1755f;
+	}
+
+	private Vector2 TransformerCoordonneesPosition(Vector2 coord) {
+		return new Vector2 (coord.x * ((float)Screen.width) / 1755f,
+		                    coord.y * ((float)Screen.height) / 987.1875f);
 	}
 
 	public void AfficherEtape(EtapeTutorial etape) {
@@ -237,16 +262,16 @@ public class GuidageTutorial : MonoBehaviour {
 	private Position positionCible;
 
 	// Position du guidage en haut de l'écran.
-	private const float kPositionHaut = 689.94f;
+	private float kPositionHaut = 689.94f;
 
 	// Position pour se cacher en haut de l'écran.
-	private const float kPositionCacherHaut = 1000.0f;
+	private float kPositionCacherHaut = 1000.0f;
 
 	// Position du guidage en bas de l'écran.
-	private const float kPositionBas = 0;
+	private float kPositionBas = 0;
 
 	// Position pour se cacher en bas de l'écran.
-	private const float kPositionCacherBas = -300.0f;
+	private float kPositionCacherBas = -300.0f;
 
 	// Indique si on doit feliciter le jouer.
 	private bool doitFeliciter;
