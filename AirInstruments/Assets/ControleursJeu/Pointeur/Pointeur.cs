@@ -216,8 +216,8 @@ public class Pointeur : MonoBehaviour {
 			                         largeur,
 			                         hauteur));
 			GUI.DrawTexture (new Rect (largeur/4, hauteur/4, largeur/2, hauteur/2), imagesMain[0], ScaleMode.ScaleToFit);
-			if(tempsCibleActuelle == 0)
-				GUI.DrawTexture(new Rect (0, 0, largeur, hauteur), chargement[indexImageMain], ScaleMode.ScaleToFit);
+			if(indexImageMain >= 1)
+				GUI.DrawTexture(new Rect (0, 0, largeur, hauteur), chargement[indexImageMain - 1], ScaleMode.ScaleToFit);
 			GUI.EndGroup();
 		}
 	}
