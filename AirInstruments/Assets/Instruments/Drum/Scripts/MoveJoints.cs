@@ -103,10 +103,14 @@ public class MoveJoints : MonoBehaviour {
 		// Initialiser les filtres de Kalman.
 		for (int i = 0; i < kalman.Length; ++i) {
 			kalman[i] = new Kalman(1.0f);
+			kalman[i].SetInitialObservation(Vector4.zero);
 		}
 	}
 
 	void OnEnable() {
+		if (m_player_one == null)
+			return;
+
 		// Mettre les valeurs initiales dans le filtre de Kalman.
 		for (int i = 0; i < kalman.Length; ++i) {
 			Vector3 posJoint;
