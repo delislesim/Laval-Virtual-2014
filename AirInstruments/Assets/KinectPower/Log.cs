@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Log {
+public class Log : MonoBehaviour {
 
 	public static void Debug(string message) {
 		if (file != null) {
 			file.WriteLine(message);
+			messageStatic = message;
 		}
 	}
 
@@ -20,6 +21,17 @@ public class Log {
 		}
 		return;
 	}
+
+	public void OnGUI() {
+		GUI.skin = skin;
+		GUI.Label (rect, messageStatic);
+	}
+
+	public GUISkin skin;
+
+	private static string messageStatic;
+
+	private Rect rect = new Rect(0, 0, 600, 800);
 
 	private static System.IO.StreamWriter file;
 }

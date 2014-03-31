@@ -7,10 +7,21 @@ public class Pointeur : MonoBehaviour {
 
 	// Images de main, a plusieurs stades de remplissage.
 	public List<Texture> imagesMain;
+	private Texture[] chargement = new Texture[12];
 
 	public Pointeur() {
 		// Singleton.
 		instance = this;
+	}
+
+	void Start(){
+		//Loader les ressources
+		for (int i = 0; i < chargement.Length; i++) {
+			string imageChargement;
+			int indeximageChargment = i + 1;
+			imageChargement = indeximageChargment + "_12";
+			chargement [i] = (Texture)Resources.Load ("ChargementAnimation/" + imageChargement);
+		}
 	}
 
 	public static Pointeur obtenirInstance() {
@@ -167,9 +178,10 @@ public class Pointeur : MonoBehaviour {
 			}
 
 			// Determiner quelle image de main afficher.
-			indexImageMain = (int)(tempsCibleActuelle * imagesMain.Count / kTempsCibleChoisie);
-			if (indexImageMain >= imagesMain.Count) {
-				indexImageMain = imagesMain.Count - 1;
+			//indexImageMain = (int)(tempsCibleActuelle * imagesMain.Count / kTempsCibleChoisie);
+			indexImageMain = (int)(tempsCibleActuelle * chargement.Length / kTempsCibleChoisie);
+			if (indexImageMain >= chargement.Length) {
+				indexImageMain = chargement.Length - 1;
 			}
 		} else {
 			// Trouver une nouvelle cible.
@@ -197,14 +209,15 @@ public class Pointeur : MonoBehaviour {
 			GUI.depth = 0;
 
 			// Dessiner la main.
-			float largeur = 70 * Screen.width / 1080;
-			float hauteur = 70 * Screen.height / 768;
-
-			GUI.DrawTexture (new Rect (handPosition.x * Screen.width - largeur,
-			                           handPosition.y * Screen.height + hauteur,
-			                           largeur,
-			                           hauteur),
-			                 imagesMain[indexImageMain]);
+			float largeur = 100 * Screen.width / 1080;
+			float hauteur = 100 * Screen.height / 768;
+			GUI.BeginGroup(new Rect (handPosition.x * Screen.width - largeur,
+			                         handPosition.y * Screen.height + hauteur,
+			                         largeur,
+			                         hauteur));
+			GUI.DrawTexture (new Rect (largeur/4, hauteur/4, largeur/2, hauteur/2), imagesMain[0], ScaleMode.ScaleToFit);
+			GUI.DrawTexture(new Rect (0, 0, largeur, hauteur), chargement[indexImageMain], ScaleMode.ScaleToFit);
+			GUI.EndGroup();
 		}
 	}
 

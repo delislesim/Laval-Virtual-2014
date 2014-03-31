@@ -157,9 +157,11 @@ public class PianoBuilder : MonoBehaviour, Instrument {
 		notes [index].DefinirStatut (statut);
 
 		// Rendre les notes adjacentes injouables.
-		for (int i = index - 2; i < index + 2; ++i) {
-			if (i >= 0 && i < notes.Count) {
-				notes [i].DefinirAdjacentAJouer(true);
+		if (statut == PartitionPiano.StatutNote.Joueur) {
+			for (int i = index - 4; i < index + 4; ++i) {
+				if (i >= 0 && i < notes.Count) {
+					notes [i].DefinirAdjacentAJouer (true);
+				}
 			}
 		}
 	}

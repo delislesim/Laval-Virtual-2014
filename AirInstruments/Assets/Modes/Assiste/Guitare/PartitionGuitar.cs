@@ -127,6 +127,7 @@ public class PartitionGuitar {
 				int octave = 0;
 				bool hasSeenNoteBeginning = false;
 				Solo solo = Solo.NON;
+				PositionManche position = PositionManche.LOIN;
 				GuitarPlayer.Style style = GuitarPlayer.Style.NOTE;
 				for (int i = pos; i < ligne.Length; ++i) {
 					Char caractere = ligne[i];
@@ -150,6 +151,7 @@ public class PartitionGuitar {
 						pos = i + 1;
 					} else if (caractere == '+') {
 						hasSeenNoteBeginning = true;
+						position = PositionManche.PRES;
 						style = GuitarPlayer.Style.CHORD;
 						pos = i + 1;
 					}else if (caractere == '*') {
@@ -179,7 +181,7 @@ public class PartitionGuitar {
 				                            notToTone[val],
 				                            style,
 				                            octave,
-				                            PositionManche.LOIN,
+				                            position,
 				                            solo));
 				//Debug.Log ("Found note : " + val);               
 				return true;

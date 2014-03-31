@@ -26,7 +26,7 @@ public class DrumEtapeTambours : EtapeTutorial {
 
 		components.Add (tom1);
 		components.Add (tom2);
-		components.Add (highHat);
+		components.Add (crash);
 		components.Add (ride);
 		//components.Add (tomBig);
 		//components.Add (crash);
