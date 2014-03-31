@@ -12,7 +12,9 @@ public class Pointeur : MonoBehaviour {
 	public Pointeur() {
 		// Singleton.
 		instance = this;
+	}
 
+	void start(){
 		//Loader les ressources
 		for (int i = 0; i < chargement.Length; i++) {
 			string imageChargement;
@@ -213,8 +215,8 @@ public class Pointeur : MonoBehaviour {
 			                         handPosition.y * Screen.height + hauteur,
 			                         largeur,
 			                         hauteur));
-			GUI.DrawTexture (new Rect (0, 0, largeur, hauteur), imagesMain[0]);
-			GUI.DrawTexture(new Rect (0, 0, largeur, hauteur), chargement[indexImageMain]);
+			GUI.DrawTexture (new Rect (0, 0, largeur, hauteur), imagesMain[0], ScaleMode.ScaleToFit);
+			GUI.DrawTexture(new Rect (-largeur/2, -hauteur/2, largeur*2, hauteur*2), chargement[indexImageMain], ScaleMode.ScaleToFit);
 			GUI.EndGroup();
 		}
 	}
