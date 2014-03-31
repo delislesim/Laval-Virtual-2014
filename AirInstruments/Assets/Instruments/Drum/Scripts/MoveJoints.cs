@@ -99,6 +99,20 @@ public class MoveJoints : MonoBehaviour {
 		kalman_hand_right.SetInitialObservation (Vector4.zero);
 		kalman_thumb_left.SetInitialObservation (Vector4.zero);
 		kalman_thumb_right.SetInitialObservation (Vector4.zero);
+
+		// Initialiser les filtres de Kalman.
+		for (int i = 0; i < kalman.Length; ++i) {
+			kalman[i] = new Kalman(1.0f);
+		}
+	}
+
+	void OnEnable() {
+		// Mettre les valeurs initiales dans le filtre de Kalman.
+		for (int i = 0; i < kalman.Length; ++i) {
+			Vector3 posJoint;
+			Skeleton.JointStatus jointStatus = m_player_one.GetJointPosition((Skeleton.Joint)i, out posJoint);
+			kalman[i].SetInitialObservation(new Vector4(posJoint.x, posJoint.y, posJoint.z));
+		}
 	}
 	
 	// Update is called once per frame
@@ -160,6 +174,7 @@ public class MoveJoints : MonoBehaviour {
 				                                                   targetPosition,
 				                                                   kDeplacementMaxTete * Time.deltaTime);
 			} else {
+
 				if (i == (int)Skeleton.Joint.HandTipLeft) {
 					current_positions[i] = KalmanRelatif(current_positions[(int)Skeleton.Joint.HandTipLeft],
 					                                     current_positions[(int)Skeleton.Joint.HandLeft],
@@ -168,14 +183,16 @@ public class MoveJoints : MonoBehaviour {
 					current_positions[i] = KalmanRelatif(current_positions[(int)Skeleton.Joint.HandTipRight],
 					                                     current_positions[(int)Skeleton.Joint.HandRight],
 					                                     kalman_hand_right);
-				} else if (i == (int)Skeleton.Joint.ThumbLeft) {
-					current_positions[i] = KalmanRelatif(current_positions[(int)Skeleton.Joint.ThumbLeft],
-					                                     current_positions[(int)Skeleton.Joint.WristLeft],
-					                                     kalman_thumb_left);
-				} else if (i == (int)Skeleton.Joint.ThumbRight) {
-					current_positions[i] = KalmanRelatif(current_positions[(int)Skeleton.Joint.ThumbRight],
-					                                     current_positions[(int)Skeleton.Joint.WristRight],
-					                                     kalman_thumb_right);
+				} else if (i == (int)Skeleton.Joint.HandLeft ||
+				    i == (int)Skeleton.Joint.HandRight ||
+				    i == (int)Skeleton.Joint.WristLeft ||
+				    i == (int)Skeleton.Joint.WristRight ||
+				    i == (int)Skeleton.Joint.HandTipLeft ||
+				    i == (int)Skeleton.Joint.HandTipRight) {
+					Vector4 pos = kalman[i].Update(new Vector4(current_positions[i].x,
+					                                           current_positions[i].y,
+					                                           current_positions[i].z));
+					current_positions[i] = pos;
 				}
 
 				if (i == (int)Skeleton.Joint.HandRight || i == (int)Skeleton.Joint.HandLeft) {
@@ -221,15 +238,6 @@ public class MoveJoints : MonoBehaviour {
 	}
 
 	void FixerSquelette() {
-		/*
-		// Mesurer les bras.
-		Vector3 positionEpaule = current_positions [(int)Skeleton.Joint.ShoulderLeft];
-		Vector3 positionCoude = current_positions [(int)Skeleton.Joint.ElbowLeft];
-		Vector3 positionMain = current_positions [(int)Skeleton.Joint.HandLeft];
-		float longueurBras = Vector3.Distance (positionEpaule, positionCoude) +
-						Vector3.Distance (positionCoude, positionMain);
-		*/
-
 		// Le centre des épaules doit etre pret de la position fixee.
 		Vector3 positionCentreEpaules = current_positions [(int)Skeleton.Joint.Neck];
 		if (positionCentreEpaules == HIDING_POS)
@@ -286,6 +294,9 @@ public class MoveJoints : MonoBehaviour {
 
 	// Kalman pour les doigts droits par rapport a la main.
 	private Kalman kalman_hand_right = new Kalman(kKalmanForce);
+
+	// Filtres de Kalman.
+	private Kalman[] kalman = new Kalman[(int)KinectHelpers.Skeleton.Joint.Count];
 
 
 }
