@@ -264,15 +264,17 @@ public class PianoNote : MonoBehaviour {
 		if (statut != PartitionPiano.StatutNote.Muette)
 			return;
 
+
+
 		if (!noire &&
-		    angleCourant >= kAngleCommencerSonAssisteInvalide ||
+		    (angleCourant >= kAngleCommencerSonAssisteInvalide || (angleCourant >= kAngleCommencerSon && !adjacentAJouer)) ||
 		    (estJouee && angleCourant >= kAngleCommencerSonAssisteVoulu)) {
 			tempsEnfonceeParErreur += Time.deltaTime;
-			if (tempsEnfonceeParErreur >= kTempsEnfonceeParErreurMax) {
+			if (tempsEnfonceeParErreur >= kTempsEnfonceeParErreurMax ||
+			    (tempsEnfonceeParErreur >= kTempsEnfonceeParErreurMaxNonAdjacente && !adjacentAJouer)) {
 				// Appliquer l'angle et jouer la note.
 				AppliquerRotation(angleCourant);
 				JouerSon(0.8f);  // on ne joue pas le son trop fort.
-
 			} else {
 				angleCourant = 0.0f;
 			}
@@ -313,6 +315,9 @@ public class PianoNote : MonoBehaviour {
 
 	// Temps que la note doit etre enfoncee par erreur avant qu'on entende un son.
 	private const float kTempsEnfonceeParErreurMax = 0.3f;
+
+	// Temps que la note doit etre enfoncee par erreur avant qu'on entende un son, si elle n'est pas adjacente a une note a jouer.
+	private const float kTempsEnfonceeParErreurMaxNonAdjacente = 0f;
 
 	// Vitesse de diminution du volume.
 	private const float kVitesseDiminutionVolume = 4.0f;

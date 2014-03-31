@@ -110,7 +110,7 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 				for (int i = dernierTempsJoue; i < tempsAJouerEchantillons; ++i) {
 					int tempsAJouerEchantillonsModulo = i % nombreEchantillons;
 
-					// Reinitialiser les booleens indiquant si chaque note est adjacent
+					// Reinitialiser les booleens indiquant si chaque note est adjacente
 					// a une note a jouer.
 					for (int j = 0; j < nombreNotes; ++j) {
 						instrumentScript.DefinirAdjacentAJouer(j, false);
@@ -160,8 +160,6 @@ public class AssistedModeControllerPiano : MonoBehaviour {
 		// Gerer les notes qui doivent etre jouees.
 		peutContinuer = true;
 		for (int indexNote = 0; indexNote < nombreNotes; ++indexNote) {
-			// TODO(aimantation)
-
 			PianoNote note = instrumentScript.ObtenirNote(indexNote);
 			bool ok = note.GererNoteQuiDoitEtreJouee();
 			if (!ok)
