@@ -282,10 +282,10 @@ public class MoveJoints : MonoBehaviour {
 	{
 		//Compare current knee pos to Queue
 		int go = 0;
-		float y = current_positions [Skeleton.Joint.KneeRight].y;
+		float y = current_positions [(int)Skeleton.Joint.KneeRight].y;
 
 		for (int i = 0; i<NUMBER_OF_KNEE_POS; i++) {
-			if (y < lastKneePositionsY [i])
+			//if (y < lastKneePositionsY [i])
 				go++;
 		}
 
