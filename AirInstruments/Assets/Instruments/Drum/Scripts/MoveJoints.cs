@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using KinectHelpers;
 
 public class MoveJoints : MonoBehaviour {
@@ -41,11 +42,12 @@ public class MoveJoints : MonoBehaviour {
 	private Vector3[] last_positions;
 	private Quaternion[] current_rotations;
 	private Quaternion[] last_rotations;
-	private const float KICK_SPEED = 1.0f;
-	private const float HH_SPEED = 1.0f;
+	//private const float KICK_SPEED = 1.0f;
+	//private const float HH_SPEED = 1.0f;
+	private const int NUMBER_OF_KNEE_POS = 5;
 	private Vector3 HIDING_POS = new Vector3(0,-150,-150);
 	private bool kick_ready;
-	private bool hit_hat_ready;
+	//private bool hit_hat_ready;
 	private const float PLAYER_HIGHT = 5.0f;
 	private const float DELTA_CHECK_TIME = 5.0f;
 	private const float DIST_MAX_KINECT = 12.0f; //2m
@@ -104,6 +106,12 @@ public class MoveJoints : MonoBehaviour {
 		for (int i = 0; i < kalman.Length; ++i) {
 			kalman[i] = new Kalman(1.0f);
 		}
+
+		// Initialiser les filtres de Kalman.
+		for (int i = 0; i < NUMBER_OF_KNEE_POS; ++i) {
+			lastKneePositionsY.Enqueue(-1000.0f);
+		}
+
 	}
 
 	void OnEnable() {
@@ -218,6 +226,8 @@ public class MoveJoints : MonoBehaviour {
 			//Store new current position/rotation
 			current_positions[i] = joints[i].transform.position;
 			current_rotations[i] = joints[i].transform.localRotation;
+			//Play basskick if we should
+			HandleBassKick();
 		}
 
 		// Rotation des mains.
@@ -267,9 +277,36 @@ public class MoveJoints : MonoBehaviour {
 		                   kinectPosition.y*PLAYER_HIGHT,
 		                   -kinectPosition.z*PLAYER_HIGHT);
 	}
+
+	private void HandleBassKick()
+	{
+		//Compare current knee pos to Queue
+		int go = 0;
+		float y = current_positions [Skeleton.Joint.KneeRight].y;
+
+		for (int i = 0; i<NUMBER_OF_KNEE_POS; i++) {
+			if (y < lastKneePositionsY [i])
+				go++;
+		}
+
+		//Lower than all last positions -> play sound
+		if (go == NUMBER_OF_KNEE_POS)
+			Bass_Kick.PlaySound ();
+
+	
+		//lastKneePositionsY.
+
+		//On garde les positions dans notre queue.
+		lastKneePositionsY.Enqueue(y);
+		lastKneePositionsY.Dequeue();
+
+
+	}
 	
 	// Unique instance de cette classe.
 	private static MoveJoints instance;
+
+	private Queue<float> lastKneePositionsY;
 
 	// Layer des colliders de drum components.
 	private int drumComponentLayer;
