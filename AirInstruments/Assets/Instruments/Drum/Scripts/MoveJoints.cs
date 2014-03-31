@@ -110,7 +110,7 @@ public class MoveJoints : MonoBehaviour {
 
 		// Initialiser les filtres de Kalman.
 		for (int i = 0; i < NUMBER_OF_KNEE_POS; ++i) {
-			lastKneePositionsY.Enqueue(-1000.0f);
+			lastKneePositionsY.Add(-1000.0f);
 		}
 
 	}
@@ -289,7 +289,7 @@ public class MoveJoints : MonoBehaviour {
 		float y = current_positions [(int)Skeleton.Joint.KneeRight].y;
 
 		for (int i = 0; i<NUMBER_OF_KNEE_POS; i++) {
-			//if (y < lastKneePositionsY [i])
+			if (y < lastKneePositionsY [i])
 				go++;
 		}
 
@@ -301,8 +301,8 @@ public class MoveJoints : MonoBehaviour {
 		//lastKneePositionsY.
 
 		//On garde les positions dans notre queue.
-		lastKneePositionsY.Enqueue(y);
-		lastKneePositionsY.Dequeue();
+		lastKneePositionsY.Add(y);
+		lastKneePositionsY.RemoveAt(0);
 
 
 	}
@@ -310,7 +310,7 @@ public class MoveJoints : MonoBehaviour {
 	// Unique instance de cette classe.
 	private static MoveJoints instance;
 
-	private Queue<float> lastKneePositionsY;
+	private List<float> lastKneePositionsY;
 
 	// Layer des colliders de drum components.
 	private int drumComponentLayer;
