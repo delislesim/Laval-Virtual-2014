@@ -104,32 +104,35 @@ public class GuitarPlayer : MonoBehaviour {
 			int idx = 0;
 			//Debug.Log ("Octave : " + octave);
 			if(style == Style.NOTE){
-				//switch(level){
-				//case 0:
+				switch(level){
+				case 0:
 					idx = note + (12*octave);
 					if(idx > 44)//be safe
 						idx = idx-12;
-				//	break;
-				//default :
-				//	idx = note + (12*(octave + 1));
-				//	if(idx > 44)//be safe
-				//		idx = idx-12;
-				//	break;
-				//}
+					break;
+				default :
+					idx = note + (12*(octave + 1));
+					if(idx > 44)//be safe
+						idx = idx-12;
+					break;
+				}
 				audio1.clip = HighVelocityNotes[idx];
 
 			}
 			else if(style == Style.CHORD){
-				if(level == 0)
-					idx = note;
-				else
-					idx = note+12;
-				idx = idx%18;
+				switch(level){
+				case 0:
+					idx = note + (12*(octave-1));
+					if(idx < 0)//be safe
+						idx = idx+12;
+					break;
+				default :
+					idx = note + (12*(octave));
+					if(idx > 44)//be safe
+						idx = idx-12;
+					break;
+				}
 				audio1.clip = HighVelocityNotes[idx];
-				//audio2.clip = HighVelocityNotes[idx+7];
-				//audio3.clip = HighVelocityNotes[idx+12];
-				//audio3.Play();
-				//audio2.Play ();
 			}
 
 		}

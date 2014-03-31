@@ -105,12 +105,18 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 	}
 
 	void Update () {
+
+
 		if (partition == null || tempsEcoule > partition [partition.Count - 1].time + 6.0f)
 			return;
-		
+
+		tempsEcoule = audio.timeSamples/44100.0f + 0.055f;
+		//Log.Debug("Temps de chanson : " + tempsEcoule);
+
 		// Temps actuel, en secondes.
 		//Set le tone et style de la note a jouer
-		tempsEcoule = tempsEcoule + Time.deltaTime;
+		//tempsEcoule = tempsEcoule + Time.deltaTime;
+
 
 		if(currentPartitionIndex < partition.Count-1) {
 			if (tempsEcoule >= partition[currentPartitionIndex+1].time) {
