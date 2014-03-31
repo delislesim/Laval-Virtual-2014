@@ -71,7 +71,7 @@ public class GesturePiano : Gesture {
 		float upperLimit = headPos[1];//((avgShouldPos[1] - avgHipPos[1]) * (2.0f/3.0f)) + avgHipPos[1];
 		float lowerLimit = ((avgHipPos[1] - avgKneePos[1]) * (2.0f/3.0f)) + avgKneePos[1];
 
-		Log.Debug (speed [0] + " " + speed [1]);
+		//Log.Debug (speed [0] + " " + speed [1]);
 		
 		bool isInLimits = lowerLimit < leftHandPos[1] && lowerLimit < rightHandPos[1] && leftHandPos[1] < upperLimit && rightHandPos[1] < upperLimit;
 		bool isFastEnough = (speed [0] >= minimalHorizontalSpeed_ && speed [1] >= minimalHorizontalSpeed_);
@@ -87,7 +87,7 @@ public class GesturePiano : Gesture {
 		previousHandsPosition_ [0] = leftHandPos.x;
 		previousHandsPosition_ [1] = rightHandPos.x;
 
-		Debug.Log (previousHandsPosition_ [0]);
+		//Log.Debug (previousHandsPosition_ [0]);
 
 		if(elapsedTime_ >= gestureTime_)
 		{
@@ -119,7 +119,7 @@ public class GesturePiano : Gesture {
 		return elapsedTime_ / gestureTime_;
 	}
 
-	private float[] getSpeed(Vector3 posActuelleDroite, Vector3 posActuelleGauche)
+	private float[] getSpeed(Vector3 posActuelleGauche, Vector3 posActuelleDroite)
 	{
 		float leftHandSpeed = Mathf.Abs (posActuelleGauche.x - previousHandsPosition_ [0]) / (GestureRecognition.deltaTime);
 		float rightHandSpeed = Mathf.Abs (posActuelleDroite.x - previousHandsPosition_ [1]) / (GestureRecognition.deltaTime);
@@ -140,5 +140,5 @@ public class GesturePiano : Gesture {
 	private const uint MOVES_NUMBER = 3;
 	private const float minHandDepth_ = 0.18f;
 	private const float gestureTimeout_ = 0.5f;
-	private const float minimalHorizontalSpeed_ = 0.2f;
+	private const float minimalHorizontalSpeed_ = 0.4f;
 }

@@ -52,7 +52,7 @@ public class GestureMenu : Gesture {
 
 		if (isHighEnough && handsDistantEnough) {
 			//Debug.Log ("BRAVO GESTE DETECTE");
-			elapsedTime_ += Time.deltaTime;
+			elapsedTime_ += GestureRecognition.deltaTime;
 		}
 		else
 			elapsedTime_ = 0;
