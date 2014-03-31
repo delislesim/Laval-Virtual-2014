@@ -15,6 +15,7 @@ public class TipFollower : MonoBehaviour {
 		// Layer des colliders de drum components.
 		drumComponentLayer = 1 << LayerMask.NameToLayer ("DrumComponent");
 		composanteVisee = null;
+		timeSinceLastHit = 0;
 		resetLastComponentMemory();
 		resetLastOldComponentMemory();
 	}
@@ -25,6 +26,7 @@ public class TipFollower : MonoBehaviour {
 		lastPosition = transform.position;
 
 		currentSpeed = Vector3.Distance (transform.position , beforeLastPos) / Time.deltaTime;
+		timeSinceLastHit = timeSinceLastHit + Time.deltaTime;
 
 		// Suivre l'objet auquel on a été assigné.
 		transform.position = objectToFollow.transform.position;
@@ -54,7 +56,9 @@ public class TipFollower : MonoBehaviour {
 			if (distanceReelle < 0)
 				distanceReelle = 0;
 
+			//Coup valide
 			if (componentInterface != dernierDrumComponent && distanceReelle < kDistancePourJouer) {
+				timeSinceLastHit = 0 ;
 				if(componentInterface == Crash)
 				{
 					componentInterface.PlaySoundWhenAssisted();
@@ -112,6 +116,11 @@ public class TipFollower : MonoBehaviour {
 		return dernierLongMemory;
 	}
 
+	public float GetTimeSinceLastHit()
+	{
+		return timeSinceLastHit;
+	}
+
 	// Derniere position du tip.
 	private Vector3 lastPosition;
 	private Vector3 beforeLastPos;
@@ -136,6 +145,9 @@ public class TipFollower : MonoBehaviour {
 
 	// Distance entre le bout de la baguette et le drum component lors de l'impact.
 	float distanceDernierDrumComponent;
+
+	// Temps accumulé depuis la derniere collision avec un DrumCompnent.
+	float timeSinceLastHit;
 
 	// Layer des colliders de drum components.
 	int drumComponentLayer;

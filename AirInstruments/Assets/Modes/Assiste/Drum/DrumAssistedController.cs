@@ -48,6 +48,7 @@ public class DrumAssistedController : MonoBehaviour {
 	private const float MIN_DIST = 2.5f;
 	private const float MIN_SPEED = 1.0f;
 	private const int BEAT_MEMORY = 1;
+	private const float TIME_TO_MUTE = 0.4f;
 	private bool trackBplaying;
 	//private bool trackAplaying;
 	private bool baseTrackNeeded;
@@ -107,6 +108,19 @@ public class DrumAssistedController : MonoBehaviour {
 			elapsedTime = 0;
 		}
 
+		//Muter si on touche a rien depuis TIME_TO_MUTE
+		if(tipLeft.GetTimeSinceLastHit() > TIME_TO_MUTE && tipRight.GetTimeSinceLastHit() > TIME_TO_MUTE)
+		{
+			baseTrackNeeded = false;
+			baseRythmA.Stop ();
+			baseRythmB.Stop ();
+			track1_A.Stop ();
+			track1_B.Stop ();
+			track2_A.Stop ();
+			track2_B.Stop ();
+		}
+
+		//Arreter les tracks si on touche a rien
 		if(memLeft >= BEAT_MEMORY && memRight >= BEAT_MEMORY)
 			baseTrackNeeded = false;
 		else
