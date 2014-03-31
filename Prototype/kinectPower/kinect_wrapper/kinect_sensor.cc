@@ -219,7 +219,7 @@ int KinectSensor::ChooseBody(int tracked_index, int nBodyCount, IBody** ppBodies
 
   // Constantes pour choisir le meilleur squelette.
   const float kDistanceMaxToTrackSkeleton = 2.25f;
-  const float kXCible = 0.18f;
+  const float kXCible = 0.0f;
   const float kToleranceX = 0.4f;
 
   // Tableau pour accueillir des positions.
