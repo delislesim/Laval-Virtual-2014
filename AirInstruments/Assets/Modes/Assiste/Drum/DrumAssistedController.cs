@@ -107,7 +107,7 @@ public class DrumAssistedController : MonoBehaviour {
 			elapsedTime = 0;
 		}
 
-		if(memLeft > BEAT_MEMORY && memRight > BEAT_MEMORY)
+		if(memLeft >= BEAT_MEMORY && memRight >= BEAT_MEMORY)
 			baseTrackNeeded = false;
 		else
 			baseTrackNeeded = true;
