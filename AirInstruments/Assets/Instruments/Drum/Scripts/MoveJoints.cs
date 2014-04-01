@@ -285,14 +285,14 @@ public class MoveJoints : MonoBehaviour {
 
 	private void HandleBassKick()
 	{
-		//Compare current knee pos to Queue
-		int go = 0;
+		//Compare current knee pos to List
 		float y = current_positions [(int)Skeleton.Joint.KneeRight].y;
 
-		List<float> list = lastKneePositionsY;
-		list.Sort ();
+		List<float> list = new List<float>(lastKneePositionsY);
+		list.Sort();
+		list.Reverse();
 		//Lower than all last positions -> play sound
-		if (y < list[10])
+		if (list.Equals(lastKneePositionsY) /*&& lastKneePositionsY[0]-y > 3*/)
 			Bass_Kick.PlaySound ();
 
 		//On garde les positions dans notre queue.

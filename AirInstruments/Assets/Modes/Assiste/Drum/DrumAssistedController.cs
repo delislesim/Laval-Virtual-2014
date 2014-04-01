@@ -111,6 +111,11 @@ public class DrumAssistedController : MonoBehaviour {
 		//Muter si on touche a rien depuis TIME_TO_MUTE
 		if(tipLeft.GetTimeSinceLastHit() > TIME_TO_MUTE && tipRight.GetTimeSinceLastHit() > TIME_TO_MUTE)
 		{
+
+			baseTrackNeeded = false;
+			track1Needed = false;
+			track2Needed = false;
+			/*
 			baseTrackNeeded = false;
 			baseRythmA.Stop ();
 			baseRythmB.Stop ();
@@ -118,6 +123,9 @@ public class DrumAssistedController : MonoBehaviour {
 			track1_B.Stop ();
 			track2_A.Stop ();
 			track2_B.Stop ();
+			tipLeft.resetLastComponentMemory();
+			tipRight.resetLastComponentMemory();
+			*/
 		}
 
 		//Arreter les tracks si on touche a rien
@@ -172,8 +180,19 @@ public class DrumAssistedController : MonoBehaviour {
 		DrumComponent closestFromLeft;
 		DrumComponent closestFromRight;
 
+		//Check closest drum component and tip memories
 		track1Needed = getClosestDrumComponent(tipLeft, out closestFromLeft);
 		track2Needed = getClosestDrumComponent(tipRight, out closestFromRight);
+
+		//Assure we've been doing something lately
+		//Strategy 2.
+		if(tipLeft.GetTimeSinceLastHit() > TIME_TO_MUTE && tipRight.GetTimeSinceLastHit() > TIME_TO_MUTE)
+		{
+			
+			baseTrackNeeded = false;
+			track1Needed = false;
+			track2Needed = false;
+		}
 
 		bool OnSameComponent = (closestFromLeft == closestFromRight && track1Needed);
 		//No need of 2 tracks if we're hitting the same component with both tips
