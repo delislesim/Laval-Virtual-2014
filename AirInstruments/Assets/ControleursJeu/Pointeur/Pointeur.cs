@@ -121,26 +121,26 @@ public class Pointeur : MonoBehaviour {
 		float avancement;
 
 		if (mainActive == MainActive.GAUCHE) {
-			Vector3 positionMainDepth;
-			skeleton.GetJointPositionDepth(Skeleton.Joint.HandLeft, out positionMainDepth);
+			Vector3 positionMain3d;
+			skeleton.GetJointPosition(Skeleton.Joint.HandLeft, out positionMain3d);
 			Vector3 positionEpaule;
-			skeleton.GetJointPositionDepth(Skeleton.Joint.ShoulderLeft, out positionEpaule);
+			skeleton.GetJointPosition(Skeleton.Joint.ShoulderLeft, out positionEpaule);
 
-			positionMain.x = positionMainDepth.x;
-			positionMain.y = positionMainDepth.y;
+			positionMain.x = positionMain3d.x;
+			positionMain.y = positionMain3d.y;
 
 			positionCentre.x = positionEpaule.x - kDistanceHorizontalCentre;
 			positionCentre.y = positionEpaule.y;
 
 			avancement = avancementMainGauche;
 		} else {
-			Vector3 positionMainDepth;
-			skeleton.GetJointPositionDepth(Skeleton.Joint.HandRight, out positionMainDepth);
+			Vector3 positionMain3d;
+			skeleton.GetJointPosition(Skeleton.Joint.HandRight, out positionMain3d);
 			Vector3 positionEpaule;
-			skeleton.GetJointPositionDepth(Skeleton.Joint.ShoulderRight, out positionEpaule);
+			skeleton.GetJointPosition(Skeleton.Joint.ShoulderRight, out positionEpaule);
 			
-			positionMain.x = positionMainDepth.x;
-			positionMain.y = positionMainDepth.y;
+			positionMain.x = positionMain3d.x;
+			positionMain.y = positionMain3d.y;
 			
 			positionCentre.x = positionEpaule.x + kDistanceHorizontalCentre;
 			positionCentre.y = positionEpaule.y;
@@ -154,7 +154,7 @@ public class Pointeur : MonoBehaviour {
 		Vector4 handPositionTmp = new Vector4 (positionAbsolue.x / kLargeur, positionAbsolue.y / kHauteur, 0, 0);
 		Vector4 handPositionSmooth = kalman.Update (handPositionTmp);
 		handPosition.x = handPositionSmooth.x;
-		handPosition.y = handPositionSmooth.y;
+		handPosition.y = 1.0f - handPositionSmooth.y;
 
 		// Verifier si on clique sur une cible.
 		float pressExtent = (avancement - kDistanceActive) * 15.0f;
@@ -246,10 +246,10 @@ public class Pointeur : MonoBehaviour {
 	private const float kDistanceHorizontalCentre = 0f;
 
 	// Largeur pouvant etre parcourue par une main.
-	private const float kLargeur = 160f;
+	private const float kLargeur = 1.0f;
 
 	// Hauteur pouvant etre parcourue par une main.
-	private const float kHauteur = 90f;
+	private const float kHauteur = 0.6f;
 
 	// Indique quelle main est active.
 	enum MainActive {
@@ -281,7 +281,7 @@ public class Pointeur : MonoBehaviour {
 	private const int kIndexCibleInvalide = -1;
 
 	// Temps nécessaire pour qu'une cible soit considérée choisie.
-	private const float kTempsCibleChoisie = 2.0f;
+	private const float kTempsCibleChoisie = 2.5f;
 
 	// Decalage vertical.
 	private float decalageVertical = 0;
