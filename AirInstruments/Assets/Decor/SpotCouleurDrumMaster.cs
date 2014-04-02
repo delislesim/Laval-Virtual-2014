@@ -22,10 +22,12 @@ public class SpotCouleurDrumMaster : MonoBehaviour {
 			foreach (SpotCouleurDrum spot in spots) {
 				spot.Fermer();
 			}
+			smoke.particleEmitter.emit = false;
 		} else if (!fermePourFeu && this.fermePourFeu) {
 			foreach (SpotCouleurDrum spot in spots) {
 				spot.Allumer();
 			}
+			smoke.particleEmitter.emit = true;
 		}
 		this.fermePourFeu = fermePourFeu;
 	}
