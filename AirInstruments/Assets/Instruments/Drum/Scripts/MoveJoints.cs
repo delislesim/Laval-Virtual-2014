@@ -107,6 +107,7 @@ public class MoveJoints : MonoBehaviour {
 			lastKneePositionsY.Add(-1000.0f);
 		}
 
+		OnEnable ();
 	}
 
 	void OnEnable() {
