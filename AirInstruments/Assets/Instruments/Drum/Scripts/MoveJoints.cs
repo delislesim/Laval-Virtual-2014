@@ -120,7 +120,7 @@ public class MoveJoints : MonoBehaviour {
 			Vector3 posJoint;
 			Skeleton.JointStatus jointStatus = m_player_one.GetJointPosition((Skeleton.Joint)i, out posJoint);
 			if(i == (int)Skeleton.Joint.KneeRight)
-				kalman[i] = new Kalman(5.0f);
+				kalman[i] = new Kalman(1.0f);
 			else
 				kalman[i] = new Kalman(1.0f);
 			posJoint = WorldPositionFromKinectPosition(posJoint);
@@ -208,7 +208,8 @@ public class MoveJoints : MonoBehaviour {
 				    i == (int)Skeleton.Joint.WristLeft ||
 				    i == (int)Skeleton.Joint.WristRight ||
 				    i == (int)Skeleton.Joint.HandTipLeft ||
-				    i == (int)Skeleton.Joint.HandTipRight) {
+				    i == (int)Skeleton.Joint.HandTipRight ||
+				    i == (int)Skeleton.Joint.KneeRight) {
 					Vector4 pos = kalman[i].Update(new Vector4(current_positions[i].x,
 					                                           current_positions[i].y,
 					                                           current_positions[i].z));
