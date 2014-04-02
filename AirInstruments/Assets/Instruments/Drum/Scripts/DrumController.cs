@@ -19,6 +19,12 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 	//Assisted Controller
 	public DrumAssistedController assistedcontroller;
 
+	// Spotlight du drum.
+	public SpotlightControl spotDrum;
+
+	// Effets de lumiere et de fumee du drum.
+	public SpotCouleurDrumMaster spotCouleurDrum;
+
 	// Composants du drum.
 	public DrumComponent crash;
 	public DrumComponent highHat;
@@ -71,6 +77,12 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 
 		// Desactiver les planes de collisions.
 		SetPlanesCollisionsActive (false);
+
+		// Diminuer un peu le spot.
+		spotDrum.SetTargetIntensity (4.0f, 1.0f);
+
+		// Allumer les spots psychedeliques.
+		spotCouleurDrum.Allumer ();
 	}
 
 	private void SetPlanesCollisionsActive(bool active) {

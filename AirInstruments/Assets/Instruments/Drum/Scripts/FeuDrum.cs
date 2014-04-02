@@ -9,6 +9,9 @@ public class FeuDrum : MonoBehaviour {
 	public List<ParticleSystem> tom1;
 	public List<ParticleSystem> tom2;
 
+	// Effets de lumiere et de fumee du drum.
+	public SpotCouleurDrumMaster spotCouleurDrum;
+
 	// Listes de particle systems.
 	private List<List<ParticleSystem>> particle_list;
 
@@ -46,6 +49,7 @@ public class FeuDrum : MonoBehaviour {
 		break;
 		}
 		compteurs [(int)typeEmission] = 0;
+		fireOn [(int)typeEmission] = true;
 	}
 
 	// Use this for initialization
@@ -74,14 +78,22 @@ public class FeuDrum : MonoBehaviour {
 
 		for (int i = 0; i < (int)TypeEmission.COUNT; ++i) {
 			compteurs[i] += Time.deltaTime;
-			if (compteurs[i] >= kTempsDesactiver) {
+			if (compteurs[i] >= kTempsDesactiver[i]) {
 				SetEmettre(false, particle_list[i]);
 				SetActive(false, particle_list[i]);
 				compteurs[i] = 0;
+				fireOn [i] = false;
 			} else if (compteurs[i] >= kTempsArreterEmettre[i]) {
 				SetEmettre(false, particle_list[i]);
 			}
 		}
+
+		bool some_fire = false;
+		for (int i = 0; i < (int)TypeEmission.COUNT; ++i) {
+			if (fireOn[i])
+				some_fire = true;
+		}
+		spotCouleurDrum.SetFermePourFeu (some_fire);
 	}
 
 	void SetEmettre(bool emettre, List<ParticleSystem> particle) {
@@ -100,10 +112,13 @@ public class FeuDrum : MonoBehaviour {
 	private float[] kTempsArreterEmettre = {2.0f, 0.3f, 1.0f, 1.0f};
 
 	// Temps pour desactiver le feu.
-	private const float kTempsDesactiver = 7.0f;
+	private float[] kTempsDesactiver = {4.0f, 1.0f, 3.0f, 3.0f};
 
 	// Compteurs pour fermer les bursts.
 	private float[] compteurs = new float[(int)TypeEmission.COUNT];
+
+	// Indiquer quels feux sont allumes.
+	private bool[] fireOn = {false, false, false, false};
 
 	// Mettre un burst sur le crash.
 	private static bool burstCrash = false;

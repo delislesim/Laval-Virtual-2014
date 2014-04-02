@@ -22,6 +22,9 @@ public class GameState : MonoBehaviour {
 	// Assistance.
 	public GameObject assistance;
 
+	// Effets de lumiere et de fumee du drum.
+	public SpotCouleurDrumMaster spotCouleurDrum;
+
 	// Retourne l'unique instance de la classe GameState.
 	public static GameState ObtenirInstance() {
 		return instance;
@@ -73,6 +76,7 @@ public class GameState : MonoBehaviour {
 			return;
 		}
 
+		spotCouleurDrum.Fermer ();
 		KinectPower.SetAffichageSqueletteActive (false);
 
 		transitionTerminee = false;
