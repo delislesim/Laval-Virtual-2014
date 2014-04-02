@@ -36,11 +36,13 @@ public class DrumHand : MonoBehaviour {
 	}
 
 	private void MettreAJourPosition(Vector3 position) {
+		/*
 		Vector3 motion = position - transform.position;
 
 		CharacterController characterController = GetComponent<CharacterController> ();
 		characterController.Move (motion);
-
+*/
+		transform.position = position;
 		/*
 		// Si la main est trop loin de sa position actuelle selon Kinect, faire
 		// une teleportation.
