@@ -144,10 +144,11 @@ public class PianoNote : MonoBehaviour {
 	public void JouerSon(float volume) {
 		if (!estJouee) {
 			audio.volume = volume;
-			if (!estFadeout || audio.volume < 0.5f) {
+			//if (!estFadeout || audio.volume < 0.5f) {
+				audio.Stop();
 				audio.pitch = Mathf.Pow (2.0f, ecartDemiTon / 12);
 				audio.Play ();
-			}
+			//}
 			estJouee = true;
 			estFadeout = false;
 		}
