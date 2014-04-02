@@ -25,6 +25,8 @@ public class GameState : MonoBehaviour {
 	// Effets de lumiere et de fumee du drum.
 	public SpotCouleurDrumMaster spotCouleurDrum;
 
+	private GuidageController guidageController;
+
 	// Retourne l'unique instance de la classe GameState.
 	public static GameState ObtenirInstance() {
 		return instance;
@@ -37,21 +39,40 @@ public class GameState : MonoBehaviour {
 	void Start () {
 		// Activer l'etat initial de choix d'instrument.
 		AccederEtat (State.ChooseInstrument);
+		guidageController = GuidageController.ObtenirInstance();
 	}
 
 	void Update() {
+
+		if(needToCheckAnimation){
+			if(guidageController.getAniamtionStatus()){
+				AccederEtat(nextState);
+				needToCheckAnimation = false;
+				nextState = State.Unknown;
+			}
+		}
+
 		// Changements d'etat a l'aide du clavier.
 		if (Input.GetButtonDown("ChoixInstrument")) {
 			AccederEtat (State.ChooseInstrument);
 			return;
 		} else if (Input.GetButtonDown("Piano")) {
-			AccederEtat (State.Piano);
+			needToCheckAnimation = true;
+			nextState = State.Piano;
+			guidageController.overrideGeste(GestureId.GESTURE_PIANO);
+			//AccederEtat (State.Piano);
 			return;
 		} else if (Input.GetButtonDown("Drum")) {
-			AccederEtat (State.Drum);
+			needToCheckAnimation = true;
+			nextState = State.Drum;
+			guidageController.overrideGeste(GestureId.GESTURE_DRUM);
+			//AccederEtat (State.Drum);
 			return;
 		} else if (Input.GetButtonDown("Guitare")) {
-			AccederEtat (State.Guitar);
+			needToCheckAnimation = true;
+			nextState = State.Guitar;
+			guidageController.overrideGeste(GestureId.GESTURE_GUITAR);
+			//AccederEtat (State.Guitar);
 			return;
 		} else if (Input.GetKey (KeyCode.Escape)) {
 			Application.Quit ();
@@ -186,6 +207,12 @@ public class GameState : MonoBehaviour {
 
 	// Etat precedent.
 	private GameState.State previousState = State.Unknown;
+
+	// Etat suivant
+	private GameState.State nextState = State.Unknown;
+
+	// Check animation
+	bool needToCheckAnimation = false;
 
 	// Indique si la transition vers l'etat courant est terminee.
 	private bool transitionTerminee = true;

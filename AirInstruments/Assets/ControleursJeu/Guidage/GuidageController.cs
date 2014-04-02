@@ -35,6 +35,12 @@ public class GuidageController : MonoBehaviour
 		private const float kTempsAnimation = 1.0f;
 		private static GuidageController instance;
 
+	private bool isGesteOverriden = false;
+	private GestureId gestureOverriden;
+	private bool isOverridenAnimationFinished = false;
+	private const float overridenAnimationTime = 1.0f;
+	private float elapsedAnimationTime = 0;
+
 		public static GuidageController ObtenirInstance ()
 		{
 				return instance;
@@ -79,6 +85,8 @@ public class GuidageController : MonoBehaviour
 		{
 				timer += Time.deltaTime;
 				timer = timer % kTempsAnimation;
+
+				elapsedAnimationTime += Time.deltaTime;
 
 				/*
 		sumDeltaTime += 1.0f / Time.deltaTime;
@@ -179,23 +187,47 @@ public class GuidageController : MonoBehaviour
 								if (indexAnimation >= guitarGesture.Length) {
 										indexAnimation = guitarGesture.Length - 1;
 								}
+			GUI.BeginGroup (rectangleMenu, skinGuidage.customStyles [0]);
 
-								GUI.BeginGroup (rectangleMenu, skinGuidage.customStyles [0]);
+			if(gestureOverriden == GestureId.GESTURE_PIANO && isGesteOverriden){
+				if((elapsedAnimationTime/overridenAnimationTime+seuilChargement) >= 1.0f) {
+					isGesteOverriden = false;
+					isOverridenAnimationFinished = true;
+					pasChargement = true;
+					elapsedAnimationTime=0.0f;
+				} else {
+					indexChargementAnimation = indexChargement ((elapsedAnimationTime/overridenAnimationTime)+seuilChargement);
+					pasChargement = false;
+				}
+			}
+			else{
+					// L'animation du piano
+					if (gestureEnCours == GestureId.GESTURE_PIANO && completionPiano >= seuilChargement) {
+							pasChargement = false;
+							indexChargementAnimation = indexChargement (completionPiano);
+					} else {
+							pasChargement = true;
+					}
+			}
 
-								// L'animation du piano
-								if (gestureEnCours == GestureId.GESTURE_PIANO && completionPiano >= seuilChargement) {
-										pasChargement = false;
-										indexChargementAnimation = indexChargement (completionPiano);
-								} else {
-										pasChargement = true;
-								}
 								GUI.BeginGroup (new Rect (rectWidthMenuPrincipal * 0.75f, 0, rectWidthMenuPrincipal, rectHeightMenuPrincipal));
 								GUI.DrawTexture (new Rect (0, 0, rectWidthMenuPrincipal, rectHeightMenuPrincipal), menuBackground, ScaleMode.ScaleToFit);
 								GUI.DrawTexture (new Rect (0, 0, rectWidthMenuPrincipal, rectHeightMenuPrincipal), pianoGesture [indexAnimation], ScaleMode.ScaleToFit);
 								if (!pasChargement)		
 										GUI.DrawTexture (new Rect (0, 0, rectWidthMenuPrincipal, rectHeightMenuPrincipal), chargement [indexChargementAnimation], ScaleMode.ScaleToFit);
 								GUI.EndGroup ();
-
+			if(gestureOverriden == GestureId.GESTURE_DRUM && isGesteOverriden){
+				if((elapsedAnimationTime/overridenAnimationTime+seuilChargement) >= 1.0f) {
+					isGesteOverriden = false;
+					isOverridenAnimationFinished = true;
+					pasChargement = true;
+					elapsedAnimationTime=0.0f;
+				} else {
+					indexChargementAnimation = indexChargement ((elapsedAnimationTime/overridenAnimationTime)+seuilChargement);
+					pasChargement = false;
+				}
+			}
+			else{
 								// L'animation du drum
 								if (gestureEnCours == GestureId.GESTURE_DRUM && completionDrum >= seuilChargement) {
 										pasChargement = false;
@@ -203,13 +235,25 @@ public class GuidageController : MonoBehaviour
 								} else {
 										pasChargement = true;
 								}
+			}
 								GUI.BeginGroup (new Rect ((rectangleMenu.width - rectWidthMenuPrincipal) / 2, 0, rectWidthMenuPrincipal, rectHeightMenuPrincipal));
 								GUI.DrawTexture (new Rect (0, 0, rectWidthMenuPrincipal, rectHeightMenuPrincipal), menuBackground, ScaleMode.ScaleToFit);
 								GUI.DrawTexture (new Rect (0, 0, rectWidthMenuPrincipal, rectHeightMenuPrincipal), drumGesture [indexAnimation], ScaleMode.ScaleToFit);
 								if (!pasChargement)		
 										GUI.DrawTexture (new Rect (0, 0, rectWidthMenuPrincipal, rectHeightMenuPrincipal), chargement [indexChargementAnimation], ScaleMode.ScaleToFit);		
 								GUI.EndGroup ();
-
+			if(gestureOverriden == GestureId.GESTURE_GUITAR && isGesteOverriden){
+				if((elapsedAnimationTime/overridenAnimationTime+seuilChargement) >= 1.0f) {
+					isGesteOverriden = false;
+					isOverridenAnimationFinished = true;
+					pasChargement = true;
+					elapsedAnimationTime=0.0f;
+				} else {
+					indexChargementAnimation = indexChargement ((elapsedAnimationTime/overridenAnimationTime)+seuilChargement);
+					pasChargement = false;
+				}
+			}
+			else{
 								// L'animation de la guitare
 								if (gestureEnCours == GestureId.GESTURE_GUITAR && completionGuitare >= seuilChargement) {
 										pasChargement = false;
@@ -217,6 +261,7 @@ public class GuidageController : MonoBehaviour
 								} else {
 										pasChargement = true;
 								}
+			}
 								GUI.BeginGroup (new Rect (rectangleMenu.width - rectWidthMenuPrincipal * 1.75f, 0, rectWidthMenuPrincipal, rectHeightMenuPrincipal));
 								GUI.DrawTexture (new Rect (0, 0, rectWidthMenuPrincipal, rectHeightMenuPrincipal), menuBackground, ScaleMode.ScaleToFit);
 								GUI.DrawTexture (new Rect (0, 0, rectWidthMenuPrincipal, rectHeightMenuPrincipal), guitarGesture [indexAnimation], ScaleMode.ScaleToFit);
@@ -230,12 +275,24 @@ public class GuidageController : MonoBehaviour
 				}
 		}
 
+	public void overrideGeste(GestureId gesture){
+		isOverridenAnimationFinished = false;
+		gestureOverriden = gesture;
+		isGesteOverriden = true;
+
+		elapsedAnimationTime = gestureRecognition.GetGestureCompletion(gesture) * overridenAnimationTime;
+	}
+
+	public bool getAniamtionStatus(){
+		return isOverridenAnimationFinished;
+	}
+
 		public void changerGuidage (typeGuidage type)
 		{
 				typeGuidage = type;
 		}
 
-		private int indexChargement (float completion)
+		private int indexChargement (float completion)//[0,1]
 		{
 				return (int)(((completion - seuilChargement) / (1.0f - seuilChargement)) * (chargement.Length - 1));
 		}
