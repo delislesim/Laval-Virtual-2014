@@ -57,21 +57,27 @@ public class GameState : MonoBehaviour {
 			AccederEtat (State.ChooseInstrument);
 			return;
 		} else if (Input.GetButtonDown("Piano")) {
-			needToCheckAnimation = true;
-			nextState = State.Piano;
-			guidageController.overrideGeste(GestureId.GESTURE_PIANO);
+			if (currentState == State.ChooseInstrument) {
+				needToCheckAnimation = true;
+				nextState = State.Piano;
+				guidageController.overrideGeste(GestureId.GESTURE_PIANO);
+			}
 			//AccederEtat (State.Piano);
 			return;
 		} else if (Input.GetButtonDown("Drum")) {
-			needToCheckAnimation = true;
-			nextState = State.Drum;
-			guidageController.overrideGeste(GestureId.GESTURE_DRUM);
+			if (currentState == State.ChooseInstrument) {
+				needToCheckAnimation = true;
+				nextState = State.Drum;
+				guidageController.overrideGeste(GestureId.GESTURE_DRUM);
+			}
 			//AccederEtat (State.Drum);
 			return;
 		} else if (Input.GetButtonDown("Guitare")) {
-			needToCheckAnimation = true;
-			nextState = State.Guitar;
-			guidageController.overrideGeste(GestureId.GESTURE_GUITAR);
+			if (currentState == State.ChooseInstrument) {
+				needToCheckAnimation = true;
+				nextState = State.Guitar;
+				guidageController.overrideGeste(GestureId.GESTURE_GUITAR);
+			}
 			//AccederEtat (State.Guitar);
 			return;
 		} else if (Input.GetKey (KeyCode.Escape)) {

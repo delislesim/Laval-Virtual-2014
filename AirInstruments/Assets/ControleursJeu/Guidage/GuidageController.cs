@@ -193,6 +193,7 @@ public class GuidageController : MonoBehaviour
 				if((elapsedAnimationTime/overridenAnimationTime+seuilChargement) >= 1.0f) {
 					isGesteOverriden = false;
 					isOverridenAnimationFinished = true;
+					GestureRecognition.Bloquer (false);
 					pasChargement = true;
 					elapsedAnimationTime=0.0f;
 				} else {
@@ -220,6 +221,7 @@ public class GuidageController : MonoBehaviour
 				if((elapsedAnimationTime/overridenAnimationTime+seuilChargement) >= 1.0f) {
 					isGesteOverriden = false;
 					isOverridenAnimationFinished = true;
+					GestureRecognition.Bloquer (false);
 					pasChargement = true;
 					elapsedAnimationTime=0.0f;
 				} else {
@@ -246,6 +248,7 @@ public class GuidageController : MonoBehaviour
 				if((elapsedAnimationTime/overridenAnimationTime+seuilChargement) >= 1.0f) {
 					isGesteOverriden = false;
 					isOverridenAnimationFinished = true;
+					GestureRecognition.Bloquer (false);
 					pasChargement = true;
 					elapsedAnimationTime=0.0f;
 				} else {
@@ -281,6 +284,7 @@ public class GuidageController : MonoBehaviour
 		isGesteOverriden = true;
 
 		elapsedAnimationTime = gestureRecognition.GetGestureCompletion(gesture) * overridenAnimationTime;
+		GestureRecognition.Bloquer (true);
 	}
 
 	public bool getAniamtionStatus(){

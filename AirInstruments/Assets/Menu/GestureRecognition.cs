@@ -75,6 +75,10 @@ public class GestureRecognition : MonoBehaviour {
 		}
 	}
 
+	public static void Bloquer(bool bloqueParam) {
+		bloque = bloqueParam;
+	}
+
 	public void AddGesture(Gesture gesture) {
 		gestureList.Add(gesture);
 	}
