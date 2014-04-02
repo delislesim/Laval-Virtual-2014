@@ -13,9 +13,9 @@ public class DrumEtapeImprovisez : EtapeTutorial {
 	// l'execution de cette etape du tutorial.
 	public string ObtenirTexte() {
 		if(!Langue.isEnglish)
-			return "Improvisez vos propres rythmes.";
+			return "Bienvenu dans le mode assité, improvisez vos propres rythmes.";
 		else
-			return "Improvise your own beats.";
+			return "Welcome to the assisted mode, improvise your own beats.";
 	}
 	
 	// Retourne la voix lisant l'instruction.

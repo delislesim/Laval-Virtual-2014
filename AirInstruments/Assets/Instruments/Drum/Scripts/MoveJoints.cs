@@ -44,7 +44,7 @@ public class MoveJoints : MonoBehaviour {
 	private Quaternion[] last_rotations;
 	//private const float KICK_SPEED = 1.0f;
 	//private const float HH_SPEED = 1.0f;
-	private const int NUMBER_OF_KNEE_POS = 10;
+	private const int NUMBER_OF_KNEE_POS = 40;
 	private Vector3 HIDING_POS = new Vector3(0,-150,-150);
 	private bool kick_ready;
 	//private bool hit_hat_ready;
@@ -106,6 +106,7 @@ public class MoveJoints : MonoBehaviour {
 		for (int i = 0; i < NUMBER_OF_KNEE_POS; ++i) {
 			lastKneePositionsY.Add(-1000.0f);
 		}
+		timeSinceLastKick = 0;
 
 		OnEnable ();
 	}
@@ -118,13 +119,17 @@ public class MoveJoints : MonoBehaviour {
 		for (int i = 0; i < kalman.Length; ++i) {
 			Vector3 posJoint;
 			Skeleton.JointStatus jointStatus = m_player_one.GetJointPosition((Skeleton.Joint)i, out posJoint);
-			kalman[i] = new Kalman(1.0f);
+			if(i == (int)Skeleton.Joint.KneeRight)
+				kalman[i] = new Kalman(5.0f);
+			else
+				kalman[i] = new Kalman(1.0f);
 			kalman[i].SetInitialObservation(new Vector4(posJoint.x, posJoint.y, posJoint.z));
 		}
 	}
 	
 	// Update is called once per frame
 	void Update () {
+		timeSinceLastKick = timeSinceLastKick+Time.deltaTime;
 		m_player_one.ReloadSkeleton ();
 
 		if (m_player_one.IsDifferent()) {
@@ -233,7 +238,7 @@ public class MoveJoints : MonoBehaviour {
 			current_positions[i] = joints[i].transform.position;
 			current_rotations[i] = joints[i].transform.localRotation;
 			//Play basskick if we should
-			//HandleBassKick();
+			HandleBassKick();
 		}
 
 		// Rotation des mains.
@@ -293,16 +298,21 @@ public class MoveJoints : MonoBehaviour {
 		list.Sort();
 		list.Reverse();
 		//Lower than all last positions -> play sound
-		if (list.Equals(lastKneePositionsY) /*&& lastKneePositionsY[0]-y > 3*/)
-			Bass_Kick.PlaySound ();
+
+		//Log.Debug("LOLZ " + timeSinceLastKick);
+		if (list[0] - y >0.15f && timeSinceLastKick>0.12)
+		{
+			Bass_Kick.PlaySoundWhenAssisted ();
+			timeSinceLastKick = 0;
+			for (int i = 0; i < NUMBER_OF_KNEE_POS; ++i) {
+				lastKneePositionsY.Add(-1000.0f);
+			}
+		}
 
 		//On garde les positions dans notre queue.
 
 		lastKneePositionsY = lastKneePositionsY.GetRange(1,NUMBER_OF_KNEE_POS-1);
 		lastKneePositionsY.Add(y);
-		Log.Debug ("Count de la liste : " + lastKneePositionsY.Count);
-		Log.Debug ("Hauteur max : " + list[0]);
-
 
 	}
 	
@@ -338,6 +348,6 @@ public class MoveJoints : MonoBehaviour {
 	// Filtres de Kalman.
 	private Kalman[] kalman = new Kalman[(int)KinectHelpers.Skeleton.Joint.Count];
 
-
+	private float timeSinceLastKick;
 }
 
