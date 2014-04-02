@@ -91,7 +91,7 @@ public class GestureDrum : Gesture {
 		// If activated verify that speed is high enough
 		float leftHandSpeed = Mathf.Abs (leftHandPos [1] - previousHandsPosition_ [0]) / (GestureRecognition.deltaTime);
 		float rightHandSpeed = Mathf.Abs (rightHandPos [1] - previousHandsPosition_ [1]) / (GestureRecognition.deltaTime);
-		Log.Debug ("boubou: " + leftHandSpeed);
+		//Log.Debug ("boubou: " + leftHandSpeed);
 
 		previousHandsPosition_[0] = leftHandPos[1];
 		previousHandsPosition_[1] = rightHandPos[1];
