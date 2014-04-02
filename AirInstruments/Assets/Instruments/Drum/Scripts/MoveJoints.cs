@@ -115,6 +115,8 @@ public class MoveJoints : MonoBehaviour {
 		if (m_player_one == null)
 			return;
 
+		kickEnabled = true;
+
 		// Mettre les valeurs initiales dans le filtre de Kalman.
 		for (int i = 0; i < kalman.Length; ++i) {
 			Vector3 posJoint;
@@ -130,6 +132,10 @@ public class MoveJoints : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (Input.GetButtonDown ("Kick")) {
+			kickEnabled = !kickEnabled;
+		}
+
 		timeSinceLastKick = timeSinceLastKick+Time.deltaTime;
 		m_player_one.ReloadSkeleton ();
 
@@ -293,6 +299,9 @@ public class MoveJoints : MonoBehaviour {
 
 	private void HandleBassKick()
 	{
+		if (!kickEnabled)
+			return;
+
 		//Compare current knee pos to List
 		float y = current_positions [(int)Skeleton.Joint.KneeRight].y;
 
@@ -351,5 +360,8 @@ public class MoveJoints : MonoBehaviour {
 	private Kalman[] kalman = new Kalman[(int)KinectHelpers.Skeleton.Joint.Count];
 
 	private float timeSinceLastKick;
+
+	// Indique si le kick est active.
+	private bool kickEnabled = true;
 }
 
