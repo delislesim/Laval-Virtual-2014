@@ -41,6 +41,7 @@ public class DrumHand : MonoBehaviour {
 		CharacterController characterController = GetComponent<CharacterController> ();
 		characterController.Move (motion);
 
+		/*
 		// Si la main est trop loin de sa position actuelle selon Kinect, faire
 		// une teleportation.
 		if ((transform.position - position).magnitude > kDistanceTeleportation) {
@@ -48,6 +49,7 @@ public class DrumHand : MonoBehaviour {
 				transform.position = position;
 			}
 		}
+		*/
 	}
 
 	// Distance maximale pour une teleportation.
