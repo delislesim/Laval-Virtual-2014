@@ -123,6 +123,7 @@ public class MoveJoints : MonoBehaviour {
 				kalman[i] = new Kalman(5.0f);
 			else
 				kalman[i] = new Kalman(1.0f);
+			posJoint = WorldPositionFromKinectPosition(posJoint);
 			kalman[i].SetInitialObservation(new Vector4(posJoint.x, posJoint.y, posJoint.z));
 		}
 	}

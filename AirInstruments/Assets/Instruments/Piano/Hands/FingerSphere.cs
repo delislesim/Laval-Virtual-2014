@@ -117,6 +117,7 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 		projector.SetActive (true);
 
 		// Empecher de glisser en x si on est en train de jouer une note.
+		/*
 		if (noteJouee != null) {
 			Vector3 positionNote = transform.parent.InverseTransformPoint(noteJouee.transform.position);
 			Vector3 positionDoigt = transform.localPosition;
@@ -126,6 +127,7 @@ public class FingerSphere : MonoBehaviour, HandJointSphereI {
 				targetPosition.x = positionNote.x;
 			}
 		}
+		*/
 
 		// Mettre a jour la position.
 		if (!initialized) {
