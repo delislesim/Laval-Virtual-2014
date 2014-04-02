@@ -33,6 +33,9 @@ public class MoveJointsForGuitar : MonoBehaviour {
 	// Hand follower.
 	public HandFollower handFollower;
 
+	// Kalman pour tous les joints.
+	private Kalman[] kalman = new Kalman[(int)Skeleton.Joint.Count];
+
 	//public GuitarPlayer GuitPlayer;
 	public Transform GuitarContainer;
 
@@ -85,13 +88,27 @@ public class MoveJointsForGuitar : MonoBehaviour {
 
 		// Se "connecter" au squelette 0.
 		m_player_one = new Skeleton(0);
+
+		OnEnable ();
 	}
 
 	void OnEnable () {
-		kalmanMainGauche = new Kalman (15.0f);
-		kalmanMainDroite = new Kalman (7.0f);
+		if (m_player_one == null)
+			return;
 
 		proportionColonneGuitare = 0.5f;
+
+		// Initialiser Kalman.
+		for (int i = 0; i < kalman.Length; ++i) {
+			if (i == (int)Skeleton.Joint.HandRight || i == (int)Skeleton.Joint.WristRight) {
+				kalman[i] = new Kalman(1.0f);
+			} else {
+				kalman[i] = new Kalman(4.0f);
+			}
+			Vector3 posJoint;
+			Skeleton.JointStatus jointStatus = m_player_one.GetJointPosition((Skeleton.Joint)i, out posJoint);
+			kalman[i].SetInitialObservation(WorldPositionFromKinectPosition(posJoint));
+		}
 	}
 	
 	// Update is called once per frame
@@ -141,22 +158,13 @@ public class MoveJointsForGuitar : MonoBehaviour {
 				     i == (int)Skeleton.Joint.ThumbLeft ||
 				     i == (int)Skeleton.Joint.ThumbRight))
 				{
-					// Appliquer un filtre de Kalman au mains.
-					if (i == (int)Skeleton.Joint.HandLeft) {
-						Vector3 positionPoignet;
-						player.GetJointPosition(Skeleton.Joint.WristLeft, out positionPoignet);
-						posJoint = AppliquerKalmanMain(kalmanMainGauche, positionPoignet, posJoint);
-					} else if (i == (int)Skeleton.Joint.HandRight) {
-						Vector3 positionPoignet;
-						player.GetJointPosition(Skeleton.Joint.WristRight, out positionPoignet);
-						posJoint = AppliquerKalmanMain(kalmanMainDroite, positionPoignet, posJoint);
-					}
+					// Appliquer le filtre de Kalman.
+					//if (i != (int)Skeleton.Joint.WristLeft && i != (int)Skeleton.Joint.HandLeft) {
+						posJoint = kalman[i].Update(posJoint);
+					//}
 
 					//POSITIONS
-					joints[i].transform.position = 
-						new Vector3(posJoint.x*PLAYER_HIGHT, posJoint.y*PLAYER_HIGHT+2.5f, -posJoint.z*PLAYER_HIGHT)
-							+ kDeplacementJoueur;
-
+					joints[i].transform.position = WorldPositionFromKinectPosition(posJoint);
 					joints[i].renderer.enabled = true;
 
 				}
@@ -176,6 +184,11 @@ public class MoveJointsForGuitar : MonoBehaviour {
 		manageMouvementsAndSounds(current_positions, last_positions);
 	}
 
+	Vector3 WorldPositionFromKinectPosition(Vector3 kinectPosition) {
+		return new Vector3(kinectPosition.x*PLAYER_HIGHT, kinectPosition.y*PLAYER_HIGHT+2.5f, -kinectPosition.z*PLAYER_HIGHT)
+							+ kDeplacementJoueur;
+	}
+
 	// Retourne une position ajustee pour la main.
 	Vector3 PositionMainAjustee(Vector3 positionCoude, Vector3 positionPoignet) {
 		if (positionCoude == positionPoignet)
@@ -185,12 +198,14 @@ public class MoveJointsForGuitar : MonoBehaviour {
 		return positionPoignet + avantBras.normalized * kLongueurPoignetMain;
 	}
 
+	/*
 	Vector3 AppliquerKalmanMain(Kalman kalman, Vector3 posPoignet, Vector3 posMain) {
 		Vector3 posRelative = posMain - posPoignet;
 		Vector4 newPosRelative = kalman.Update(new Vector4(posRelative.x, posRelative.y, posRelative.z, 0));
 		return posPoignet + new Vector3(newPosRelative.x, newPosRelative.y, newPosRelative.z);
 	}
 
+*/
 	public static Vector3 GetPositionGuitare() {
 		return positionGuitare;
 	}
@@ -229,12 +244,6 @@ public class MoveJointsForGuitar : MonoBehaviour {
 
 	// Longueur entre le poignet et la main.
 	private const float kLongueurPoignetMain = 0.1f;
-
-	// Kalman pour la main gauche (position relative au poignet).
-	private Kalman kalmanMainGauche;
-
-	// Kalman pour la main droite (position relative au poignet).
-	private Kalman kalmanMainDroite;
 
 	// Proportion de la colonne ou mettre la guitare.
 	private float proportionColonneGuitare = 0.0f;
