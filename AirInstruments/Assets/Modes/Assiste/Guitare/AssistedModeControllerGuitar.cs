@@ -96,8 +96,8 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 	}
 
 	public static bool EstActive() {
-		return partition != null &&
-			tempsEcoule < partition [partition.Count - 1].time + 5.0f; // Attendre 1 seconde apres la fin de la musique.
+		return partition != null && isActive;
+			//tempsEcoule < partition [partition.Count - 1].time - 1.0f; // Attendre 1 seconde apres la fin de la musique.
 	}
 
 	public static bool EstSolo() {
@@ -107,18 +107,15 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 	void Update () {
 
 
-		if (partition == null || tempsEcoule > partition [partition.Count - 1].time + 6.0f)
+		if (partition == null || tempsEcoule > partition [partition.Count - 1].time - 0.1f)
 			return;
 
-		tempsEcoule = audio.timeSamples/44100.0f + 0.055f;
-		//Log.Debug("Temps de chanson : " + tempsEcoule);
-
-		// Temps actuel, en secondes.
-		//Set le tone et style de la note a jouer
+		tempsEcoule = audio.timeSamples/44100.0f + 0.05f;
+		isActive = audio.isPlaying;
 		//tempsEcoule = tempsEcoule + Time.deltaTime;
 
 
-		if(currentPartitionIndex < partition.Count-1) {
+		if(currentPartitionIndex < partition.Count) {
 			if (tempsEcoule >= partition[currentPartitionIndex+1].time) {
 
 				currentPartitionIndex ++;
@@ -169,7 +166,7 @@ public class AssistedModeControllerGuitar : MonoBehaviour {
 
 	private GuitarPlayer.Tone currentTone;
 	private GuitarPlayer.Style currentStyle;
-
+	private static bool isActive;
 	// Guitar player.
 	private GuitarPlayer guitarPlayer;
 }
