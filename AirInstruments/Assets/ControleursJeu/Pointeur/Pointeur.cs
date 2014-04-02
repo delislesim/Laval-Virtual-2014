@@ -101,29 +101,21 @@ public class Pointeur : MonoBehaviour {
 		}
 
 		// Si aucune main n'est active, on doit en choisir une.
-		if (mainActive == MainActive.AUCUNE) {
+		//if (mainActive == MainActive.AUCUNE) {
 			if (avancementMainGauche > avancementMainDroite) {
 				if (avancementMainGauche > kDistanceActive) {
 					timerChangerMain += Time.deltaTime;
-					//if (timerChangerMain > kTempsChangerMain) {
-						mainActive = MainActive.GAUCHE;
-						timerChangerMain = 0;
-					//}
-				} else {
+					mainActive = MainActive.GAUCHE;
 					timerChangerMain = 0;
 				}
 			} else {
 				if (avancementMainDroite > kDistanceActive) {
 					timerChangerMain += Time.deltaTime;
-					//if (timerChangerMain > kTempsChangerMain) {
-						mainActive = MainActive.DROITE;
-						timerChangerMain = 0;
-					//}
-				} else {
+					mainActive = MainActive.DROITE;
 					timerChangerMain = 0;
 				}
 			}
-		}
+		//}
 
 		// S'il n'y a toujours aucune main active, on abandonne.
 		if (mainActive == MainActive.AUCUNE)
@@ -169,7 +161,7 @@ public class Pointeur : MonoBehaviour {
 		Vector4 handPositionSmooth = kalman.Update (handPositionTmp);
 		handPosition.x = handPositionSmooth.x;
 		handPosition.y = 1.0f - handPositionSmooth.y;
-
+		
 		// Verifier si on clique sur une cible.
 		float pressExtent = (avancement - kDistanceActive) * 15.0f;
 
@@ -185,11 +177,7 @@ public class Pointeur : MonoBehaviour {
 			}
 
 			// Augmenter le compteur de la cible.
-			if (pressExtent > 1.0f) {
-				tempsCibleActuelle += Time.deltaTime * pressExtent;
-			} else {
-				tempsCibleActuelle += Time.deltaTime;
-			}
+			tempsCibleActuelle += Time.deltaTime;
 
 			// Determiner quelle image de main afficher.
 			//indexImageMain = (int)(tempsCibleActuelle * imagesMain.Count / kTempsCibleChoisie);
@@ -254,16 +242,16 @@ public class Pointeur : MonoBehaviour {
 	private Skeleton skeleton = new Skeleton(0);
 
 	// Distance pour qu'une main soit consideree active.
-	private const float kDistanceActive = 0.25f;
+	private const float kDistanceActive = 0.15f;
 
 	// Distance horizontale entre l'epaule et le "centre de l'ecran".
 	private const float kDistanceHorizontalCentre = 0f;
 
 	// Largeur pouvant etre parcourue par une main.
-	private const float kLargeur = 1.0f;
+	private const float kLargeur = 0.9f;
 
 	// Hauteur pouvant etre parcourue par une main.
-	private const float kHauteur = 0.6f;
+	private const float kHauteur = 0.55f;
 
 	// Indique quelle main est active.
 	enum MainActive {
@@ -295,7 +283,7 @@ public class Pointeur : MonoBehaviour {
 	private const int kIndexCibleInvalide = -1;
 
 	// Temps nécessaire pour qu'une cible soit considérée choisie.
-	private const float kTempsCibleChoisie = 2.5f;
+	private const float kTempsCibleChoisie = 1.15f;
 
 	// Kalman pour le pointeur.
 	private Kalman kalman = new Kalman (5.0f);
@@ -304,5 +292,5 @@ public class Pointeur : MonoBehaviour {
 	private float timerChangerMain = 0;
 
 	// Temps pour changer de main.
-	private float kTempsChangerMain = 0.15f;
+	private float kTempsChangerMain = 0.25f;
 }

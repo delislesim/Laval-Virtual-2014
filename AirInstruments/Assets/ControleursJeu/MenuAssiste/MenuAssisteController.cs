@@ -84,32 +84,42 @@ public class MenuAssisteController : MonoBehaviour {
 	void OnEnable () {
 		Pointeur pointeur = Pointeur.obtenirInstance ();
 
+		float largeur = 0.24f / 2.0f;
+		float hauteur = 0.38f / 2.0f;
+
+		float yHaut = 0.48f;
+		float yBas = 0.08f;
+
+		float xGauche = 0.325f;
+		float xCentre = 0.565f;
+		float xDroite = 0.79f;
+
 		// Mettre les bonnes cibles pour le pointeur.
 		pointeur.RemoveAllTargets ();
 		if (!boutons[0].GetComponent<BoutonMusique> ().EstDesactive()) {
-			pointeur.AddTarget (0, new Vector2 (19.0f/68.0f, 0.34f), new Vector2 (7.0f/68.0f, 14.0f/38.0f));
+			pointeur.AddTarget (0, new Vector2 (xGauche, (yHaut + yBas) / 2.0f), new Vector2 (largeur, hauteur * 2.0f));
 			pointeur.SetBoutonRetourPresent (true);
 		} else {
 			pointeur.SetBoutonRetourPresent (false);
 		}
 
 		if (!boutons[1].GetComponent<BoutonMusique> ().EstDesactive())
-			pointeur.AddTarget (1, new Vector2 (44.0f/68.0f, 0.13f), new Vector2 (14.0f/68.0f, 7.0f/38.0f));
+			pointeur.AddTarget (1, new Vector2 ((xCentre + xDroite) / 2.0f, yHaut), new Vector2 (largeur * 2.0f, hauteur));
 		
 		if (!boutons[2].GetComponent<BoutonMusique> ().EstDesactive())
-			pointeur.AddTarget (2, new Vector2 (44.0f/68.0f, 0.55f), new Vector2 (14.0f/68.0f, 7.0f/38.0f));
+			pointeur.AddTarget (2, new Vector2 ((xCentre + xDroite) / 2.0f, yBas), new Vector2 (largeur * 2.0f, hauteur));
 
 		if (!boutons[3].GetComponent<BoutonMusique> ().EstDesactive())
-			pointeur.AddTarget (3, new Vector2 (37.0f/68.0f, 0.55f), new Vector2 (7.0f/68.0f, 7.0f/38.0f));
+			pointeur.AddTarget (3, new Vector2 (xGauche, yBas), new Vector2 (largeur, hauteur));
 
 		if (!boutons[4].GetComponent<BoutonMusique> ().EstDesactive())
-			pointeur.AddTarget (4, new Vector2 (51.0f/68.0f, 0.55f), new Vector2 (7.0f/68.0f, 7.0f/38.0f));
+			pointeur.AddTarget (4, new Vector2 (xDroite, yBas), new Vector2 (largeur, hauteur));
 
 		if (!boutons[5].GetComponent<BoutonMusique> ().EstDesactive())
-			pointeur.AddTarget (5, new Vector2 (37.0f/68.0f, 0.13f), new Vector2 (7.0f/68.0f, 7.0f/38.0f));
+			pointeur.AddTarget (5, new Vector2 (xGauche, yHaut), new Vector2 (largeur, hauteur));
 		
 		if (!boutons[6].GetComponent<BoutonMusique> ().EstDesactive())
-			pointeur.AddTarget (6, new Vector2 (51.0f/68.0f, 0.13f), new Vector2 (7.0f/68.0f, 7.0f/38.0f));
+			pointeur.AddTarget (6, new Vector2 (xDroite, yHaut), new Vector2 (largeur, hauteur));
 
 		// Activer le pointeur.
 		pointeur.gameObject.SetActive (true);

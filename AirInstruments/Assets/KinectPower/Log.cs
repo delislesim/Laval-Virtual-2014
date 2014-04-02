@@ -31,7 +31,7 @@ public class Log : MonoBehaviour {
 
 	private static string messageStatic;
 
-	private Rect rect = new Rect(0, 0, 600, 800);
+	private Rect rect = new Rect(0, 0, 600, 200);
 
 	private static System.IO.StreamWriter file;
 }
