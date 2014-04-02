@@ -102,7 +102,9 @@ public class GuidageController : MonoBehaviour
 		{
 				GUI.skin = skinGuidage;
 
-				//GUI.Label (new Rect (50, 50, 1000, 300), "FPS: " + fps);
+				string mode;
+				float rectHeightMode = rectHeight / 1.5f;
+				float rectWidthMode = rectWidth / 1.5f;
 
 				float completionPiano = gestureRecognition.GetGestureCompletion (GestureId.GESTURE_PIANO);
 				float completionDrum = gestureRecognition.GetGestureCompletion (GestureId.GESTURE_DRUM);
@@ -136,6 +138,16 @@ public class GuidageController : MonoBehaviour
 								GUI.DrawTexture (new Rect (0, -6, rectWidth, rectHeight * proportionPicto * 1.2f), chargement [indexChargementAnimation], ScaleMode.ScaleToFit);
 						GUI.Label (new Rect (0, rectHeight * proportionPicto, rectWidth, rectHeight * (1 - proportionPicto)), "Menu");
 						GUI.EndGroup ();
+
+			//Afficher le mode (assité ou libre)
+						GUI.BeginGroup (new Rect (Screen.width - rectWidthMode*1.2f, Screen.height - rectHeightMode, rectWidthMode, rectHeightMode));
+						if (AssistedModeControllerGuitar.EstActive () || DrumAssistedController.EstActive ()) {
+								mode = "Mode assisté";
+						} else {
+								mode = "Mode libre";
+						}
+						GUI.Label (new Rect (0, 0, rectWidthMode, rectHeightMode), mode);
+						GUI.EndGroup ();
 						break;
 				case typeGuidage.PIANO:
 						if (gestureEnCours == GestureId.GESTURE_MENU && completionMenu >= seuilChargement) {
@@ -149,6 +161,16 @@ public class GuidageController : MonoBehaviour
 						if (!pasChargement)		
 								GUI.DrawTexture (new Rect (0, -6, rectWidth, rectHeight * proportionPicto), chargement [indexChargementAnimation], ScaleMode.ScaleToFit);
 						GUI.Label (new Rect (0, rectHeight * proportionPicto, rectWidth, rectHeight * (1 - proportionPicto)), "Menu");
+						GUI.EndGroup ();
+
+			//Afficher le mode (assité ou libre)
+						GUI.BeginGroup (new Rect (Screen.width - rectWidthMode*1.2f, 0, rectWidthMode, rectHeightMode));
+						if (AssistedModeControllerPiano.EstActive ()) {
+								mode = "Mode assisté";
+						} else {
+								mode = "Mode libre";
+						}
+						GUI.Label (new Rect (0, 0, rectWidthMode, rectHeightMode), mode);
 						GUI.EndGroup ();
 						break;
 				case typeGuidage.MENU_PRINCIPAL:
