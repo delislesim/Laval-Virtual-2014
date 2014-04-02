@@ -32,7 +32,7 @@ public class SpotCouleurDrum : MonoBehaviour {
 			opacite = Lerp.LerpFloat(opacite, kOpaciteMax, kVitesseOpacite * Time.deltaTime);
 		} else if (!allume || fermePourLeFun) {
 			// Animation de fermeture.
-			opacite = Lerp.LerpFloat(opacite, 0, kVitesseOpacite * Time.deltaTime);
+			opacite = Lerp.LerpFloat(opacite, !allume ? 0 : 0.25f, kVitesseOpacite * Time.deltaTime);
 		}
 
 		// Animation de l'angle.
