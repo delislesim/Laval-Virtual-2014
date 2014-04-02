@@ -98,7 +98,7 @@ public class DrumAssistedController : MonoBehaviour {
 	void Update () {
 		elapsedTime = elapsedTime + Time.deltaTime;
 
-		//Track Control
+		//Track Control - Le temps courant tire a sa fin. On prépare le prochain
 		if (elapsedTime >= (SAMPLE_TIME - S_DELAY))
 		{
 			//Debug.Log ("Elapsed time : " + elapsedTime + ", SAMPLE_TIME : " + SAMPLE_TIME + " , S_DELAY : " + S_DELAY);
@@ -175,6 +175,10 @@ public class DrumAssistedController : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// Makes the track choices.
+	/// Logique des tracks selon les coups joués récemment.
+	/// </summary>
 	void MakeTrackChoices()
 	{
 		DrumComponent closestFromLeft;
@@ -193,16 +197,17 @@ public class DrumAssistedController : MonoBehaviour {
 			track1Needed = false;
 			track2Needed = false;
 		}
-
+		 
+		//Est-ce qu'on frappe le meme tambour avec les 2 baguettes?
 		bool OnSameComponent = (closestFromLeft == closestFromRight && track1Needed);
 		//No need of 2 tracks if we're hitting the same component with both tips
-		//track2Needed = (track2Needed && (!OnSameComponent));
 		if(OnSameComponent)
 			track2Needed = false;
 
 		int idxCoups = 0;
 		int idxProb = 0;
 		int bonusForBothHands = OnSameComponent ? 1 : 0;
+		//Log.Debug ("On same component ? " + bonusForBothHands );
 
 		if(track1Needed) // LEFT HAND
 		{
@@ -210,8 +215,9 @@ public class DrumAssistedController : MonoBehaviour {
 			try {
 				//nombre de coups a jouer
 				int nbCoupsReel = closestFromLeft.GetCoupsDernierTemps()  + bonusForBothHands;
-				int nbCoups = Mathf.Min(nbCoupsReel, TracksCollection[closestFromLeft].Count-1);
-				idxCoups = nbCoups;
+				idxCoups = Mathf.Min(nbCoupsReel-1, TracksCollection[closestFromLeft].Count-1);
+				//idxCoups = nbCoups;
+				//Log.Debug ("Nombre de coups détectés " + nbCoups );
 
 				// Feu.
 				if (closestFromRight != null)
@@ -230,10 +236,6 @@ public class DrumAssistedController : MonoBehaviour {
 				}
 
 				idxProb = idxList[UnityEngine.Random.Range(0, idxList.Count)];
-				//Debug.Log("LEFT NAME : " + closestFromLeft.name + ", NB COUPS: " + nbCoups);
-				//Debug.Log("COUNT : " + TracksCollection[closestFromLeft][idxCoups].Count + ", IDX PROB : " + idxProb);
-				//Debug.Log( "COUNT PROB + " + TracksCollection[closestFromdLeft][idxCoups].Count + ",  PROB : " + idxProb);
-
 				setTrack1(TracksCollection[closestFromLeft][idxCoups][idxProb]);
 			}
 			catch (Exception e) {
@@ -243,8 +245,8 @@ public class DrumAssistedController : MonoBehaviour {
 		else
 		{
 			memLeft++;
-			if (memLeft >= BEAT_MEMORY)
-				tipLeft.resetLastOldComponentMemory();
+			//if (memLeft >= BEAT_MEMORY)
+			tipLeft.resetLastOldComponentMemory();
 				
 		}
 		tipLeft.resetLastComponentMemory();
@@ -254,8 +256,7 @@ public class DrumAssistedController : MonoBehaviour {
 			memRight = 0;
 
 			int nbCoupsReel = closestFromRight.GetCoupsDernierTemps() + bonusForBothHands;
-			int nbCoups = Mathf.Min(nbCoupsReel, TracksCollection[closestFromRight].Count-1);
-			idxCoups = nbCoups;
+			idxCoups = Mathf.Min(nbCoupsReel -1, TracksCollection[closestFromRight].Count-1);
 
 			// Feu.
 			if (closestFromLeft != null)
@@ -273,15 +274,12 @@ public class DrumAssistedController : MonoBehaviour {
 			}
 			
 			idxProb = idxList[UnityEngine.Random.Range(0, idxList.Count)];
-			//Debug.Log("RIGHT NAME : " + closestFromRight.name + ", NB COUPS: " + nbCoups);
-			//Debug.Log("COUNT : " + TracksCollection[closestFromRight][idxCoups].Count + ", IDX PROB : " + idxProb);
-
 			setTrack2(TracksCollection[closestFromRight][idxCoups][idxProb]);
 		}
 		else
 		{
 			memRight++;
-			if (memRight >= BEAT_MEMORY)
+		//	if (memRight >= BEAT_MEMORY)
 			tipRight.resetLastOldComponentMemory();
 		}
 		tipRight.resetLastComponentMemory();
