@@ -24,12 +24,13 @@ public class Pointeur : MonoBehaviour {
 		}
 	}
 
-	public static Pointeur obtenirInstance() {
-		return instance;
+	void OnEnable() {
+		kalman.SetInitialObservation (Vector4.zero);
+		timerChangerMain = 0;
 	}
 
-	public void AppliquerDecalageVertical(float decalageVertical) {
-		this.decalageVertical = decalageVertical;
+	public static Pointeur obtenirInstance() {
+		return instance;
 	}
 
 	public void RemoveAllTargets() {
@@ -37,7 +38,6 @@ public class Pointeur : MonoBehaviour {
 		indexCibleActuelle = kIndexCibleInvalide;
 		tempsCibleActuelle = 0;
 		indexImageMain = 0;
-		decalageVertical = 0;
 	}
 
 	public void AddTarget(int targetId,
@@ -93,20 +93,34 @@ public class Pointeur : MonoBehaviour {
 		float avancementMainDroite = positionShoulders.z - positionHandRight.z;
 
 		// Si la main actuelle a trop reculee, on ne la considere plus active.
-		if (mainActive == MainActive.GAUCHE && avancementMainGauche > kDistanceActive)
+		if (mainActive == MainActive.GAUCHE && avancementMainGauche < kDistanceActive) {
 			mainActive = MainActive.AUCUNE;
-		if (mainActive == MainActive.DROITE && avancementMainDroite > kDistanceActive)
+		}
+		if (mainActive == MainActive.DROITE && avancementMainDroite < kDistanceActive) {
 			mainActive = MainActive.AUCUNE;
+		}
 
 		// Si aucune main n'est active, on doit en choisir une.
 		if (mainActive == MainActive.AUCUNE) {
 			if (avancementMainGauche > avancementMainDroite) {
 				if (avancementMainGauche > kDistanceActive) {
-					mainActive = MainActive.GAUCHE;
+					timerChangerMain += Time.deltaTime;
+					//if (timerChangerMain > kTempsChangerMain) {
+						mainActive = MainActive.GAUCHE;
+						timerChangerMain = 0;
+					//}
+				} else {
+					timerChangerMain = 0;
 				}
 			} else {
 				if (avancementMainDroite > kDistanceActive) {
-					mainActive = MainActive.DROITE;
+					timerChangerMain += Time.deltaTime;
+					//if (timerChangerMain > kTempsChangerMain) {
+						mainActive = MainActive.DROITE;
+						timerChangerMain = 0;
+					//}
+				} else {
+					timerChangerMain = 0;
 				}
 			}
 		}
@@ -283,9 +297,12 @@ public class Pointeur : MonoBehaviour {
 	// Temps nécessaire pour qu'une cible soit considérée choisie.
 	private const float kTempsCibleChoisie = 2.5f;
 
-	// Decalage vertical.
-	private float decalageVertical = 0;
-
 	// Kalman pour le pointeur.
 	private Kalman kalman = new Kalman (5.0f);
+
+	// Timer pour changer de main.
+	private float timerChangerMain = 0;
+
+	// Temps pour changer de main.
+	private float kTempsChangerMain = 0.15f;
 }
