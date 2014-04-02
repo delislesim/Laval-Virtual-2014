@@ -8,8 +8,8 @@ public class GestureGuitar : Gesture {
 	private const float minHeightRightFromHead_ = -0.25f;
 	private const float maxHeightFromHead = -0.03f;
 	private const float minDistanceToHip_ = 0.25f;
-	private const float gestureTime_ = 3.0f;
-	private const float maxHandsDepth_ = 0.25f;
+	private const float gestureTime_ = 2.0f;
+	private const float maxHandsDepth_ = 0.33f;
 	private const float gestureTimeout_ = 0.5f;
 	private const float minRightHandSpeed_ = 0.3f;
 

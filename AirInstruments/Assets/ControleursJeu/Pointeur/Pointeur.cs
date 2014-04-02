@@ -102,14 +102,14 @@ public class Pointeur : MonoBehaviour {
 
 		// Si aucune main n'est active, on doit en choisir une.
 		//if (mainActive == MainActive.AUCUNE) {
-			if (avancementMainGauche > avancementMainDroite) {
+			if (avancementMainGauche > avancementMainDroite && positionShoulders.y - positionHandLeft.y < 0.20f) {
 				if (avancementMainGauche > kDistanceActive) {
 					timerChangerMain += Time.deltaTime;
 					mainActive = MainActive.GAUCHE;
 					timerChangerMain = 0;
 				}
 			} else {
-				if (avancementMainDroite > kDistanceActive) {
+				if (avancementMainDroite > kDistanceActive && positionShoulders.y - positionHandRight.y < 0.20f) {
 					timerChangerMain += Time.deltaTime;
 					mainActive = MainActive.DROITE;
 					timerChangerMain = 0;
@@ -163,7 +163,7 @@ public class Pointeur : MonoBehaviour {
 		handPosition.y = 1.0f - handPositionSmooth.y;
 		
 		// Verifier si on clique sur une cible.
-		float pressExtent = (avancement - kDistanceActive) * 15.0f;
+		//float pressExtent = (avancement - kDistanceActive) * 15.0f;
 
 		// Si la main est deja sur une cible, augmenter son compteur.
 		if (indexCibleActuelle != kIndexCibleInvalide) {

@@ -87,8 +87,8 @@ public class MenuAssisteController : MonoBehaviour {
 		float largeur = 0.24f / 2.0f;
 		float hauteur = 0.38f / 2.0f;
 
-		float yHaut = 0.48f;
-		float yBas = 0.08f;
+		float yHaut = 0.08f;
+		float yBas = 0.48f;
 
 		float xGauche = 0.325f;
 		float xCentre = 0.565f;
@@ -110,22 +110,19 @@ public class MenuAssisteController : MonoBehaviour {
 			pointeur.AddTarget (2, new Vector2 ((xCentre + xDroite) / 2.0f, yBas), new Vector2 (largeur * 2.0f, hauteur));
 
 		if (!boutons[3].GetComponent<BoutonMusique> ().EstDesactive())
-			pointeur.AddTarget (3, new Vector2 (xGauche, yBas), new Vector2 (largeur, hauteur));
+			pointeur.AddTarget (3, new Vector2 (xCentre, yBas), new Vector2 (largeur, hauteur));
 
 		if (!boutons[4].GetComponent<BoutonMusique> ().EstDesactive())
 			pointeur.AddTarget (4, new Vector2 (xDroite, yBas), new Vector2 (largeur, hauteur));
 
 		if (!boutons[5].GetComponent<BoutonMusique> ().EstDesactive())
-			pointeur.AddTarget (5, new Vector2 (xGauche, yHaut), new Vector2 (largeur, hauteur));
+			pointeur.AddTarget (5, new Vector2 (xCentre, yHaut), new Vector2 (largeur, hauteur));
 		
 		if (!boutons[6].GetComponent<BoutonMusique> ().EstDesactive())
 			pointeur.AddTarget (6, new Vector2 (xDroite, yHaut), new Vector2 (largeur, hauteur));
 
 		// Activer le pointeur.
 		pointeur.gameObject.SetActive (true);
-	}
-	
-	void OnDisable () {
 	}
 
 	// Indique si on est en train de se cacher.
