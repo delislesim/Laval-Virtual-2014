@@ -103,7 +103,7 @@ public class MoveJointsForGuitar : MonoBehaviour {
 			if (i == (int)Skeleton.Joint.HandRight || i == (int)Skeleton.Joint.WristRight) {
 				kalman[i] = new Kalman(1.0f);
 			} else {
-				kalman[i] = new Kalman(4.0f);
+				kalman[i] = new Kalman(2.5f);
 			}
 			Vector3 posJoint;
 			Skeleton.JointStatus jointStatus = m_player_one.GetJointPosition((Skeleton.Joint)i, out posJoint);
