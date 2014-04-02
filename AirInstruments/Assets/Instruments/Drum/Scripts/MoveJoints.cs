@@ -44,7 +44,7 @@ public class MoveJoints : MonoBehaviour {
 	private Quaternion[] last_rotations;
 	//private const float KICK_SPEED = 1.0f;
 	//private const float HH_SPEED = 1.0f;
-	private const int NUMBER_OF_KNEE_POS = 60;
+	private const int NUMBER_OF_KNEE_POS = 40;
 	private Vector3 HIDING_POS = new Vector3(0,-150,-150);
 	private bool kick_ready;
 	//private bool hit_hat_ready;
@@ -119,7 +119,10 @@ public class MoveJoints : MonoBehaviour {
 		for (int i = 0; i < kalman.Length; ++i) {
 			Vector3 posJoint;
 			Skeleton.JointStatus jointStatus = m_player_one.GetJointPosition((Skeleton.Joint)i, out posJoint);
-			kalman[i] = new Kalman(1.0f);
+			if(i == (int)Skeleton.Joint.KneeRight)
+				kalman[i] = new Kalman(5.0f);
+			else
+				kalman[i] = new Kalman(1.0f);
 			kalman[i].SetInitialObservation(new Vector4(posJoint.x, posJoint.y, posJoint.z));
 		}
 	}
@@ -296,10 +299,10 @@ public class MoveJoints : MonoBehaviour {
 		list.Reverse();
 		//Lower than all last positions -> play sound
 
-		Log.Debug("Ecart top et present: " + (list[0] - y));
-		if (list[0] - y >0.15f && timeSinceLastKick>0.15)
+		//Log.Debug("LOLZ " + timeSinceLastKick);
+		if (list[0] - y >0.15f && timeSinceLastKick>0.12)
 		{
-			Bass_Kick.PlaySound ();
+			Bass_Kick.PlaySoundWhenAssisted ();
 			timeSinceLastKick = 0;
 			for (int i = 0; i < NUMBER_OF_KNEE_POS; ++i) {
 				lastKneePositionsY.Add(-1000.0f);
@@ -310,9 +313,6 @@ public class MoveJoints : MonoBehaviour {
 
 		lastKneePositionsY = lastKneePositionsY.GetRange(1,NUMBER_OF_KNEE_POS-1);
 		lastKneePositionsY.Add(y);
-		Log.Debug ("Count de la liste : " + lastKneePositionsY.Count);
-		Log.Debug ("Hauteur max : " + list[0]);
-
 
 	}
 	
