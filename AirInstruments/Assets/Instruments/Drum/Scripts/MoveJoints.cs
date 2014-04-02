@@ -102,12 +102,6 @@ public class MoveJoints : MonoBehaviour {
 		kalman_thumb_left.SetInitialObservation (Vector4.zero);
 		kalman_thumb_right.SetInitialObservation (Vector4.zero);
 
-		// Initialiser les filtres de Kalman.
-		for (int i = 0; i < kalman.Length; ++i) {
-			kalman[i] = new Kalman(1.0f);
-			kalman[i].SetInitialObservation(Vector4.zero);
-		}
-		
 		lastKneePositionsY = new List<float>();
 		for (int i = 0; i < NUMBER_OF_KNEE_POS; ++i) {
 			lastKneePositionsY.Add(-1000.0f);
@@ -123,6 +117,7 @@ public class MoveJoints : MonoBehaviour {
 		for (int i = 0; i < kalman.Length; ++i) {
 			Vector3 posJoint;
 			Skeleton.JointStatus jointStatus = m_player_one.GetJointPosition((Skeleton.Joint)i, out posJoint);
+			kalman[i] = new Kalman(1.0f);
 			kalman[i].SetInitialObservation(new Vector4(posJoint.x, posJoint.y, posJoint.z));
 		}
 	}
@@ -186,6 +181,12 @@ public class MoveJoints : MonoBehaviour {
 				                                                   targetPosition,
 				                                                   kDeplacementMaxTete * Time.deltaTime);
 			} else {
+
+				// Donnee invalide = ne rien faire (pas updater les filtres de Kalman).
+				if (current_positions[i] == HIDING_POS || !IsReliable) {
+					joints[i].renderer.enabled = false;
+					continue;
+				}
 
 				if (i == (int)Skeleton.Joint.HandTipLeft) {
 					current_positions[i] = KalmanRelatif(current_positions[(int)Skeleton.Joint.HandTipLeft],
