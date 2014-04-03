@@ -203,7 +203,7 @@ public class GuidageController : MonoBehaviour
 						}
 
 						if (nouvelAssiste != lastAssiste) {
-							cureMode.Burst(kPositionBas);
+							cureMode.Burst(kPositionHaut);
 							lastAssiste = nouvelAssiste;
 						}
 
@@ -333,6 +333,6 @@ public class GuidageController : MonoBehaviour
 				return (int)(((completion - seuilChargement) / (1.0f - seuilChargement)) * (chargement.Length - 1));
 		}
 
-	private Vector3 kPositionBas = new Vector3(3.105135f,  -6.09929f,  5.040071f);
+	private Vector3 kPositionBas = new Vector3(0.9050451f,  -4.890831f,  3.052823f);
 	private Vector3 kPositionHaut = new Vector3(1.884743f,  -0.069542f,  9.466908f);
 }

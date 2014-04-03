@@ -102,6 +102,10 @@ public class MoveJointsForGuitar : MonoBehaviour {
 		for (int i = 0; i < kalman.Length; ++i) {
 			if (i == (int)Skeleton.Joint.HandRight || i == (int)Skeleton.Joint.WristRight) {
 				kalman[i] = new Kalman(1.0f);
+			} else if (i == (int)Skeleton.Joint.AnkleLeft || i == (int)Skeleton.Joint.AnkleRight ||
+			           i == (int)Skeleton.Joint.FootLeft || i == (int)Skeleton.Joint.FootRight ||
+			           i == (int)Skeleton.Joint.KneeLeft || i == (int)Skeleton.Joint.FootRight) {
+				kalman[i] = new Kalman(4.0f);
 			} else {
 				kalman[i] = new Kalman(2.5f);
 			}

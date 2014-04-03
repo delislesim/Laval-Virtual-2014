@@ -142,7 +142,7 @@ public class CameraSolo : MonoBehaviour {
 	private Quaternion kRotationBaseCamera;
 
 	// Distances minimales par rapport aux hanches.
-	private Vector3 kDistanceMin = new Vector3(-2.0f, -1.0f, 2.5f);
+	private Vector3 kDistanceMin = new Vector3(-2.0f, -1.0f, 3.8f);
 
 	// Distances maximales par rapport aux hanches.
 	private Vector3 kDistanceMax = new Vector3(2.0f, 0.0f, 6.0f);
