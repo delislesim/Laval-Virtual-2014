@@ -10,8 +10,16 @@ public enum typeGuidage
 		TUTORIEL,
 }
 
+public enum LastAssiste {
+	ASSISTE,
+	LIBRE,
+	AUCUN
+}
+
 public class GuidageController : MonoBehaviour
 {
+		public CureMode cureMode;
+
 		public GUISkin skinGuidage;
 		public float rectWidth;
 		public float rectHeight;
@@ -40,6 +48,8 @@ public class GuidageController : MonoBehaviour
 	private bool isOverridenAnimationFinished = false;
 	private const float overridenAnimationTime = 1.0f;
 	private float elapsedAnimationTime = 0;
+
+	private LastAssiste lastAssiste = LastAssiste.AUCUN;
 
 		public static GuidageController ObtenirInstance ()
 		{
@@ -108,6 +118,8 @@ public class GuidageController : MonoBehaviour
 		// Update is called once per frame
 		void OnGUI ()
 		{
+				LastAssiste nouvelAssiste;
+
 				GUI.skin = skinGuidage;
 
 				string mode;
@@ -150,10 +162,18 @@ public class GuidageController : MonoBehaviour
 			//Afficher le mode (assité ou libre)
 						GUI.BeginGroup (new Rect (Screen.width - rectWidthMode*1.2f, Screen.height - rectHeightMode, rectWidthMode, rectHeightMode));
 						if (AssistedModeControllerGuitar.EstActive () || DrumAssistedController.EstActive ()) {
+								nouvelAssiste = LastAssiste.ASSISTE;
 								mode = "Mode assisté";
 						} else {
+								nouvelAssiste = LastAssiste.LIBRE;
 								mode = "Mode libre";
 						}
+						if (nouvelAssiste != lastAssiste) {
+							cureMode.Burst(kPositionBas);
+							lastAssiste = nouvelAssiste;
+						}
+
+
 						GUI.Label (new Rect (0, 0, rectWidthMode, rectHeightMode), mode);
 						GUI.EndGroup ();
 						break;
@@ -173,11 +193,20 @@ public class GuidageController : MonoBehaviour
 
 			//Afficher le mode (assité ou libre)
 						GUI.BeginGroup (new Rect (Screen.width - rectWidthMode*1.2f, 0, rectWidthMode, rectHeightMode));
+
 						if (AssistedModeControllerPiano.EstActive ()) {
+								nouvelAssiste = LastAssiste.ASSISTE;
 								mode = "Mode assisté";
 						} else {
+								nouvelAssiste = LastAssiste.LIBRE;
 								mode = "Mode libre";
 						}
+
+						if (nouvelAssiste != lastAssiste) {
+							cureMode.Burst(kPositionBas);
+							lastAssiste = nouvelAssiste;
+						}
+
 						GUI.Label (new Rect (0, 0, rectWidthMode, rectHeightMode), mode);
 						GUI.EndGroup ();
 						break;
@@ -293,11 +322,17 @@ public class GuidageController : MonoBehaviour
 
 		public void changerGuidage (typeGuidage type)
 		{
-				typeGuidage = type;
+				if (typeGuidage != type) {
+					lastAssiste = LastAssiste.AUCUN;
+					typeGuidage = type;
+				}
 		}
 
 		private int indexChargement (float completion)//[0,1]
 		{
 				return (int)(((completion - seuilChargement) / (1.0f - seuilChargement)) * (chargement.Length - 1));
 		}
+
+	private Vector3 kPositionBas = new Vector3(3.105135f,  -6.09929f,  5.040071f);
+	private Vector3 kPositionHaut = new Vector3(1.884743f,  -0.069542f,  9.466908f);
 }
