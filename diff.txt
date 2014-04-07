@@ -1,0 +1,161 @@
+diff --git a/AirInstruments/Assets/ControleursJeu/GameState/GameState.cs b/AirInstruments/Assets/ControleursJeu/GameState/GameState.cs
+index 114b489..660e0ef 100644
+--- a/AirInstruments/Assets/ControleursJeu/GameState/GameState.cs
++++ b/AirInstruments/Assets/ControleursJeu/GameState/GameState.cs
+@@ -25,6 +25,8 @@ public class GameState : MonoBehaviour {
+ 	// Effets de lumiere et de fumee du drum.
+ 	public SpotCouleurDrumMaster spotCouleurDrum;
+ 
++	private GuidageController guidageController;
++
+ 	// Retourne l'unique instance de la classe GameState.
+ 	public static GameState ObtenirInstance() {
+ 		return instance;
+@@ -37,21 +39,39 @@ public class GameState : MonoBehaviour {
+ 	void Start () {
+ 		// Activer l'etat initial de choix d'instrument.
+ 		AccederEtat (State.ChooseInstrument);
++		guidageController = GuidageController.ObtenirInstance();
+ 	}
+ 
+ 	void Update() {
++
++		if(needToCheckAnimation){
++			if(guidageController.getAniamtionStatus()){
++				AccederEtat(nextState);
++				needToCheckAnimation = false;
++			}
++		}
++
+ 		// Changements d'etat a l'aide du clavier.
+ 		if (Input.GetButtonDown("ChoixInstrument")) {
+ 			AccederEtat (State.ChooseInstrument);
+ 			return;
+ 		} else if (Input.GetButtonDown("Piano")) {
+-			AccederEtat (State.Piano);
++			needToCheckAnimation = true;
++			nextState = State.Piano;
++			guidageController.overrideGeste(GestureId.GESTURE_PIANO);
++			//AccederEtat (State.Piano);
+ 			return;
+ 		} else if (Input.GetButtonDown("Drum")) {
+-			AccederEtat (State.Drum);
++			needToCheckAnimation = true;
++			nextState = State.Drum;
++			guidageController.overrideGeste(GestureId.GESTURE_DRUM);
++			//AccederEtat (State.Drum);
+ 			return;
+ 		} else if (Input.GetButtonDown("Guitare")) {
+-			AccederEtat (State.Guitar);
++			needToCheckAnimation = true;
++			nextState = State.Guitar;
++			guidageController.overrideGeste(GestureId.GESTURE_GUITAR);
++			//AccederEtat (State.Guitar);
+ 			return;
+ 		} else if (Input.GetKey (KeyCode.Escape)) {
+ 			Application.Quit ();
+@@ -187,6 +207,12 @@ public class GameState : MonoBehaviour {
+ 	// Etat precedent.
+ 	private GameState.State previousState = State.Unknown;
+ 
++	// Etat suivant
++	private GameState.State nextState = State.Unknown;
++
++	// Check animation
++	bool needToCheckAnimation = false;
++
+ 	// Indique si la transition vers l'etat courant est terminee.
+ 	private bool transitionTerminee = true;
+ 
+diff --git a/AirInstruments/Assets/ControleursJeu/Guidage/GuidageController.cs b/AirInstruments/Assets/ControleursJeu/Guidage/GuidageController.cs
+index 1ef8a2b..88f5714 100644
+--- a/AirInstruments/Assets/ControleursJeu/Guidage/GuidageController.cs
++++ b/AirInstruments/Assets/ControleursJeu/Guidage/GuidageController.cs
+@@ -35,6 +35,12 @@ public class GuidageController : MonoBehaviour
+ 		private const float kTempsAnimation = 1.0f;
+ 		private static GuidageController instance;
+ 
++	private bool isGesteOverriden = false;
++	private GestureId gestureOverriden;
++	private bool isOverridenAnimationFinished = false;
++	private float overridenAnimationTime = 2.5f;
++	private float elapsedAnimationTime = 0;
++
+ 		public static GuidageController ObtenirInstance ()
+ 		{
+ 				return instance;
+@@ -124,6 +130,8 @@ public class GuidageController : MonoBehaviour
+ 				int indexChargementAnimation = 0;
+ 				bool pasChargement = true;
+ 
++		elapsedAnimationTime += Time.deltaTime;
++
+ 				switch (typeGuidage) {
+ 				case typeGuidage.GUITARE_DRUM:
+ 						if (gestureEnCours == GestureId.GESTURE_MENU && completionMenu >= seuilChargement) {
+@@ -179,16 +187,32 @@ public class GuidageController : MonoBehaviour
+ 								if (indexAnimation >= guitarGesture.Length) {
+ 										indexAnimation = guitarGesture.Length - 1;
+ 								}
++			GUI.BeginGroup (rectangleMenu, skinGuidage.customStyles [0]);
+ 
+-								GUI.BeginGroup (rectangleMenu, skinGuidage.customStyles [0]);
++			if(gestureOverriden == GestureId.GESTURE_PIANO && isGesteOverriden){
++				if((elapsedAnimationTime/overridenAnimationTime+seuilChargement) >= 1.0f) {
++					isGesteOverriden = false;
++					isOverridenAnimationFinished = true;
++					pasChargement = true;
++					elapsedAnimationTime=0.0f;
++				} else {
++					indexChargementAnimation = indexChargement ((elapsedAnimationTime/overridenAnimationTime)+seuilChargement);
++					Debug.Log ("completion : " + (elapsedAnimationTime/overridenAnimationTime));
++					Debug.Log ("index : " + indexChargementAnimation);
++					pasChargement = false;
++					//gestureEnCours = gestureOverriden
++				}
++			}
++			else{
++					// L'animation du piano
++					if (gestureEnCours == GestureId.GESTURE_PIANO && completionPiano >= seuilChargement) {
++							pasChargement = false;
++							indexChargementAnimation = indexChargement (completionPiano);
++					} else {
++							pasChargement = true;
++					}
++			}
+ 
+-								// L'animation du piano
+-								if (gestureEnCours == GestureId.GESTURE_PIANO && completionPiano >= seuilChargement) {
+-										pasChargement = false;
+-										indexChargementAnimation = indexChargement (completionPiano);
+-								} else {
+-										pasChargement = true;
+-								}
+ 								GUI.BeginGroup (new Rect (rectWidthMenuPrincipal * 0.75f, 0, rectWidthMenuPrincipal, rectHeightMenuPrincipal));
+ 								GUI.DrawTexture (new Rect (0, 0, rectWidthMenuPrincipal, rectHeightMenuPrincipal), menuBackground, ScaleMode.ScaleToFit);
+ 								GUI.DrawTexture (new Rect (0, 0, rectWidthMenuPrincipal, rectHeightMenuPrincipal), pianoGesture [indexAnimation], ScaleMode.ScaleToFit);
+@@ -230,12 +254,23 @@ public class GuidageController : MonoBehaviour
+ 				}
+ 		}
+ 
++	public void overrideGeste(GestureId gesture){
++		isOverridenAnimationFinished = false;
++		elapsedAnimationTime = 0.0f;
++		gestureOverriden = gesture;
++		isGesteOverriden = true;
++	}
++
++	public bool getAniamtionStatus(){
++		return isOverridenAnimationFinished;
++	}
++
+ 		public void changerGuidage (typeGuidage type)
+ 		{
+ 				typeGuidage = type;
+ 		}
+ 
+-		private int indexChargement (float completion)
++		private int indexChargement (float completion)//[0,1]
+ 		{
+ 				return (int)(((completion - seuilChargement) / (1.0f - seuilChargement)) * (chargement.Length - 1));
+ 		}

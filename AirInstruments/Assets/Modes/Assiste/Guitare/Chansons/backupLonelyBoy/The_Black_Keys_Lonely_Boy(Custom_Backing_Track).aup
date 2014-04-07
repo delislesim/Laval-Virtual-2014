@@ -1,6 +1,6 @@
 <?xml version="1.0" standalone="no" ?>
 <!DOCTYPE project PUBLIC "-//audacityproject-1.3.0//DTD//EN" "http://audacity.sourceforge.net/xml/audacityproject-1.3.0.dtd" >
-<project xmlns="http://audacity.sourceforge.net/xml/" projname="Lonely Boy Audacity_data" version="1.3.0" audacityversion="2.0.5" sel0="86.9652641879" sel1="86.9652641879" vpos="0" h="83.8654365856" zoom="288.0805369128" rate="44100.0">
+<project xmlns="http://audacity.sourceforge.net/xml/" projname="The_Black_Keys_Lonely_Boy(Custom_Backing_Track)_data" version="1.3.0" audacityversion="2.0.5" sel0="4.7764420837" sel1="4.7764420837" vpos="0" h="20.0846612618" zoom="288.0805369128" rate="44100.0">
 	<tags>
 		<tag name="GENRE" value="Rock"/>
 		<tag name="ARTIST" value="The Black Keys"/>
@@ -13,7 +13,7 @@
 		<tag name="Lyricist" value="Daniel Auerbach/Patrick Carney/Brian Joseph Burton"/>
 		<tag name="ALBUM" value="Karaoke Version"/>
 	</tags>
-	<wavetrack name="The_Black_Keys_Lonely_Boy(Custom_Backing_Track)" channel="0" linked="1" mute="0" solo="0" height="150" minimized="0" isSelected="0" rate="44100" gain="1.0" pan="0.0">
+	<wavetrack name="The_Black_Keys_Lonely_Boy(Custom_Backing_Track)" channel="0" linked="1" mute="0" solo="0" height="150" minimized="0" isSelected="1" rate="44100" gain="1.0" pan="0.0">
 		<waveclip offset="0.00000000">
 			<sequence maxsamples="262144" sampleformat="262159" numsamples="6035573">
 				<waveblock start="0">
@@ -92,7 +92,7 @@
 			<envelope numpoints="0"/>
 		</waveclip>
 	</wavetrack>
-	<wavetrack name="The_Black_Keys_Lonely_Boy(Custom_Backing_Track)" channel="1" linked="0" mute="0" solo="0" height="150" minimized="0" isSelected="0" rate="44100" gain="1.0" pan="0.0">
+	<wavetrack name="The_Black_Keys_Lonely_Boy(Custom_Backing_Track)" channel="1" linked="0" mute="0" solo="0" height="150" minimized="0" isSelected="1" rate="44100" gain="1.0" pan="0.0">
 		<waveclip offset="0.00000000">
 			<sequence maxsamples="262144" sampleformat="262159" numsamples="6035573">
 				<waveblock start="0">
@@ -171,8 +171,7 @@
 			<envelope numpoints="0"/>
 		</waveclip>
 	</wavetrack>
-	<labeltrack name="Label Track" numlabels="512" height="158" minimized="0" isSelected="1">
-		<label t="0.00000000" t1="0.00000000" title="-E0"/>
+	<labeltrack name="Label Track" numlabels="510" height="158" minimized="0" isSelected="0">
 		<label t="5.14563104" t1="5.14563104" title="-E0"/>
 		<label t="5.36331811" t1="5.36331811" title="-E0"/>
 		<label t="5.53746777" t1="5.53746777" title="-E0"/>
@@ -469,19 +468,19 @@
 		<label t="83.88237971" t1="83.88237971" title="-G0"/>
 		<label t="84.07104184" t1="84.07104184" title="-A0"/>
 		<label t="84.23067903" t1="84.23067903" title="-A0"/>
-		<label t="84.42083683" t1="84.42083683" title="-A0"/>
-		<label t="84.60828441" t1="84.60828441" title="-A0"/>
-		<label t="84.79226074" t1="84.79226074" title="-A0"/>
-		<label t="84.97623707" t1="84.97623707" title="-A0"/>
-		<label t="85.14979965" t1="85.14979965" title="-A0"/>
+		<label t="84.40482869" t1="84.40482869" title="-A0"/>
+		<label t="84.57897835" t1="84.57897835" title="-A0"/>
+		<label t="84.75312801" t1="84.75312801" title="-A0"/>
+		<label t="84.94179014" t1="84.94179014" title="-A0"/>
+		<label t="85.13045227" t1="85.13045227" title="-A0"/>
 		<label t="85.30460193" t1="85.30460193" title="-A0"/>
-		<label t="85.49345355" t1="85.49345355" title="-E0"/>
-		<label t="85.66354487" t1="85.66354487" title="-E0"/>
-		<label t="85.83710745" t1="85.83710745" title="-E0"/>
-		<label t="86.02108378" t1="86.02108378" title="-E0"/>
-		<label t="86.20853136" t1="86.20853136" title="-G0"/>
-		<label t="86.58689777" t1="86.58689777" title="-E0"/>
-		<label t="86.76393160" t1="86.76393160" title="-E0"/>
+		<label t="85.52228900" t1="85.52228900" title="-E0"/>
+		<label t="85.71095114" t1="85.71095114" title="-E0"/>
+		<label t="85.88510080" t1="85.88510080" title="-E0"/>
+		<label t="86.05925046" t1="86.05925046" title="-E0"/>
+		<label t="86.26242506" t1="86.26242506" title="-G0"/>
+		<label t="86.59621191" t1="86.59621191" title="-E0"/>
+		<label t="86.78487404" t1="86.78487404" title="-E0"/>
 		<label t="87.13317336" t1="87.13317336" title="-E0"/>
 		<label t="87.32183549" t1="87.32183549" title="-E0"/>
 		<label t="87.49598515" t1="87.49598515" title="-E0"/>
@@ -528,13 +527,13 @@
 		<label t="96.58079241" t1="96.58079241" title="-E0"/>
 		<label t="96.75494207" t1="96.75494207" title="-E0"/>
 		<label t="96.94360420" t1="96.94360420" title="-E0"/>
-		<label t="97.29190352" t1="97.29190352" title="+E2"/>
-		<label t="97.64020284" t1="97.64020284" title="+E2"/>
-		<label t="98.35131395" t1="98.35131395" title="+E2"/>
-		<label t="98.52546361" t1="98.52546361" title="+D1"/>
-		<label t="98.88827540" t1="98.88827540" title="+B1"/>
-		<label t="99.25108719" t1="99.25108719" title="+G1"/>
-		<label t="99.43974932" t1="99.43974932" title="+A1"/>
+		<label t="97.29190352" t1="97.29190352" title="-E2"/>
+		<label t="97.64020284" t1="97.64020284" title="-E2"/>
+		<label t="98.35131395" t1="98.35131395" title="-E2"/>
+		<label t="98.52546361" t1="98.52546361" title="D1"/>
+		<label t="98.88827540" t1="98.88827540" title="-B1"/>
+		<label t="99.25108719" t1="99.25108719" title="-G1"/>
+		<label t="99.43974932" t1="99.43974932" title="-A1"/>
 		<label t="100.10732302" t1="100.10732302" title="-A1"/>
 		<label t="100.49915975" t1="100.49915975" title="-A1"/>
 		<label t="101.18124592" t1="101.18124592" title="-A1"/>
@@ -542,13 +541,13 @@
 		<label t="101.76174479" t1="101.76174479" title="-E1"/>
 		<label t="102.12455658" t1="102.12455658" title="-D0"/>
 		<label t="102.31321871" t1="102.31321871" title="-E1"/>
-		<label t="102.93725499" t1="102.93725499" title="+E2"/>
-		<label t="103.30006678" t1="103.30006678" title="+E2"/>
-		<label t="104.04020284" t1="104.04020284" title="+E2"/>
-		<label t="104.22886497" t1="104.22886497" title="+D1"/>
-		<label t="104.59167676" t1="104.59167676" title="+B1"/>
-		<label t="104.93997608" t1="104.93997608" title="+G1"/>
-		<label t="105.14315068" t1="105.14315068" title="+A1"/>
+		<label t="102.93725499" t1="102.93725499" title="-E2"/>
+		<label t="103.30006678" t1="103.30006678" title="-E2"/>
+		<label t="104.04020284" t1="104.04020284" title="-E2"/>
+		<label t="104.22886497" t1="104.22886497" title="-D1"/>
+		<label t="104.59167676" t1="104.59167676" title="-B1"/>
+		<label t="104.93997608" t1="104.93997608" title="-G1"/>
+		<label t="105.14315068" t1="105.14315068" title="-A1"/>
 		<label t="105.81072438" t1="105.81072438" title="-A1"/>
 		<label t="106.20256111" t1="106.20256111" title="-A1"/>
 		<label t="106.87013481" t1="106.87013481" title="-A1"/>
@@ -683,6 +682,5 @@
 		<label t="130.81571304" t1="130.81571304" title="-A0"/>
 		<label t="130.98986270" t1="130.98986270" title="-A0"/>
 		<label t="131.19303730" t1="131.19303730" title="-E0"/>
-		<label t="136.85061970" t1="136.85061970" title="-E0"/>
 	</labeltrack>
 </project>
