@@ -43,6 +43,8 @@ public class PianoController : MonoBehaviour, InstrumentControllerInterface {
 
 	// Methode appelee quand l'instrument "piano" est choisi.
 	void OnEnable() {
+		menuActif = false;
+
 		pianoWrapper.SetActive (true);
 
 		// Demarrer le tutorial.

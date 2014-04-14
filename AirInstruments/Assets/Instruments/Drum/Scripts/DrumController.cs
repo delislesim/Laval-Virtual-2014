@@ -101,6 +101,8 @@ public class DrumController : MonoBehaviour, InstrumentControllerInterface {
 
 	// Methode appelee quand l'instrument "drum" est choisi.
 	void OnEnable() {
+		menuActif = false;
+
 		DrumAssistedController.DefinirInsance (assistedcontroller);
 
 		dude.gameObject.SetActive (true);
